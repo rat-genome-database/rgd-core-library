@@ -1431,11 +1431,6 @@ public class PhenominerDAO extends AbstractDAO {
         r.setMeasurementMethodId(this.insertMeasurementMethod(r.getMeasurementMethod()));
         r.setSampleId(this.insertSample(r.getSample()));
 
-        for (Condition cond: r.getConditions()) {
-            cond.setExperimentRecordId(expRecId);
-            this.insertCondition(cond);
-        }
-
         String query = "INSERT INTO experiment_record (clinical_measurement_id, experiment_id, " +
                 "curation_status, last_modified_date, measurement_method_id, sample_id, measurement_sd, measurement_sem, " +
                 "measurement_units, measurement_value, measurement_error,experiment_record_id, class, has_individual_record, "+
@@ -1455,6 +1450,12 @@ public class PhenominerDAO extends AbstractDAO {
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
                 r.getMeasurementUnits(), r.getMeasurementValue(), r.getMeasurementError(), expRecId, hasIndividualRecord,
                 speciesTypeKey);
+
+        // conditions must be added after the experiment record was inserted, due to referential integrity constraints
+        for (Condition cond: r.getConditions()) {
+            cond.setExperimentRecordId(expRecId);
+            this.insertCondition(cond);
+        }
 
         return expRecId;
     }
