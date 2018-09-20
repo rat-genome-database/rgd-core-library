@@ -28,10 +28,6 @@ public class PhenominerDAO extends AbstractDAO {
     final int CURATION_STATUS = 40; // experiment records visible in phenominer
 
 
-    public PhenominerDAO() {
-
-    }
-
     /**
      * return a study given a study id
      * @param id study id
@@ -357,9 +353,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE clinical_measurement_ont_id=? AND r.clinical_measurement_id=c.clinical_measurement_id AND curation_status=?";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT COUNT(1) FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r "+
-                    "WHERE exp_cond_ont_id=? AND x.experiment_condition_id=g.experiment_condition_id "+
-                        "AND g.condition_group_id=r.condition_group_id AND r.curation_status=?";
+            query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r "+
+                    "WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id AND r.curation_status=?";
         }
         else {
             // bad ontology
@@ -392,9 +387,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE clinical_measurement_ont_id=? AND r.clinical_measurement_id=c.clinical_measurement_id";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT COUNT(1) FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r "+
-                    "WHERE exp_cond_ont_id=? AND x.experiment_condition_id=g.experiment_condition_id "+
-                    "AND g.condition_group_id=r.condition_group_id";
+            query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r "+
+                    "WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id";
         }
         else {
             // bad ontology
@@ -455,9 +449,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT COUNT(1) FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "WHERE r.curation_status=? AND g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n"+
-                        "AND exp_cond_ont_id IN(\n";
+            query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r\n"+
+                    "WHERE r.curation_status=? AND x.experiment_record_id=g.experiment_record_id AND exp_cond_ont_id IN(\n";
         }
         else {
             // bad ontology
@@ -496,9 +489,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND r.species_type_key=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT COUNT(1) FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "WHERE r.curation_status=? AND r.species_type_key=? AND g.condition_group_id=r.condition_group_id\n"+
-                    " AND x.experiment_condition_id=g.experiment_condition_id AND exp_cond_ont_id IN(\n";
+            query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r\n"+
+                    "WHERE r.curation_status=? AND r.species_type_key=? AND x.experiment_record_id=r.experiment_record_id AND exp_cond_ont_id IN(\n";
         }
         else {
             // bad ontology
@@ -568,8 +560,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND species_type_key=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "WHERE r.curation_status=? AND species_type_key=? AND g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n"+
+            query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,experiment_record r\n"+
+                    "WHERE r.curation_status=? AND species_type_key=? AND x.experiment_record_id=r.experiment_record_id\n"+
                     "AND exp_cond_ont_id IN(\n";
         }
         else {
@@ -681,8 +673,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND species_type_key=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id=?";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "WHERE r.curation_status=? AND species_type_key=? AND g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n"+
+            query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,experiment_record r\n"+
+                    "WHERE r.curation_status=? AND species_type_key=? AND x.experiment_record_id=r.experiment_record_id\n"+
                     "AND exp_cond_ont_id=?";
         }
         else {
@@ -737,8 +729,8 @@ public class PhenominerDAO extends AbstractDAO {
                 query = "SELECT COUNT(1) FROM clinical_measurement c,experiment_record r\n" +
                         "WHERE r.curation_status=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
             } else if (accId.startsWith("XCO:")) {
-                query = "SELECT COUNT(1) FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n" +
-                        "WHERE r.curation_status=? AND g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n" +
+                query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r\n" +
+                        "WHERE r.curation_status=? AND x.experiment_record_id=r.experiment_record_id\n" +
                         "AND exp_cond_ont_id IN(\n";
             } else {
                 // bad ontology
@@ -804,9 +796,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND clinical_measurement_ont_id=? AND r.clinical_measurement_id=c.clinical_measurement_id";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r "+
-                    "WHERE r.curation_status=? AND exp_cond_ont_id=? AND x.experiment_condition_id=g.experiment_condition_id "+
-                        "AND g.condition_group_id=r.condition_group_id";
+            query = "SELECT DISTINCT experiment_record_id FROM experiment_condition x,experiment_record r "+
+                    "WHERE r.curation_status=? AND exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id";
         }
         else {
             // bad ontology
@@ -847,9 +838,8 @@ public class PhenominerDAO extends AbstractDAO {
         else if( accId.startsWith("XCO:") ) {
             query = "SELECT DISTINCT strain_ont_id FROM experiment_record r,sample s " +
                     "WHERE r.curation_status=? AND s.sample_id=r.sample_id AND experiment_record_id IN(" +
-                    "  SELECT experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r "+
-                    "  WHERE exp_cond_ont_id=? AND x.experiment_condition_id=g.experiment_condition_id "+
-                        "AND g.condition_group_id=r.condition_group_id)";
+                    "  SELECT experiment_record_id FROM experiment_condition x,experiment_record r "+
+                    "  WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id)";
         }
         else {
             // bad ontology
@@ -882,8 +872,8 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "WHERE r.curation_status=? AND g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n"+
+            query = "SELECT DISTINCT experiment_record_id FROM experiment_condition x,experiment_record r\n"+
+                    "WHERE r.curation_status=? AND x.experiment_record_id=r.experiment_record_id\n"+
                         "AND exp_cond_ont_id IN(\n";
         }
         else {
@@ -937,9 +927,8 @@ public class PhenominerDAO extends AbstractDAO {
         else if( accId.startsWith("XCO:") ) {
             query = "SELECT DISTINCT strain_ont_id FROM experiment_record r,sample s " +
                     "WHERE r.curation_status=? AND s.sample_id=r.sample_id AND experiment_record_id IN(" +
-                    "  SELECT experiment_record_id FROM experiment_condition x,cond_group_experiment_cond g,experiment_record r\n"+
-                    "  WHERE g.condition_group_id=r.condition_group_id AND x.experiment_condition_id=g.experiment_condition_id\n"+
-                        "AND exp_cond_ont_id IN(\n";
+                    "  SELECT experiment_record_id FROM experiment_condition x,experiment_record r\n"+
+                    "  WHERE x.experiment_record_id=r.experiment_record_id AND exp_cond_ont_id IN(\n";
         }
         else {
             // bad ontology
@@ -1009,7 +998,7 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         Record rec = studies.get(0);
-        rec.setConditions(this.getConditions(rec.getConditionGroupId()));
+        rec.setConditions(this.getConditions(rec.getId()));
         return rec;
     }
 
@@ -1032,7 +1021,7 @@ public class PhenominerDAO extends AbstractDAO {
         List<Record> records = execute(q, experimentId);
 
         for (Record rec: records) {
-            rec.setConditions(this.getConditions(rec.getConditionGroupId()));
+            rec.setConditions(this.getConditions(rec.getId()));
         }
 
         return records;
@@ -1127,33 +1116,16 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void deleteExperimentCondition(int ecId) throws Exception{
 
-        this.deleteExperimentConditionMapping(ecId);
-
         String sql = "delete from experiment_condition where experiment_condition_id=?";
         update(sql, ecId);
     }
 
     /**
-     * delete an experiment condition mapping from the datastore
-     * @param ecId
-     * @throws Exception
-     */
-    private void deleteExperimentConditionMapping(int ecId) throws Exception{
-
-        String sql = "delete from cond_group_experiment_cond where experiment_condition_id=?";
-        update(sql, ecId);
-    }
-
-    /**
      * delete a list of conditions from the datastore
-     * @param groupId
      * @param conditions
      * @throws Exception
      */
-    public void deleteExperimentConditions(int groupId, List<Condition> conditions) throws Exception{
-
-        String sql = "delete from cond_group_experiment_cond where condition_group_id=?";
-        update(sql, groupId);
+    public void deleteExperimentConditions(List<Condition> conditions) throws Exception{
 
         for (Condition cond: conditions) {
             this.deleteExperimentCondition(cond.getId());
@@ -1217,7 +1189,7 @@ public class PhenominerDAO extends AbstractDAO {
             e.printStackTrace();
         }
         try {
-            this.deleteExperimentConditions(rec.getConditionGroupId(), rec.getConditions());
+            this.deleteExperimentConditions(rec.getConditions());
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -1380,46 +1352,17 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
-     * Insert a condition group mapping in the datastore
-     * @param groupId group id
-     * @param conditionId condition id
-     * @throws Exception
-     */
-    private void insertConditionGroupMapping(int groupId, int conditionId) throws Exception {
-        String query = "INSERT INTO cond_group_experiment_cond (condition_group_id, experiment_condition_id) " +
-                "VALUES (?,?)";
-        update(query, groupId, conditionId);
-    }
-
-    /**
-     * Insert a condition group in the datastore
-     * @param notes condition group notes
-     * @return
-     * @throws Exception
-     */
-    private int insertConditionGroup(String notes) throws Exception {
-        int next = this.getNextKey("condition_group_seq");
-
-        String query = "insert into condition_group (condition_group_id, condition_group_notes) " +
-                "values (?,?) ";
-        update(query, next, notes);
-
-        return next;
-    }
-
-    /**
-     * Inserta condition in the datastore
-     * @param groupId
+     * Insert a condition in the datastore
      * @param c
      * @throws Exception
      */
-    public int insertCondition(int groupId, Condition c) throws Exception{
+    public int insertCondition(Condition c) throws Exception{
 
         int next = this.getNextKey("experiment_condition_seq");
 
         String query = "insert into experiment_condition (exp_cond_ordinality, exp_cond_assoc_units, exp_cond_assoc_value_min, exp_cond_assoc_value_max," +
                 "exp_cond_dur_sec_low_bound, exp_cond_dur_sec_high_bound, exp_cond_notes, exp_cond_ont_id, exp_cond_application_method " +
-                ", experiment_condition_id) values (?,?,?,?,?,?,?,?,?,?)  ";
+                ", experiment_condition_id, experiment_record_id) values (?,?,?,?,?,?,?,?,?,?,?)";
 
         SqlUpdate su = new SqlUpdate(this.getDataSource(),query);
 
@@ -1459,17 +1402,17 @@ public class PhenominerDAO extends AbstractDAO {
 
         su.declareParameter(new SqlParameter(Types.DOUBLE)); // last modified date
         su.declareParameter(new SqlParameter(Types.DOUBLE)); // last modified date
-        su.declareParameter(new SqlParameter(Types.CLOB)); // last modified date
         su.declareParameter(new SqlParameter(Types.VARCHAR)); // last modified date
         su.declareParameter(new SqlParameter(Types.VARCHAR)); // last modified date
-        su.declareParameter(new SqlParameter(Types.INTEGER)); // last modified date
+        su.declareParameter(new SqlParameter(Types.VARCHAR)); // last modified date
+        su.declareParameter(new SqlParameter(Types.INTEGER));
+        su.declareParameter(new SqlParameter(Types.INTEGER));
 
         su.compile();
-        int upVal = su.update(new Object[]{c.getOrdinality(), c.getUnits(), valueMin, valueMax,
-                c.getDurationLowerBound(), c.getDurationUpperBound(), new SqlLobValue(c.getNotes()), c.getOntologyId(),
-                c.getApplicationMethod(), next});
+        su.update(new Object[]{c.getOrdinality(), c.getUnits(), valueMin, valueMax,
+                c.getDurationLowerBound(), c.getDurationUpperBound(), c.getNotes(), c.getOntologyId(),
+                c.getApplicationMethod(), next, c.getExperimentRecordId()});
 
-        this.insertConditionGroupMapping(groupId, next);
         return next;
     }
 
@@ -1487,17 +1430,17 @@ public class PhenominerDAO extends AbstractDAO {
         r.setClinicalMeasurementId(this.insertClinicalMeasurement(r.getClinicalMeasurement()));
         r.setMeasurementMethodId(this.insertMeasurementMethod(r.getMeasurementMethod()));
         r.setSampleId(this.insertSample(r.getSample()));
-        r.setConditionGroupId(this.insertConditionGroup(""));
 
         for (Condition cond: r.getConditions()) {
-            this.insertCondition(r.getConditionGroupId(), cond);
+            cond.setExperimentRecordId(expRecId);
+            this.insertCondition(cond);
         }
 
-        String query = "INSERT INTO experiment_record (clinical_measurement_id, condition_group_id, experiment_id, " +
+        String query = "INSERT INTO experiment_record (clinical_measurement_id, experiment_id, " +
                 "curation_status, last_modified_date, measurement_method_id, sample_id, measurement_sd, measurement_sem, " +
                 "measurement_units, measurement_value, measurement_error,experiment_record_id, class, has_individual_record, "+
                 "species_type_key) VALUES( " +
-                "?,?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?)";
+                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?)";
 
         int hasIndividualRecord = r.getHasIndividualRecord() ? 1 : 0;
 
@@ -1508,7 +1451,7 @@ public class PhenominerDAO extends AbstractDAO {
             speciesTypeKey = SpeciesType.CHINCHILLA;
         }
 
-        update(query, r.getClinicalMeasurementId(), r.getConditionGroupId(), r.getExperimentId(), r.getCurationStatus(),
+        update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
                 r.getMeasurementUnits(), r.getMeasurementValue(), r.getMeasurementError(), expRecId, hasIndividualRecord,
                 speciesTypeKey);
@@ -1547,34 +1490,34 @@ public class PhenominerDAO extends AbstractDAO {
             if (cond.getId() > 0) {
                 this.updateCondition(cond);
             }else {
-                this.insertCondition(r.getConditionGroupId(), cond);
+                this.insertCondition(cond);
             }
         }
 
-        String query = "update experiment_record set clinical_measurement_id=?, condition_group_id=?, " +
-                "experiment_id=?, curation_status=?, last_modified_date=SYSTIMESTAMP, measurement_method_id=?, sample_id=?, measurement_sd=?, measurement_sem=?, " +
-                "measurement_units=?, measurement_value=?, measurement_error=? where experiment_record_id = ? ";
+        String query = "UPDATE experiment_record SET clinical_measurement_id=?, experiment_id=?, curation_status=?, " +
+                "last_modified_date=SYSTIMESTAMP, measurement_method_id=?, sample_id=?, measurement_sd=?, measurement_sem=?, " +
+                "measurement_units=?, measurement_value=?, measurement_error=? WHERE experiment_record_id=?";
 
-        update(query, r.getClinicalMeasurementId(), r.getConditionGroupId(),
-                r.getExperimentId(), r.getCurationStatus(), r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(),
-                r.getMeasurementSem(), r.getMeasurementUnits(), r.getMeasurementValue(),r.getMeasurementError(),
-                r.getId());
+        update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
+                r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
+                r.getMeasurementUnits(), r.getMeasurementValue(),r.getMeasurementError(), r.getId());
     }
 
     /**
-     * Returns a list of conditions based on a condition group id
-     * @param conditionGroupId condition group id
+     * Returns a list of conditions based on a experiment record id
+     * @param experimentRecordId experiment record id
      * @return list of Condition objects; could be empty
      * @throws Exception
      */
-    public List<Condition> getConditions(int conditionGroupId) throws Exception {
-        String query = "select * from cond_group_experiment_cond cgec, experiment_condition ec  where cgec.experiment_condition_id = ec.experiment_condition_id and cgec.condition_group_id=? order by ec.exp_cond_ordinality, ec.experiment_condition_id";
+    public List<Condition> getConditions(int experimentRecordId) throws Exception {
+        String query = "SELECT * FROM experiment_condition ec WHERE experiment_record_id=? "+
+                "ORDER BY ec.exp_cond_ordinality, ec.experiment_condition_id";
 
         ConditionQuery sq = new ConditionQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.INTEGER));
         sq.compile();
 
-        return sq.execute(conditionGroupId);
+        return sq.execute(experimentRecordId);
     }
 
     /**
@@ -1683,12 +1626,11 @@ public class PhenominerDAO extends AbstractDAO {
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
                 "from " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                "cond_group_experiment_cond cgec, experiment_condition ec\n" +
-                "where er.sample_id = s1.sample_id\n" +
+                " experiment_condition ec\n" +
+                "WHERE er.sample_id = s1.sample_id\n" +
                 "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
                 "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.condition_group_id=cgec.condition_group_id\n" +
-                "and cgec.experiment_condition_id=ec.experiment_condition_id) er1 \n" +
+                "and er.experiment_record_id=ec.experiment_record_id) er1 \n" +
                 "on e.experiment_id = er1.experiment_id\n" +
                 "where \n" +
                 "not er1.experiment_record_id is null ");
@@ -1793,12 +1735,11 @@ public class PhenominerDAO extends AbstractDAO {
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                "cond_group_experiment_cond cgec, experiment_condition ec\n" +
-                "where er.sample_id = s1.sample_id\n" +
+                " experiment_condition ec\n" +
+                "WHERE er.sample_id = s1.sample_id\n" +
                 "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
                 "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.condition_group_id=cgec.condition_group_id\n" +
-                "and cgec.experiment_condition_id=ec.experiment_condition_id) er1 \n" +
+                " AND er.experiment_record_id=ec.experiment_record_id) er1 \n" +
                 "on e.experiment_id = er1.experiment_id\n" +
                 "where \n" +
                 "1=1 ";
@@ -1917,12 +1858,11 @@ public class PhenominerDAO extends AbstractDAO {
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                "cond_group_experiment_cond cgec, experiment_condition ec\n" +
-                "where er.sample_id = s1.sample_id\n" +
+                "experiment_condition ec\n" +
+                "WHERE er.sample_id = s1.sample_id\n" +
                 "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
                 "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.condition_group_id=cgec.condition_group_id\n" +
-                "and cgec.experiment_condition_id=ec.experiment_condition_id) er1 \n" +
+                "and er.experiment_record_id=ec.experiment_record_id) er1 \n" +
                 "on e.experiment_id = er1.experiment_id\n" +
                 "where \n" +
                 "not e.experiment_id is null ";
@@ -2011,16 +1951,12 @@ public class PhenominerDAO extends AbstractDAO {
         if (recordIDs != null && recordIDs.size() > 0) {
             String IDs = Utils.concatenate(recordIDs, ",");
 
-            String query = "select ord_counts, count(*) from ( " +
-                    "select count(*) as ord_counts " +
-                    "from " +
-                    "EXPERIMENT_CONDITION ec, " +
-                    "COND_GROUP_EXPERIMENT_COND cgec, " +
-                    "experiment_record er " +
-                    "where " +
+            String query = "SELECT ord_counts, COUNT(*) FROM ( " +
+                    "SELECT COUNT(*) AS ord_counts " +
+                    "FROM experiment_condition ec, experiment_record er " +
+                    "WHERE " +
                     "er.experiment_record_id in (" + IDs + ") " +
-                    "and er.condition_group_id = cgec.condition_group_id " +
-                    "and ec.EXPERIMENT_CONDITION_ID = cgec.EXPERIMENT_CONDITION_ID " +
+                    "AND ec.experiment_record_id = er.experiment_record_id " +
                     "group by er.experiment_record_id) a " +
                     "group by a.ord_counts " +
                     "order by a.ord_counts desc";
@@ -2539,34 +2475,17 @@ public class PhenominerDAO extends AbstractDAO {
 
     private String buildInclauseForgetFullRecords(String colRef, List<String> ids) {
 
-        String query = "";
-
-        if (ids.size() > 0) {
-            query+= "and " + colRef + " in (";
+        if( ids.isEmpty() ) {
+            return "";
         }
 
-        int i=0;
-        for (String sampleId: ids) {
-
-            if (i > 0) {
-                query += ",";
-            }
-            query += "'" + sampleId + "'";
-            i++;
-        }
-
-        if (ids.size() > 0) {
-            query += ") ";
-        }
-
-
-
-
-        return query;
-
+        return "AND " + colRef + " IN ("
+                +Utils.buildInPhraseQuoted(ids)
+                +") ";
     }
 
 
+    /*
     public List<String> getCondtionGroupIds(List<String> experimentalConditionIds)  throws Exception{
 
         String sql = "select distinct condition_group_id from cond_group_experiment_cond cgec, experiment_condition ec " +
@@ -2575,11 +2494,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         return StringListQuery.execute(this, sql);
     }
-
+*/
     public String getCondtionGroupIdsSQL(List<String> experimentalConditionIds)  throws Exception{
 
-        String sql = "select distinct condition_group_id from cond_group_experiment_cond cgec, experiment_condition ec " +
-                " where cgec.experiment_condition_id=ec.experiment_condition_id ";
+        String sql = "SELECT DISTINCT experiment_record_id FROM experiment_condition ec " +
+                "WHERE 1=1 ";
 
         sql +=  this.buildInclauseForgetFullRecords("exp_cond_ont_id", experimentalConditionIds);
 
@@ -2593,8 +2512,8 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public List<Record> getFullRecords(List<String> sampleIds, List<String> measurementMethodIds, List<String> clinicalMeasurementIds, List<String> experimentalConditionIds , int speciesTypeKey) throws Exception {
 
-        String query = "select * from experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
-                "where er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id  " +
+        String query = "SELECT * FROM experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "WHERE er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id  " +
                 "and er.measurement_method_id=mm.measurement_method_id  " +
                 "and er.experiment_id=e.experiment_id and e.study_id=st.study_id " +
                 "and er.curation_status=40 and er.species_type_key=" + speciesTypeKey + " ";
@@ -2605,7 +2524,7 @@ public class PhenominerDAO extends AbstractDAO {
 
         String conditionGroupSQL = this.getCondtionGroupIdsSQL(experimentalConditionIds);
 
-        query += " and er.condition_group_id in (" + conditionGroupSQL + ")";
+        query += " and er.experiment_record_id in (" + conditionGroupSQL + ")";
 
         return runFullRecordsQuery(query);
     }
@@ -2650,7 +2569,7 @@ public class PhenominerDAO extends AbstractDAO {
         List<Record> recList = rq.execute();
 
         for (Record r: recList) {
-            r.setConditions(this.getConditions(r.getConditionGroupId()));
+            r.setConditions(this.getConditions(r.getId()));
 
             String conditionSetItem = "";
             int lastOrdinality = 1;

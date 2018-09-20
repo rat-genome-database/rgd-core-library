@@ -1,8 +1,5 @@
 package edu.mcw.rgd.datamodel.pheno;
 
-import edu.mcw.rgd.datamodel.ontologyx.Term;
-import edu.mcw.rgd.datamodel.ontologyx.Ontology;
-
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,13 +9,11 @@ import java.util.ArrayList;
  * User: jdepons
  * Date: 2/7/11
  * Time: 9:47 AM
- * To change this template use File | Settings | File Templates.
  */
 public class Record {
 
     private int id;
     private int clinicalMeasurementId;
-    private int conditionGroupId;
     private int experimentId;
     private String experimentName;
     private String experimentNotes;
@@ -34,7 +29,7 @@ public class Record {
     private Sample sample = new Sample();
     private MeasurementMethod measurementMethod = new MeasurementMethod();
     private ClinicalMeasurement clinicalMeasurement = new ClinicalMeasurement();
-    private List<Condition> conditions = new ArrayList();
+    private List<Condition> conditions = new ArrayList<>();
     private boolean hasIndividualRecord = false;
     private String conditionDescription = "";
 
@@ -180,15 +175,6 @@ public class Record {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-
-    public int getConditionGroupId() {
-        return conditionGroupId;
-    }
-
-    public void setConditionGroupId(int conditionGroupId) {
-        this.conditionGroupId = conditionGroupId;
     }
 
     public int getExperimentId() {

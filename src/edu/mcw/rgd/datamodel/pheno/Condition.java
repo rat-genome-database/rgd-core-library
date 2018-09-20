@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 public class Condition {
 
     private int id;
+    private int experimentRecordId;
     private Integer ordinality;
     private String units;
     private String valueMin;
@@ -45,6 +46,14 @@ public class Condition {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getExperimentRecordId() {
+        return experimentRecordId;
+    }
+
+    public void setExperimentRecordId(int experimentRecordId) {
+        this.experimentRecordId = experimentRecordId;
     }
 
     public Integer getOrdinality() {

@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.pheno.*;
-import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
@@ -13,12 +12,10 @@ import java.sql.SQLException;
  * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * To change this template use File | Settings | File Templates.
  */
 
 /**
- * Returns a row from the Alias table
+ * Returns a row from EXPERIMENT_RECORD table
  */
 public class RecordQuery extends MappingSqlQuery {
 
@@ -31,7 +28,6 @@ public class RecordQuery extends MappingSqlQuery {
         Record rec = new Record();
         rec.setId(rs.getInt("experiment_record_id"));
         rec.setClinicalMeasurementId(rs.getInt("clinical_measurement_id"));
-        rec.setConditionGroupId(rs.getInt("condition_group_id"));
         rec.setExperimentId(rs.getInt("experiment_id"));
         rec.setMeasurementMethodId(rs.getInt("measurement_method_id"));
         rec.setSampleId(rs.getInt("sample_id"));

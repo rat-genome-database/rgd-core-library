@@ -6,19 +6,16 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import edu.mcw.rgd.datamodel.Alias;
 import edu.mcw.rgd.datamodel.pheno.Condition;
 
 /**
  * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * To change this template use File | Settings | File Templates.
  */
 
 /**
- * Returns a row from the Alias table
+ * Returns a row from EXPERIMENT_CONDITION table
  */
 public class ConditionQuery extends MappingSqlQuery {
 
@@ -30,6 +27,7 @@ public class ConditionQuery extends MappingSqlQuery {
 
         Condition c = new Condition();
         c.setId(rs.getInt("experiment_condition_id"));
+        c.setExperimentRecordId(rs.getInt("experiment_record_id"));
         c.setOrdinality(rs.getInt("exp_cond_ordinality"));
         if (rs.wasNull()) {
             c.setOrdinality(null);
