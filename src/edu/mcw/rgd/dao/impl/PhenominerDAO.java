@@ -1731,7 +1731,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "st.study_id = e.study_id \n" +
                 "left join \n" +
                 "(\n" +
-                "select er.experiment_id, er.experiment_record_id, er.measurement_error, er.last_modified_date,\n" +
+                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
@@ -1854,7 +1854,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "st.study_id = e.study_id \n" +
                 "left join \n" +
                 "(\n" +
-                "select er.experiment_id, er.experiment_record_id, er.measurement_error, er.last_modified_date,\n" +
+                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
