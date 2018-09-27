@@ -59,13 +59,13 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         });
     }
     public List<PhenominerExpectedRange> getExpectedRangeOfMixedAndAll(String phenotype, int strainGroupId, String ageLow, String ageHigh, String sex) throws Exception {
-        String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=?  and clinical_measurement=? and sex=?" +
+        String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=?  and clinical_measurement_ont_id=? and sex=?" +
                 "and expected_range_name like '%Mixed%'";
         PhenominerExpectedRangeQuery query= new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
         return execute(query, new Object[]{strainGroupId, ageLow, ageHigh, phenotype, sex});
     }
     public List<PhenominerExpectedRange> getExpectedRanges(String phenotype, int strainGroupId, int ageLow, int ageHigh) throws Exception {
-        String sql="select * from phenominer_expected_range where strain_group_id=? and clinical_measurement=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=? " ;
+        String sql="select * from phenominer_expected_range where strain_group_id=? and clinical_measurement_ont_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=? " ;
         PhenominerExpectedRangeQuery query= new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
         return execute(query, new Object[]{strainGroupId, phenotype, ageLow, ageHigh});
     }
