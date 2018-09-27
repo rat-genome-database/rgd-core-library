@@ -31,8 +31,7 @@ public class PhenominerStrainGroupDao extends OntologyXDAO{
         String sql="select strain_group_id from phenominer_strain_group where strain_group_name=?" ;
         IntListQuery query= new IntListQuery(this.getDataSource(), sql);
         List<Integer> ids= this.execute(query, new Object[]{strainGroupName});
-
-        return ids.size()>0?(int) this.execute(query, new Object[]{strainGroupName}).get(0):0;
+        return ids.size()>0?ids.get(0):0;
     }
     public List<PhenominerStrainGroup> getStrainGroupByName(String strainGroupName) throws Exception {
         String sql="select * from phenominer_strain_group where strain_group_name='" +strainGroupName+"'";
