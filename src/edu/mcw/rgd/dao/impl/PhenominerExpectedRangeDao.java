@@ -80,41 +80,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         return execute(query, new Object[]{expectedRangeId});
     }
 
-  /*  public List<PhenominerExpectedRange> getExpectedRanges(String clinicalMeasurementOntId, List<Integer> strainGroupIds, List<String> sex, List<Integer> ageLow, List<Integer> ageHigh, List<String> selectedMethods, boolean isPGA) throws Exception {
-        String sql= "SELECT * FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID=? ";
-        if(strainGroupIds != null) {
-            sql = sql + this.buildIntQuery(strainGroupIds, "strain_group_id");
-        }
-
-        if(ageLow != null) {
-            sql = sql + this.buildIntQuery(ageLow, "AGE_DAYS_FROM_DOB_LOW_BOUND");
-        }
-
-        if(ageHigh != null) {
-            sql = sql + this.buildIntQuery(ageHigh, "AGE_DAYS_FROM_DOB_HIGH_BOUND");
-        }
-
-        if(sex != null) {
-            sql = sql + this.buildStringQuery(sex, "SEX");
-        }
-
-        if(selectedMethods!=null){
-            String query = this.buildMethodQuery(selectedMethods, "expected_range_name");
-            if(query != null) {
-                sql = sql + query;
-        }
-        }
-
-        if(isPGA){
-            sql = sql + " AND TRAIT_ONT_ID IS NULL ";
-        }else
-            sql=sql+" AND TRAIT_ONT_ID IS NOT NULL";
-
-        PhenominerExpectedRangeQuery query1 = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
-        return this.execute(query1, new Object[]{clinicalMeasurementOntId});
-    }*/
-
-    public String buildIntQuery(List<Integer> values, String field){
+   public String buildIntQuery(List<Integer> values, String field){
         String sql= new String();
         if(values!=null){
             if(values.size()>0){
