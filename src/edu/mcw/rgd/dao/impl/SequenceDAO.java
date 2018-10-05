@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.SequenceQuery;
 import edu.mcw.rgd.datamodel.Sequence;
 import edu.mcw.rgd.datamodel.Sequence2;
@@ -91,14 +92,6 @@ public class SequenceDAO extends AbstractDAO {
      * @return List of Sequence2 objects
      * @throws Exception if something goes wrong
      */
-    public List<Sequence2> getObjectSequences2(int rgdId, String seqType) throws Exception {
-
-        // retrieve all sequences for given rgd object
-        String query = "SELECT s.*,d.seq_data FROM rgd_sequences s,seq_data d "+
-                "WHERE s.rgd_id=? AND s.seq_type=? AND s.seq_data_md5=d.data_md5";
-        return SequenceQuery.execute(this, query, rgdId, seqType);
-    }
-
     public List<Sequence2> getObjectSequences2(int rgdId, String seqType) throws Exception {
 
         // retrieve all sequences for given rgd object
