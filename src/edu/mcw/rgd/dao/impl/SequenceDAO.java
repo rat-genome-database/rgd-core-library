@@ -43,6 +43,23 @@ public class SequenceDAO extends AbstractDAO {
     }
 
     /**
+     * update a sequence identified by seq_key
+     * @return count of rows affected
+     * @throws Exception if something goes wrong
+     */
+    public int updateSequence(Sequence2 seq) throws Exception {
+
+        // see if the data to be inserted is already there (reuse seq data, if possible)
+        if( Utils.isStringEmpty(seq.getSeqMD5()) ) {
+            seq.setSeqMD5( Utils.generateMD5(seq.getSeqData()) );
+        }
+
+        // insert the sequence itself
+        String sql = "UPDATE rgd_sequences SET rgd_id=?,seq_type=?,seq_data_md5=? WHERE seq_key=?";
+        return update(sql, seq.getRgdId(), seq.getSeqType(), seq.getSeqMD5(), seq.getSeqKey());
+    }
+
+    /**
      * inserts a sequence for object identified by rgd id;
      * if the sequence data is already in database, it is reused
      * @return unique sequence key
