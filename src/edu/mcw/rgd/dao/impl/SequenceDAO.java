@@ -99,6 +99,21 @@ public class SequenceDAO extends AbstractDAO {
         return SequenceQuery.execute(this, query, rgdId, seqType);
     }
 
+    public List<Sequence2> getObjectSequences2(int rgdId, String seqType) throws Exception {
+
+        // retrieve all sequences for given rgd object
+        String query = "SELECT s.*,d.seq_data FROM rgd_sequences s,seq_data d "+
+                "WHERE s.rgd_id=? AND s.seq_type=? AND s.seq_data_md5=d.data_md5";
+        return SequenceQuery.execute(this, query, rgdId, seqType);
+    }
+
+    public List<IntStringMapQuery.MapPair> getMD5ForObjectSequences(int objectKey, int speciesTypeKey, String seqType) throws Exception {
+
+        String query = "SELECT s.rgd_id,s.seq_data_md5 FROM rgd_sequences s,rgd_ids r "+
+                "WHERE s.rgd_id=r.rgd_id AND r.object_key=? AND r.species_type_key=? AND s.seq_type=?";
+        return IntStringMapQuery.execute(this, query, objectKey, speciesTypeKey, seqType);
+    }
+
     public int deleteSequence(Sequence2 seq) throws Exception {
         String sql = "DELETE FROM rgd_sequences WHERE seq_key=? AND rgd_id=?";
         return update(sql, seq.getSeqKey(), seq.getRgdId());
