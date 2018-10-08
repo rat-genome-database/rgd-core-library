@@ -61,7 +61,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += "    order by v.start_pos ";
         sql = sqlFrom + sql;
 
-        logger.info("Running Search SQL getVariantResults() : \n" + sql + "\n");
+        logger.debug("Running Search SQL getVariantResults() : \n" + sql + "\n");
         //System.out.println(sql);
 
         List<VariantResult> vrList = new ArrayList<VariantResult>();
@@ -115,7 +115,7 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
         VariantDAO.lastQuery = sql;
-        logger.info("found vrList size " + vrList.size());
+        logger.debug("found vrList size " + vrList.size());
         return vrList;
 
     }
@@ -235,7 +235,7 @@ public class VariantDAO extends JdbcBaseDAO {
             return Collections.emptyList();
         }
 
-        logger.info("Started Searching in  getVariantAndCon(VariantSearchBean vsb) ");
+        logger.debug("Started Searching in  getVariantAndCon(VariantSearchBean vsb) ");
         String sql = " ";
         String sqlFrom = "select ";
 
@@ -372,7 +372,7 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
         VariantDAO.lastQuery = sql;
-        logger.info("found vrList size " + vrList.size());
+        logger.debug("found vrList size " + vrList.size());
         return vrList;
     }
 
