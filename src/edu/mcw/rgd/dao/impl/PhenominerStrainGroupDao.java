@@ -68,12 +68,18 @@ public class PhenominerStrainGroupDao extends OntologyXDAO{
         StringListQuery query= new StringListQuery(this.getDataSource(), sql);
         return  query.execute();
     }
-    public int getStrainGroupIdByStrainOntId(String strainOntId) throws Exception {
+  /*  public int getStrainGroupIdByStrainOntId(String strainOntId) throws Exception {
         String sql="select strain_group_id from phenominer_strain_group where strain_ont_id=?";
         IntListQuery query= new IntListQuery(this.getDataSource(), sql);
         List<Integer> ids= execute(query, strainOntId);
         if(ids.size()>0){
             return ids.get(0);
         }else return 0;
-}
+}*/
+  public int getStrainGroupIdByStrainOntId(String strainOntId) throws Exception {
+      String sql = "select strain_group_id from phenominer_strain_group where strain_ont_id=? and strain_group_name not like 'NormalStrain%'";
+      IntListQuery query = new IntListQuery(this.getDataSource(), sql);
+      List ids = this.execute(query, new Object[]{strainOntId});
+      return ids.size() > 0?((Integer)ids.get(0)).intValue():0;
+  }
 }
