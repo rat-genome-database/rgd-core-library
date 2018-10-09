@@ -25,7 +25,7 @@ import static java.lang.Integer.*;
 public class PhenominerExpectedRangeDao extends AbstractDAO{
     OntologyXDAO xdao=new OntologyXDAO();
 
-    public int insert(PhenominerExpectedRange range) throws Exception {
+  /*  public int insert(PhenominerExpectedRange range) throws Exception {
         String sql="insert into PHENOMINER_EXPECTED_RANGE(" +
                 "EXPECTED_RANGE_ID , " +
                 "EXPECTED_RANGE_NAME ," +
@@ -57,6 +57,14 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
                 range.getRangeHigh(),
                 range.getRangeSD()
         });
+    }*/
+
+    public int insert(PhenominerExpectedRange range) throws Exception {
+        String sql = "insert into PHENOMINER_EXPECTED_RANGE(EXPECTED_RANGE_ID , EXPECTED_RANGE_NAME ,CLINICAL_MEASUREMENT_ONT_ID ,STRAIN_GROUP_ID ,AGE_DAYS_FROM_DOB_LOW_BOUND ,AGE_DAYS_FROM_DOB_HIGH_BOUND ,SEX , TRAIT_ONT_ID,  RANGE_UNITS, RANGE_VALUE ,RANGE_LOW ,RANGE_HIGH ,RANGE_SD, created_date, last_modified_date) values(?,?,?,?,?,?,?,?,?,?,?,?,?, SYSDATE, SYSDATE)";
+        if(range.getStrainGroupName().contains("NormalStrain")){
+            return this.update(sql, new Object[]{Integer.valueOf(range.getExpectedRangeId()), range.getStrainGroupName()+"_"+range.getSex() , range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId(), range.getUnits(), Double.valueOf(range.getRangeValue()), Double.valueOf(range.getRangeLow()), Double.valueOf(range.getRangeHigh()), Double.valueOf(range.getRangeSD())});
+        }else
+            return this.update(sql, new Object[]{Integer.valueOf(range.getExpectedRangeId()), range.getStrainGroupName() + "_" + range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId(), range.getUnits(), Double.valueOf(range.getRangeValue()), Double.valueOf(range.getRangeLow()), Double.valueOf(range.getRangeHigh()), Double.valueOf(range.getRangeSD())});
     }
     public List<PhenominerExpectedRange> getExpectedRangeOfMixedAndAll(String phenotype, int strainGroupId, String ageLow, String ageHigh, String sex) throws Exception {
         String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=?  and clinical_measurement_ont_id=? and sex=?" +
@@ -372,7 +380,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
             return query.execute();
     }
 
-    public int getExpectedRangeId(PhenominerExpectedRange range) throws Exception {
+  /*  public int getExpectedRangeId(PhenominerExpectedRange range) throws Exception {
         String sql="select expected_range_id from phenominer_expected_range where expected_range_name=? and " +
                 " clinical_measurement_ont_id=? and " +
                 " strain_group_id=? and " +
@@ -392,6 +400,31 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
                     range.getAgeLowBound(), range.getAgeHighBound(), range.getSex());
 }
         return ids.size()>0? (int) ids.get(0) :0;
+    }*/
+
+    public int getExpectedRangeId(PhenominerExpectedRange range) throws Exception {
+        String sql = "select expected_range_id from phenominer_expected_range where expected_range_name=? and  clinical_measurement_ont_id=? and  strain_group_id=? and  AGE_DAYS_FROM_DOB_LOW_BOUND=? and  AGE_DAYS_FROM_DOB_HIGH_BOUND=? and  sex=?";
+        if(range.getTraitOntId() != null && !Objects.equals(range.getTraitOntId(), "")) {
+            sql = sql + " and trait_ont_id=?  ";
+        }
+
+        IntListQuery query = new IntListQuery(this.getDataSource(), sql);
+        new ArrayList();
+        List ids;
+        //     System.out.println(range.getExpectedRangeName()+"\t"+ range.getClinicalMeasurementOntId()+"\t"+ range.getStrainGroupId()+"\t"+range.getTraitOntId());
+        if(range.getTraitOntId() != null && !Objects.equals(range.getTraitOntId(), "")) {
+            if(range.getExpectedRangeName().contains("NormalStrain")){
+                ids = this.execute(query, new Object[]{range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId()});
+            }else
+                ids = this.execute(query, new Object[]{range.getStrainGroupName() + "_" + range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId()});
+        } else {
+            if(range.getExpectedRangeName().contains("NormalStrain")){
+                ids = this.execute(query, new Object[]{range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex()});
+            }else
+                ids = this.execute(query, new Object[]{range.getStrainGroupName() + "_" + range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex()});
+        }
+
+        return ids.size() > 0?((Integer)ids.get(0)).intValue():0;
     }
     public int updateExpectedRange(PhenominerExpectedRange range, int expectedRangeId) throws Exception {
         String sql="update phenominer_expected_range set RANGE_VALUE=?, RANGE_LOW=?, RANGE_HIGH=?, RANGE_SD=?, last_modified_date=SYSDATE "+
