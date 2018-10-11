@@ -555,7 +555,7 @@ public class StatisticsDAO extends AbstractDAO {
 
     private String getPortalValue(int speciesTypeKey, int objectKey, String summaryTable) {
 
-        int sum;
+        int sum = 0;
 
         int ratGenesSum = extractValue(summaryTable, "genes-sum");
         int humanGenesSum = extractValue(summaryTable, "human-genes-sum");
