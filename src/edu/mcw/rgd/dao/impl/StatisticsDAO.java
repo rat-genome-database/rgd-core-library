@@ -601,7 +601,7 @@ public class StatisticsDAO extends AbstractDAO {
                 sum = mouseGenesSum + mouseQtlsSum + mouseStrainsSum;
         }
         // handle all species
-        else {
+        else if( speciesTypeKey==SpeciesType.ALL ){
             if( objectKey==RgdId.OBJECT_KEY_GENES )
                 sum = ratGenesSum + humanGenesSum + mouseGenesSum;
             else if( objectKey==RgdId.OBJECT_KEY_QTLS )
