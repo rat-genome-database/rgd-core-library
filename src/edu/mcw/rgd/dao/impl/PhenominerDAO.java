@@ -1491,6 +1491,7 @@ public class PhenominerDAO extends AbstractDAO {
             if (cond.getId() > 0) {
                 this.updateCondition(cond);
             }else {
+                cond.setExperimentRecordId(r.getId());
                 this.insertCondition(cond);
             }
         }
