@@ -1,7 +1,7 @@
 package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.datamodel.Sequence2;
+import edu.mcw.rgd.datamodel.Sequence;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
@@ -22,7 +22,7 @@ public class SequenceQuery extends MappingSqlQuery {
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-        Sequence2 obj = new Sequence2();
+        Sequence obj = new Sequence();
 
         obj.setSeqKey(rs.getInt("SEQ_KEY"));
         obj.setRgdId(rs.getInt("RGD_ID"));
@@ -34,7 +34,7 @@ public class SequenceQuery extends MappingSqlQuery {
         return obj;
     }
 
-    public static List<Sequence2> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+    public static List<Sequence> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
         SequenceQuery q = new SequenceQuery(dao.getDataSource(), sql);
         return dao.execute(q, params);
     }

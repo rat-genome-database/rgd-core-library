@@ -9,10 +9,8 @@ import java.sql.SQLException;
 import edu.mcw.rgd.datamodel.SSLP;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
+ * @author jdepons
+ * @since Jan 17, 2008
  */
 public class SSLPQuery extends MappingSqlQuery {
 
@@ -29,6 +27,13 @@ public class SSLPQuery extends MappingSqlQuery {
         sslp.setRgdId(rs.getInt("rgd_id"));
         sslp.setSslpType(rs.getString("sslp_type"));
         sslp.setSpeciesTypeKey(rs.getInt("species_type_key"));
+
+        try {
+            sslp.setTemplateSeq(rs.getString("seq_template"));
+            sslp.setForwardSeq(rs.getString("seq_forward"));
+            sslp.setReverseSeq(rs.getString("seq_reverse"));
+        }catch (Exception ignored) {
+        }
 
         return sslp;
     }

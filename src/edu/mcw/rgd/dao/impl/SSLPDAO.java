@@ -8,10 +8,8 @@ import edu.mcw.rgd.datamodel.SSLP;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 1:31:52 PM
+ * @author jdepons
+ * @since May 19, 2008
  */
 public class SSLPDAO extends AbstractDAO {
 
@@ -116,8 +114,8 @@ public class SSLPDAO extends AbstractDAO {
      */
     public List<SSLP> getActiveSSLPsByNameOnly(String sslpName) throws Exception {
 
-        String query = "select s.*,r.SPECIES_TYPE_KEY from SSLPS s, RGD_IDS r "+
-                "where r.RGD_ID=s.RGD_ID and s.RGD_NAME_LC=? AND r.OBJECT_STATUS='ACTIVE'";
+        String query = "SELECT s.*,r.species_type_key FROM sslps s, rgd_ids r "+
+                "WHERE r.rgd_id=s.rgd_id AND s.rgd_name_lc=? AND r.object_status='ACTIVE'";
 
         return executeSSLPQuery(query, sslpName.toLowerCase());
     }
@@ -131,25 +129,25 @@ public class SSLPDAO extends AbstractDAO {
     public List<SSLP> getSSLPsForGene(int geneKey) throws Exception {
 
         String query = "SELECT s.*,r.species_type_key FROM sslps s, rgd_ids r, rgd_gene_sslp gs "+
-                "where gs.gene_key=? AND gs.sslp_key=s.sslp_key AND r.rgd_id=s.rgd_id";
+                "WHERE gs.gene_key=? AND gs.sslp_key=s.sslp_key AND r.rgd_id=s.rgd_id";
 
         return executeSSLPQuery(query, geneKey);
     }
 
     /**
-     * Update qtl in the datastore based on rgdID
+     * Update SSLP object given RGD ID
      *
-     * @param sslp SSLP object
+     * @param sslp SSLP object with RGD ID set
      * @return number of rows affected
      * @throws Exception when unexpected error in spring framework occurs
      */
     public int updateSSLP(SSLP sslp) throws Exception{
 
-        String sql = "update SSLPS set SSLP_KEY=?, RGD_NAME=?, RGD_NAME_LC=LOWER(?), EXPECTED_SIZE=?, NOTES=?," +
-                " SSLP_TYPE=? where RGD_ID=?";
+        String sql = "UPDATE sslps SET sslp_key=?, rgd_name=?, rgd_name_lc=LOWER(?), expected_size=?, notes=?, " +
+                "sslp_type=?, seq_template=?, seq_forward=?, seq_reverse=? WHERE rgd_id=?";
 
         return update(sql, sslp.getKey(), sslp.getName(), sslp.getName(), sslp.getExpectedSize(), sslp.getNotes(),
-                sslp.getSslpType(), sslp.getRgdId());
+                sslp.getSslpType(), sslp.getTemplateSeq(), sslp.getForwardSeq(), sslp.getReverseSeq(), sslp.getRgdId());
     }
 
     /**
@@ -160,13 +158,13 @@ public class SSLPDAO extends AbstractDAO {
      */
     public int insertSSLP(SSLP sslp) throws Exception{
 
-        String sql = "insert into SSLPS (SSLP_KEY, RGD_NAME, RGD_NAME_LC, " +
-                "EXPECTED_SIZE, NOTES, SSLP_TYPE, RGD_ID) values (?,?,LOWER(?),?,?,?,?)";
+        String sql = "INSERT INTO sslps (sslp_key, rgd_name, rgd_name_lc, expected_size, notes, sslp_type, " +
+                "seq_template, seq_forward, seq_reverse, rgd_id) VALUES (?,?,LOWER(?),?,?,?,?,?,?,?)";
 
         sslp.setKey(this.getNextKey("SSLPS","SSLP_KEY"));
 
         return update(sql, sslp.getKey(), sslp.getName(), sslp.getName(), sslp.getExpectedSize(), sslp.getNotes(),
-                sslp.getSslpType(), sslp.getRgdId());
+                sslp.getSslpType(), sslp.getTemplateSeq(), sslp.getForwardSeq(), sslp.getReverseSeq(), sslp.getRgdId());
     }
 
     /**

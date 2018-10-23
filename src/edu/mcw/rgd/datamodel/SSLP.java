@@ -1,10 +1,8 @@
 package edu.mcw.rgd.datamodel;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 1:54:44 PM
+ * @author jdepons
+ * @since May 19, 2008
  */
 public class SSLP implements Identifiable, Speciated, ObjectWithName {
     private int key;
@@ -14,6 +12,9 @@ public class SSLP implements Identifiable, Speciated, ObjectWithName {
     private int rgdId;
     private String sslpType;
     private int speciesTypeKey;
+    private String templateSeq;
+    private String forwardSeq;
+    private String reverseSeq;
 
     public int getKey() {
         return key;
@@ -69,5 +70,29 @@ public class SSLP implements Identifiable, Speciated, ObjectWithName {
 
     public void setSpeciesTypeKey(int speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
+    }
+
+    public String getTemplateSeq() {
+        return templateSeq;
+    }
+
+    public void setTemplateSeq(String templateSeq) {
+        this.templateSeq = templateSeq;
+    }
+
+    public String getForwardSeq() {
+        return forwardSeq;
+    }
+
+    public void setForwardSeq(String forwardSeq) {
+        this.forwardSeq = forwardSeq;
+    }
+
+    public String getReverseSeq() {
+        return reverseSeq;
+    }
+
+    public void setReverseSeq(String reverseSeq) {
+        this.reverseSeq = reverseSeq;
     }
 }
