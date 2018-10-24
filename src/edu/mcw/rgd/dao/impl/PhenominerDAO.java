@@ -784,19 +784,19 @@ public class PhenominerDAO extends AbstractDAO {
         // determine kind of term
         String query;
         if( accId.startsWith("RS:") || accId.startsWith("CS:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM sample s,experiment_record r "+
+            query = "SELECT DISTINCT r.experiment_record_id FROM sample s,experiment_record r "+
                     "WHERE r.curation_status=? AND s.strain_ont_id=? AND r.sample_id=s.sample_id";
         }
         else if( accId.startsWith("MMO:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM measurement_method m,experiment_record r " +
+            query = "SELECT DISTINCT r.experiment_record_id FROM measurement_method m,experiment_record r " +
                     "WHERE r.curation_status=? AND m.measurement_method_ont_id=? AND r.measurement_method_id=m.measurement_method_id";
         }
         else if( accId.startsWith("CMO:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM clinical_measurement c,experiment_record r " +
+            query = "SELECT DISTINCT r.experiment_record_id FROM clinical_measurement c,experiment_record r " +
                     "WHERE r.curation_status=? AND c.clinical_measurement_ont_id=? AND r.clinical_measurement_id=c.clinical_measurement_id";
         }
         else if( accId.startsWith("XCO:") ) {
-            query = "SELECT DISTINCT experiment_record_id FROM experiment_condition x,experiment_record r "+
+            query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,experiment_record r "+
                     "WHERE r.curation_status=? AND x.exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id";
         }
         else {
