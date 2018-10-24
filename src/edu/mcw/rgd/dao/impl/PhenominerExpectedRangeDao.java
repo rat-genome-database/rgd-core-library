@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.phenominerExpectedRanges.PhenominerExpectedRangeQuery;
@@ -9,10 +10,12 @@ import edu.mcw.rgd.dao.spring.phenominerExpectedRanges.PhenominerRangeTraitQuery
 import edu.mcw.rgd.datamodel.phenominerExpectedRange.PhenominerExpectedRange;
 import edu.mcw.rgd.datamodel.phenominerExpectedRange.PhenominerRangeExperimentRec;
 import edu.mcw.rgd.datamodel.phenominerExpectedRange.TraitObject;
+import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -535,7 +538,13 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         PhenominerExpectedRangeQuery query11 = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
         return this.execute(query11, new Object[]{clinicalMeasurementOntId});
     }
-
+    public int getExpectedRangesByTrait(String traitOntId) throws Exception {
+        String sql = "SELECT Count(distinct(clinical_measurement_ont_id)) FROM PHENOMINER_EXPECTED_RANGE WHERE EXPECTED_RANGE_ID IN ( SELECT EXPECTED_RANGE_ID FROM PHENOMINER_RANGE_TRAIT WHERE TRAIT_ONT_ID= ? )";
+        CountQuery query = new CountQuery(this.getDataSource(), sql);
+        //  return execute(query, new Object[]{traitOntId});
+        query.declareParameter(new SqlParameter(Types.VARCHAR));
+        return query.getCount(new Object[]{traitOntId});
+    }
 
     public static void main(String[] args) throws Exception {
         PhenominerExpectedRangeDao dao=new PhenominerExpectedRangeDao();

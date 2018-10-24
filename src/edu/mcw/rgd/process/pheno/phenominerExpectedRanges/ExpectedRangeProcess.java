@@ -401,7 +401,7 @@ public class ExpectedRangeProcess extends OntologyXDAO{
 
             return traitMap;
         }
-        public List<String> getPhenotypesByAncestorTrait(String traitOntId) throws Exception {
+     /*   public List<String> getPhenotypesByAncestorTrait(String traitOntId) throws Exception {
             List<String> phenotypes=new ArrayList<>();
             if(traitOntId!=null){
                 if(!traitOntId.equals("") && !traitOntId.equals("pga")){
@@ -419,7 +419,22 @@ public class ExpectedRangeProcess extends OntologyXDAO{
             }
             return phenotypes;
         }
+*/
+     public List<String> getPhenotypesByAncestorTrait(String traitOntId) throws Exception {
+         new ArrayList();
+         List<String> phenotypes;
+         if (traitOntId != null) {
+             if (!traitOntId.equals("")) {
+                 phenotypes = this.dao.getDistinctClinicalMeasurementOntIdsByAncestorTrait(traitOntId);
+             } else {
+                 phenotypes = this.dao.getDistinctPhenotypes((String) null);
+             }
+         } else {
+             phenotypes = this.dao.getDistinctPhenotypes((String) null);
+         }
 
+         return phenotypes;
+     }
         public Map<String, String> getDistinctExpectedRangeTraits() throws Exception {
             List<String> traits= dao.getDistinctTraits(); // gets list of all distinct trait_Ont_ids from PHENOMINER_RANGE_TRAIT
             Map<String, String> tMap=new TreeMap<>();
@@ -428,7 +443,22 @@ public class ExpectedRangeProcess extends OntologyXDAO{
             }
             return tMap;
         }
-
+    public Map<Term, Integer> getAggregationByTraitCounts() throws Exception {
+        List<String> traits = dao.getDistinctTraits(); // gets list of all distinct trait_Ont_ids from PHENOMINER_RANGE_TRAIT
+        Map<Term, Integer> tMap = new TreeMap<Term, Integer>(new Comparator<Term>() {
+            @Override
+            public int compare(Term o1, Term o2) {
+                return Utils.stringsCompareToIgnoreCase(o1.getTerm(), o2.getTerm());
+            }
+        });
+        for (String t : traits) {
+            int count= dao.getExpectedRangesByTrait(t);
+            Term term= getTermByAccId(t);
+            tMap.put(term, count);
+            System.out.println(getTerm(t).getTerm()+"\t"+ count);
+        }
+        return tMap;
+    }
         public List<TraitObject> getPhenotypeTraitParents(String phenotype, String trait) throws Exception {
             return  dao.getDistinctPhenotypeTraitParents(phenotype, trait);
 
@@ -643,18 +673,57 @@ public class ExpectedRangeProcess extends OntologyXDAO{
                             }
                         }
                     }
-                    if(t.getTerm().equalsIgnoreCase("pga")){
+                 /*   if(t.getTerm().equalsIgnoreCase("pga")){
                         if(o.getTraits()==null){
                             subtraits.add(o);
                         }
-                    }
+                    }*/
                 }
                 traitSubtraitMap.put(t, subtraits);
 
             }
             return traitSubtraitMap;
         }
-    public Map<List<Term>, List<PhenotypeObject>> getOverAllObjectsNDistinctTraits(List<String> phenotypes, String traitOntId, boolean isPGA) throws Exception {
+    public Map<List<Term>, List<PhenotypeObject>> getOverAllObjectsNDistinctTraits(List<String> phenotypes, String traitOntId, boolean selectBytrait) throws Exception {
+        List<Term> distinctTraits = new ArrayList<>();
+        List<PhenotypeObject> overallObjects = new ArrayList<>();
+        Map<List<Term>, List<PhenotypeObject>> objectsNDistinctTraits = new HashMap<>();
+
+        for (String p : phenotypes) {
+            List<PhenominerExpectedRange> rangerecs = new ArrayList<>();
+            List<TraitObject> phenoTraits = getPhenotypeTraitParents(p, traitOntId);
+            if (phenoTraits.size() > 0) {
+
+                for (TraitObject t : phenoTraits) {
+                    if (t != null) {
+                        rangerecs = dao.getExpectedRangesByParentTrait(p, selectBytrait, t.getSubTrait().getAccId());
+                        PhenotypeObject overAllObj = getOverAllObject(rangerecs, p);
+                        if (rangerecs.size() > 0)
+                            overAllObj.setTraits(getTraitTerms(rangerecs));
+                        overAllObj.setTraitAncestors(new ArrayList<>(Arrays.asList(t)));
+                        if (isDistinctTrait(distinctTraits, t.getSubTrait()))
+                            distinctTraits.add(t.getSubTrait());
+
+                        overallObjects.add(overAllObj);
+
+                    } else {
+                        rangerecs = dao.getExpectedRanges(p, null, null, null, null, null, selectBytrait);
+                        if (rangerecs.size() > 0)
+                            overallObjects.add(getOverAllObject(rangerecs, p));
+                    }
+                }
+
+            } else {
+                rangerecs = dao.getExpectedRangesOfPhenotype(p, null, null, null, null, null, selectBytrait);
+                overallObjects.add(getOverAllObject(rangerecs, p));
+            }
+        }
+        overallObjects.sort((o1, o2) -> Utils.stringsCompareToIgnoreCase(o1.getClinicalMeasurement(), o2.getClinicalMeasurement()));
+        objectsNDistinctTraits.put(distinctTraits, overallObjects);
+        return objectsNDistinctTraits;
+
+    }
+   /* public Map<List<Term>, List<PhenotypeObject>> getOverAllObjectsNDistinctTraits(List<String> phenotypes, String traitOntId, boolean isPGA) throws Exception {
         List<Term> distinctTraits=new ArrayList<>();
         List<PhenotypeObject> overallObjects=new ArrayList<>();
         Map<List<Term>, List<PhenotypeObject>> objectsNDistinctTraits=new HashMap<>();
@@ -698,23 +767,22 @@ public class ExpectedRangeProcess extends OntologyXDAO{
         objectsNDistinctTraits.put(distinctTraits, overallObjects);
         return objectsNDistinctTraits;
     }
+*/
+   public PhenotypeObject getOverAllObject(List<PhenominerExpectedRange> rangeRecs, String p) throws Exception {
+       PhenotypeObject overAllObj = new PhenotypeObject();
+       overAllObj.setClinicalMeasurement(this.getClinicalMeasurement(rangeRecs));
+       overAllObj.setClinicalMeasurementOntId(p);
+       PhenominerExpectedRange normalRecord = this.getNormalRange(rangeRecs, "Mixed");
+       if(normalRecord != null) {
+           overAllObj.setNormalRange(normalRecord.getRangeLow() + " - " + normalRecord.getRangeHigh());
+       }
 
-    public PhenotypeObject getOverAllObject(List<PhenominerExpectedRange> records, String p) throws Exception {
-        //   System.out.println("PHENOTYPE: "+ p+"\tRECORDS SIZE: "+ records.size());
-        PhenotypeObject overAllObj = new PhenotypeObject();
-        overAllObj.setClinicalMeasurement(this.getClinicalMeasurement(records));
-        overAllObj.setClinicalMeasurementOntId(p);
-        PhenominerExpectedRange normalRecord = this.getNormalRange(records, "Mixed");
-        if(normalRecord != null) {
-            overAllObj.setNormalRange(normalRecord.getRangeLow() + " - " + normalRecord.getRangeHigh());
-        }
-
-        overAllObj.setRanges(records);
-        overAllObj.setStrainSpecifiedRecordCount(this.getRecordCountByStrain(records));
-        overAllObj.setSexSpecifiedRecordCount(this.getRecordCountBySex(records));
-        overAllObj.setAgeSpecifiedRecordCount(this.getRecordCountByAge(records));
-        return overAllObj;
-    }
+       overAllObj.setRanges(rangeRecs);
+       overAllObj.setStrainSpecifiedRecordCount(this.getRecordCountByStrain(rangeRecs));
+       overAllObj.setSexSpecifiedRecordCount(this.getRecordCountBySex(rangeRecs));
+       overAllObj.setAgeSpecifiedRecordCount(this.getRecordCountByAge(rangeRecs));
+       return overAllObj;
+   }
 
     public List<Term> getTraitTerms(List<PhenominerExpectedRange> records) throws Exception {
         List<Term> terms= new ArrayList<>();
