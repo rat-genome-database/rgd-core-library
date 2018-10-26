@@ -1721,7 +1721,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
                 "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
-                "s1.*, cm.*, mm.*, ec.*\n" +
+                "s1.sample_id, cm.clinical_measurement_id, mm.measurement_method_id, ec.experiment_record_id\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
                 " experiment_condition ec\n" +
                 "WHERE er.sample_id = s1.sample_id\n" +
