@@ -65,35 +65,18 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public List<Study> getStudies(List studyIds) throws Exception {
         if (studyIds.size() == 0) {
-            return new ArrayList<Study>();
+            return Collections.emptyList();
         }
         if( studyIds.size()>1000 ) {
             studyIds = studyIds.subList(0, 999);
         }
 
-        String query = "SELECT * from study where study_id in (";
+        String query = "SELECT * FROM study WHERE study_id IN ("
+            + Utils.concatenate(studyIds,",")
+            + ")  ORDER BY study_id DESC";
 
-        for (int i=0; i< studyIds.size(); i++) {
-            if (i > 0) {
-                query = query + ",";
-            }
-
-            query = query + "?";
-        }
-
-        query = query + ")  order by study_id desc";
-        StudyQuery sq = new StudyQuery(this.getDataSource(), query);
-
-        Object[] objArray = new Object[studyIds.size()];
-
-        for (int i=0; i< studyIds.size(); i++) {
-            sq.declareParameter(new SqlParameter(Types.INTEGER));
-            objArray[i] = studyIds.get(i);
-        }
-
-        sq.compile();
-
-        return sq.execute(objArray);
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        return execute(q, query);
     }
 
     /**
@@ -102,8 +85,11 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public void updateStudy(Study study) throws Exception{
-        String query = "UPDATE study SET study_name=?, study_source=?, study_type=?, ref_rgd_id=? WHERE study_id=?";
-        update(query, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(), study.getId());
+
+        String query = "UPDATE study SET study_name=?, study_source=?, study_type=?, ref_rgd_id=?, "+
+            "data_type=?, geo_series_acc=? WHERE study_id=?";
+        update(query, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(),
+                study.getDataType(), study.getGeoSeriesAcc(), study.getId());
 
         // Update curation status for each experiment record that belongs to this study
         if (study.getCurationStatus() != -1) {
@@ -127,17 +113,18 @@ public class PhenominerDAO extends AbstractDAO {
         int studyId = this.getNextKey("study_seq");
         study.setId(studyId);
 
-        String sql = "insert into study (study_name, study_source, " +
-                "study_type, ref_rgd_id, study_id) values (?,?,?,?,?)";
+        String sql = "INSERT INTO study (study_name, study_source, study_type, ref_rgd_id, " +
+                "data_type, geo_series_acc, study_id) VALUES(?,?,?,?,?,?,?)";
 
-        update(sql, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(), study.getId());
+        update(sql, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(),
+                study.getDataType(), study.getGeoSeriesAcc(), study.getId());
 
         return studyId;
     }
 
     /**
      * Delete a study from the data store
-     * @param studyId
+     * @param studyId study id
      * @throws Exception
      */
     public void deleteStudy(int studyId) throws Exception{
