@@ -23,6 +23,7 @@ import javax.print.attribute.standard.DateTimeAtCompleted;
  */
 public class SkyGenDAO extends AbstractDAO {
 
+
     public Patient getPatient(int id) throws Exception{
 
         String query = "select * from skygen_patient sp, skygen_user_patient sup " +
