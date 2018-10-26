@@ -75,8 +75,7 @@ public class PhenominerDAO extends AbstractDAO {
             + Utils.concatenate(studyIds,",")
             + ")  ORDER BY study_id DESC";
 
-        StudyQuery q = new StudyQuery(this.getDataSource(), query);
-        return execute(q, query);
+        return execute(new StudyQuery(this.getDataSource(), query));
     }
 
     /**
