@@ -642,7 +642,7 @@ public class ExpectedRangeProcess extends OntologyXDAO{
                 List<String> cmoIds;
                 StrainObject object= new StrainObject();
                 String strainGroupName=sdao.getStrainGroupName(Integer.parseInt(s));
-                if(!strainGroupName.contains("normal")) {
+                if(!strainGroupName.contains("Normal")) {
                     object.setStrainGroupId(s);
                     object.setStrainGroupName(strainGroupName);
                     if(traitOntId!=null){
