@@ -507,7 +507,7 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     /**
-     * for given source and ontology, get all annotations modified before given date and time
+     * for given pipeline and ontology, get all annotations modified before given date and time
      *
      * @return list of annotations
      * @throws Exception on spring framework dao failure
@@ -516,6 +516,18 @@ public class AnnotationDAO extends AbstractDAO {
 
         String query = "SELECT * FROM full_annot WHERE created_by=? AND last_modified_date<? AND aspect=?";
         return executeAnnotationQuery(query, createdBy, dt, aspect);
+    }
+
+    /**
+     * for given pipeline and reference, get all annotations modified before given date and time
+     *
+     * @return list of annotations
+     * @throws Exception on spring framework dao failure
+     */
+    public List<Annotation> getAnnotationsModifiedBeforeTimestamp(int createdBy, Date dt, int refRgdId) throws Exception{
+
+        String query = "SELECT * FROM full_annot WHERE created_by=? AND last_modified_date<? AND ref_rgd_id=?";
+        return executeAnnotationQuery(query, createdBy, dt, refRgdId);
     }
 
     /**
