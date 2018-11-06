@@ -645,7 +645,7 @@ public class ExpectedRangeProcess extends OntologyXDAO{
                 if(!strainGroupName.contains("Normal")) {
                     object.setStrainGroupId(s);
                     object.setStrainGroupName(strainGroupName);
-                    if(traitOntId!=null){
+                    if(traitOntId!=null && !Objects.equals(traitOntId, "")){
                         cmoIds= dao.getDistinctPhenotypesByTrait(s, traitOntId);
                     }else
                         cmoIds= dao.getDistinctPhenotypesByStrainGroupId(s);
