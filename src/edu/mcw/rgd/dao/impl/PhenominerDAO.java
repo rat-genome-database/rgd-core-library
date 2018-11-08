@@ -1604,24 +1604,85 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<Integer> getRecordIds(SearchBean sb, int studyId, int experimentId, int recordId, int curationStatus, boolean isForReport) throws Exception {
-        StringBuilder query = new StringBuilder("select distinct(er1.experiment_record_id) from study st \n" +
-                "left join experiment e on \n" +
-                "st.study_id = e.study_id \n" +
-                "left join \n" +
-                "(\n" +
-                "select er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
-                "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
-                "s1.*, cm.*, mm.measurement_method_id, ec.experiment_record_id\n" +
-                "from " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                " experiment_condition ec\n" +
-                "WHERE er.sample_id = s1.sample_id\n" +
-                "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
-                "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.experiment_record_id=ec.experiment_record_id) er1 \n" +
-                "on e.experiment_id = er1.experiment_id\n" +
-                "where \n" +
-                "not er1.experiment_record_id is null ");
+
+        StringBuilder query = new StringBuilder("SELECT DISTINCT(er1.experiment_record_id)");
+        return getIds(sb, studyId, experimentId, recordId, curationStatus, isForReport, query);
+    }
+
+    public List<Integer> getStudyIds(SearchBean sb) throws Exception {
+        return getStudyIds(sb, -1, -1, -1);
+    }
+
+    /**
+     * Returns a list of study ids for a search bean
+     * @param sb
+     * @return
+     * @throws Exception
+     */
+    public List<Integer> getStudyIds(SearchBean sb, int studyId, int experimentId, int recordId) throws Exception {
+
+        StringBuilder query = new StringBuilder("SELECT DISTINCT(st.study_id)");
+        return getIds(sb, studyId, experimentId, recordId, -1, false, query);
+    }
+
+    /**
+     * Returns a list of experiment ids based on a search bean.
+     * @param sb
+     * @return
+     * @throws Exception
+     */
+    public List<Integer> getExperimentIds(SearchBean sb) throws Exception {
+        return this.getExperimentIds(sb,-1);
+    }
+
+    /**
+     * Retunrs a list fo experiment ids based on parameterized search bean
+     * @param sb
+     * @param experimentId
+     * @return
+     * @throws Exception
+     */
+    public List<Integer> getExperimentIds(SearchBean sb, int experimentId) throws Exception {
+        return this.getExperimentIds(sb, -1, experimentId, -1);
+    }
+
+    /**
+     * Retunrs a list fo experiment ids based on parameterized search bean
+     * @param sb
+     * @param studyId
+     * @param experimentId
+     * @return
+     * @throws Exception
+     */
+    public List<Integer> getExperimentIds(SearchBean sb, int studyId, int experimentId, int recordId) throws Exception {
+
+        StringBuilder query = new StringBuilder("SELECT DISTINCT(e.experiment_id)");
+        return getIds(sb, studyId, experimentId, recordId, -1, false, query);
+    }
+
+    private List<Integer> getIds(SearchBean sb, int studyId, int experimentId, int recordId, int curationStatus,
+                                 boolean isForReport, StringBuilder query) throws Exception {
+
+        query.append(" FROM study st \n")
+             .append("LEFT JOIN experiment e ON st.study_id = e.study_id \n")
+             .append("LEFT JOIN (\n")
+             .append("SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n")
+             .append("er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n")
+             .append("er.curation_status, er.has_individual_record, er.last_modified_by,\n")
+             .append("s1.*, cm.*, mm.measurement_method_id, ec.experiment_record_id,\n")
+             .append("mm.measurement_method_ont_id, mm.measurement_duration_in_secs, mm.measurement_site,\n")
+             .append("mm.measurement_method_pi_type, mm.meas_method_pi_time_value, mm.meas_method_pi_time_unit,\n")
+             .append("ec.exp_cond_ont_id, ec.exp_cond_assoc_value_min, ec.exp_cond_assoc_value_max, ec.exp_cond_assoc_units,\n")
+             .append("ec.exp_cond_application_method, ec.exp_cond_dur_sec_low_bound, ec.exp_cond_dur_sec_high_bound, ec.exp_cond_ordinality\n")
+             .append("FROM ")
+               .append(isForReport ? "experiment_record_view" : "experiment_record")
+               .append(" er, sample s1, clinical_measurement cm, measurement_method mm, experiment_condition ec\n")
+             .append("WHERE er.sample_id = s1.sample_id\n")
+               .append("and er.clinical_measurement_id = cm.clinical_measurement_id \n")
+               .append("and er.measurement_method_id = mm.measurement_method_id \n")
+               .append("and er.experiment_record_id=ec.experiment_record_id) er1 \n")
+             .append("ON e.experiment_id = er1.experiment_id\n")
+             .append("WHERE 1=1 \n");
 
         if (recordId != -1) {
             query.append(" and er1.experiment_record_id=").append(recordId).append(" ");
@@ -1639,294 +1700,67 @@ public class PhenominerDAO extends AbstractDAO {
             query.append(" and er1.curation_status=").append(curationStatus).append(" ");
         }
 
-        query.append(this.buildLike(sb.getStudyName(), "study_name"));
-        query.append(this.buildStrEqual(sb.getStudySource(), "study_source"));
-        query.append(this.buildStrEqual(sb.getStudyType(), "study_type"));
+        buildLike(query, sb.getStudyName(), "study_name");
+        buildStrEqual(query, sb.getStudySource(), "study_source");
+        buildStrEqual(query, sb.getStudyType(), "study_type");
 
-        query.append(this.buildNumberEqual(sb.getReference(), "ref_rgd_id"));
-        query.append(this.buildLike(sb.getExperimentName(), "experiment_name"));
-        query.append(this.buildStrEqual(sb.getCmAccId(), "clinical_measurement_ont_id"));
-        query.append(this.buildNumberEqual(sb.getCmValue(), "measurement_value"));
-        query.append(this.buildLike(sb.getCmUnits(), "measurement_units"));
-        query.append(this.buildNumberEqual(sb.getCmSD(), "measurement_sd"));
-        query.append(this.buildNumberEqual(sb.getCmSEM(), "measurement_sem"));
-        query.append(this.buildStrEqual(sb.getCmError(), "measurement_error"));
-        query.append(this.buildLike(sb.getCmFormula(), "formula"));
-        query.append(this.buildLike(sb.getCmAveType(), "clinical_meas_average_type"));
+        buildNumberEqual(query, sb.getReference(), "ref_rgd_id");
+        buildLike(query, sb.getExperimentName(), "experiment_name");
+        buildStrEqual(query, sb.getCmAccId(), "clinical_measurement_ont_id");
+        buildNumberEqual(query, sb.getCmValue(), "measurement_value");
+        buildLike(query, sb.getCmUnits(), "measurement_units");
+        buildNumberEqual(query, sb.getCmSD(), "measurement_sd");
+        buildNumberEqual(query, sb.getCmSEM(), "measurement_sem");
+        buildStrEqual(query, sb.getCmError(), "measurement_error");
+        buildLike(query, sb.getCmFormula(), "formula");
+        buildLike(query, sb.getCmAveType(), "clinical_meas_average_type");
 
-        query.append(this.buildStrEqual(sb.getMmAccId(), "measurement_method_ont_id"));
-        query.append(this.buildNumberEqual(sb.getMmDuration(), "measurement_duration_in_secs"));
-        query.append(this.buildLike(sb.getMmSite(), "measurement_site"));
-        query.append(this.buildLike(sb.getMmPIType(), "measurement_method_pi_type"));
-        query.append(this.buildNumberEqual(sb.getMmPITime(), "meas_method_pi_time_value"));
-        query.append(this.buildLike(sb.getMmPIUnit(), "meas_method_pi_time_unit"));
+        buildStrEqual(query, sb.getMmAccId(), "measurement_method_ont_id");
+        buildNumberEqual(query, sb.getMmDuration(), "measurement_duration_in_secs");
+        buildLike(query, sb.getMmSite(), "measurement_site");
+        buildLike(query, sb.getMmPIType(), "measurement_method_pi_type");
+        buildNumberEqual(query, sb.getMmPITime(), "meas_method_pi_time_value");
+        buildLike(query, sb.getMmPIUnit(), "meas_method_pi_time_unit");
 
-        query.append(this.buildStrEqual(sb.getSAccId(), "strain_ont_id"));
-        query.append(this.buildNumberEqual(sb.getSAnimalCount(), "number_of_animals"));
-        query.append(this.buildNumberEqual(sb.getSMinAge(), "age_days_from_dob_low_bound"));
-        query.append(this.buildNumberEqual(sb.getSMaxAge(), "age_days_from_dob_high_bound"));
-        query.append(this.buildStrEqual(sb.getSSex(), "sex"));
+        buildStrEqual(query, sb.getSAccId(), "strain_ont_id");
+        buildNumberEqual(query, sb.getSAnimalCount(), "number_of_animals");
+        buildNumberEqual(query, sb.getSMinAge(), "age_days_from_dob_low_bound");
+        buildNumberEqual(query, sb.getSMaxAge(), "age_days_from_dob_high_bound");
+        buildStrEqual(query, sb.getSSex(), "sex");
 
         if (sb.conditionSet()) {
 
             if (sb.getCAccId() != null) {
-                query.append(this.buildStrEqual(sb.getCAccId(), "exp_cond_ont_id"));
+                buildStrEqual(query, sb.getCAccId(), "exp_cond_ont_id");
             }
             if (sb.getCValueMin() != null) {
-                query.append(this.buildNumberEqual(sb.getCValueMin(), "exp_cond_assoc_value_min"));
+                buildNumberEqual(query, sb.getCValueMin(), "exp_cond_assoc_value_min");
             }
 
             if (sb.getCValueMax() != null) {
-                query.append(this.buildNumberEqual(sb.getCValueMax(), "exp_cond_assoc_value_max"));
+                buildNumberEqual(query, sb.getCValueMax(), "exp_cond_assoc_value_max");
             }
 
             if (sb.getCUnits() != null) {
-                query.append(this.buildLike(sb.getCUnits(), "exp_cond_assoc_units"));
+                buildLike(query, sb.getCUnits(), "exp_cond_assoc_units");
             }
             if (sb.getCapplicationMethod() != null) {
-                query.append(this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method"));
+                buildLike(query, sb.getCapplicationMethod(), "exp_cond_application_method");
             }
             if (sb.getCMaxDuration() != null) {
-                query.append(this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound"));
+                buildStrEqual(query, sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound");
             }
             if (sb.getCMinDuration() != null ) {
-                query.append(this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound"));
+                buildStrEqual(query, sb.getCMinDuration(), "exp_cond_dur_sec_high_bound");
             }
             if (sb.getCordinality() != null ) {
-                query.append(this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality"));
+                buildNumberEqual(query, sb.getCordinality(), "exp_cond_ordinality");
             }
         }
 
         return IntListQuery.execute(this, query.toString());
     }
 
-    public List getStudyIds(SearchBean sb) throws Exception {
-        return getStudyIds(sb, -1, -1, -1);
-    }
-
-    /**
-     * Returns a list of study ids for a search bean
-     * @param sb
-     * @return
-     * @throws Exception
-     */
-    public List getStudyIds(SearchBean sb, int studyId, int experimentId, int recordId) throws Exception {
-        //get record ids for condition
-
-        String query = "select distinct(st.study_id) from study st \n" +
-                "left join experiment e on \n" +
-                "st.study_id = e.study_id \n" +
-                "left join \n" +
-                "(\n" +
-                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
-                "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
-                "s1.sample_id, cm.clinical_measurement_id, mm.measurement_method_id, ec.experiment_record_id\n" +
-                "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                " experiment_condition ec\n" +
-                "WHERE er.sample_id = s1.sample_id\n" +
-                "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
-                "and er.measurement_method_id = mm.measurement_method_id\n" +
-                " AND er.experiment_record_id=ec.experiment_record_id) er1 \n" +
-                "on e.experiment_id = er1.experiment_id\n" +
-                "where \n" +
-                "1=1 ";
-
-        if (recordId != -1) {
-            query += " and er1.experiment_record_id=" + recordId + " ";
-        }
-
-        if (experimentId != -1) {
-            query = query + " and e.experiment_id=" + experimentId + " ";
-        }
-
-        if (studyId != -1) {
-            query += " and st.study_id=" + studyId + " ";
-        }
-
-        query = query + this.buildLike(sb.getStudyName(),"study_name");
-        query = query + this.buildStrEqual(sb.getStudySource(),"study_source");
-        query = query + this.buildStrEqual(sb.getStudyType(),"study_type");
-
-        query = query + this.buildNumberEqual(sb.getReference(),"ref_rgd_id");
-        query = query + this.buildLike(sb.getExperimentName(),"experiment_name");
-        query = query + this.buildStrEqual(sb.getCmAccId(),"clinical_measurement_ont_id");
-        query = query + this.buildNumberEqual(sb.getCmValue(),"measurement_value");
-        query = query + this.buildLike(sb.getCmUnits(),"measurement_units");
-        query = query + this.buildNumberEqual(sb.getCmSD(),"measurement_sd");
-        query = query + this.buildNumberEqual(sb.getCmSEM(),"measurement_sem");
-        query = query + this.buildStrEqual(sb.getCmError(),"measurement_error");
-        query = query + this.buildLike(sb.getCmFormula(),"formula");
-        query = query + this.buildLike(sb.getCmAveType(),"clinical_meas_average_type");
-
-        query = query + this.buildStrEqual(sb.getMmAccId(),"measurement_method_ont_id");
-        query = query + this.buildNumberEqual(sb.getMmDuration(),"measurement_duration_in_secs");
-        query = query + this.buildLike(sb.getMmSite(),"measurement_site");
-        query = query + this.buildLike(sb.getMmPIType(),"measurement_method_pi_type");
-        query = query + this.buildNumberEqual(sb.getMmPITime(),"meas_method_pi_time_value");
-        query = query + this.buildLike(sb.getMmPIUnit(),"meas_method_pi_time_unit");
-
-        query = query + this.buildStrEqual(sb.getSAccId(),"strain_ont_id");
-        query = query + this.buildNumberEqual(sb.getSAnimalCount(),"number_of_animals");
-        query = query + this.buildNumberEqual(sb.getSMinAge(),"age_days_from_dob_low_bound");
-        query = query + this.buildNumberEqual(sb.getSMaxAge(),"age_days_from_dob_high_bound");
-        query = query + this.buildStrEqual(sb.getSSex(),"sex");
-
-        if (sb.conditionSet()) {
-
-            if (sb.getCAccId() != null) {
-                query = query + this.buildStrEqual(sb.getCAccId(), "exp_cond_ont_id");
-            }
-            if (sb.getCValueMin() != null) {
-                query = query + this.buildNumberEqual(sb.getCValueMin(), "exp_cond_assoc_value_min");
-            }
-
-            if (sb.getCValueMax() != null) {
-                query = query + this.buildNumberEqual(sb.getCValueMax(), "exp_cond_assoc_value_max");
-            }
-
-            if (sb.getCUnits() != null) {
-                query = query + this.buildLike(sb.getCUnits(), "exp_cond_assoc_units");
-            }
-            if (sb.getCapplicationMethod() != null) {
-                query = query + this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method");
-            }
-            if (sb.getCMaxDuration() != null) {
-                query = query + this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound");
-            }
-            if (sb.getCMinDuration() != null ) {
-                query = query + this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound");
-            }
-            if (sb.getCordinality() != null ) {
-                query = query + this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality");
-            }
-        }
-        
-        return IntListQuery.execute(this, query);
-    }
-
-    /**
-     * Returns a list of experiment ids based on a search bean.
-     * @param sb
-     * @return
-     * @throws Exception
-     */
-    public List getExperimentIds(SearchBean sb) throws Exception {
-        return this.getExperimentIds(sb,-1);
-    }
-
-    /**
-     * Retunrs a list fo experiment ids based on parameterized search bean
-     * @param sb
-     * @param experimentId
-     * @return
-     * @throws Exception
-     */
-    public List getExperimentIds(SearchBean sb, int experimentId) throws Exception {
-        return this.getExperimentIds(sb, -1, experimentId, -1);
-    }
-
-    /**
-     * Retunrs a list fo experiment ids based on parameterized search bean
-     * @param sb
-     * @param studyId
-     * @param experimentId
-     * @return
-     * @throws Exception
-     */
-    public List getExperimentIds(SearchBean sb, int studyId, int experimentId, int recordId) throws Exception {
-
-        String query = "select distinct(e.experiment_id) from study st \n" +
-                "left join experiment e on \n" +
-                "st.study_id = e.study_id \n" +
-                "left join \n" +
-                "(\n" +
-                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
-                "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
-                "s1.*, cm.*, mm.*, ec.*\n" +
-                "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                "experiment_condition ec\n" +
-                "WHERE er.sample_id = s1.sample_id\n" +
-                "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
-                "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.experiment_record_id=ec.experiment_record_id) er1 \n" +
-                "on e.experiment_id = er1.experiment_id\n" +
-                "where \n" +
-                "not e.experiment_id is null ";
-
-        if (recordId != -1) {
-            query += " and er1.experiment_record_id=" + recordId + " ";
-        }
-
-        if (experimentId != -1) {
-            query = query + " and e.experiment_id=" + experimentId + " ";
-        }
-
-        if (studyId != -1) {
-            query += " and st.study_id=" + studyId + " ";
-        }
-
-        query = query + this.buildLike(sb.getStudyName(),"study_name");
-        query = query + this.buildStrEqual(sb.getStudySource(),"study_source");
-        query = query + this.buildStrEqual(sb.getStudyType(),"study_type");
-
-        query = query + this.buildNumberEqual(sb.getReference(),"ref_rgd_id");
-        query = query + this.buildLike(sb.getExperimentName(),"experiment_name");
-        query = query + this.buildStrEqual(sb.getCmAccId(),"clinical_measurement_ont_id");
-        query = query + this.buildNumberEqual(sb.getCmValue(),"measurement_value");
-        query = query + this.buildLike(sb.getCmUnits(),"measurement_units");
-        query = query + this.buildNumberEqual(sb.getCmSD(),"measurement_sd");
-        query = query + this.buildNumberEqual(sb.getCmSEM(),"measurement_sem");
-        query = query + this.buildStrEqual(sb.getCmError(),"measurement_error");
-        query = query + this.buildLike(sb.getCmFormula(),"formula");
-        query = query + this.buildLike(sb.getCmAveType(),"clinical_meas_average_type");
-
-        query = query + this.buildStrEqual(sb.getMmAccId(),"measurement_method_ont_id");
-        query = query + this.buildNumberEqual(sb.getMmDuration(),"measurement_duration_in_secs");
-        query = query + this.buildLike(sb.getMmSite(),"measurement_site");
-        query = query + this.buildLike(sb.getMmPIType(),"measurement_method_pi_type");
-        query = query + this.buildNumberEqual(sb.getMmPITime(),"meas_method_pi_time_value");
-        query = query + this.buildLike(sb.getMmPIUnit(),"meas_method_pi_time_unit");
-
-        query = query + this.buildStrEqual(sb.getSAccId(),"strain_ont_id");
-        query = query + this.buildNumberEqual(sb.getSAnimalCount(),"number_of_animals");
-        query = query + this.buildNumberEqual(sb.getSMinAge(),"age_days_from_dob_low_bound");
-        query = query + this.buildNumberEqual(sb.getSMaxAge(),"age_days_from_dob_high_bound");
-        query = query + this.buildStrEqual(sb.getSSex(),"sex");
-
-        if (sb.conditionSet()) {
-
-            if (sb.getCAccId() != null) {
-                query = query + this.buildStrEqual(sb.getCAccId(), "exp_cond_ont_id");
-            }
-            if (sb.getCValueMin() != null) {
-                query = query + this.buildNumberEqual(sb.getCValueMin(), "exp_cond_assoc_value_min");
-            }
-
-            if (sb.getCValueMax() != null) {
-                query = query + this.buildNumberEqual(sb.getCValueMax(), "exp_cond_assoc_value_max");
-            }
-
-            if (sb.getCUnits() != null) {
-                query = query + this.buildLike(sb.getCUnits(), "exp_cond_assoc_units");
-            }
-            if (sb.getCapplicationMethod() != null) {
-                query = query + this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method");
-            }
-            if (sb.getCMaxDuration() != null) {
-                query = query + this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound");
-            }
-            if (sb.getCMinDuration() != null ) {
-                query = query + this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound");
-            }
-            if (sb.getCordinality() != null ) {
-                query = query + this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality");
-            }
-        }
-
-        return IntListQuery.execute(this, query);
-    }
 
     /**
      * Get ordinality counts of records
@@ -2016,24 +1850,22 @@ public class PhenominerDAO extends AbstractDAO {
         }
     }
 
-    private String buildLike(String value, String column) {
+    private void buildLike(StringBuilder buf, String value, String column) {
         if (value != null) {
-            return " and lower(" + column + ") like '%" + value.toLowerCase() + "%' ";
+            buf.append(" and lower(").append(column).append(") like '%").append(value.toLowerCase()).append("%' ");
         }
-        return "";
-    }
-    private String buildStrEqual(String value, String column) {
-        if (value != null) {
-            return " and lower(" + column + ") = '" + value.toLowerCase() + "' ";
-        }
-        return "";
     }
 
-    private String buildNumberEqual(String value, String column) {
+    private void buildStrEqual(StringBuilder buf, String value, String column) {
         if (value != null) {
-            return " and " + column + "=" + value.toLowerCase() + " ";
+            buf.append(" and lower(").append(column).append(") = '").append(value.toLowerCase()).append("' ");
         }
-        return "";
+    }
+
+    private void buildNumberEqual(StringBuilder buf, String value, String column) {
+        if (value != null) {
+            buf.append(" and ").append(column).append("=").append(value.toLowerCase()).append(" ");
+        }
     }
 
     public List<HeatMapRecord> getHeatMap(String colIDs, String rowIDs, char sex) throws Exception {
