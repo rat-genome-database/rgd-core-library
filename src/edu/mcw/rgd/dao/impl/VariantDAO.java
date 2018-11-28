@@ -611,6 +611,75 @@ public class VariantDAO extends JdbcBaseDAO {
     }
 
     /**
+     * get the list of damaging or possibly damaging variants associated with the gene
+     * @param rgdId,mapKey
+     * @return variants associated with gene in an assembly
+     * @throws Exception when unexpected error occurs
+     */
+    public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId,String mapKey) throws Exception {
+        String sql = "select * from VARIANT where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n"+
+        " (select VARIANT_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
+                "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
+                "AND PREDICTION LIKE '%damaging') and SAMPLE_ID IN (SELECT UNIQUE(SAMPLE_ID) "+
+        "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
+        VariantMapper q = new VariantMapper(getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId, mapKey);
+    }
+
+    public List<String> getGeneAssemblyOfDamagingVariants(int rgdId) throws Exception {
+        List<String> res = new ArrayList<String>();
+
+        String sql = "select UNIQUE(s.MAP_KEY) from VARIANT v,SAMPLE s, MAPS m where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n" +
+                "(select VARIANT_ID from VARIANT_TRANSCRIPT \n" +
+                "where TRANSCRIPT_RGD_ID IN (select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID = " + rgdId + "))" +
+                "AND PREDICTION LIKE '%damaging') and v.SAMPLE_ID = s.SAMPLE_ID and s.MAP_KEY = m.MAP_KEY";
+
+        return getList(sql);
+    }
+
+    public List<String> getAssemblyOfDamagingVariants(int strainRgdId) throws Exception {
+        List<String> res = new ArrayList<String>();
+
+        String sql = "select UNIQUE(MAP_KEY) from SAMPLE where STRAIN_RGD_ID = " + strainRgdId;
+        return getList(sql);
+    }
+
+    /**
+     * get the list of damaging or possibly damaging variants associated with the strain
+     * @param rgdId
+     * @return variants associated with strain
+     * @throws Exception when unexpected error occurs
+     */
+    public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
+        String sql = "select count(DISTINCT(VARIANT_ID)) as count from POLYPHEN where VARIANT_ID in \n"+
+                " (select VARIANT_ID from VARIANT where SAMPLE_ID IN" +
+                "(select SAMPLE_ID from SAMPLE where STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey+"))"+
+                "AND PREDICTION LIKE '%damaging'";
+
+        return getCount(sql);
+    }
+
+    /**
+     * get the list of damaging or possibly damaging variants associated with the strain
+     * @param rgdId,mapKey
+     * @return variants associated with strain
+     * @throws Exception when unexpected error occurs
+     */
+    public List<Variant> getDamagingVariantsForStrainByAssembly(int rgdId,int mapKey) throws Exception {
+        String sql = "select distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v,POLYPHEN p where v.VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n"+
+                " (select VARIANT_ID from VARIANT where SAMPLE_ID IN "+
+        "(select SAMPLE_ID from SAMPLE where STRAIN_RGD_ID =?and MAP_KEY =? )) AND PREDICTION LIKE '%damaging')" +
+                "AND v.VARIANT_ID=p.VARIANT_ID ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
+        VariantMapper q = new VariantMapper(getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+       return q.execute(rgdId,mapKey);
+    }
+
+
+    /**
      * For the List of Variants only some properties are updated used by Zygosity and depth load
      *
      * @param variantList
@@ -658,5 +727,25 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
         return -1;
+    }
+
+    List<String> getList(String sql) {
+        List<String> res = new ArrayList<>();
+        try (Connection conn = this.getDataSource().getConnection()) {
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                res.add(rs.getString(1));
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public String getGeneSymbolByVariantId(long id) throws Exception {
+        String query = "select GENE_SYMBOL from POLYPHEN where VARIANT_ID ="+id;
+        return getList(query).get(0);
     }
 }
