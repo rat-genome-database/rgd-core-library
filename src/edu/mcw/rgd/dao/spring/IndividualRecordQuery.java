@@ -8,11 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: WLiu
- * Date: 10/14/11
- * Time: 1:22 PM
- * To change this template use File | Settings | File Templates.
+ * @author WLiu
+ * @since 10/14/11
  */
 public class IndividualRecordQuery extends MappingSqlQuery  {
 
@@ -21,8 +18,10 @@ public class IndividualRecordQuery extends MappingSqlQuery  {
     }
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
         IndividualRecord irec = new IndividualRecord();
 
+        irec.setId(rs.getInt("experiment_record_ind_id"));
         irec.setRecordId(rs.getInt("experiment_record_id"));
         irec.setAnimalId(rs.getString("animal_id"));
         irec.setMeasurementValue(rs.getString("measurement_value"));
