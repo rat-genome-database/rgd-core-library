@@ -32,7 +32,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
         sql += vsb.getVariantTable() + " v ";
         sqlFrom += "v.* ";
-        String[] results = vsb.getTableJoinSQL(sqlFrom, false);
+        String[] results = vsb.getTableJoinSQL(sqlFrom,false);
         sql += results[1];
         sqlFrom = results[0] + " from \n";  // We're done updating the sql From clause
 
@@ -393,7 +393,7 @@ public class VariantDAO extends JdbcBaseDAO {
         if (vsb.getGeneMap().size() > 0) {
             sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=v.chromosome and gl.pos=v.start_pos) ";
         }else {
-            sql += " left outer join  gene_loci gl ";
+            sql += " inner join  gene_loci gl ";
             sql += " on (v.chromosome=gl.chromosome and v.start_pos = gl.pos and gl.map_key=" + vsb.getMapKey() + " )";
         }
 
