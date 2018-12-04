@@ -1,21 +1,18 @@
 package edu.mcw.rgd.datamodel.pheno;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: WLiu
+ * @author WLiu
  * Date: 10/13/11
- * Time: 2:58 PM
- * To change this template use File | Settings | File Templates.
  */
 public class IndividualRecord {
 
+    private int id;
     private int recordId;
     private String animalId;
 
     private String measurementValue;
+
     private Record record = new Record();
 
     public Record getRecord() {
@@ -24,6 +21,14 @@ public class IndividualRecord {
 
     public void setRecord(Record value) {
         this.record = value;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getRecordId() {
