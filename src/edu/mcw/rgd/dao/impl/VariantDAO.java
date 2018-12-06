@@ -386,7 +386,7 @@ public class VariantDAO extends JdbcBaseDAO {
     public Map<String, Map<String, Integer>> getVariantToGeneCountMap(VariantSearchBean vsb) throws Exception{
 
         String sql = "SELECT gene_symbols as gene_symbol, sample_id, count(*) as count FROM (" +
-                "select  distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
+                "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
 
         sql += vsb.getVariantTable() +  " v ";
 
