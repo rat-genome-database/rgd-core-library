@@ -6,10 +6,8 @@ import edu.mcw.rgd.process.Dumper;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA. <br/>
- * User: jdepons <br/>
- * Date: Mar 20, 2009 <br/>
- * Time: 3:24:47 PM <br/>
+ * @author jdepons
+ * @since Mar 20, 2009
  * <p>
  * Bean class for an ontology annotation
  */
@@ -30,7 +28,6 @@ public class Annotation implements Cloneable, Dumpable {
     private String relativeTo;
     private Date createdDate;
     private Date lastModifiedDate;
-    private Integer expRgdId;
     private String termAcc;
     private Integer createdBy;
     private Integer lastModifiedBy;
@@ -170,14 +167,6 @@ public class Annotation implements Cloneable, Dumpable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public Integer getExpRgdId() {
-        return expRgdId;
-    }
-
-    public void setExpRgdId(Integer expRgdId) {
-        this.expRgdId = expRgdId;
-    }
-
     public String getTermAcc() {
         return termAcc;
     }
@@ -240,7 +229,6 @@ public class Annotation implements Cloneable, Dumpable {
             .put("LAST_MOD_DATE", lastModifiedDate)
             .put("CREATED_BY", createdBy)
             .put("LAST_MOD_BY", lastModifiedBy)
-            .put("EXP_RGD_ID", expRgdId)
             .put("RELATIVE_TO", relativeTo)
             .put("SPECIES_TYPE_KEY", speciesTypeKey)
             .dump();
