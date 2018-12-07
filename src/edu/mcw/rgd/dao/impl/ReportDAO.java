@@ -924,7 +924,7 @@ public class ReportDAO extends AbstractDAO {
             String query = "SELECT g.object_type,g.symbol,g.name,g.rgd_id,v.trait_name,v.clinical_significance,m.* "+
                     "FROM genomic_elements g \n"+
                     "LEFT JOIN maps_data m ON g.rgd_id = m.rgd_id " + buildMappingForMapKey(sb) +
-                    " INNER JOIN variants v ON g.rgd_id=v.rgd_id " +
+                    " INNER JOIN clinvar v ON g.rgd_id=v.rgd_id " +
                     " WHERE g.rgd_id IN (" + Utils.buildInPhrase(rgdIds.keySet()) + ") " +
                     buildMappingForPos(sb);
 
@@ -980,7 +980,7 @@ public class ReportDAO extends AbstractDAO {
                 int stopPos = Integer.parseInt(row[2]);
 
                 String query = "select ge.*, r.*, md.* , v.* " +
-                    "from genomic_elements ge, rgd_ids r, maps_data md, variants v " +
+                    "from genomic_elements ge, rgd_ids r, maps_data md, clinvar v " +
                     "where r.object_status='ACTIVE' and r.rgd_id=ge.rgd_id and md.rgd_id=ge.rgd_id and ge.rgd_id=v.rgd_id " +
                     "and md.chromosome=? " +
                     "and md.start_pos<=? " +

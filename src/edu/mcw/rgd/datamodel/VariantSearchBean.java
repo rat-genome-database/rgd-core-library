@@ -230,7 +230,7 @@ public class VariantSearchBean {
      * @return
      */
     public boolean hasTranscript() {
-        if (polyphen.size() > 0) {
+       if (polyphen.size() > 0) {
             return true;
         }
         if (nearSpliceSite.size() > 0) {
@@ -256,7 +256,35 @@ public class VariantSearchBean {
         }
         return false;
     }
-
+    /**
+     * Return true if any of the transcript related values are set
+     *
+     * @return
+     */
+    public boolean hasOnlyTranscript() {
+        if (nearSpliceSite.size() > 0) {
+            return true;
+        }
+        if (isTrue(isPrematureStop)) {
+            return true;
+        }
+        if (isTrue(isReadthrough)) {
+            return true;
+        }
+        if (aaChange.size() > 0) {
+            return true;
+        }
+        if (location.size() > 0) {
+            return true;
+        }
+        if (isTrue(isProteinCoding)) {
+            return true;
+        }
+        if (isTrue(isFrameshift)) {
+            return true;
+        }
+        return false;
+    }
     /*
      * Methods to check if the various types of data are being limited
      */
@@ -1064,10 +1092,6 @@ public class VariantSearchBean {
         return "";
     }
 
-
-
-
-
     /**
      * Generate the SQL needed for the table join.
      *
@@ -1083,16 +1107,17 @@ public class VariantSearchBean {
 
         if (limit) {
 
-            if (this.hasTranscript()) {
+            if (this.hasOnlyTranscript()) {
                 sql += " inner join "+vtTable+" vt on v.variant_id=vt.variant_id ";
                 sqlFrom += ",vt.* ";
                 sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
-                if (this.hasPolyphen()) {
-                    sql += " inner join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
+
+            }
+             if (this.hasPolyphen()) {
+                    sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
                     sqlFrom += ",p.* ";
                 }
-            }
 
             if (this.hasDBSNP() ) {
 
@@ -1116,7 +1141,7 @@ public class VariantSearchBean {
 
             if (this.hasClinicalSignificance()) {
                 log.info(" getTableJoinSql hasClinicalSignificance");
-                sql += " inner join variants cv on (v.rgd_id=cv.rgd_id) ";
+                sql += " inner join clinvar cv on (v.rgd_id=cv.rgd_id) ";
                 sqlFrom += ",cv.* ";
             }
 
@@ -1131,7 +1156,7 @@ public class VariantSearchBean {
             sql += " left outer join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
 
-            sql += " left outer join variants cv on (v.rgd_id=cv.rgd_id) ";
+            sql += " left outer join clinvar cv on (v.rgd_id=cv.rgd_id) ";
             sqlFrom += ",cv.* ";
 
             sql += " left outer join " + this.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";

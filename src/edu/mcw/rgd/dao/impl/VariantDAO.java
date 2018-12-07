@@ -288,10 +288,10 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
         if (vsb.hasClinicalSignificance()) {
-            sql += " inner join variants cv on (cv.rgd_id=v.rgd_id) ";
+            sql += " inner join clinvar cv on (cv.rgd_id=v.rgd_id) ";
             sqlFrom += ",cv.* ";
         }else {
-            sql += " left outer join variants cv on (cv.rgd_id=v.rgd_id) ";
+            sql += " left outer join clinvar cv on (cv.rgd_id=v.rgd_id) ";
             sqlFrom += ",cv.*";
         }
 
