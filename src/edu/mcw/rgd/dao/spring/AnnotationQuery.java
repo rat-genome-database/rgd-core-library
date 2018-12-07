@@ -44,8 +44,6 @@ public class AnnotationQuery extends MappingSqlQuery {
         annot.setEvidence(rs.getString("evidence"));
         annot.setCreatedDate(rs.getTimestamp("created_date"));
         annot.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
-        annot.setExpRgdId(rs.getInt("exp_rgd_id"));
-        if (rs.wasNull()) annot.setExpRgdId(null);
         annot.setTermAcc(rs.getString("term_acc"));
         annot.setCreatedBy(rs.getInt("created_by"));
         if (rs.wasNull()) annot.setCreatedBy(null);

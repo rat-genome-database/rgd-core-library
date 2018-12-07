@@ -197,17 +197,19 @@ public class AnnotationDAO extends AbstractDAO {
         return executeAnnotationQuery(query, termAcc);
     }
 
+    /* unused -- to be removed?
+
     public List<SNVAnnotation> getSNVAnnotationList(List<String> termAccs, List<Integer> objectRgdIds, String dataSrc) throws Exception {
-        String query = "";
+        String query;
 
         if (termAccs.size() ==0) {
             query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.exp_rgd_id, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId " +
+                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId " +
                 " from full_annot fa, rgd_associations ra " +
                  " where master_rgd_id=annotated_object_rgd_id and ra.assoc_type='variant_to_gene' ";
         }else {
             query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.exp_rgd_id, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId, fai.term_acc as childTerm " +
+                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId, fai.term_acc as childTerm " +
                 " from full_annot_index fai, full_annot fa, rgd_associations ra " +
                  " where fai.full_annot_key = fa.full_annot_key and master_rgd_id=annotated_object_rgd_id and ra.assoc_type='variant_to_gene' ";
         }
@@ -244,7 +246,7 @@ public class AnnotationDAO extends AbstractDAO {
 
     public List<Annotation> getAnnotationList(List<String> termAccs, List<Integer> objectRgdIds, int objectKey) throws Exception {
         String query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.exp_rgd_id, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source " +
+                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source " +
                 " from full_annot_index fai, full_annot fa " +
                  " where fai.full_annot_key = fa.full_annot_key ";
 
@@ -266,7 +268,6 @@ public class AnnotationDAO extends AbstractDAO {
 
 
         query += " and rgd_object_key=" + objectKey;
-
         query += "  order by term, object_symbol ";
 
         AnnotationQuery q = new AnnotationQuery(this.getDataSource(), query);
@@ -275,7 +276,7 @@ public class AnnotationDAO extends AbstractDAO {
         return q.execute();
 
     }
-
+*/
 
     public List<Annotation> getAnnotationByEvidence(int annotatedObjectRGDId, String termAcc, int createdBy, String evidence) throws Exception {
         String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? and term_acc=? and created_by=? and evidence=?";
@@ -1900,14 +1901,14 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, " +
                 "data_src=?, object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, " +
                 "object_name=?, notes=?, qualifier=?, relative_to=?, last_modified_date=?, " +
-                "exp_rgd_id=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=? " +
+                "term_acc=?, created_by=?, last_modified_by=?, xref_source=? " +
                 "WHERE full_annot_key=?";
 
         return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
                 annot.getDataSrc(), annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
                 annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
                 annot.getQualifier(), annot.getRelativeTo(), annot.getLastModifiedDate(),
-                annot.getExpRgdId(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
+                annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
                 annot.getXrefSource(), annot.getKey());
     }
 
@@ -1926,9 +1927,9 @@ public class AnnotationDAO extends AbstractDAO {
 
         String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
                 " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
-                " relative_to, created_date, last_modified_date, exp_rgd_id," +
+                " relative_to, created_date, last_modified_date, " +
                 " term_acc, created_by, last_modified_by, xref_source, full_annot_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,full_annot_seq.NEXTVAL) "+
                 "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
 
         try( Connection conn = this.getConnection() ) {
@@ -1946,21 +1947,20 @@ public class AnnotationDAO extends AbstractDAO {
             cs.setString(11, annot.getNotes());
             cs.setString(12, annot.getQualifier());
             cs.setString(13, annot.getRelativeTo());
-            setInt(cs, 14, annot.getExpRgdId());
-            cs.setString(15, annot.getTermAcc());
-            setInt(cs, 16, annot.getCreatedBy());
-            setInt(cs, 17, annot.getLastModifiedBy());
-            cs.setString(18, annot.getXrefSource());
+            cs.setString(14, annot.getTermAcc());
+            setInt(cs, 15, annot.getCreatedBy());
+            setInt(cs, 16, annot.getLastModifiedBy());
+            cs.setString(17, annot.getXrefSource());
 
-            cs.registerOutParameter(19, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(20, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(21, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(18, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(19, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(20, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(19));
-            annot.setCreatedDate(cs.getTimestamp(20));
-            annot.setLastModifiedDate(cs.getTimestamp(21));
+            annot.setKey(cs.getInt(18));
+            annot.setCreatedDate(cs.getTimestamp(19));
+            annot.setLastModifiedDate(cs.getTimestamp(20));
         }
 
         return annot.getKey();
