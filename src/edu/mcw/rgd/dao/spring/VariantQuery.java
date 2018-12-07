@@ -7,13 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:31 AM
+ * @author mtutaj
+ * @since 2/22/12
  * <p>
- *     mapping sql query to work with lists of VariantInfo objects
- * </p>
+ * mapping sql query to work with lists of VariantInfo objects
  */
 public class VariantQuery extends GenomicElementQuery {
 
@@ -28,7 +25,7 @@ public class VariantQuery extends GenomicElementQuery {
         // read data from genomic elements table
         mapRowForGenomicElement(obj, rs);
 
-        // read data from variants table
+        // read data from clinvar table
         mapVariants(rs, obj);
 
         return obj;
@@ -36,7 +33,7 @@ public class VariantQuery extends GenomicElementQuery {
 
     static public void mapVariants(ResultSet rs, VariantInfo obj) throws SQLException {
 
-        // read data from variants table
+        // read data from clinvar table
         obj.setClinicalSignificance(rs.getString("clinical_significance"));
         obj.setDateLastEvaluated(rs.getDate("date_last_evaluated"));
         obj.setReviewStatus(rs.getString("review_status"));
