@@ -2,13 +2,14 @@ package edu.mcw.rgd.datamodel.phenominerExpectedRange;
 
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by jthota on 5/29/2018.
  */
-public class PhenotypeObject {
+public class PhenotypeObject  implements Serializable{
     private String clinicalMeasurement;
     private String clinicalMeasurementOntId;
     private String normalRange;

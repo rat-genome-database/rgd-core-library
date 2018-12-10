@@ -32,7 +32,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
         sql += vsb.getVariantTable() + " v ";
         sqlFrom += "v.* ";
-        String[] results = vsb.getTableJoinSQL(sqlFrom, false);
+        String[] results = vsb.getTableJoinSQL(sqlFrom,false);
         sql += results[1];
         sqlFrom = results[0] + " from \n";  // We're done updating the sql From clause
 
@@ -171,7 +171,6 @@ public class VariantDAO extends JdbcBaseDAO {
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
-
         return getCount(sql);
     }
 
@@ -218,7 +217,6 @@ public class VariantDAO extends JdbcBaseDAO {
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
-
         return getCount(sql);
     }
 
@@ -249,7 +247,7 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
 
-        if (vsb.hasTranscript()) {
+        if (vsb.hasOnlyTranscript()) {
             if( vsb.isHuman() ) {
                 sql += " inner join variant_transcript_human vt on v.variant_id=vt.variant_id ";
             } else {
@@ -258,10 +256,11 @@ public class VariantDAO extends JdbcBaseDAO {
             sqlFrom += ",vt.* ";
             sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
-            if (vsb.hasPolyphen()) {
-                sql += " inner join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
-                sqlFrom += ",p.* ";
-            }
+
+        }
+        if (vsb.hasPolyphen()) {
+            sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+            sqlFrom += ",p.* ";
         }
 
         if (vsb.hasDBSNP()) {
@@ -336,6 +335,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql = sqlFrom + " from " +  sql;
 
         logger.debug("Running Search SQL getVariantResults() : \n" + sql + "\n");
+       
         List<VariantResult> vrList = new ArrayList<VariantResult>();
         try( Connection conn = this.getDataSource().getConnection()) {
 
@@ -386,14 +386,14 @@ public class VariantDAO extends JdbcBaseDAO {
     public Map<String, Map<String, Integer>> getVariantToGeneCountMap(VariantSearchBean vsb) throws Exception{
 
         String sql = "SELECT gene_symbols as gene_symbol, sample_id, count(*) as count FROM (" +
-                "select  distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
+                "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
 
         sql += vsb.getVariantTable() +  " v ";
 
         if (vsb.getGeneMap().size() > 0) {
             sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=v.chromosome and gl.pos=v.start_pos) ";
         }else {
-            sql += " left outer join  gene_loci gl ";
+            sql += " inner join  gene_loci gl ";
             sql += " on (v.chromosome=gl.chromosome and v.start_pos = gl.pos and gl.map_key=" + vsb.getMapKey() + " )";
         }
 
@@ -424,7 +424,6 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += "   ) group by gene_symbols, sample_id order by sample_id, gene_symbols ";
 
         logger.debug("getVariantToGeneCountMap: "+sql);
-
         VariantDAO.lastQuery = sql;
 
         Map<String, Map<String,Integer>> tMap = new TreeMap<>();

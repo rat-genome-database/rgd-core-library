@@ -1,6 +1,7 @@
 package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.impl.MapDAO;
+import edu.mcw.rgd.dao.impl.TranscriptDAO;
 import edu.mcw.rgd.datamodel.Map;
 import edu.mcw.rgd.datamodel.MapData;
 import junit.framework.TestCase;
@@ -22,6 +23,9 @@ public class MapDAOTest extends TestCase {
     }
 
     public void testAll() throws Exception {
+
+        //TranscriptDAO tdao = new TranscriptDAO();
+        //tdao.deleteTranscript(7652850, 11402951);
 
         testMapDAO();
 

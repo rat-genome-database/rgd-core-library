@@ -4,13 +4,14 @@ import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.pheno.Condition;
 import edu.mcw.rgd.datamodel.pheno.Record;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by jthota on 4/30/2018.
  */
-public class PhenominerExpectedRange {
+public class PhenominerExpectedRange implements Serializable {
 
     private int expectedRangeId;
     private String clinicalMeasurement;
