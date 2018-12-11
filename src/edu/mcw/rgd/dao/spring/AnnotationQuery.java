@@ -8,11 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * <p>
+ * @author jdepons
+ * @since Jan 17, 2008
  * Returns a row from the Annotation table
  */
 public class AnnotationQuery extends MappingSqlQuery {
@@ -55,6 +52,8 @@ public class AnnotationQuery extends MappingSqlQuery {
             annot.setSpeciesTypeKey(rs.getInt("species_type_key"));
         }catch (Exception ignored) {
         }
+
+        annot.setStrainTermAcc(rs.getString("strain_term_acc"));
 
         return annot;
     }

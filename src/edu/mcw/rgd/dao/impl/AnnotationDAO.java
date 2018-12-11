@@ -7,7 +7,6 @@ import edu.mcw.rgd.datamodel.Portal;
 import edu.mcw.rgd.datamodel.annotation.Enrichment;
 import edu.mcw.rgd.datamodel.annotation.OntologyEnrichment;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
-import edu.mcw.rgd.datamodel.ontology.SNVAnnotation;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
@@ -1891,7 +1890,7 @@ public class AnnotationDAO extends AbstractDAO {
     /**
      * Update annotation object in FULL_ANNOT table
      * <p>Note: annot.getKey() must be a valid full_annot_key
-     * <p>Note: annot.createdDate() is ignored and CREATION_DATE won;t be updated
+     * <p>Note: annot.createdDate() is ignored and CREATION_DATE won't be updated
      * @param annot Annotation object representing properties to be updated
      * @throws Exception
      * @return number of rows affected by the update
@@ -1901,7 +1900,7 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, " +
                 "data_src=?, object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, " +
                 "object_name=?, notes=?, qualifier=?, relative_to=?, last_modified_date=?, " +
-                "term_acc=?, created_by=?, last_modified_by=?, xref_source=? " +
+                "term_acc=?, created_by=?, last_modified_by=?, xref_source=?, strain_term_acc=? " +
                 "WHERE full_annot_key=?";
 
         return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
@@ -1909,7 +1908,7 @@ public class AnnotationDAO extends AbstractDAO {
                 annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
                 annot.getQualifier(), annot.getRelativeTo(), annot.getLastModifiedDate(),
                 annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
-                annot.getXrefSource(), annot.getKey());
+                annot.getXrefSource(), annot.getStrainTermAcc(), annot.getKey());
     }
 
     /**
@@ -1927,9 +1926,9 @@ public class AnnotationDAO extends AbstractDAO {
 
         String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
                 " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
-                " relative_to, created_date, last_modified_date, " +
-                " term_acc, created_by, last_modified_by, xref_source, full_annot_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,full_annot_seq.NEXTVAL) "+
+                " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
+                " xref_source, strain_term_acc, full_annot_key) "+
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
                 "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
 
         try( Connection conn = this.getConnection() ) {
@@ -1951,16 +1950,17 @@ public class AnnotationDAO extends AbstractDAO {
             setInt(cs, 15, annot.getCreatedBy());
             setInt(cs, 16, annot.getLastModifiedBy());
             cs.setString(17, annot.getXrefSource());
+            cs.setString(18, annot.getStrainTermAcc());
 
-            cs.registerOutParameter(18, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(19, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(20, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(19, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(20, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(21, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(18));
-            annot.setCreatedDate(cs.getTimestamp(19));
-            annot.setLastModifiedDate(cs.getTimestamp(20));
+            annot.setKey(cs.getInt(19));
+            annot.setCreatedDate(cs.getTimestamp(20));
+            annot.setLastModifiedDate(cs.getTimestamp(21));
         }
 
         return annot.getKey();
@@ -2003,11 +2003,6 @@ public class AnnotationDAO extends AbstractDAO {
                 "and fa.annotated_object_rgd_id=ri.rgd_id " +
                 "and ri.species_type_key in (1,2,3) " +
                 "and ri.object_key=1 and evidence in ('EXP','IAGP','IDA','IED','IEP','IGI','IMP','IPI','IPM','QTM')";
-
-        //return new ArrayList<Annotation>();
-
-        //AnnotationQuery q = new AnnotationQuery(this.getDataSource(), sql);
-        //return execute(q, params);
 
         return executeAnnotationQuery(sql, termAcc );
     }
