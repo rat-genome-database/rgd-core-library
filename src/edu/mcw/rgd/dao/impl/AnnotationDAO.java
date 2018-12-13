@@ -23,6 +23,59 @@ import java.util.Date;
  */
 public class AnnotationDAO extends AbstractDAO {
 
+
+    public List<Annotation> getAnnotations(String accId, List<String> ids, List<Integer> speciesTypeKeys, List<String> evidenceCodes) throws Exception {
+        String speciesInClause = "(";
+        boolean first = true;
+        Iterator evidenceInClause = speciesTypeKeys.iterator();
+
+        while(evidenceInClause.hasNext()) {
+            Integer idInClause = (Integer)evidenceInClause.next();
+            if(first) {
+                speciesInClause = speciesInClause + idInClause;
+                first = false;
+            } else {
+                speciesInClause = speciesInClause + "," + idInClause;
+            }
+        }
+
+        speciesInClause = speciesInClause + ")";
+        String evidenceInClause1 = "(";
+        first = true;
+        Iterator idInClause1 = evidenceCodes.iterator();
+
+        String query;
+        while(idInClause1.hasNext()) {
+            query = (String)idInClause1.next();
+            if(first) {
+                evidenceInClause1 = evidenceInClause1 + "\'" + query + "\'";
+                first = false;
+            } else {
+                evidenceInClause1 = evidenceInClause1 + ",\'" + query + "\'";
+            }
+        }
+
+        evidenceInClause1 = evidenceInClause1 + ")";
+        String idInClause2 = "(";
+        first = true;
+        Iterator query1 = ids.iterator();
+
+        while(query1.hasNext()) {
+            String id = (String)query1.next();
+            if(first) {
+                idInClause2 = idInClause2 + id;
+                first = false;
+            } else {
+                idInClause2 = idInClause2 + "," + id;
+            }
+        }
+
+        idInClause2 = idInClause2 + ")";
+        query = "SELECT a.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g  WHERE term_acc=\'" + accId + "\' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
+        query = query + " AND object_status=\'ACTIVE\' and rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 + " and evidence in " + evidenceInClause1 + " and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
+        return this.executeAnnotationQuery(query, new Object[0]);
+    }
+
     /**
      * get annotation by unique key
      * @param key annotation key
