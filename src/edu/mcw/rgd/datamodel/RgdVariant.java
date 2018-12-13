@@ -8,7 +8,7 @@ package edu.mcw.rgd.datamodel;
  * <p>
  * represents a row from Variants table
  */
-public class Variants implements Identifiable, Speciated, ObjectWithName {
+public class RgdVariant implements Identifiable, Speciated, ObjectWithName {
 
     private int rgdId;
     private String name;

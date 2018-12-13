@@ -31,7 +31,7 @@ public class RgdId implements Identifiable, Speciated {
     static public final int OBJECT_KEY_3UTRS = 20;
     static public final int OBJECT_KEY_5UTRS = 17;
     static public final int OBJECT_KEY_VARIANTS = 7;
-    static public final int OBJECT_KEY_VARIANT=24;
+    static public final int OBJECT_KEY_RGDVARIANT=24;
 
 
 
@@ -169,7 +169,7 @@ public class RgdId implements Identifiable, Speciated {
             case OBJECT_KEY_SEQUENCES:  return "Sequence";
             case OBJECT_KEY_CHROMOSOME: return "Chromosome";
             case OBJECT_KEY_VARIANTS:   return "Variant";
-            case OBJECT_KEY_VARIANT:    return "Variants";
+            case OBJECT_KEY_RGDVARIANT: return "RgdVariant";
             case OBJECT_KEY_PROTEINS:   return "Protein";
             default:                    return objectKey + "";
         }
