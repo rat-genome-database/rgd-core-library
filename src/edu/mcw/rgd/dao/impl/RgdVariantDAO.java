@@ -1,9 +1,9 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.dao.spring.VariantsQuery;
+import edu.mcw.rgd.dao.spring.RgdVariantQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
-import edu.mcw.rgd.datamodel.Variants;
+import edu.mcw.rgd.datamodel.RgdVariant;
 
 import java.util.List;
 
@@ -17,18 +17,18 @@ import edu.mcw.rgd.datamodel.RgdId;
  * <p>
  * API to manipulate data in Variants table
  */
-public class VariantsDAO extends AbstractDAO {
+public class RgdVariantDAO extends AbstractDAO {
     /**
      * get variant by variant rgd id
      * @param rgdId variant rgd id
-     * @return Variants object
+     * @return RgdVariant object
      * @throws Exception when variant rgd id is invalid
      * @deprecated Exceptions should not be used as substitute for normal flow logic; NULL should be returned instead
      */
-      public Variants getVariant(int variantRgdId) throws Exception {
+      public RgdVariant getVariant(int variantRgdId) throws Exception {
         String query = "select v.*,r.species_type_key from variants v, RGD_IDS r where r.RGD_ID=v.RGD_ID and r.RGD_ID=?";
 
-        List<Variants> variants = executeVariantsQuery(query, variantRgdId);
+        List<RgdVariant> variants = executeVariantsQuery(query, variantRgdId);
         if (variants.size() == 0) {
             throw new Exception("Variant " + variantRgdId + " not found");
         }
@@ -38,16 +38,16 @@ public class VariantsDAO extends AbstractDAO {
     /**
      * Update variant in the datastore based on rgdID
      *
-     * @param variant Variants object
+     * @param variant RgdVariant object
      * @throws Exception when something wrong happens in the spring framework
      */
-    public void updateVariant(Variants variants) throws Exception{
+    public void updateVariant(RgdVariant variant) throws Exception{
 
         String sql = "UPDATE variants SET SO_ACC_ID=?,name=?,description=?,ref_nuc=?,var_nuc=?,notes=?,last_modified_date=current_date  where RGD_ID=?";
 
-        update(sql, variants.getType(),variants.getName(),
-                variants.getDescription(), variants.getRef_nuc(), variants.getVar_nuc(),
-                variants.getNotes(),variants.getRgdId());
+        update(sql, variant.getType(),variant.getName(),
+                variant.getDescription(), variant.getRef_nuc(), variant.getVar_nuc(),
+                variant.getNotes(),variant.getRgdId());
     }
 
     /**
@@ -56,22 +56,22 @@ public class VariantsDAO extends AbstractDAO {
      * @param variant
      * @throws Exception
      */
-    public void insertVariant(Variants variants, String objectStatus, int speciesTypeKey) throws Exception{
+    public void insertVariant(RgdVariant variant, String objectStatus, int speciesTypeKey) throws Exception{
 
         RGDManagementDAO dao = new RGDManagementDAO();
         RgdId id = null;
         try {
             // create new qtl rgd id
-            id = dao.createRgdId(RgdId.OBJECT_KEY_VARIANT, objectStatus, speciesTypeKey);
-            variants.setRgdId(id.getRgdId());
+            id = dao.createRgdId(RgdId.OBJECT_KEY_RGDVARIANT, objectStatus, speciesTypeKey);
+            variant.setRgdId(id.getRgdId());
             System.out.println("Rgd id:" + id.getRgdId());
             String sql = "INSERT INTO variants (RGD_ID,SO_ACC_ID, NAME, " +
                     "DESCRIPTION, REF_NUC, VAR_NUC, NOTES, LAST_MODIFIED_DATE) " +
                     "VALUES (?,?,?,?,?,?,?,current_date)";
 
-            update(sql,  variants.getRgdId(), variants.getType(),variants.getName(),
-                    variants.getDescription(), variants.getRef_nuc(), variants.getVar_nuc(),
-                    variants.getNotes());
+            update(sql,  variant.getRgdId(), variant.getType(),variant.getName(),
+                    variant.getDescription(), variant.getRef_nuc(), variant.getVar_nuc(),
+                    variant.getNotes());
         }
         catch(Exception e) {
             // rollback changes if something goes wrong
@@ -84,8 +84,8 @@ public class VariantsDAO extends AbstractDAO {
 
 
     /// QTL query implementation helper
-    public List<Variants> executeVariantsQuery(String query, Object ... params) throws Exception {
-        VariantsQuery q = new VariantsQuery(this.getDataSource(), query);
+    public List<RgdVariant> executeVariantsQuery(String query, Object ... params) throws Exception {
+        RgdVariantQuery q = new RgdVariantQuery(this.getDataSource(), query);
         return execute(q, params);
     }
 }
