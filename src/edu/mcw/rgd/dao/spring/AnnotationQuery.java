@@ -8,11 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * <p>
+ * @author jdepons
+ * @since Jan 17, 2008
  * Returns a row from the Annotation table
  */
 public class AnnotationQuery extends MappingSqlQuery {
@@ -44,8 +41,6 @@ public class AnnotationQuery extends MappingSqlQuery {
         annot.setEvidence(rs.getString("evidence"));
         annot.setCreatedDate(rs.getTimestamp("created_date"));
         annot.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
-        annot.setExpRgdId(rs.getInt("exp_rgd_id"));
-        if (rs.wasNull()) annot.setExpRgdId(null);
         annot.setTermAcc(rs.getString("term_acc"));
         annot.setCreatedBy(rs.getInt("created_by"));
         if (rs.wasNull()) annot.setCreatedBy(null);
@@ -57,6 +52,8 @@ public class AnnotationQuery extends MappingSqlQuery {
             annot.setSpeciesTypeKey(rs.getInt("species_type_key"));
         }catch (Exception ignored) {
         }
+
+        annot.setStrainTermAcc(rs.getString("strain_term_acc"));
 
         return annot;
     }

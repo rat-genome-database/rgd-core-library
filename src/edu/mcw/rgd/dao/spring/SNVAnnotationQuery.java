@@ -1,6 +1,5 @@
 package edu.mcw.rgd.dao.spring;
 
-import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontology.SNVAnnotation;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
@@ -24,6 +23,8 @@ public class SNVAnnotationQuery extends MappingSqlQuery {
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
+        /** unused -- remove?
+         *
         SNVAnnotation annot = new SNVAnnotation();
         annot.setKey(rs.getInt("full_annot_key"));
         annot.setTerm(rs.getString("term"));
@@ -45,8 +46,6 @@ public class SNVAnnotationQuery extends MappingSqlQuery {
         annot.setEvidence(rs.getString("evidence"));
         annot.setCreatedDate(rs.getTimestamp("created_date"));
         annot.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
-        annot.setExpRgdId(rs.getInt("exp_rgd_id"));
-        if (rs.wasNull()) annot.setExpRgdId(null);
         annot.setTermAcc(rs.getString("term_acc"));
         annot.setCreatedBy(rs.getInt("created_by"));
         if (rs.wasNull()) annot.setCreatedBy(null);
@@ -65,6 +64,8 @@ public class SNVAnnotationQuery extends MappingSqlQuery {
         }
 
         return annot;
+         */
+        return null;
     }
 
 }

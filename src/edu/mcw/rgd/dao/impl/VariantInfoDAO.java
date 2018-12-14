@@ -14,13 +14,13 @@ import java.util.List;
  * Date: 2/12/14
  * Time: 4:29 PM
  * <p>
- * represents a row from VARIANTS+GENOMIC_ELEMENT+RGD_IDS table join
+ * represents a row from CLINVAR+GENOMIC_ELEMENT+RGD_IDS table join
  */
 public class VariantInfoDAO extends GenomicElementDAO {
 
     public VariantInfo getVariant(int rgdId) throws Exception {
 
-        String query = "SELECT g.*,r.*,v.* FROM rgd_ids r,genomic_elements g,variants v "+
+        String query = "SELECT g.*,r.*,v.* FROM rgd_ids r,genomic_elements g,clinvar v "+
                 "WHERE r.rgd_id=? AND r.rgd_id=g.rgd_id AND g.rgd_id=v.rgd_id";
         VariantQuery q = new VariantQuery(this.getDataSource(), query);
 
@@ -32,7 +32,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
     }
 
     /**
-     * insert new variant object into VARIANTS table
+     * insert new variant object into CLINVAR table
      * <br>
      * Note: implicitly a row is inserted into GENOMIC_ELEMENTS table as well
      * @param obj VariantInfo object
@@ -44,9 +44,9 @@ public class VariantInfoDAO extends GenomicElementDAO {
         // insert a row into GENOMIC_ELEMENTS table
         int r = insertElement(obj);
 
-        // insert a row into VARIANTS table
+        // insert a row into CLINVAR table
         String sql =
-            "INSERT INTO variants(clinical_significance,date_last_evaluated,review_status,method_type,"+
+            "INSERT INTO clinvar(clinical_significance,date_last_evaluated,review_status,method_type,"+
                     "nucleotide_change,trait_name,age_of_onset,prevalence,molecular_consequence,"+
                     "submitter,rgd_id) "+
             "VALUES(?,?,?,?, ?,?,?,?,?, ?,?)";
@@ -59,7 +59,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
     }
 
     /**
-     * update variant object in VARIANTS and GENOMIC_ELEMENTS tables
+     * update variant object in CLINVAR and GENOMIC_ELEMENTS tables
      * @param obj VariantInfo object
      * @return count of rows affected
      * @throws Exception
@@ -71,7 +71,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
 
         // update a row in VARIANT table
         String sql =
-            "UPDATE variants "+
+            "UPDATE clinvar "+
             "SET clinical_significance=?, date_last_evaluated=?, review_status=?, method_type=?, "+
             "    nucleotide_change=?, trait_name=?, age_of_onset=?, prevalence=?, molecular_consequence=?, "+
             "    submitter=?"+
@@ -93,7 +93,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
     public List<VariantInfo> getVariantsBySymbol(String symbol) throws Exception {
 
         String sql = "SELECT v.*,ge.*,r.species_type_key,r.object_status,r.object_key "+
-                "FROM variants v,genomic_elements ge, rgd_ids r "+
+                "FROM clinvar v,genomic_elements ge, rgd_ids r "+
                 "WHERE LOWER(ge.symbol)=LOWER(?) AND ge.rgd_id=r.rgd_id AND r.object_key=? AND v.rgd_id=ge.rgd_id";
 
         VariantQuery q = new VariantQuery(this.getDataSource(), sql);
@@ -109,7 +109,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
     public List<VariantInfo> getVariantsBySource(String source) throws Exception {
 
         String sql = "SELECT v.*,ge.*,r.species_type_key,r.object_status,r.object_key "+
-                "FROM variants v,genomic_elements ge, rgd_ids r "+
+                "FROM clinvar v,genomic_elements ge, rgd_ids r "+
                 "WHERE ge.source=? AND ge.rgd_id=r.rgd_id AND r.object_key=? AND v.rgd_id=ge.rgd_id";
 
         VariantQuery q = new VariantQuery(this.getDataSource(), sql);
@@ -125,7 +125,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
     public List<VariantInfo> getVariantsForGene(int geneRgdId) throws Exception {
 
         String sql = "SELECT v.*,ge.*,r.species_type_key,r.object_status,r.object_key "+
-                "FROM variants v, genomic_elements ge, rgd_ids r, rgd_associations a "+
+                "FROM clinvar v, genomic_elements ge, rgd_ids r, rgd_associations a "+
                 "WHERE ge.rgd_id=r.rgd_id AND r.object_key=? AND v.rgd_id=ge.rgd_id "+
                 "AND assoc_type='variant_to_gene' AND a.detail_rgd_id=? AND ge.rgd_id=master_rgd_id";
 

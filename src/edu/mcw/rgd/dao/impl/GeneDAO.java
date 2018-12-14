@@ -656,6 +656,17 @@ public class GeneDAO extends AbstractDAO {
     }
 
     /**
+     * get genes associated with given rgd object
+     * @param associatedObjectRgdId rgd id of associated object
+     * @return List of Gene objects associated with another rgd object
+     * @throws Exception when something really bad happens in spring framework
+     */
+    public List<Gene> getAssociatedGenes(int associatedObjectRgdId) throws Exception {
+        String query = "select g.*, ri.species_type_key from rgd_associations a, genes g, rgd_ids ri\n" +
+                "where a.master_rgd_id=? and a.detail_rgd_id=g.rgd_id and g.rgd_id = ri.rgd_id";
+        return executeGeneQuery(query, associatedObjectRgdId);
+    }
+    /**
      * Returns a Gene based on an rgd id
      * @param rgdId rgd id
      * @return Gene object for given rgd id

@@ -5,14 +5,12 @@ import edu.mcw.rgd.process.Dumper;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/12/14
- * Time: 4:22 PM
+ * @author mtutaj
+ * @since 2/12/14
  * <p>
- * represents a row from table VARIANTS
+ * represents a row from table CLINVAR
  * <p>
- * Note: Variant class represents a row from VARIANT table RATCNDEV|RATCNPROD schema
+ * Note: Variant class represents a row from CLINVAR table RATCNDEV|RATCNPROD schema
  */
 public class VariantInfo extends GenomicElement {
 

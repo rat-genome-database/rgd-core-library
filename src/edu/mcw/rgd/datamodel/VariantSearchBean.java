@@ -1141,7 +1141,7 @@ public class VariantSearchBean {
 
             if (this.hasClinicalSignificance()) {
                 log.info(" getTableJoinSql hasClinicalSignificance");
-                sql += " inner join variants cv on (v.rgd_id=cv.rgd_id) ";
+                sql += " inner join clinvar cv on (v.rgd_id=cv.rgd_id) ";
                 sqlFrom += ",cv.* ";
             }
 
@@ -1156,7 +1156,7 @@ public class VariantSearchBean {
             sql += " left outer join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
 
-            sql += " left outer join variants cv on (v.rgd_id=cv.rgd_id) ";
+            sql += " left outer join clinvar cv on (v.rgd_id=cv.rgd_id) ";
             sqlFrom += ",cv.* ";
 
             sql += " left outer join " + this.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";
