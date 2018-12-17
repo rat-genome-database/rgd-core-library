@@ -24,7 +24,7 @@ public class Link {
     private static String STRAIN = "/rgdweb/report/strain/main.html?id=";
     private static String VARIANT = "/rgdweb/report/variant/main.html?id=";
     private static String CELLLINE = "/rgdweb/report/cellline/main.html?id=";
-
+    private static String RGDVARIANT = "/rgdweb/report/rgdvariant/main.html?id=";
     private static String ONTOLOGY_VIEW = "/rgdweb/ontology/view.html?acc_id=";
     private static String ONTOLOGY_ANNOT = "/rgdweb/ontology/annot.html?acc_id=";
     private static String PATHWAY_DIAGRAM = "/rgdweb/pathway/pathwayRecord.html?acc_id=";
@@ -121,6 +121,7 @@ public class Link {
             case RgdId.OBJECT_KEY_REFERENCES: return ref(rgdId);
             case RgdId.OBJECT_KEY_PROMOTERS: return ge(rgdId);
             case RgdId.OBJECT_KEY_VARIANTS: return variant(rgdId);
+            case RgdId.OBJECT_KEY_RGDVARIANT: return rgdvariant(rgdId);
             case RgdId.OBJECT_KEY_CELL_LINES: return cellLine(rgdId);
             case 0: return it(rgdId);
             default: return rgdId+"";
@@ -157,6 +158,15 @@ public class Link {
     }
 
     /**
+     * return a link to variants report page
+     * @param rgdId rgd id
+     * @return relative link to entry point of variants report page
+     */
+    public static String rgdvariant(int rgdId) {
+        return RGDVARIANT + rgdId;
+    }
+
+    /**
      * return a link to variant report page
      * @param rgdId rgd id
      * @return relative link to entry point of variant report page
@@ -164,7 +174,6 @@ public class Link {
     public static String variant(int rgdId) {
         return VARIANT + rgdId;
     }
-
     /**
      * return a link to cell line report page
      * @param rgdId rgd id
