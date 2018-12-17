@@ -14,10 +14,9 @@ public class RgdVariant implements Identifiable, Speciated, ObjectWithName {
     private String name;
     private String description;
     private String type;
-    private String ref_nuc;
-    private String var_nuc;
+    private String refNuc;
+    private String varNuc;
     private String notes;
-    private String last_modified_date;
     private int speciesTypeKey;
 
     public int getRgdId() {
@@ -52,20 +51,20 @@ public class RgdVariant implements Identifiable, Speciated, ObjectWithName {
         this.type = type;
     }
 
-    public String getRef_nuc() {
-        return ref_nuc;
+    public String getRefNuc() {
+        return refNuc;
     }
 
-    public void setRef_nuc(String ref_nuc) {
-        this.ref_nuc = ref_nuc;
+    public void setRefNuc(String refNuc) {
+        this.refNuc = refNuc;
     }
 
-    public String getVar_nuc() {
-        return var_nuc;
+    public String getVarNuc() {
+        return varNuc;
     }
 
-    public void setVar_nuc(String var_nuc) {
-        this.var_nuc = var_nuc;
+    public void setVarNuc(String varNuc) {
+        this.varNuc = varNuc;
     }
 
     public String getNotes() {
@@ -74,14 +73,6 @@ public class RgdVariant implements Identifiable, Speciated, ObjectWithName {
 
     public void setNotes(String notes) {
         this.notes = notes;
-    }
-
-    public String getLast_modified_date() {
-        return last_modified_date;
-    }
-
-    public void setLast_modified_date(String last_modified_date) {
-        this.last_modified_date = last_modified_date;
     }
 
     public int getSpeciesTypeKey() {

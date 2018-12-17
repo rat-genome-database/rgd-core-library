@@ -46,7 +46,7 @@ public class RgdVariantDAO extends AbstractDAO {
         String sql = "UPDATE variants SET SO_ACC_ID=?,name=?,description=?,ref_nuc=?,var_nuc=?,notes=?,last_modified_date=current_date  where RGD_ID=?";
 
         update(sql, variant.getType(),variant.getName(),
-                variant.getDescription(), variant.getRef_nuc(), variant.getVar_nuc(),
+                variant.getDescription(), variant.getRefNuc(), variant.getVarNuc(),
                 variant.getNotes(),variant.getRgdId());
     }
 
@@ -70,7 +70,7 @@ public class RgdVariantDAO extends AbstractDAO {
                     "VALUES (?,?,?,?,?,?,?,current_date)";
 
             update(sql,  variant.getRgdId(), variant.getType(),variant.getName(),
-                    variant.getDescription(), variant.getRef_nuc(), variant.getVar_nuc(),
+                    variant.getDescription(), variant.getRefNuc(), variant.getVarNuc(),
                     variant.getNotes());
         }
         catch(Exception e) {
