@@ -1155,6 +1155,12 @@ public class PhenominerDAO extends AbstractDAO {
 
         Record rec = this.getRecord(recordId);
 
+        try {
+            this.deleteExperimentConditions(rec.getConditions());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
         String sql = "delete from experiment_record where experiment_record_id=?";
         update(sql, recordId);
 
@@ -1171,11 +1177,6 @@ public class PhenominerDAO extends AbstractDAO {
         }
         try {
             this.deleteClinicalMeasurement(rec.getClinicalMeasurementId());
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            this.deleteExperimentConditions(rec.getConditions());
         }catch (Exception e) {
             e.printStackTrace();
         }
