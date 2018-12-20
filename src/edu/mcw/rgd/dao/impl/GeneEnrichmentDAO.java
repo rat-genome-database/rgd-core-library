@@ -40,12 +40,12 @@ public class GeneEnrichmentDAO extends AbstractDAO {
      * @return count of annotated genes
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public int getRefAnnotGeneCount(String term) throws Exception {
+    public int getRefAnnotGeneCount(String term,int speciesTypeKey) throws Exception {
 
         String query = "SELECT GENE_COUNT FROM GENE_ANNOT_COUNT " +
-                "WHERE TERM_ACC = ?";
+                "WHERE TERM_ACC = ? and SPECIES_TYPE_KEY = ?";
 
-        return getCount(query, term);
+        return getCount(query, term, speciesTypeKey);
     }
 
     public List<StringMapQuery.MapPair> getAnnotatedGOTermsForGenes(List<String> genes,String aspect,int speciesTypeKey) throws Exception{

@@ -6,10 +6,10 @@ public class GeneOntologyEnrichmentProcess{
 
 
 
-    public double calculatePValue(int inputGenes,int refGenes,String term,int inputAnnotGenes) throws Exception{
+    public double calculatePValue(int inputGenes,int refGenes,String term,int inputAnnotGenes,int speciesTypeKey) throws Exception{
 
         GeneEnrichmentDAO dao = new GeneEnrichmentDAO();
-        int refAnnotGenes = dao.getRefAnnotGeneCount(term);
+        int refAnnotGenes = dao.getRefAnnotGeneCount(term,speciesTypeKey);
         HypergeometricDistribution hg =
                 new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
         double pvalue = hg.probability(inputAnnotGenes);
