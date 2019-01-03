@@ -94,7 +94,7 @@
     <target name="dist+docs" depends="dist" description="Create distribution with documentation" >
         <mkdir dir="docs"/>
         <javadoc
-                failonerror="false" failonwarning="false"
+               failonerror="false"
                destdir="docs/${name}"
                author="true"
                version="true"
