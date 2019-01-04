@@ -8,20 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * <p>
- * Utility class to return a single integer value from a sql query.
- * <b>Usage:</b>
- * <pre>
- * String query = "SELECT count(*) from study";
- * CountQuery q = new CountQuery(this.getDataSource(), query);
- * q.compile();
- * int countValue = q.getCount();
- * </pre>
- * </p>
+ * @author jdepons
+ * @since Jan 17, 2008
  */
 public class RecordCountOverlapQuery extends MappingSqlQuery {
 

@@ -12,11 +12,8 @@ import org.apache.commons.collections.ListUtils;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pjayaraman
- * Date: Mar 28, 2011
- * Time: 4:09:52 PM
- * <p>
+ * @author pjayaraman
+ * @since Mar 28, 2011
  * curated pathway: a pathway that has an entry in PATHWAY table, thus having a custom pathway diagram
  */
 public class PathwayDAO extends AbstractDAO {
@@ -342,7 +339,6 @@ public class PathwayDAO extends AbstractDAO {
      *
      * @param pwObject Pathway object representing column values
      * @throws Exception
-     * @return void
      */
     public void deletePathwayData(Pathway pwObject) throws Exception{
 

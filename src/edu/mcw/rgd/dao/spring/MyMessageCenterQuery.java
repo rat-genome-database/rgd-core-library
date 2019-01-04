@@ -10,13 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA. <br/>
- * User: jdepons <br/>
- * Date: Jan 17, 2008 <br/>
- * Time: 10:08:19 AM
- * <p>
- *     mapping sql query to work with lists of Gene objects
- * </p>
+ * @author jdepons
+ * @since Jan 17, 2008
  */
 public class MyMessageCenterQuery extends MappingSqlQuery {
 

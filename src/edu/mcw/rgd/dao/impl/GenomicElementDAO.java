@@ -12,19 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:31 AM<p>
+ * @author mtutaj
+ * @since 2/22/12
  * handles all code regarding genomic elements and their attributes
- * </p>
- * <bl>
+ * <blockquote>
  *     Note: for effective searches on symbol, please create lower-case index on symbol field:
  *     CREATE INDEX genomic_elements_symbol_lc_i ON genomic_elements(LOWER(symbol));
  *     <br>
  *     Then Oracle will use that index for queries like that:
  *     SELECT * FROM genomic_elements WHERE LOWER(symbol)='symbol_lc';
- * </bl>
+ * </blockquote>
  * GENOMIC_ELEMENTS_VIEW contains genes,qtls,strains and sslps not kept in GENOMIC_ELEMENTS table yet
  * <pre>
 CREATE VIEW GENOMIC_ELEMENTS_VIEW AS
