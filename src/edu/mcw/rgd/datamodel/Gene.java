@@ -8,11 +8,8 @@ import java.util.*;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA. <br/>
- * User: jdepons <br/>
- * Date: Dec 19, 2007 <br/>
- * Time: 3:19:01 PM
- * <p>
+ * @author jdepons
+ * @since Dec 19, 2007
  * Bean class for an RGD gene.
  * <p>
  * Data is currently contained in the genes table

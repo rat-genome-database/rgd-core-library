@@ -9,10 +9,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
+ * @author jdepons
+ * @since Jan 17, 2008
  * <p>
  * Returns a list of strings
  */
@@ -27,7 +25,7 @@ public class StringListQuery extends MappingSqlQuery {
     }
 
     /**
-     * wrapper for execute(), casting result to List<String>
+     * wrapper for execute()
      * @return list of strings
      */
     public List<String> getStringList() {
@@ -35,7 +33,7 @@ public class StringListQuery extends MappingSqlQuery {
     }
 
     /**
-     * wrapper for execute(Object[]), casting result to List<String>
+     * wrapper for execute(Object[])
      * @param params array of params
      * @return list of strings
      */

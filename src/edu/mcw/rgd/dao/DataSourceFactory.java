@@ -7,11 +7,8 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 18, 2008
- * Time: 1:55:06 PM
- *<p>
+ * @author jdepons
+ * @since Jan 18, 2008
  * Singleton factory class that returns a DataSource object.
  * This class requires a data source definition in the spring configuration file.
  * The file path must be set as a system property.
@@ -21,12 +18,12 @@ import javax.sql.DataSource;
  * </pre>
  * The required spring config...
  * <pre>
- * <bean id="DataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
- *		<property name="driverClassName"><value>oracle.jdbc.driver.OracleDriver</value></property>
- *	    <property name="url"><value>jdbc:oracle:thin:@taylor.brc.mcw.edu:1521:rgd1</value></property>
- *		<property name="password"><value>asdf</value></property>
- *      <property name="username"><value>asdf</value></property>
- *	</bean>
+ * &lt;bean id="DataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"&gt;
+ *		&lt;property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /&gt;
+ *	    &lt;property name="url" value="jdbc:oracle:thin:@taylor.brc.mcw.edu:1521:rgd1" /&gt;
+ *		&lt;property name="password" value="asdf" /&gt;
+ *      &lt;property name="username" value="asdf" /&gt;
+ *	&lt;/bean&gt;
  * </pre>
  */
 
