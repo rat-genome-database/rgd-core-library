@@ -8,11 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA. <br>
- * User: mtutaj <br>
- * Date: 10/27/11 <br>
- * Time: 1:37 PM <br>
- * <p/>
+ * @author mtutaj
+ * @since 10/27/11
  * wrapper to conveniently query RGD_ASSOCIATION table
  */
 public class AssociationQuery extends MappingSqlQuery {
