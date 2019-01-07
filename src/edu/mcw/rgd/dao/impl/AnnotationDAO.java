@@ -7,7 +7,6 @@ import edu.mcw.rgd.datamodel.Portal;
 import edu.mcw.rgd.datamodel.annotation.Enrichment;
 import edu.mcw.rgd.datamodel.annotation.OntologyEnrichment;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
-import edu.mcw.rgd.datamodel.ontology.SNVAnnotation;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
@@ -25,55 +24,14 @@ public class AnnotationDAO extends AbstractDAO {
 
 
     public List<Annotation> getAnnotations(String accId, List<String> ids, List<Integer> speciesTypeKeys, List<String> evidenceCodes) throws Exception {
-        String speciesInClause = "(";
-        boolean first = true;
-        Iterator evidenceInClause = speciesTypeKeys.iterator();
 
-        while(evidenceInClause.hasNext()) {
-            Integer idInClause = (Integer)evidenceInClause.next();
-            if(first) {
-                speciesInClause = speciesInClause + idInClause;
-                first = false;
-            } else {
-                speciesInClause = speciesInClause + "," + idInClause;
-            }
-        }
+        String speciesInClause = "(" + Utils.buildInPhrase(speciesTypeKeys) + ")";
+        String evidenceInClause1 = "(" + Utils.buildInPhraseQuoted(evidenceCodes) + ")";
+        String idInClause2 = "(" + Utils.buildInPhrase(ids) + ")";
 
-        speciesInClause = speciesInClause + ")";
-        String evidenceInClause1 = "(";
-        first = true;
-        Iterator idInClause1 = evidenceCodes.iterator();
-
-        String query;
-        while(idInClause1.hasNext()) {
-            query = (String)idInClause1.next();
-            if(first) {
-                evidenceInClause1 = evidenceInClause1 + "\'" + query + "\'";
-                first = false;
-            } else {
-                evidenceInClause1 = evidenceInClause1 + ",\'" + query + "\'";
-            }
-        }
-
-        evidenceInClause1 = evidenceInClause1 + ")";
-        String idInClause2 = "(";
-        first = true;
-        Iterator query1 = ids.iterator();
-
-        while(query1.hasNext()) {
-            String id = (String)query1.next();
-            if(first) {
-                idInClause2 = idInClause2 + id;
-                first = false;
-            } else {
-                idInClause2 = idInClause2 + "," + id;
-            }
-        }
-
-        idInClause2 = idInClause2 + ")";
-        query = "SELECT a.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g  WHERE term_acc=\'" + accId + "\' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
+        String query = "SELECT a.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g  WHERE term_acc=\'" + accId + "\' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
         query = query + " AND object_status=\'ACTIVE\' and rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 + " and evidence in " + evidenceInClause1 + " and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
-        return this.executeAnnotationQuery(query, new Object[0]);
+        return executeAnnotationQuery(query);
     }
 
     /**
@@ -585,6 +543,19 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     /**
+     * for given pipeline, reference and species, get all annotations modified before given date and time
+     *
+     * @return list of annotations
+     * @throws Exception on spring framework dao failure
+     */
+    public List<Annotation> getAnnotationsModifiedBeforeTimestamp(int createdBy, Date dt, int refRgdId, int speciesTypeKey) throws Exception{
+
+        String query = "SELECT a.*,i.species_type_key FROM full_annot a,rgd_ids i WHERE a.annotated_object_rgd_id=i.rgd_id "+
+                "AND created_by=? AND last_modified_date<? AND ref_rgd_id=? AND species_type_key=?";
+        return executeAnnotationQuery(query, createdBy, dt, refRgdId, speciesTypeKey);
+    }
+
+    /**
      * for given ontology, get annotations modified before given date and time
      *
      * @return list of annotations
@@ -731,8 +702,8 @@ public class AnnotationDAO extends AbstractDAO {
      * get annotations by Reference and limit by aspect
      * @param refRgdId
      * @param aspect
-     * @src source of annotations
-     * @return list of annottaion objects.
+     * @param src source of annotations
+     * @return list of annotation objects
      * @throws Exception
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, String src) throws Exception {
@@ -1944,7 +1915,7 @@ public class AnnotationDAO extends AbstractDAO {
     /**
      * Update annotation object in FULL_ANNOT table
      * <p>Note: annot.getKey() must be a valid full_annot_key
-     * <p>Note: annot.createdDate() is ignored and CREATION_DATE won;t be updated
+     * <p>Note: annot.createdDate() is ignored and CREATION_DATE won't be updated
      * @param annot Annotation object representing properties to be updated
      * @throws Exception
      * @return number of rows affected by the update
@@ -1980,8 +1951,8 @@ public class AnnotationDAO extends AbstractDAO {
 
         String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
                 " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
-                " relative_to, created_date, last_modified_date, " +
-                " term_acc, created_by, last_modified_by, xref_source, full_annot_key) "+
+                " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
+                " xref_source, full_annot_key) "+
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,full_annot_seq.NEXTVAL) "+
                 "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
 
@@ -2004,6 +1975,7 @@ public class AnnotationDAO extends AbstractDAO {
             setInt(cs, 15, annot.getCreatedBy());
             setInt(cs, 16, annot.getLastModifiedBy());
             cs.setString(17, annot.getXrefSource());
+            //cs.setString(18, annot.getStrainTermAcc());
 
             cs.registerOutParameter(18, Types.INTEGER); // full_annot_key
             cs.registerOutParameter(19, Types.TIMESTAMP); // created_date
@@ -2021,7 +1993,7 @@ public class AnnotationDAO extends AbstractDAO {
 
     /**
      * Update notes for given annotation object; also last_modified_date is set to SYSDATE
-     * <bl>Much faster than updateAnnotation because notes field is not a part of any index so update is much faster</bl>
+     * <p>Much faster than updateAnnotation because notes field is not a part of any index so update is much faster
      * @param fullAnnotKey key uniquely identifying the annotation
      * @param notes new contents of notes field
      * @throws Exception
@@ -2056,11 +2028,6 @@ public class AnnotationDAO extends AbstractDAO {
                 "and fa.annotated_object_rgd_id=ri.rgd_id " +
                 "and ri.species_type_key in (1,2,3) " +
                 "and ri.object_key=1 and evidence in ('EXP','IAGP','IDA','IED','IEP','IGI','IMP','IPI','IPM','QTM')";
-
-        //return new ArrayList<Annotation>();
-
-        //AnnotationQuery q = new AnnotationQuery(this.getDataSource(), sql);
-        //return execute(q, params);
 
         return executeAnnotationQuery(sql, termAcc );
     }
