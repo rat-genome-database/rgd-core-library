@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * return a List of MapPair<Integer,String> objects
+ * return a List of MapPair objects: key:Integer, value:String
  */
 public class IntStringMapQuery extends MappingSqlQuery {
 

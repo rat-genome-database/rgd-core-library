@@ -7,21 +7,16 @@ import edu.mcw.rgd.datamodel.pipeline.PipelineLogFlag;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA. <br>
- * User: mtutaj <br>
- * Date: 9/12/11 <br>
- * Time: 2:38 PM <br>
- * <p/>
+ * @author mtutaj
+ * @since 9/12/11
  * Manages reading and writing of pipeline flags. This implementation is suitable to work with one pipeline log
  * setup in the constructor.
  * <p>
  * To start working with pipeline log flags, the application first to have register the all flags
  * being used by the pipeline. The flags will be identified by the symbol.
- * </p>
  * <p>
  * To minimize the count of database calls, all pipeline flags are accumulated in the memory for one pipeline record,
  * and they are flushed into the database once the record processing is complete.
- * </p>
  */
 public class PipelineLogFlagManager {
 

@@ -1,11 +1,5 @@
 package edu.mcw.rgd.dao.spring;
 
-/**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 6/13/12
- * Time: 2:13 PM
- */
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
@@ -13,16 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * <p>
- * Utility class to return a single integer value from a sql query.
- * <b>Usage:</b>
- * <pre>
- * String query = "SELECT count(*) from study";
- * CountLongQuery q = new CountLongQuery(this.getDataSource(), query);
- * q.compile();
- * long countValue = q.getCount();
- * </pre>
- * </p>
+ * @author mtutaj
+ * @since 6/13/12
+ * Utility class to return a single long integer value from a sql query.
  */
 public class CountLongQuery extends MappingSqlQuery {
 
