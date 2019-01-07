@@ -33,7 +33,7 @@ public class Annotation implements Cloneable, Dumpable {
     private Integer lastModifiedBy;
     private String xrefSource;
     private int speciesTypeKey; // optional: if 0, it is undefined
-    private String strainTermAcc;
+    //private String strainTermAcc;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -207,7 +207,7 @@ public class Annotation implements Cloneable, Dumpable {
     public void setSpeciesTypeKey(int speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
     }
-
+/*
     public String getStrainTermAcc() {
         return strainTermAcc;
     }
@@ -215,7 +215,7 @@ public class Annotation implements Cloneable, Dumpable {
     public void setStrainTermAcc(String strainTermAcc) {
         this.strainTermAcc = strainTermAcc;
     }
-
+*/
     public String dump(String delimiter) {
 
         return new Dumper(delimiter)
@@ -240,7 +240,7 @@ public class Annotation implements Cloneable, Dumpable {
             .put("LAST_MOD_BY", lastModifiedBy)
             .put("RELATIVE_TO", relativeTo)
             .put("SPECIES_TYPE_KEY", speciesTypeKey)
-            .put("STRAIN_TERM_ACC", strainTermAcc)
+//            .put("STRAIN_TERM_ACC", strainTermAcc)
             .dump();
     }
 }

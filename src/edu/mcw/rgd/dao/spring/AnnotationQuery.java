@@ -53,7 +53,7 @@ public class AnnotationQuery extends MappingSqlQuery {
         }catch (Exception ignored) {
         }
 
-        annot.setStrainTermAcc(rs.getString("strain_term_acc"));
+        //annot.setStrainTermAcc(rs.getString("strain_term_acc"));
 
         return annot;
     }
