@@ -29,9 +29,11 @@ public class AnnotationDAO extends AbstractDAO {
         String evidenceInClause1 = "(" + Utils.buildInPhraseQuoted(evidenceCodes) + ")";
         String idInClause2 = "(" + Utils.buildInPhrase(ids) + ")";
 
-        String query = "SELECT a.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g  WHERE term_acc=\'" + accId + "\' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
-        query = query + " AND object_status=\'ACTIVE\' and rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 + " and evidence in " + evidenceInClause1 + " and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
-        return executeAnnotationQuery(query);
+        String query = "SELECT a.*, r.species_type_key FROM full_annot a, rgd_ids r, genes g "+
+            "WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
+        query += " AND object_status=\'ACTIVE\' and rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 +
+                " AND evidence in " + evidenceInClause1 + " AND r.rgd_id=g.rgd_id ORDER BY g.gene_symbol_lc";
+        return executeAnnotationQuery(query, accId);
     }
 
     /**
@@ -551,7 +553,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsModifiedBeforeTimestamp(int createdBy, Date dt, int refRgdId, int speciesTypeKey) throws Exception{
 
         String query = "SELECT a.*,i.species_type_key FROM full_annot a,rgd_ids i WHERE a.annotated_object_rgd_id=i.rgd_id "+
-                "AND created_by=? AND last_modified_date<? AND ref_rgd_id=? AND species_type_key=?";
+                "AND created_by=? AND a.last_modified_date<? AND ref_rgd_id=? AND species_type_key=?";
         return executeAnnotationQuery(query, createdBy, dt, refRgdId, speciesTypeKey);
     }
 
