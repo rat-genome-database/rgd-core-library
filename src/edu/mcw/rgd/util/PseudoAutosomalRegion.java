@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Contains the coordinates for the PseudoAutosomal Region (PAR).
  *
- * @author Brandon Wilk <bwilk@mcw.edu>
+ * @author Brandon Wilk &lt;bwilk@mcw.edu&gt;
  */
 public class PseudoAutosomalRegion {
 

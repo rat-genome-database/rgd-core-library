@@ -1127,7 +1127,6 @@ public class VariantSearchBean {
                         " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
                         "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
                         "    AND v.VAR_NUC = dbs.ALLELE  " +
-                        "    AND dbs.SNP_TYPE = 'notwithdrawn'\n" +
                         "    AND dbs.SOURCE = s.DBSNP_SOURCE \n" +
                         "    AND dbs.MAP_KEY = s.MAP_KEY ) \n ";
                 }
@@ -1167,7 +1166,6 @@ public class VariantSearchBean {
                 " left outer join db_snp dbs ON (  v.START_POS  = dbs.POSITION  " +
                 "    AND v.CHROMOSOME = dbs.CHROMOSOME   " +
                 "    AND v.VAR_NUC = dbs.ALLELE  " +
-                "    AND dbs.SNP_TYPE = 'notwithdrawn'\n" +
                 "    AND dbs.SOURCE = s.DBSNP_SOURCE \n" +
                 "    AND dbs.MAP_KEY = s.MAP_KEY ) \n ";
 

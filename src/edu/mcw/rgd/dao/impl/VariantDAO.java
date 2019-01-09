@@ -271,7 +271,6 @@ public class VariantDAO extends JdbcBaseDAO {
                     " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
                     "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
                     "    AND v.VAR_NUC = dbs.ALLELE  " +
-                    "    AND dbs.SNP_TYPE = 'notwithdrawn' "+
                     "    AND dbs.MAP_KEY = s.MAP_KEY AND dbs.source=s.dbsnp_source) \n ";
             }
 
