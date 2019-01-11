@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.RgdVariantQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
 import edu.mcw.rgd.datamodel.RgdVariant;
 
@@ -66,5 +67,45 @@ public class GeneEnrichmentDAO extends AbstractDAO {
                 "and RGD_OBJECT_KEY = 1 GROUP BY fai.TERM_ACC\n";
 
         return StringMapQuery.execute(this,query);
+    }
+
+    public int getAnnotatedGeneCount(String term,int speciesTypeKey) throws Exception{
+        String query = "select count(distinct(fa.annotated_object_rgd_id)) as gene_count\n" +
+                "from full_annot fa\n" +
+                "inner join full_annot_index fai on fa.full_annot_key = fai.full_annot_key \n" +
+                "inner join rgd_ids r on (r.rgd_id = fa.annotated_object_rgd_id and r.species_type_key = ?)\n" +
+                "where aspect in ('D','W','N','C','F','P','E')  and RGD_OBJECT_KEY = 1 " +
+                " and fai.term_acc = ? ";
+
+        return getCount(query,speciesTypeKey,term);
+
+    }
+
+    public List<String> getAnnotatedNewTerms(int speciesTypeKey) throws Exception{
+        String query = "select fai.term_acc from full_annot fa\n" +
+                "inner join full_annot_index fai on fa.full_annot_key = fai.full_annot_key \n" +
+                "inner join rgd_ids r on (r.rgd_id = fa.annotated_object_rgd_id and r.species_type_key = ?)\n" +
+                "where aspect in ('D','W','N','C','F','P','E') and RGD_OBJECT_KEY = 1  \n" +
+                "MINUS\n" +
+                "select term_acc from gene_annot_count where species_type_key = ?";
+        return StringListQuery.execute(this,query,speciesTypeKey,speciesTypeKey);
+    }
+
+    public void insertAnnotGeneCount(int speciesTypeKey) throws Exception{
+        String query= "INSERT INTO GENE_ANNOT_COUNT(TERM_ACC,GENE_COUNT,SPECIES_TYPE_KEY)\n" +
+                "(select fai.term_acc, count(distinct(fa.annotated_object_rgd_id)) as gene_count,r.species_type_key\n" +
+                "from full_annot fa\n" +
+                "inner join full_annot_index fai on fa.full_annot_key = fai.full_annot_key \n" +
+                "inner join rgd_ids r on (r.rgd_id = fa.annotated_object_rgd_id and r.species_type_key = ?)\n" +
+                "where aspect in ('D','W','N','C','F','P','E')  and RGD_OBJECT_KEY = 1  and fai.term_acc not in ( select term_acc from gene_annot_count where species_type_key = ? )\n" +
+                "GROUP BY fai.term_acc,species_type_key )";
+
+        update(query,speciesTypeKey,speciesTypeKey);
+    }
+
+    public void updateAnnotGeneCount(int count,String term,int speciesTypeKey) throws Exception{
+        String query = "UPDATE GENE_ANNOT_COUNT SET GENE_COUNT = ? where term_acc = ? and species_type_key = ?";
+
+        update(query,count,term,speciesTypeKey);
     }
 }

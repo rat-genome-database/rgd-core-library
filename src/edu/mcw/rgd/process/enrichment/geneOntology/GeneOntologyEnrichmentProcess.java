@@ -3,6 +3,8 @@ package edu.mcw.rgd.process.enrichment.geneOntology;
 import org.apache.commons.math3.distribution.HypergeometricDistribution;
 import edu.mcw.rgd.dao.impl.GeneEnrichmentDAO;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,62 +14,61 @@ public class GeneOntologyEnrichmentProcess{
 
 
 
-    public double calculatePValue(int inputGenes,int refGenes,String term,int inputAnnotGenes,int speciesTypeKey) throws Exception{
+    public BigDecimal calculatePValue(int inputGenes, int refGenes, String term, int inputAnnotGenes, int speciesTypeKey) throws Exception{
 
         GeneEnrichmentDAO dao = new GeneEnrichmentDAO();
         int refAnnotGenes = dao.getRefAnnotGeneCount(term,speciesTypeKey);
         HypergeometricDistribution hg =
                 new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
-        double pvalue = hg.probability(inputAnnotGenes);
+        BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes));
         return pvalue;
     }
 
-    public float calculateBonferroni(float pvalue,int terms){
-        float bonferroni = pvalue * terms;
-        if (bonferroni > 1)
-            bonferroni = 1;
+    public BigDecimal calculateBonferroni(BigDecimal pvalue,BigDecimal terms){
+        BigDecimal bonferroni = pvalue.multiply(terms);
+        if (bonferroni.compareTo(BigDecimal.ONE) == 1)
+            bonferroni = BigDecimal.ONE;
 
         return bonferroni;
     }
 
-    public float calculateHolmBonferroni(float pvalue,int terms,int rank){
-        float HolmBonferroni = pvalue * (terms - rank);
-        if (HolmBonferroni > 1)
-            HolmBonferroni = 1;
+    public BigDecimal calculateHolmBonferroni(BigDecimal pvalue,BigDecimal terms,BigDecimal rank){
+        BigDecimal HolmBonferroni = pvalue.multiply (terms.subtract(rank));
+        if (HolmBonferroni.compareTo(BigDecimal.ONE) == 1)
+            HolmBonferroni = BigDecimal.ONE;
 
         return HolmBonferroni;
     }
 
-    public float calculateBenjamini(float pvalue,int terms,int rank){
-        float HolmBenjamini = pvalue * (terms/rank);
-        if (HolmBenjamini > 1)
-            HolmBenjamini = 1;
+    public BigDecimal calculateBenjamini(BigDecimal pvalue,BigDecimal terms,BigDecimal rank){
+        BigDecimal HolmBenjamini = pvalue.multiply(new BigDecimal(terms.intValue()/rank.intValue()));
+        if (HolmBenjamini.compareTo(BigDecimal.ONE) == 1)
+            HolmBenjamini = BigDecimal.ONE;
 
         return HolmBenjamini;
     }
-    public Map<String,Float> sortPvalues(HashMap<String,Float> pvalues){
+    public Map<String,BigDecimal> sortPvalues(HashMap<String,BigDecimal> pvalues){
         Comparator<String> comparator = new CustomComparator(pvalues);
         //TreeMap is a map sorted by its keys.
         //The comparator is used to sort the TreeMap by keys.
-        TreeMap<String, Float> result = new TreeMap<String, Float>(comparator);
+        TreeMap<String, BigDecimal> result = new TreeMap<String, BigDecimal>(comparator);
         result.putAll(pvalues);
         return result;
     }
 }
 class CustomComparator implements Comparator<String>{
 
-    HashMap<String, Float> map = new HashMap<String, Float>();
+    HashMap<String, BigDecimal> map = new HashMap<String, BigDecimal>();
 
-    public CustomComparator(HashMap<String, Float> map){
+    public CustomComparator(HashMap<String, BigDecimal> map){
         this.map.putAll(map);
     }
 
     @Override
     public int compare(String s1, String s2) {
-        if(map.get(s1) >= map.get(s2)){
-            return 1;
-        }else{
-            return -1;
-        }
+        if( map.get(s1).compareTo(map.get(s2)) == 0)
+            return s1.compareTo(s2);
+        else
+            return map.get(s1).compareTo(map.get(s2));
     }
 }
