@@ -22,8 +22,6 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
     private String symbol;
     private String name;
     private String description;
-    private String product;
-    private String function;
     private String notes;
     private int rgdId;
     private String type;
@@ -32,6 +30,8 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
     private String refSeqStatus;
     private String NcbiAnnotStatus;
     private String soAccId;
+    private String agrDescription;
+    private String mergedDescription;
 
     /**
      * two genes are equal if either they have same rgd_id or gene key
@@ -115,22 +115,6 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
         this.description = description;
     }
 
-    public String getProduct() {
-        return product;
-    }
-
-    public void setProduct(String product) {
-        this.product = product;
-    }
-
-    public String getFunction() {
-        return function;
-    }
-
-    public void setFunction(String function) {
-        this.function = function;
-    }
-
     public String getNotes() {
         return notes;
     }
@@ -188,6 +172,22 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
         this.soAccId = soAccId;
     }
 
+    public String getAgrDescription() {
+        return agrDescription;
+    }
+
+    public void setAgrDescription(String agrDescription) {
+        this.agrDescription = agrDescription;
+    }
+
+    public String getMergedDescription() {
+        return mergedDescription;
+    }
+
+    public void setMergedDescription(String mergedDescription) {
+        this.mergedDescription = mergedDescription;
+    }
+
     public String toString() {
        return "RGD:" + rgdId + ", " + symbol + ", " + name;
     }
@@ -199,8 +199,6 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
             .put("GENE_SYMBOL", symbol)
             .put("FULL_NAME", name)
             .put("GENE_DESC", description)
-            .put("PRODUCT", product)
-            .put("FUNCTION", function)
             .put("NOTES", notes)
             .put("RGD_ID", rgdId)
             .put("GENE_TYPE_LC", type)

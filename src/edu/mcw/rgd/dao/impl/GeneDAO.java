@@ -23,46 +23,23 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getAnnotatedGenes(String accId) throws Exception{
 
         String query = "SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
-                " WHERE term_acc='" + accId + "' AND annotated_object_rgd_id=r.rgd_id ";
-        query += " AND object_status='ACTIVE' and rgd_object_key=1  and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
+            " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id "+
+            " AND object_status='ACTIVE' and rgd_object_key=1  and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
 
-        return executeGeneQuery(query);
+        return executeGeneQuery(query, accId);
     }
 
     public List<Gene> getAnnotatedGenes(String accId, List<Integer> speciesTypeKeys, List<String> evidenceCodes) throws Exception{
 
-        String speciesInClause = "(";
-        boolean first = true;
-        for (Integer species: speciesTypeKeys) {
-            if (first) {
-                speciesInClause += species;
-                first=false;
-            }else {
-                speciesInClause += "," + species;
-            }
-        }
-        speciesInClause += ")";
-
-        String evidenceInClause = "(";
-        first = true;
-        for (String evidence: evidenceCodes) {
-            if (first) {
-                evidenceInClause +="'" + evidence + "'";
-                first=false;
-            }else {
-                evidenceInClause += ",'" + evidence + "'";
-            }
-        }
-        evidenceInClause += ")";
+        String speciesInClause = "("+Utils.buildInPhrase(speciesTypeKeys)+")";
+        String evidenceInClause = Utils.buildInPhraseQuoted(evidenceCodes);
 
         String query = "SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
-                " WHERE term_acc='" + accId + "' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
+                " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key IN " + speciesInClause;
         query += " AND object_status='ACTIVE' and rgd_object_key=1 " +
+                " AND evidence in (" + evidenceInClause + ") AND r.rgd_id=g.rgd_id ORDER BY upper(g.gene_symbol)";
 
-                " and evidence in " + evidenceInClause + " and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
-
-
-        return executeGeneQuery(query);
+        return executeGeneQuery(query, accId);
     }
 
 
@@ -233,7 +210,7 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
-        String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,g.gene_desc,g.product,g.function,"+
+        String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,g.gene_desc,g.agr_desc,g.merged_desc,"+
             "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
             "g.ncbi_annot_status,r.species_type_key " +
             "FROM agr_orthologs a,genes g,rgd_ids r " +
@@ -273,11 +250,11 @@ public class GeneDAO extends AbstractDAO {
     public void updateGene(Gene gene) throws Exception{
 
         String sql = "update GENES set GENE_KEY=?, GENE_SYMBOL=?, GENE_SYMBOL_LC=LOWER(?), "+
-                "FULL_NAME=?, GENE_DESC=?, PRODUCT=?, FUNCTION=?, NOTES=?, FULL_NAME_LC=LOWER(?), "+
+                "FULL_NAME=?, GENE_DESC=?, AGR_DESC=?, MERGED_DESC=?, NOTES=?, FULL_NAME_LC=LOWER(?), "+
                 "GENE_TYPE_LC=LOWER(?), NOMEN_REVIEW_DATE=?, REFSEQ_STATUS=?, NCBI_ANNOT_STATUS=? where RGD_ID=?";
 
         update(sql, gene.getKey(), gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(),
-                gene.getProduct(), gene.getFunction(), gene.getNotes(), gene.getName(), gene.getType(),
+                gene.getAgrDescription(), gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(),
                 gene.getNomenReviewDate(), gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId());
     }
 
@@ -290,14 +267,14 @@ public class GeneDAO extends AbstractDAO {
     public void insertGene(Gene gene) throws Exception{
 
         String sql = "insert into GENES (GENE_KEY, GENE_SYMBOL, GENE_SYMBOL_LC, " +
-                "FULL_NAME, GENE_DESC, PRODUCT, FUNCTION, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, "+
+                "FULL_NAME, GENE_DESC, AGR_DESC, MERGED_DESC, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, "+
                 "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID) values (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?)";
 
         int key = this.getNextKey("genes","gene_key");
         gene.setKey(key);
 
-        update(sql, key, gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(), gene.getProduct(),
-                gene.getFunction(), gene.getNotes(), gene.getName(), gene.getType(), gene.getNomenReviewDate(),
+        update(sql, key, gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(), gene.getAgrDescription(),
+                gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(), gene.getNomenReviewDate(),
                 gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId());
     }
 
