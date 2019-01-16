@@ -1,5 +1,8 @@
 package edu.mcw.rgd.process.enrichment.geneOntology;
 
+import edu.mcw.rgd.dao.impl.OntologyXDAO;
+import edu.mcw.rgd.datamodel.RgdId;
+import edu.mcw.rgd.datamodel.ontologyx.TermWithStats;
 import org.apache.commons.math3.distribution.HypergeometricDistribution;
 import edu.mcw.rgd.dao.impl.GeneEnrichmentDAO;
 
@@ -16,8 +19,11 @@ public class GeneOntologyEnrichmentProcess{
 
     public BigDecimal calculatePValue(int inputGenes, int refGenes, String term, int inputAnnotGenes, int speciesTypeKey) throws Exception{
 
-        GeneEnrichmentDAO dao = new GeneEnrichmentDAO();
-        int refAnnotGenes = dao.getRefAnnotGeneCount(term,speciesTypeKey);
+
+        OntologyXDAO odao = new OntologyXDAO();
+        TermWithStats ts = odao.getTermWithStatsCached(term);
+        int withChildren = 1;
+        int refAnnotGenes = ts.getStat("annotated_object_count", speciesTypeKey, RgdId.OBJECT_KEY_GENES, withChildren);
         HypergeometricDistribution hg =
                 new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
         BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes));
