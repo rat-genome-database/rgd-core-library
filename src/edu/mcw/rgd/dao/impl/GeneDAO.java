@@ -600,11 +600,11 @@ public class GeneDAO extends AbstractDAO {
             return null;
 
         String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
-                "WHERE r.species_type_key=? AND g.gene_symbol_lc=IN ("+
+                "WHERE r.species_type_key="+ speciesKey + "AND g.gene_symbol_lc=IN ("+
                 Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
                 ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
 
-        return IntListQuery.execute(this, query, speciesKey);
+        return IntListQuery.execute(this, query);
     }
     /**
      * Returns a count of all active genes with nomenclature review date between given pair of dates.
