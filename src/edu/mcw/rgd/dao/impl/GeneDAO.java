@@ -140,7 +140,7 @@ public class GeneDAO extends AbstractDAO {
     /**
      *  get all ortholog genes (for active genes)
      *
-     * @param rgdId rgd id
+     * @param rgdIds rgd id
      * @return list of Gene objects
      * @throws Exception when unexpected error in spring framework occurs
      */
@@ -172,7 +172,7 @@ public class GeneDAO extends AbstractDAO {
     /**
      *  get all ortholog genes (for active genes)
      *
-     * @param rgdId rgd id
+     * @param rgdIds rgd id
      * @return list of Gene objects
      * @throws Exception when unexpected error in spring framework occurs
      */
@@ -587,7 +587,25 @@ public class GeneDAO extends AbstractDAO {
 
         return IntListQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey);
     }
+    /**
+     * get active rgd ids for genes given gene symbols and species type key;
+     * @param geneSymbols gene symbol to be searched for
+     * @param speciesKey species type key
+     * @return list of all rgd ids for genes with exact matching symbol (empty list possible)
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Integer> getActiveGeneRgdIdsBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
 
+        if( geneSymbols == null)
+            return null;
+
+        String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
+                "WHERE g.gene_symbol_lc=IN ("+
+                Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
+                "AND g.rgd_id=r.rgd_id AND r.species_type_key=? and r.object_status='ACTIVE'";
+
+        return IntListQuery.execute(this, query, speciesKey);
+    }
     /**
      * Returns a count of all active genes with nomenclature review date between given pair of dates.
      * Results do not contain splices or alleles.
