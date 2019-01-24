@@ -600,9 +600,9 @@ public class GeneDAO extends AbstractDAO {
             return null;
 
         String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
-                "WHERE g.gene_symbol_lc=IN ("+
+                "WHERE r.species_type_key=? AND g.gene_symbol_lc=IN ("+
                 Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") AND g.rgd_id=r.rgd_id AND r.species_type_key=? and r.object_status='ACTIVE'";
+                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
 
         return IntListQuery.execute(this, query, speciesKey);
     }
