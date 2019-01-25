@@ -68,10 +68,15 @@ public class DataSourceFactory {
             if (System.getProperty("spring.config") != null && !System.getProperty("spring.config").equals("")) {
                 return (DataSource) (XmlBeanFactoryManager.getInstance().getBean(domain+"DataSource"));
             }else {
-                Context initContext = new InitialContext();
-                Context envContext  = (Context)initContext.lookup("java:/comp/env");
-                String jdniContext = domain.isEmpty() ? "jdbc/rgd2" : "jdbc/"+domain.toLowerCase();
-                return (DataSource)envContext.lookup(jdniContext);
+                DataSource ds = null;
+                String jdniContext = domain.isEmpty() ? "jdbc/rgd2" : "jdbc/" + domain.toLowerCase();
+                synchronized(this) {
+                    Context initContext = new InitialContext();
+                    Context envContext = (Context) initContext.lookup("java:/comp/env");
+                    ds = (DataSource) envContext.lookup(jdniContext);
+                }
+                return ds;
+
             }
         }catch (Exception e) {
             e.printStackTrace();
