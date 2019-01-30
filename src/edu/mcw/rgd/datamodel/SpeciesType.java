@@ -11,10 +11,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Feb 8, 2008
- * Time: 9:28:21 AM
+ * @author jdepons
+ * @since Feb 8, 2008
  * <p>
  * Translates species type from a string to and int and vice versa.  Integer values
  * reflect what is in the species type field in the rgd_ids table
@@ -29,6 +27,7 @@ public final class SpeciesType {
     public static final int DOG = 6;
     public static final int SQUIRREL = 7;
     public static final int ZEBRAFISH = 8;
+    public static final int PIG = 9;
 
     public static final int ALL = 0;
     public static final int UNKNOWN = -1;
