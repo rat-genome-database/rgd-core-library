@@ -2,10 +2,12 @@ package edu.mcw.rgd.datamodel.phenominerExpectedRange;
 
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 
+import java.io.Serializable;
+
 /**
  * Created by jthota on 4/30/2018.
  */
-public class TraitObject {
+public class TraitObject implements Serializable {
     private Term trait;
     private Term subTrait;
     private Term subSubTrait;

@@ -9,10 +9,8 @@ import junit.framework.TestCase;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Sep 13, 2010
- * Time: 10:40:41 AM
+ * @author mtutaj
+ * @since Sep 13, 2010
  */
 public class MapDAOTest extends TestCase {
 
@@ -25,7 +23,7 @@ public class MapDAOTest extends TestCase {
     public void testAll() throws Exception {
 
         //TranscriptDAO tdao = new TranscriptDAO();
-        //tdao.deleteTranscript(7652850, 11402951);
+        //tdao.deleteTranscript(9325969, 11515292);
 
         testMapDAO();
 

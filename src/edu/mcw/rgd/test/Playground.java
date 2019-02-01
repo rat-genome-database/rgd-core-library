@@ -2,6 +2,7 @@ package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.impl.SampleDAO;
+import edu.mcw.rgd.dao.impl.TranscriptDAO;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.reporting.Record;
 import edu.mcw.rgd.reporting.Report;
@@ -18,6 +19,9 @@ import java.util.List;
 public class Playground {
 
     public static void main (String[] args) throws Exception{
+
+        TranscriptDAO tdao = new TranscriptDAO();
+        tdao.deleteTranscript(12269125, 13284682);
 
         SampleDAO sampleDAO = new SampleDAO();
         sampleDAO.setDataSource(DataSourceFactory.getInstance().getCarpeNovoDataSource());

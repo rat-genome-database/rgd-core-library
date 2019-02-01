@@ -68,6 +68,8 @@ public class DataSourceFactory {
             if (System.getProperty("spring.config") != null && !System.getProperty("spring.config").equals("")) {
                 return (DataSource) (XmlBeanFactoryManager.getInstance().getBean(domain+"DataSource"));
             }else {
+                Thread l_thread = Thread.currentThread();
+                l_thread.setContextClassLoader(this.getClass().getClassLoader());
                 Context initContext = new InitialContext();
                 Context envContext  = (Context)initContext.lookup("java:/comp/env");
                 String jdniContext = domain.isEmpty() ? "jdbc/rgd2" : "jdbc/"+domain.toLowerCase();
