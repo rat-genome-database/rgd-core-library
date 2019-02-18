@@ -215,7 +215,7 @@ public class GeneDAO extends AbstractDAO {
             "g.ncbi_annot_status,r.species_type_key " +
             "FROM agr_orthologs a,genes g,rgd_ids r " +
             "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
-            " AND (is_best_score='Y' and is_best_rev_score='Y')";
+            " AND confidence='stringent'";
         return executeGeneQuery(query, rgdId);
     }
 

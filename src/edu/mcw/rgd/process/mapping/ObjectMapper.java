@@ -196,6 +196,23 @@ public class ObjectMapper {
                         logUnformatted.add("Annotated to KEGG Pathway " + symbol + ": " + msg );
                     }
                     continue;
+                }else if(numericIdType.equals("hgnc")){
+                    XdbIdDAO xdao = new XdbIdDAO();
+                    List<Gene> genes = xdao.getGenesByXdbId(21,symbol.toUpperCase(),speciesTypeKey);
+
+                    String msg = "";
+                    for (Gene g: genes) {
+                        this.addToMap(g);
+
+                        if (msg.equals("")) {
+                            msg += g.getSymbol();
+                        }else {
+                            msg += ", " + g.getSymbol();
+                        }
+                    }
+
+
+                    continue;
                 }
 
             }catch (Exception ignored) {
@@ -351,6 +368,8 @@ public class ObjectMapper {
         ProteinDAO pdao = new ProteinDAO();
 
         List<Protein> proteins = pdao.getProteinListByUniProtIdOrSymbol(symbols,speciesTypeKey);
+        List<String> hgncIds=new ArrayList<>();
+        List<String> otherIdentifiers=new ArrayList<>();
 
         HashMap pMap = new HashMap();
 
@@ -367,13 +386,20 @@ public class ObjectMapper {
         for (String symbol: symbols) {
             if (!pMap.containsKey(symbol.toUpperCase())){
                 listMinusProteins.add(symbol);
-            }else {
-                //System.out.println("skipped " + symbol);
             }
 
         }
 
-        this.mapSymbols(listMinusProteins,speciesTypeKey,numericIdType);
+        for(String identifier:listMinusProteins){
+            if(identifier.toLowerCase().contains("hgnc")){
+                hgncIds.add(identifier);
+            }else{
+                identifier=(identifier.toLowerCase().contains("rgd:"))?identifier.toLowerCase().replace("rgd:",""):identifier;
+                otherIdentifiers.add(identifier);
+            }
+        }
+        this.mapSymbols(hgncIds,speciesTypeKey,"hgnc");
+        this.mapSymbols(otherIdentifiers,speciesTypeKey,numericIdType);
 
 
     }

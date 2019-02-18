@@ -11,10 +11,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Feb 8, 2008
- * Time: 9:28:21 AM
+ * @author jdepons
+ * @since Feb 8, 2008
  * <p>
  * Translates species type from a string to and int and vice versa.  Integer values
  * reflect what is in the species type field in the rgd_ids table
@@ -29,6 +27,10 @@ public final class SpeciesType {
     public static final int DOG = 6;
     public static final int SQUIRREL = 7;
     public static final int ZEBRAFISH = 8;
+    public static final int PIG = 9;
+    public static final int FRUITFLY = 10;
+    public static final int ROUNDWORM = 11;
+    public static final int YEAST = 12;
 
     public static final int ALL = 0;
     public static final int UNKNOWN = -1;
@@ -40,7 +42,7 @@ public final class SpeciesType {
      * Parses a common or taxonomic name and returns the species type key.  This method returns
      * -1 if the name can not be matched.
      * @param type a string denoting species
-     * @return one of (1:HUMAN, 2:MOUSE, 3:RAT, 4: CHINCHILLA, 0:ALL); -1 if species name could not be parsed
+     * @return one of (1:HUMAN, 2:MOUSE, 3:RAT, ..., 0:ALL); -1 if species name could not be parsed
      */
     public static int parse(String type)  {
 
@@ -129,6 +131,16 @@ public final class SpeciesType {
     }
 
     /**
+     * Returns the organism genus based on the species type key passed in, f.e. 'Rattus'
+     * @param speciesTypeKey  species type key
+     * @return organism genus
+     */
+    public static String getOrganismGenus(int speciesTypeKey) {
+        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        return info==null ? "" : info.genus;
+    }
+
+    /**
      * return true if species type key is valid; currently must be in the range 1..4
      * @param speciesTypeKey species type key
      * @return true if species type key is valid
@@ -189,11 +201,6 @@ public final class SpeciesType {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
                     while( rs.next() ) {
-
-                        //we don't want to return zebrafish
-                        if(rs.getInt("species_type_key") == 8) {
-                            continue;
-                        }
 
                         info = new SpeciesInfo();
                         info.speciesTypeKey = rs.getInt("species_type_key");
