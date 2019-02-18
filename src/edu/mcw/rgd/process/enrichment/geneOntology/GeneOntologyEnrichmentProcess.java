@@ -5,9 +5,14 @@ import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.ontologyx.TermWithStats;
 import org.apache.commons.math3.distribution.HypergeometricDistribution;
 import edu.mcw.rgd.dao.impl.GeneEnrichmentDAO;
+import org.apache.commons.math3.util.FastMath;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,25 +22,37 @@ public class GeneOntologyEnrichmentProcess{
 
 
 
-    public BigDecimal calculatePValue(int inputGenes, int refGenes, String term, int inputAnnotGenes, int speciesTypeKey) throws Exception{
+    public String calculatePValue(int inputGenes, int refGenes, String term, int inputAnnotGenes, int speciesTypeKey) throws Exception{
 
-
+        NumberFormat formatter = new DecimalFormat("0.0E0");
+        formatter.setRoundingMode(RoundingMode.HALF_UP);
+        formatter.setMinimumFractionDigits(2);
+        MathContext mc = new MathContext(3);
         OntologyXDAO odao = new OntologyXDAO();
         TermWithStats ts = odao.getTermWithStatsCached(term);
         int withChildren = 1;
         int refAnnotGenes = ts.getStat("annotated_object_count", speciesTypeKey, RgdId.OBJECT_KEY_GENES, withChildren);
         HypergeometricDistribution hg =
                 new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
-        BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes));
-        return pvalue;
+
+        BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes),mc);
+        String p = formatter.format(pvalue);
+
+        return p;
     }
 
-    public BigDecimal calculateBonferroni(BigDecimal pvalue,BigDecimal terms){
-        BigDecimal bonferroni = pvalue.multiply(terms);
+    public String calculateBonferroni(String pvalue,BigDecimal terms){
+        BigDecimal val = new BigDecimal(pvalue);
+        BigDecimal bonferroni = val.multiply(terms);
         if (bonferroni.compareTo(BigDecimal.ONE) == 1)
             bonferroni = BigDecimal.ONE;
 
-        return bonferroni;
+        NumberFormat formatter = new DecimalFormat("0.0E0");
+        formatter.setRoundingMode(RoundingMode.HALF_UP);
+        formatter.setMinimumFractionDigits(2);
+        String p = formatter.format(bonferroni);
+
+        return p;
     }
 
     public BigDecimal calculateHolmBonferroni(BigDecimal pvalue,BigDecimal terms,BigDecimal rank){
