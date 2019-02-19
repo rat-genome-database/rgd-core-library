@@ -202,7 +202,9 @@ public class GeneDAO extends AbstractDAO {
     }
 
 
-    /** get list of AGR orthologs tagged as is-best-score and is-best-rev-score
+    /** get list of stringent AGR orthologs;
+     * Note 1: NOTES field returns AGR_ORTHOLOGS.METHODS_MATCHED;
+     * Note 2: GENE_DESC field returns RGD_ACC_XDB.ACC_ID for xdb_key=63 (AGR_GENE);
      *
      * @param rgdId gene rgd id for a gene
      * @return list of genes being orthologous to a given gene, as listed by AGR
@@ -210,12 +212,12 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
-        String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,g.gene_desc,g.agr_desc,g.merged_desc,"+
+        String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
             "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
             "g.ncbi_annot_status,r.species_type_key " +
-            "FROM agr_orthologs a,genes g,rgd_ids r " +
+            "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
             "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
-            " AND confidence='stringent'";
+            " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
         return executeGeneQuery(query, rgdId);
     }
 
