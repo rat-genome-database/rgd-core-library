@@ -215,7 +215,7 @@ public class GeneDAO extends AbstractDAO {
         String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
             "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
             "g.ncbi_annot_status,r.species_type_key " +
-            "FROM agr_orthologs a, genes g, rgd_ids r, xdb_ids x " +
+            "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
             "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
             " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
         return executeGeneQuery(query, rgdId);
