@@ -15,6 +15,7 @@ public class Aspect {
     public static final String MOLECULAR_FUNCTION="F";
     public static final String BIOLOGICAL_PROCESS="P";
     public static final String MAMMALIAN_PHENOTYPE="N";
+    public static final String HUMAN_PHENOTYPE="H";
     public static final String NEURO="B";
     public static final String CHEBI="E";
     public static final String RAT_STRAIN="S";
@@ -35,6 +36,8 @@ public class Aspect {
             return "GO: Biological Process";
         }else if (aspect.toUpperCase().equals("N")) {
             return "Mammalian Phenotype";
+        }else if (aspect.toUpperCase().equals("H")) {
+            return "Human Phenotype";
         }else if (aspect.toUpperCase().equals("N")) {
             return "Neuro";
         }else if (aspect.toUpperCase().equals("E")) {
