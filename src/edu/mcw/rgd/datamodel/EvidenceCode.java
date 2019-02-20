@@ -80,4 +80,9 @@ public final class EvidenceCode {
         Evidence ev = getEvidence(code);
         return ev != null && ev.getManualCuration() != null;
     }
+
+    public static String getEcoId(String code) throws Exception {
+        Evidence ev = getEvidence(code);
+        return ev==null ? null : ev.getEcoId();
+    }
 }

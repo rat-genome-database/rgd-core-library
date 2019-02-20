@@ -26,6 +26,7 @@ public class EvidenceQuery extends MappingSqlQuery {
         obj.setName(rs.getString("evidence_name"));
         obj.setDescription(rs.getString("description"));
         obj.setManualCuration(rs.getString("manual_curation_flag"));
+        obj.setEcoId(rs.getString("eco_id"));
         return obj;
     }
 }

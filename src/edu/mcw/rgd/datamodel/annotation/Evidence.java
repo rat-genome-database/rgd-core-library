@@ -13,6 +13,7 @@ public class Evidence {
     private String name;
     private String description;
     private String manualCuration; // NULL, or 'same_species' or 'other_species'
+    private String ecoId; // ECO ontology id
 
     public String getEvidence() {
         return evidence;
@@ -44,5 +45,13 @@ public class Evidence {
 
     public void setManualCuration(String manualCuration) {
         this.manualCuration = manualCuration;
+    }
+
+    public String getEcoId() {
+        return ecoId;
+    }
+
+    public void setEcoId(String ecoId) {
+        this.ecoId = ecoId;
     }
 }
