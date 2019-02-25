@@ -213,11 +213,11 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
         String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
-            "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
-            "g.ncbi_annot_status,r.species_type_key " +
-            "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
-            "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
-            " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
+                "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
+                "g.ncbi_annot_status,r.species_type_key " +
+                "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
+                "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
+                " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
         return executeGeneQuery(query, rgdId);
     }
 
@@ -854,7 +854,16 @@ public class GeneDAO extends AbstractDAO {
 
         return GeneQuery.execute(this, query, termAcc, speciesTypeKey);
     }
+    public List<Gene> getActiveAnnotatedGenes(List<Integer> rgdIds,String termAcc, int speciesTypeKey) throws Exception {
 
+        String query = "select * from genes g, rgd_ids ri where g.rgd_id=ri.rgd_id and g.rgd_id in ( " +
+                " select distinct(annotated_object_rgd_id) from full_annot_index fai,  full_annot fa " +
+                " where fai.full_annot_key=fa.full_annot_key and fai.term_acc='"+termAcc+"') " +
+                " and ri.object_status='ACTIVE' and ri.species_type_key=" +speciesTypeKey+
+                " and g.rgd_id in ("+Utils.concatenate(rgdIds,",") +")";
+        System.out.print(query);
+        return GeneQuery.execute(this, query);
+    }
     public List<Gene> getGeneDataWithinRange(int lowerRange, int higherRange, String chr, int mapKey) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key from MAPS_DATA m, RGD_IDS r, GENES g where " +
