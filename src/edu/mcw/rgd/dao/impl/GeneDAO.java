@@ -213,11 +213,11 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
         String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
-            "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
-            "g.ncbi_annot_status,r.species_type_key " +
-            "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
-            "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
-            " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
+                "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
+                "g.ncbi_annot_status,r.species_type_key " +
+                "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
+                "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
+                " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
         return executeGeneQuery(query, rgdId);
     }
 
@@ -601,10 +601,13 @@ public class GeneDAO extends AbstractDAO {
         if( geneSymbols == null)
             return null;
 
-        String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
-                "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
+        String query = "select rgd_id from rgd_ids where rgd_id in ( " +
+                "select distinct(gr.src_rgd_id) from genetogene_rgd_id_rlt gr "+
+                "inner join genes g on  gr.dest_rgd_id = g.rgd_id "+
+                "inner join rgd_ids r on g.rgd_id = r.rgd_id and r.object_status = 'ACTIVE' "+
+                "WHERE g.gene_symbol_lc IN ("+
                 Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+                ") ) AND species_type_key="+ speciesKey ;
 
         return IntListQuery.execute(this, query);
     }
@@ -854,7 +857,7 @@ public class GeneDAO extends AbstractDAO {
 
         return GeneQuery.execute(this, query, termAcc, speciesTypeKey);
     }
-
+  
     public List<Gene> getGeneDataWithinRange(int lowerRange, int higherRange, String chr, int mapKey) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key from MAPS_DATA m, RGD_IDS r, GENES g where " +
