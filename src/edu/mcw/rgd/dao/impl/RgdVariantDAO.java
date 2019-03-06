@@ -2,7 +2,6 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.RgdVariantQuery;
-import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.RgdVariant;
 
 import java.util.List;
@@ -10,29 +9,38 @@ import java.util.List;
 import edu.mcw.rgd.datamodel.RgdId;
 
 /**
- * Created by IntelliJ IDEA.
- * User: hsnalabolu
- * Date: Dec 7, 2018
- * Time: 9:50:52 AM
- * <p>
- * API to manipulate data in Variants table
+ * @author hsnalabolu
+ * @since Dec 7, 2018
+ * API to manipulate data in VARIANTS table
  */
 public class RgdVariantDAO extends AbstractDAO {
     /**
      * get variant by variant rgd id
-     * @param rgdId variant rgd id
-     * @return RgdVariant object
-     * @throws Exception when variant rgd id is invalid
-     * @deprecated Exceptions should not be used as substitute for normal flow logic; NULL should be returned instead
+     * @param variantRgdId variant rgd id
+     * @return RgdVariant object or null if variant rgd id is invalid
+     * @throws Exception when something wrong happens in the spring framework
      */
       public RgdVariant getVariant(int variantRgdId) throws Exception {
-        String query = "select v.*,r.species_type_key from variants v, RGD_IDS r where r.RGD_ID=v.RGD_ID and r.RGD_ID=?";
+        String query = "SELECT v.*,r.species_type_key FROM variants v, rgd_ids r WHERE r.rgd_id=v.rgd_id AND r.rgd_id=?";
 
         List<RgdVariant> variants = executeVariantsQuery(query, variantRgdId);
-        if (variants.size() == 0) {
-            throw new Exception("Variant " + variantRgdId + " not found");
+        if( variants.isEmpty() ) {
+            return null;
         }
         return variants.get(0);
+    }
+
+    /**
+     * get all active variants for given species
+     * @param speciesTypeKey species type key
+     * @return List of RgdVariant objects (could be empty, never null)
+     * @throws Exception when something wrong happens in the spring framework
+     */
+    public List<RgdVariant> getVariantsForSpecies(int speciesTypeKey) throws Exception {
+
+        String query = "SELECT v.*,r.species_type_key FROM variants v, rgd_ids r WHERE r.rgd_id=v.rgd_id AND object_status='ACTIVE' AND r.species_type_key=?";
+
+        return executeVariantsQuery(query, speciesTypeKey);
     }
 
     /**
@@ -64,7 +72,7 @@ public class RgdVariantDAO extends AbstractDAO {
             // create new qtl rgd id
             id = dao.createRgdId(RgdId.OBJECT_KEY_RGDVARIANT, objectStatus, speciesTypeKey);
             variant.setRgdId(id.getRgdId());
-            System.out.println("Rgd id:" + id.getRgdId());
+            //System.out.println("Rgd id:" + id.getRgdId());
             String sql = "INSERT INTO variants (RGD_ID,SO_ACC_ID, NAME, " +
                     "DESCRIPTION, REF_NUC, VAR_NUC, NOTES, LAST_MODIFIED_DATE) " +
                     "VALUES (?,?,?,?,?,?,?,current_date)";
