@@ -681,6 +681,31 @@ public class GeneDAO extends AbstractDAO {
         }
         return genes.get(0);
     }
+    /**
+     * Returns a Gene based on an rgd id
+     * @param rgdIds rgd ids
+     * @return List<Gene> object for given rgd id
+     * @throws Exception thrown when there is no gene with such rgd id
+     */
+    public List<Gene> getGeneByRgdIds(List<Integer> rgdIds) throws Exception {
+        String query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
+
+
+        boolean first = true;
+        for (Integer rgdId: rgdIds) {
+
+            if (first) {
+                query += rgdId;
+            }else {
+                query += "," + rgdId;
+            }
+            first=false;
+        }
+
+        query += ")";
+        List<Gene> genes = GeneQuery.execute(this, query);
+        return genes;
+    }
 
     /**
      * get gene object by gene key
@@ -857,7 +882,7 @@ public class GeneDAO extends AbstractDAO {
 
         return GeneQuery.execute(this, query, termAcc, speciesTypeKey);
     }
-  
+
     public List<Gene> getGeneDataWithinRange(int lowerRange, int higherRange, String chr, int mapKey) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key from MAPS_DATA m, RGD_IDS r, GENES g where " +
