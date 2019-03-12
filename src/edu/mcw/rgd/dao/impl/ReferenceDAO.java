@@ -6,16 +6,12 @@ import edu.mcw.rgd.datamodel.Author;
 import edu.mcw.rgd.datamodel.Reference;
 import edu.mcw.rgd.datamodel.XdbId;
 import edu.mcw.rgd.process.Utils;
-import org.springframework.jdbc.core.SqlParameter;
 
-import java.sql.Types;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 2:59:59 PM
+ * @author jdepons
+ * @since May 19, 2008
  */
 public class ReferenceDAO extends AbstractDAO {
 
@@ -153,26 +149,14 @@ public class ReferenceDAO extends AbstractDAO {
     public int getReferenceRgdIdByPubmedId(String pmid) throws Exception {
 
         String query = "SELECT MAX(ref.rgd_id) \n" +
-                "FROM references ref, rgd_acc_xdb x, rgd_ids r \n" +
-                "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
-                " AND x.rgd_id=ref.rgd_id AND x.acc_id=?\n" +
-                " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+            "FROM references ref, rgd_acc_xdb x, rgd_ids r \n" +
+            "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
+            " AND x.rgd_id=ref.rgd_id AND x.acc_id=?\n" +
+            " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
 
         return getCount(query, pmid);
     }
-    public int getMaxReferenceRgdIdByPubmedId(String pmid) throws Exception {
 
-            String query = "SELECT ref.rgd_id" +
-                    " FROM references ref, rgd_acc_xdb x, rgd_ids r " +
-                "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
-                    " AND x.rgd_id=ref.rgd_id AND x.acc_id=?" +
-                " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
-
-        IntListQuery q = new IntListQuery(this.getDataSource(), query);
-            List<Integer> refRgdIds = execute(q, new Object[]{pmid});
-        return refRgdIds.isEmpty() ? 0 : refRgdIds.get(0);
-
-    }
     /**
      * get PubMed IDs for all active references
      * @return list of external ids
@@ -184,6 +168,19 @@ public class ReferenceDAO extends AbstractDAO {
                 "AND r.object_status='ACTIVE' AND r.object_key=12";
 
         return StringListQuery.execute(this, sql);
+    }
+
+    /**
+     * get {ref-rgd-id, PMID} for all active references
+     * @return list of IntStringMapQuery.MapPair objects
+     */
+    public List<IntStringMapQuery.MapPair> getPubmedIdsAndRefRgdIds() throws Exception {
+
+        String sql = "SELECT x.rgd_id,acc_id FROM rgd_acc_xdb x, rgd_ids r \n" +
+                "WHERE x.rgd_id=r.rgd_id AND x.xdb_key=2 \n" +
+                "AND r.object_status='ACTIVE' AND r.object_key=12";
+
+        return IntStringMapQuery.execute(this, sql);
     }
 
     /**
