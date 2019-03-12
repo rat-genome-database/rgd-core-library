@@ -206,6 +206,13 @@ public class StrainDAO extends AbstractDAO {
                 strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getRgdId());
     }
 
+    public List<Strain> getStrainsByGroupId(int strain_group_id,int speciesTypeKey) throws Exception {
+        String sql= "select s.*, ? as species_type_key from STRAINS s,ont_terms o,PHENOMINER_STRAIN_GROUP p "+
+                "where p.strain_group_id=? and p.strain_ont_id = o.term_acc and s.STRAIN_SYMBOL = o.term";
+
+        return executeStrainQuery(sql, speciesTypeKey,strain_group_id);
+    }
+
     /// Strain query implementation helper
     public List<Strain> executeStrainQuery(String query, Object ... params) throws Exception {
         StrainQuery q = new StrainQuery(this.getDataSource(), query);
