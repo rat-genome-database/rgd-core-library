@@ -651,14 +651,25 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql = "select count(DISTINCT(VARIANT_ID)) as count from POLYPHEN where VARIANT_ID in \n"+
-                " (select VARIANT_ID from VARIANT where SAMPLE_ID IN" +
-                "(select SAMPLE_ID from SAMPLE where STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey+"))"+
-                "AND PREDICTION LIKE '%damaging'";
+        String sql = "select count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
+                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' " +
+                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey;
 
         return getCount(sql);
     }
+    /**
+     * get the list of damaging or possibly damaging variants associated with the sample
+     * @param sampleId
+     * @return variants associated with sample
+     * @throws Exception when unexpected error occurs
+     */
+    public int getCountofDamagingVariantsForSample(int sampleId,String mapKey) throws Exception {
+        String sql = "select count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
+                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' " +
+                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
 
+        return getCount(sql);
+    }
     /**
      * get the list of damaging or possibly damaging variants associated with the strain
      * @param rgdId,mapKey
