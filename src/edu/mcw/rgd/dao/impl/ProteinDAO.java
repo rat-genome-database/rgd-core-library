@@ -114,8 +114,7 @@ public class ProteinDAO extends AbstractDAO {
                 "   g.rgd_id=r.rgd_id " +
                 "   AND g.rgd_id=m.rgd_id " +
                 "   AND r.object_status='ACTIVE' " +
-
-                "AND r.species_type_key=3 " +
+                //"AND r.species_type_key=3 " +
                 "AND m.map_key=?";
 
         if(chr!=null)
