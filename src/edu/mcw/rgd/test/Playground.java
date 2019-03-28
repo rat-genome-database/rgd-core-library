@@ -1,24 +1,32 @@
 package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.impl.ProteinDAO;
 import edu.mcw.rgd.dao.impl.SampleDAO;
 import edu.mcw.rgd.dao.impl.TranscriptDAO;
+import edu.mcw.rgd.datamodel.Protein;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.reporting.Record;
 import edu.mcw.rgd.reporting.Report;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Jun 9, 2008
- * Time: 9:15:34 AM
- * To change this template use File | Settings | File Templates.
  */
 public class Playground {
 
     public static void main (String[] args) throws Exception{
+
+        ProteinDAO pdao = new ProteinDAO();
+        List<String> accIds = new ArrayList<>();
+        accIds.add("a0A0g2k562");
+        accIds.add("ADA10_rat");
+        List<Protein> p = pdao.getProteinListByUniProtIdOrSymbol(accIds, 3);
+        System.out.println(p.size());
 
         TranscriptDAO tdao = new TranscriptDAO();
         tdao.deleteTranscript(12269125, 13284682);
