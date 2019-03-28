@@ -3,17 +3,15 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.ProteinQuery;
-import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Protein;
-import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * <p>API to manipulate PROTEINS table
+ * @author mtutaj
+ * API to manipulate PROTEINS table
  */
 public class ProteinDAO extends AbstractDAO {
 
@@ -57,48 +55,26 @@ public class ProteinDAO extends AbstractDAO {
         return results.isEmpty() ? null : results.get(0);
     }
 
-
     public List<Protein> getProteinListByUniProtIdOrSymbol(List<String> uniProtIdOrProteinSymbol, int speciesTypeKey) throws Exception {
 
+        if( uniProtIdOrProteinSymbol==null || uniProtIdOrProteinSymbol.isEmpty() ) {
+            return Collections.emptyList();
+        }
+        String inList = Utils.concatenate(",", uniProtIdOrProteinSymbol, "toUpperCase", "'");
         String sql = "SELECT p.*,r.species_type_key " +
-                "FROM proteins p,rgd_ids r WHERE p.rgd_id=r.rgd_id and r.species_type_key=" + speciesTypeKey +
-                "and uniprot_id in (";
-
-                boolean first=true;
-                for (String p: uniProtIdOrProteinSymbol) {
-                    if (first) {
-                        sql+= "'" + p.toUpperCase() + "'";
-                        first=false;
-                    }else {
-                        sql += ",'" + p.toUpperCase() + "'";
-                    }
-
-                }
-                sql += ")";
-                sql += " union " +
+                "FROM proteins p,rgd_ids r WHERE p.rgd_id=r.rgd_id AND r.species_type_key=?" +
+                " AND uniprot_id IN ("+inList+") " +
+                "UNION " +
                 "SELECT p.*,r.species_type_key " +
-                "FROM proteins p,rgd_ids r WHERE p.rgd_id=r.rgd_id and r.species_type_key=" + speciesTypeKey +
-                "and protein_symbol in (";
+                "FROM proteins p,rgd_ids r WHERE p.rgd_id=r.rgd_id AND r.species_type_key=?" +
+                " AND protein_symbol IN ("+inList+")";
 
-                first=true;
-                for (String p: uniProtIdOrProteinSymbol) {
-                    if (first) {
-                        sql+= "'" + p.toUpperCase() + "'";
-                        first=false;
-                    }else {
-                        sql += ",'" + p.toUpperCase() + "'";
-                    }
-
-                }
-                sql += ")";
-
-            //    System.out.println(sql);
-
-                return executeProteinQuery(sql);
+        return executeProteinQuery(sql, speciesTypeKey, speciesTypeKey);
     }
+
     public List<Protein> getProteinsByRgdIdList(List<Integer> rgdIdsList) throws Exception {
         String sql= "SELECT p.*,r.species_type_key  FROM proteins p, rgd_ids r WHERE p.rgd_id=r.rgd_id and p.rgd_id  IN ("+ Utils.concatenate(rgdIdsList, ",")+") ";
-         return executeProteinQuery(sql);
+        return executeProteinQuery(sql);
     }
 
     /// Protein query implementation helper
@@ -106,17 +82,16 @@ public class ProteinDAO extends AbstractDAO {
         ProteinQuery q = new ProteinQuery(this.getDataSource(), query);
         return execute(q, params);
     }
+
     public int getRgdId(String uniprot_id) throws Exception{
-        Protein protein =new Protein();
-        int rgdId =0;
-        if(this.getProteinByUniProtId(uniprot_id)!=null){
-            protein=this.getProteinByUniProtId(uniprot_id);
-            if(protein.getRgdId()!=0){
-                rgdId=protein.getRgdId();
-            }
+        int rgdId = 0;
+        Protein protein = getProteinByUniProtId(uniprot_id);
+        if( protein != null ){
+            rgdId = protein.getRgdId();
         }
         return rgdId;
     }
+
     public List<Protein> getProteins() throws Exception{
         String sql= "SELECT p.*,r.species_type_key  FROM proteins p, rgd_ids r WHERE p.rgd_id=r.rgd_id";
         return executeProteinQuery(sql);
@@ -139,12 +114,12 @@ public class ProteinDAO extends AbstractDAO {
                 "AND m.map_key=?";
 
         if(chr!=null)
-        sql=sql+  " AND m.chromosome=? " ;
+            sql=sql+  " AND m.chromosome=? " ;
         sql= sql+"  )";
         List results=null;
         CountQuery q= new CountQuery(this.getDataSource(), sql);
         if(chr!=null)
-         results= this.execute(q, new Object[]{mapKey, chr});
+            results= this.execute(q, new Object[]{mapKey, chr});
         else
             results=this.execute(q, new Object[]{mapKey});
         return (Integer) results.get(0);
