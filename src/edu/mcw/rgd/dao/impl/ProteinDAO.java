@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.ProteinQuery;
 import edu.mcw.rgd.datamodel.Protein;
 import edu.mcw.rgd.process.Utils;
@@ -101,6 +100,12 @@ public class ProteinDAO extends AbstractDAO {
         String sql= "SELECT p.*,r.species_type_key  FROM proteins p, rgd_ids r WHERE p.rgd_id=r.rgd_id and r.species_type_key=?";
         return executeProteinQuery(sql, speciesTypeKey);
     }
+
+    public List<Protein> getActiveProteins(int speciesTypeKey) throws Exception{
+        String sql= "SELECT p.*,r.species_type_key FROM proteins p, rgd_ids r WHERE p.rgd_id=r.rgd_id AND r.species_type_key=? AND object_status='ACTIVE'";
+        return executeProteinQuery(sql, speciesTypeKey);
+    }
+
     public int getProteinsCount(int mapKey, String chr) throws Exception {
         String sql="SELECT COUNT(*) FROM rgd_associations WHERE " +
                 "   assoc_type='protein_to_gene' " +
@@ -116,14 +121,13 @@ public class ProteinDAO extends AbstractDAO {
         if(chr!=null)
             sql=sql+  " AND m.chromosome=? " ;
         sql= sql+"  )";
-        List results=null;
-        CountQuery q= new CountQuery(this.getDataSource(), sql);
-        if(chr!=null)
-            results= this.execute(q, new Object[]{mapKey, chr});
-        else
-            results=this.execute(q, new Object[]{mapKey});
-        return (Integer) results.get(0);
 
+        int count;
+        if( chr!=null )
+            count = getCount(sql, mapKey, chr);
+        else
+            count = getCount(sql, mapKey);
+        return count;
     }
 
 }
