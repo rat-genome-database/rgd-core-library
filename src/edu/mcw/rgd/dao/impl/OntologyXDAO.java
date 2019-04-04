@@ -616,6 +616,22 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
+     * get active (non-obsolete) descendant (child) terms of given term, recursively
+     * @param termAcc term accession id
+     * @return list of descendant terms
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getAllActiveTermDescendantAccIds(String termAcc) throws Exception {
+        String sql = "SELECT t.term_acc FROM ont_terms t "+
+                "WHERE term_acc IN( "+
+                "  SELECT child_term_acc FROM ont_dag "+
+                "  START WITH parent_term_acc=? "+
+                "  CONNECT BY PRIOR child_term_acc=parent_term_acc "+
+                ") AND is_obsolete=0";
+        return StringListQuery.execute(this, sql, termAcc);
+    }
+
+    /**
      * get count of descendants for given term (including the most remote descendants)
      * @param termAcc term accession id
      * @return count of descendant terms
@@ -1574,6 +1590,17 @@ public class OntologyXDAO extends AbstractDAO {
         return StringListQuery.execute(this, query, ontId);
     }
 
+    /**
+     * get list of Obsolete Terms for an OntId
+     * @param ontId
+     * @return list of obsolete terms
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getObsoleteTerms(String ontId) throws Exception {
+
+        String query = "SELECT term_acc FROM ont_terms where ont_id = ? and is_obsolete = 1";
+        return StringListQuery.execute(this, query, ontId);
+    }
     /**
      * to differentiate between ours and the framework's exceptions
      */
