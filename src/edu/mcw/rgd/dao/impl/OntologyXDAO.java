@@ -1598,9 +1598,10 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public List<String> getObsoleteTerms(String ontId) throws Exception {
 
-        String query = "SELECT term_acc FROM ont_terms where ont_id = ? and is_obsolete = 1";
+        String query = "SELECT term_acc FROM ont_terms WHERE ont_id = ? AND is_obsolete <> 0";
         return StringListQuery.execute(this, query, ontId);
     }
+
     /**
      * to differentiate between ours and the framework's exceptions
      */
