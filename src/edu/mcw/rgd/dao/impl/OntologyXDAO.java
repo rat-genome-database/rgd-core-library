@@ -1386,8 +1386,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql = "SELECT * FROM ont_terms \n" +
                 "WHERE is_obsolete=0 AND ont_id=? \n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc)\n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=parent_term_acc)";
+                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)";
 
         return executeTermQuery(sql, ontId);
     }
@@ -1400,10 +1399,9 @@ public class OntologyXDAO extends AbstractDAO {
      * @throws Exception if something wrong happens in spring framework
      */
     public int obsoleteOrphanedTerms(String ontId) throws Exception {
-        String sql = "UPDATE ont_terms SET is_obsolete=2 \n" +
+        String sql = "UPDATE ont_terms SET is_obsolete=2, modification_date=SYSDATE \n" +
                 "WHERE is_obsolete=0 AND ont_id=? \n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc)\n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=parent_term_acc)";
+                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)";
 
         return update(sql, ontId);
     }
