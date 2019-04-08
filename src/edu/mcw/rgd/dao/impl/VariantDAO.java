@@ -649,7 +649,7 @@ public class VariantDAO extends JdbcBaseDAO {
      */
     public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
         String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
-                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' " +
+                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey;
 
         return getCount(sql);
@@ -662,11 +662,30 @@ public class VariantDAO extends JdbcBaseDAO {
      */
     public int getCountofDamagingVariantsForSample(int sampleId,String mapKey) throws Exception {
         String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
-                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' " +
+                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
 
         return getCount(sql);
     }
+
+    /**
+     * get the list of damaging or possibly damaging variants associated with the sample
+     * @param sampleId,mapKey
+     * @return variants associated with sample
+     * @throws Exception when unexpected error occurs
+     */
+    public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId,int mapKey) throws Exception {
+        String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v\n" +
+                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =?\n" +
+                "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 \n" +
+                "ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
+        VariantMapper q = new VariantMapper(getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(sampleId,mapKey);
+    }
+
+
     /**
      * get the list of damaging or possibly damaging variants associated with the strain
      * @param rgdId,mapKey
@@ -676,7 +695,7 @@ public class VariantDAO extends JdbcBaseDAO {
     public List<Variant> getDamagingVariantsForStrainByAssembly(int rgdId,int mapKey) throws Exception {
         String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.STRAIN_RGD_ID=? and s.MAP_KEY =?\n" +
-                "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' " +
+                "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
