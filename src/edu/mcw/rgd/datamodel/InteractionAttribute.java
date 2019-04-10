@@ -13,6 +13,39 @@ public class InteractionAttribute {
     private Date createdDate;
     private Date lastModifiedDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        InteractionAttribute that = (InteractionAttribute) o;
+
+        if (interactionKey != that.interactionKey) return false;
+        if (!attributeName.equals(that.attributeName)) return false;
+        return attributeValue.equals(that.attributeValue);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = interactionKey;
+        result = 31 * result + attributeName.hashCode();
+        result = 31 * result + attributeValue.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "InteractionAttribute{ " +
+                "attributeKey=" + attributeKey +
+                ", interactionKey=" + interactionKey +
+                ", attributeName='" + attributeName + '\'' +
+                ", attributeValue='" + attributeValue + '\'' +
+                ", createdDate=" + createdDate +
+                ", lastModifiedDate=" + lastModifiedDate +
+                '}';
+    }
+
     public int getAttributeKey() {
         return attributeKey;
     }
