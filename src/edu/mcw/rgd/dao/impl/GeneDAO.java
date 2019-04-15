@@ -365,6 +365,29 @@ public class GeneDAO extends AbstractDAO {
         return MappedGeneQuery.run(this, query, mapKey);
     }
 
+    public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
+
+        if( rgdIds.isEmpty() )
+            return Collections.emptyList();
+
+        String query = "SELECT g.*, r.species_type_key, md.* \n" +
+                "FROM genes g, rgd_ids r, maps_data md\n" +
+                "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=? "+
+                " AND g.rgd_id IN (";
+        boolean first = true;
+        for (Integer rgdId: rgdIds) {
+
+            if (first) {
+                query += rgdId;
+            }else {
+                query += "," + rgdId;
+            }
+            first=false;
+        }
+         query += ") ORDER BY md.chromosome,md.start_pos";
+
+        return MappedGeneQuery.run(this, query, mapKey);
+    }
     public List<MappedGene> getActiveMappedGenesByGeneList(int mapKey, List<Gene> genes) throws Exception {
 
         if( genes.isEmpty() )
@@ -601,15 +624,33 @@ public class GeneDAO extends AbstractDAO {
         if( geneSymbols == null)
             return null;
 
-        String query = "select rgd_id from rgd_ids where rgd_id in ( " +
-                "select distinct(gr.src_rgd_id) from genetogene_rgd_id_rlt gr "+
-                "inner join genes g on  gr.dest_rgd_id = g.rgd_id "+
-                "inner join rgd_ids r on g.rgd_id = r.rgd_id and r.object_status = 'ACTIVE' "+
-                "WHERE g.gene_symbol_lc IN ("+
+        String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
+                "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
                 Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") ) AND species_type_key="+ speciesKey ;
+                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
 
         return IntListQuery.execute(this, query);
+    }
+
+    /**
+     * get active rgd ids for genes given gene symbols and species type key;
+     * @param geneSymbols gene symbol to be searched for
+     * @param speciesKey species type key
+     * @return list of all active genes with exact matching symbol (empty list possible)
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Gene> getActiveGenesBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
+
+        if( geneSymbols == null)
+            return null;
+
+        String query = "SELECT * FROM genes g, rgd_ids r "+
+                "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
+                Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
+                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+
+
+        return GeneQuery.execute(this, query);
     }
     /**
      * Returns a count of all active genes with nomenclature review date between given pair of dates.
@@ -681,7 +722,7 @@ public class GeneDAO extends AbstractDAO {
         }
         return genes.get(0);
     }
-    /**
+      /**
      * Returns a Gene based on an rgd id
      * @param rgdIds rgd ids
      * @return List<Gene> object for given rgd id
@@ -706,7 +747,6 @@ public class GeneDAO extends AbstractDAO {
         List<Gene> genes = GeneQuery.execute(this, query);
         return genes;
     }
-
     /**
      * get gene object by gene key
      * @param key gene key
@@ -882,7 +922,16 @@ public class GeneDAO extends AbstractDAO {
 
         return GeneQuery.execute(this, query, termAcc, speciesTypeKey);
     }
+    public List<Gene> getActiveAnnotatedGenes(List<Integer> rgdIds,String termAcc, int speciesTypeKey) throws Exception {
 
+        String query = "select * from genes g, rgd_ids ri where g.rgd_id=ri.rgd_id and g.rgd_id in ( " +
+                " select distinct(annotated_object_rgd_id) from full_annot_index fai,  full_annot fa " +
+                " where fai.full_annot_key=fa.full_annot_key and fai.term_acc='"+termAcc+"') " +
+                " and ri.object_status='ACTIVE' and ri.species_type_key=" +speciesTypeKey+
+                " and g.rgd_id in ("+Utils.concatenate(rgdIds,",") +")";
+
+        return GeneQuery.execute(this, query);
+    }
     public List<Gene> getGeneDataWithinRange(int lowerRange, int higherRange, String chr, int mapKey) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key from MAPS_DATA m, RGD_IDS r, GENES g where " +
