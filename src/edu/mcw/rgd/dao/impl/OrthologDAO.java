@@ -124,6 +124,36 @@ public class OrthologDAO extends AbstractDAO {
     }
 
     /**
+     * get gene orthologs for given source rgd ids and species type key (exclude non-active genes)
+     *
+     * @param rgdIds rgd ids
+     * @param speciesTypeKey speciesTypeKey
+     * @return List of Ortholog objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Ortholog> getOrthologsForSourceRgdIds(List<Integer> rgdIds, int speciesTypeKey) throws Exception {
+
+        String query = "SELECT o.*,s.species_type_key src_species_type_key,d.species_type_key dest_species_type_key \n" +
+                "FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d \n" +
+                "WHERE o.src_rgd_id=s.rgd_id AND o.dest_rgd_id=d.rgd_id AND o.src_rgd_id in ( ";
+        boolean first = true;
+        for (Integer rgdId: rgdIds) {
+
+            if (first) {
+                query += rgdId;
+            }else {
+                query += "," + rgdId;
+            }
+            first=false;
+        }
+
+        query += ") AND s.object_status='ACTIVE' AND d.object_status='ACTIVE' AND d.species_type_key = ?";
+
+        System.out.println(query);
+        return executeOrthologQuery(query, speciesTypeKey);
+    }
+
+    /**
      * get gene orthologs for given source rgd id and dest rgd id(exclude non-active genes)
      *
      * @param srcRgdId  source rgd id
