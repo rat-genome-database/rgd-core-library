@@ -1,11 +1,8 @@
 package edu.mcw.rgd.datamodel.pheno;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Feb 18, 2011
- * Time: 2:06:29 PM
- * To change this template use File | Settings | File Templates.
+ * @author jdepons
+ * @since Feb 18, 2011
  */
 public class MeasurementMethod {
 
@@ -17,6 +14,12 @@ public class MeasurementMethod {
     private String piType;
     private Integer piTimeValue;
     private String piTypeUnit;
+    private String siteOntIds;
+    private String type;
+
+    // mutually exclusive: experimentRecordId, geneExpressionRecordId
+    private int experimentRecordId;
+    private int geneExpressionRecordId;
 
     public String getSiteOntIds() {
         return siteOntIds;
@@ -25,8 +28,6 @@ public class MeasurementMethod {
     public void setSiteOntIds(String siteOntIds) {
         this.siteOntIds = siteOntIds;
     }
-
-    private String siteOntIds;
 
     public int getId() {
         return id;
@@ -90,5 +91,29 @@ public class MeasurementMethod {
 
     public void setPiTypeUnit(String piTypeUnit) {
         this.piTypeUnit = piTypeUnit;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public int getExperimentRecordId() {
+        return experimentRecordId;
+    }
+
+    public void setExperimentRecordId(int experimentRecordId) {
+        this.experimentRecordId = experimentRecordId;
+    }
+
+    public int getGeneExpressionRecordId() {
+        return geneExpressionRecordId;
+    }
+
+    public void setGeneExpressionRecordId(int geneExpressionRecordId) {
+        this.geneExpressionRecordId = geneExpressionRecordId;
     }
 }

@@ -1,21 +1,23 @@
 package edu.mcw.rgd.datamodel.pheno;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Feb 17, 2011
- * Time: 2:51:52 PM
- * To change this template use File | Settings | File Templates.
+ * @author jdepons
+ * @since Feb 17, 2011
  */
 public class Sample {
 
     private int id;
     private Integer ageDaysFromHighBound;
     private Integer ageDaysFromLowBound;
-    private Integer numberOfAnimals = new Integer(0);
+    private Integer numberOfAnimals = 0;
     private String notes;
     private String sex;
     private String strainAccId;
+    private String tissueAccId;
+    private String cellTypeAccId;
+    private String subcellComponentAccId;
+    private String geoSampleAcc;
+    private String bioSampleId;
 
     public int getId() {
         return id;
@@ -71,5 +73,45 @@ public class Sample {
 
     public void setStrainAccId(String strainAccId) {
         this.strainAccId = strainAccId;
+    }
+
+    public String getTissueAccId() {
+        return tissueAccId;
+    }
+
+    public void setTissueAccId(String tissueAccId) {
+        this.tissueAccId = tissueAccId;
+    }
+
+    public String getCellTypeAccId() {
+        return cellTypeAccId;
+    }
+
+    public void setCellTypeAccId(String cellTypeAccId) {
+        this.cellTypeAccId = cellTypeAccId;
+    }
+
+    public String getSubcellComponentAccId() {
+        return subcellComponentAccId;
+    }
+
+    public void setSubcellComponentAccId(String subcellComponentAccId) {
+        this.subcellComponentAccId = subcellComponentAccId;
+    }
+
+    public String getGeoSampleAcc() {
+        return geoSampleAcc;
+    }
+
+    public void setGeoSampleAcc(String geoSampleAcc) {
+        this.geoSampleAcc = geoSampleAcc;
+    }
+
+    public String getBioSampleId() {
+        return bioSampleId;
+    }
+
+    public void setBioSampleId(String bioSampleId) {
+        this.bioSampleId = bioSampleId;
     }
 }
