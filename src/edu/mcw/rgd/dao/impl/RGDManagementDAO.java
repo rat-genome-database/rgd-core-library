@@ -4,8 +4,8 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.RgdIdQuery;
 import edu.mcw.rgd.datamodel.Identifiable;
 import edu.mcw.rgd.datamodel.MapData;
-import edu.mcw.rgd.datamodel.Protein;
 import edu.mcw.rgd.datamodel.RgdId;
+import edu.mcw.rgd.process.Utils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,12 +13,9 @@ import java.sql.ResultSet;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Dec 28, 2007
- * Time: 9:45:44 AM
- * <p>
- * Provides methods to perform RGD Management tasks against the data store.
+ * @author jdepons
+ * @since Dec 28, 2007
+ * Manages data in RGD_IDS table.
  */
 public class RGDManagementDAO extends AbstractDAO {
 
@@ -56,27 +53,9 @@ public class RGDManagementDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public void recordIdHistory(int fromRgdId, int toRgdId) throws Exception {
-        Connection conn = null;
-        try {
 
-            conn = this.getConnection();
-            String sql = "insert into rgd_id_history (history_key, old_rgd_id, new_rgd_id, last_modified_date, created_date) values (?,?,?,?,?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, this.getNextKey("rgd_id_history", "history_key" ));
-            ps.setInt(2, fromRgdId);
-            ps.setInt(3, toRgdId);
-            java.sql.Date now = new java.sql.Date(new java.util.Date().getTime());
-            ps.setDate(4, now);
-            ps.setDate(5, now);
-
-            ps.execute();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception ignored) {
-            }
-        }
-
+        String sql = "INSERT INTO rgd_id_history (history_key, old_rgd_id, new_rgd_id, last_modified_date, created_date) VALUES (?,?,?,SYSDATE,SYSDATE)";
+        update(sql, getNextKey("rgd_id_history", "history_key"), fromRgdId, toRgdId);
     }
 
     /**
@@ -225,19 +204,10 @@ public class RGDManagementDAO extends AbstractDAO {
             return null;
         }
     }
-    // Added to get list of RgdId objects for a list of rgdIds for TESTING on 06/22/2017 by JYOTHI
+
+    /// Added to get list of RgdId objects for a list of rgdIds for TESTING on 06/22/2017 by JYOTHI
     public List<RgdId> getListOfRgdId2(List<Integer> rgdIds) throws Exception {
-        String query = "select * from RGD_IDS where RGD_ID in (";
-        boolean first=true;
-        for(int rgdid:rgdIds){
-            if(first) {
-                query = query + rgdid;
-                first=false;
-            }else{
-                query=query + ", "+ rgdid;
-            }
-        }
-        query=query+")";
+        String query = "SELECT * FROM rgd_ids WHERE rgd_id IN ("+ Utils.buildInPhrase(rgdIds)+")";
 
         RgdIdQuery q = new RgdIdQuery(this.getDataSource(), query);
         List<RgdId> ids = execute(q);
@@ -261,6 +231,21 @@ public class RGDManagementDAO extends AbstractDAO {
 
         RgdIdQuery q = new RgdIdQuery(this.getDataSource(), query);
         return execute(q, objectKey);
+    }
+
+    /**
+     * get RgdId objects for given object key and species type key
+     * @param objectKey object key
+     * @param speciesTypeKey species type key
+     * @return list of RgdId objects
+     * @throws Exception when there is a problem in spring framework
+     */
+    public List<RgdId> getRgdIds(int objectKey, int speciesTypeKey) throws Exception {
+
+        String query = "SELECT * FROM rgd_ids WHERE object_key=? AND species_type_key=?";
+
+        RgdIdQuery q = new RgdIdQuery(this.getDataSource(), query);
+        return execute(q, objectKey, speciesTypeKey);
     }
 
     /**
