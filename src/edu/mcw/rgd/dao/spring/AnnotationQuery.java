@@ -1,11 +1,13 @@
 package edu.mcw.rgd.dao.spring;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author jdepons
@@ -32,9 +34,8 @@ public class AnnotationQuery extends MappingSqlQuery {
         annot.setAspect(rs.getString("aspect"));
         annot.setObjectName(rs.getString("object_name"));
         try {
-        annot.setNotes(rs.getString("notes"));
+            annot.setNotes(rs.getString("notes"));
         }catch (Exception e) {
-
         }
         annot.setQualifier(rs.getString("qualifier"));
         annot.setRelativeTo(rs.getString("relative_to"));
@@ -56,6 +57,11 @@ public class AnnotationQuery extends MappingSqlQuery {
         //annot.setStrainTermAcc(rs.getString("strain_term_acc"));
 
         return annot;
+    }
+
+    public static List<Annotation> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+        AnnotationQuery q = new AnnotationQuery(dao.getDataSource(), sql);
+        return dao.execute(q, params);
     }
 
 }

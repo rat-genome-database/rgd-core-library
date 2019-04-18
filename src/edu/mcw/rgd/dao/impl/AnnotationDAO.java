@@ -22,17 +22,16 @@ import java.util.Date;
  */
 public class AnnotationDAO extends AbstractDAO {
 
-
+    /// method should be renamed to 'getGeneAnnotations'
     public List<Annotation> getAnnotations(String accId, List<String> ids, List<Integer> speciesTypeKeys, List<String> evidenceCodes) throws Exception {
 
         String speciesInClause = "(" + Utils.buildInPhrase(speciesTypeKeys) + ")";
-        String evidenceInClause1 = "(" + Utils.buildInPhraseQuoted(evidenceCodes) + ")";
         String idInClause2 = "(" + Utils.buildInPhrase(ids) + ")";
 
         String query = "SELECT a.*, r.species_type_key FROM full_annot a, rgd_ids r, genes g "+
-            "WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
-        query += " AND object_status=\'ACTIVE\' and rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 +
-                " AND evidence in " + evidenceInClause1 + " AND r.rgd_id=g.rgd_id ORDER BY g.gene_symbol_lc";
+            "WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause +
+            " AND object_status='ACTIVE' AND rgd_object_key=1  AND a.annotated_object_rgd_id in " + idInClause2 +
+            " AND evidence IN (" + Utils.buildInPhraseQuoted(evidenceCodes) + ") AND r.rgd_id=g.rgd_id ORDER BY g.gene_symbol_lc";
         return executeAnnotationQuery(query, accId);
     }
 
@@ -1443,10 +1442,7 @@ public class AnnotationDAO extends AbstractDAO {
         logger.debug("---\n" + query + "\n-----");
 
 
-        logger.debug("hey 1");
         StrainQuery slq = new StrainQuery(this.getDataSource(), query);
-        logger.debug("hey 2");
-
         return slq.execute();
     }
 
@@ -1455,51 +1451,40 @@ public class AnnotationDAO extends AbstractDAO {
         if (accIds.size()==0) throw new Exception("Must pass a term");
 
         String query = "select distinct object_symbol from full_annot fa, full_annot_index fai, rgd_ids ri where ri.rgd_id = fa.annotated_object_rgd_id \n" +
-                "and ri.species_type_key=" + speciesTypeKey + " and fa.rgd_object_key=1  AND fai.term_acc IN(\"";
-
-        query += Utils.buildInPhraseQuoted(accIds);
-
-        query += ") and fa.full_annot_key=fai.full_annot_key order by object_symbol";
+            "AND ri.species_type_key=? AND fa.rgd_object_key=1 AND fai.term_acc IN(" + Utils.buildInPhraseQuoted(accIds) +
+            ") AND fa.full_annot_key=fai.full_annot_key  ORDER BY object_symbol";
 
         logger.debug("---\n" + query + "\n-----");
 
-        StringListQuery slq = new StringListQuery(this.getDataSource(), query);
-        return slq.execute();
+        return StringListQuery.execute(this, query, speciesTypeKey);
     }
 
  	public List<String> getAnnotatedGeneSymbols(List accIds, int mapKey, String chromosome) throws Exception {
 
         String query = "select distinct object_symbol from full_annot fa, full_annot_index fai, maps_data md " +
-        "where fa.annotated_object_rgd_id = md.rgd_id and md.chromosome=? and fa.rgd_object_key=1 and md.map_key=? and fai.term_acc in (";
-
-        query += Utils.buildInPhraseQuoted(accIds);
-
-        query += ") and fa.full_annot_key=fai.full_annot_key";
+            "where fa.annotated_object_rgd_id = md.rgd_id and md.chromosome=? and fa.rgd_object_key=1 and md.map_key=? and fai.term_acc in ("+
+            Utils.buildInPhraseQuoted(accIds) + ") and fa.full_annot_key=fai.full_annot_key";
 
         logger.debug(query);
 
-        StringListQuery slq = new StringListQuery(this.getDataSource(), query);
-        return execute(slq, chromosome, mapKey);
+        return StringListQuery.execute(this, query, chromosome, mapKey);
  	}
 
 
     public List<String> getAnnotatedGeneSymbols(List accIds, int mapKey, String chromosome, Integer start, Integer stop) throws Exception {
 
-        String query = "select distinct object_symbol from full_annot fa, full_annot_index fai, maps_data md  " +
-                "where fa.annotated_object_rgd_id = md.rgd_id and md.chromosome=? ";
-
-        if (start !=null && stop != null) {
-            query += " and md.start_pos<" + stop + " and md.stop_pos>" + start;
+        if (start == null || stop == null) {
+            return getAnnotatedGeneSymbols(accIds, mapKey, chromosome);
         }
 
-        query += " AND fa.rgd_object_key=1 AND md.map_key=? AND fai.term_acc IN(";
-        query += Utils.buildInPhraseQuoted(accIds);
-        query += ") AND fa.full_annot_key=fai.full_annot_key";
+        String query = "SELECT DISTINCT object_symbol FROM full_annot fa, full_annot_index fai, maps_data md  " +
+            "WHERE fa.annotated_object_rgd_id = md.rgd_id and md.chromosome=? AND md.start_pos<? AND md.stop_pos>? \n" +
+            " AND fa.rgd_object_key=1 AND md.map_key=? AND fai.term_acc IN(" + Utils.buildInPhraseQuoted(accIds) +
+            ") AND fa.full_annot_key=fai.full_annot_key";
 
         logger.debug(query);
 
-        StringListQuery slq = new StringListQuery(this.getDataSource(), query);
-        return execute(slq, chromosome, mapKey);
+        return StringListQuery.execute(this, query, chromosome, stop, start, mapKey);
     }
 
     public List<Integer> getAnnotatedObjectIds(String accId, boolean withChildren, int speciesTypeKey, int objectTypeKey) throws Exception {
@@ -2019,10 +2004,12 @@ public class AnnotationDAO extends AbstractDAO {
 
     /// Annotation query implementation helper
     public List<Annotation> executeAnnotationQuery(String query, Object ... params) throws Exception {
-        AnnotationQuery q = new AnnotationQuery(this.getDataSource(), query);
-        return execute(q, params);
+        return AnnotationQuery.execute(this, query, params);
     }
 
+    /**
+     * @deprecated query does not use any passed parameters -- sloppy debug code
+     */
     public List<Annotation> getAnnotations(String termAcc, List<Integer> speciesTypeKeys, List<String> evidenceCodes, Integer someInt) throws Exception {
 
         String sql = "select * from full_annot fa, rgd_ids ri " +
