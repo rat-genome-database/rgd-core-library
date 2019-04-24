@@ -7,12 +7,10 @@ package edu.mcw.rgd.datamodel.pheno;
  */
 public class IndividualRecord {
 
-    private int id;
     private int recordId;
     private String animalId;
 
     private String measurementValue;
-
     private Record record = new Record();
 
     public Record getRecord() {
@@ -21,14 +19,6 @@ public class IndividualRecord {
 
     public void setRecord(Record value) {
         this.record = value;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getRecordId() {

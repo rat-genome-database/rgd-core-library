@@ -18,10 +18,8 @@ public class IndividualRecordQuery extends MappingSqlQuery  {
     }
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
         IndividualRecord irec = new IndividualRecord();
 
-        irec.setId(rs.getInt("experiment_record_ind_id"));
         irec.setRecordId(rs.getInt("experiment_record_id"));
         irec.setAnimalId(rs.getString("animal_id"));
         irec.setMeasurementValue(rs.getString("measurement_value"));

@@ -3,16 +3,18 @@ package edu.mcw.rgd.datamodel.pheno;
 import java.text.DecimalFormat;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: 2/7/11
- * Time: 9:47 AM
- * To change this template use File | Settings | File Templates.
+ * @author jdepons
+ * @since 2/7/11
+ * Represents a row from EXPERIMENT_CONDITION table.
  */
 public class Condition {
 
-    private int id;
+    private int id; // unique condition id, from Oracle sequence EXPERIMENT_CONDITION_SEQ
+
+    // mutually exclusive: experimentRecordId, geneExpressionRecordId
     private int experimentRecordId;
+    private int geneExpressionRecordId;
+
     private Integer ordinality;
     private String units;
     private String valueMin;
@@ -119,6 +121,14 @@ public class Condition {
 
     public void setApplicationMethod(String applicationMethod) {
         this.applicationMethod = applicationMethod;
+    }
+
+    public int getGeneExpressionRecordId() {
+        return geneExpressionRecordId;
+    }
+
+    public void setGeneExpressionRecordId(int geneExpressionRecordId) {
+        this.geneExpressionRecordId = geneExpressionRecordId;
     }
 
     // String array for special values of DurationBounds

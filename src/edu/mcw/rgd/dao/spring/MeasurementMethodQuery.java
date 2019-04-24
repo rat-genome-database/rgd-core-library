@@ -6,20 +6,12 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import edu.mcw.rgd.datamodel.Alias;
-import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.pheno.MeasurementMethod;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * To change this template use File | Settings | File Templates.
- */
-
-/**
- * Returns a row from the Alias table
+ * @author jdepons
+ * @since Jan 17, 2008
+ * Returns a row from MEASUREMENT_METHOD table.
  */
 public class MeasurementMethodQuery extends MappingSqlQuery {
 
@@ -41,6 +33,12 @@ public class MeasurementMethodQuery extends MappingSqlQuery {
             mm.setPiTimeValue(null);
         }
         mm.setPiTypeUnit(rs.getString("meas_method_pi_time_unit"));
+        mm.setSiteOntIds(rs.getString("measurement_site_ont_ids"));
+        mm.setType(rs.getString("measurement_method_type"));
+
+        // one of these two must be set
+        mm.setExperimentRecordId(rs.getInt("experiment_record_id"));
+        mm.setGeneExpressionRecordId(rs.getInt("gene_expression_exp_record_id"));
 
         return mm;
     }
