@@ -497,19 +497,21 @@ public class ExpectedRangeProcess extends OntologyXDAO{
         }
         public List<PhenominerExpectedRange> addExtraAttributes(List<PhenominerExpectedRange> records) throws Exception {
             for(PhenominerExpectedRange r:records) {
-                List<Integer> experimentRecordIds = dao.getExperimentRecordIds(r.getExpectedRangeId());
-                List<Record> expRecords = pdao.getFullRecords(experimentRecordIds);
-                List<Term> conditions = getConditions(expRecords);
-                List<Term> methods = getMethods(expRecords);
-                List<Term> strains =getStrains(expRecords);
-                Map<String, String> traitMap =getTraitMap(expRecords);
-                r.setConditions(conditions);
-                r.setMethods(methods);
-                r.setStrains(strains);
-                for (Map.Entry e : traitMap.entrySet()) {
-                    r.setTraitOntId((String) e.getKey());
-                    r.setTrait((String) e.getValue());
+                if(!r.getExpectedRangeName().toLowerCase().contains("normalstrain")) {
+                    List<Integer> experimentRecordIds = dao.getExperimentRecordIds(r.getExpectedRangeId());
+                    List<Record> expRecords = pdao.getFullRecords(experimentRecordIds);
+                    List<Term> conditions = getConditions(expRecords);
+                    List<Term> methods = getMethods(expRecords);
+                    List<Term> strains = getStrains(expRecords);
+                    Map<String, String> traitMap = getTraitMap(expRecords);
+                    r.setConditions(conditions);
+                    r.setMethods(methods);
+                    r.setStrains(strains);
+                    for (Map.Entry e : traitMap.entrySet()) {
+                        r.setTraitOntId((String) e.getKey());
+                        r.setTrait((String) e.getValue());
 
+                    }
                 }
             }
             return records;
