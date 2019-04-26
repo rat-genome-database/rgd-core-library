@@ -1566,24 +1566,21 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<Integer> getRecordIds(SearchBean sb, int studyId, int experimentId, int recordId, int curationStatus, boolean isForReport) throws Exception {
-        StringBuilder query = new StringBuilder("select distinct(er1.experiment_record_id) from study st \n" +
-                "left join experiment e on \n" +
-                "st.study_id = e.study_id \n" +
-                "left join \n" +
-                "(\n" +
-                "select er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
-                "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
-                "s1.*, cm.*, mm.*, ec.*\n" +
-                "from " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
-                " experiment_condition ec\n" +
-                "WHERE er.sample_id = s1.sample_id\n" +
-                "and er.clinical_measurement_id = cm.clinical_measurement_id\n" +
-                "and er.measurement_method_id = mm.measurement_method_id\n" +
-                "and er.experiment_record_id=ec.experiment_record_id) er1 \n" +
-                "on e.experiment_id = er1.experiment_id\n" +
-                "where \n" +
-                "not er1.experiment_record_id is null ");
+        StringBuilder query = new StringBuilder("SELECT DISTINCT(er1.experiment_record_id) FROM study st \n" +
+            "LEFT JOIN experiment e ON st.study_id = e.study_id \n" +
+            "LEFT JOIN \n" +
+            "(\n" +
+            "SELECT er.experiment_id, er.measurement_error, er.last_modified_date, er.measurement_sd, er.measurement_sem, \n" +
+            "er.measurement_units, er.measurement_value, er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
+            "mm.measurement_method_id, mm.measurement_method_ont_id, mm.measurement_duration_in_secs, mm.measurement_site, " +
+            "s1.*, cm.*, ec.*\n" +
+            "FROM " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, " +
+            " experiment_condition ec\n" +
+            "WHERE er.sample_id = s1.sample_id AND er.clinical_measurement_id = cm.clinical_measurement_id\n" +
+            " AND er.measurement_method_id = mm.measurement_method_id AND er.experiment_record_id=ec.experiment_record_id\n" +
+            ")er1 \n" +
+            "ON e.experiment_id = er1.experiment_id\n" +
+            "WHERE NOT er1.experiment_record_id IS NULL ");
 
         if (recordId != -1) {
             query.append(" and er1.experiment_record_id=").append(recordId).append(" ");
