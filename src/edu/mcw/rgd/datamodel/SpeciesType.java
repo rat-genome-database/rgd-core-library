@@ -141,13 +141,23 @@ public final class SpeciesType {
     }
 
     /**
-     * return true if species type key is valid; currently must be in the range 1..4
+     * return true if species type key is valid
      * @param speciesTypeKey species type key
      * @return true if species type key is valid
      */
     static public boolean isValidSpeciesTypeKey(int speciesTypeKey) {
 
         return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey)!=null;
+    }
+
+    /**
+     * return true if objects of this species should be indexed by Elastic Search
+     * @param speciesTypeKey species type key
+     * @return true if species is available in RGD search
+     */
+    static public boolean isSearchable(int speciesTypeKey) {
+
+        return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey).isSearchable;
     }
 
     /**
@@ -211,6 +221,7 @@ public final class SpeciesType {
                         info.genebankCommonName = rs.getString("genebank_common_name");
                         info.ncbiGenomeUrl = XDBIndex.getInstance().getXDB(61).getUrl(info.speciesTypeKey);
                         info.taxonomicName = info.genus+" "+info.species;
+                        info.isSearchable = rs.getInt("is_searchable")!=0;
                         _map.put(info.speciesTypeKey, info);
                     }
                 } catch (Exception ignore) {
@@ -233,6 +244,7 @@ public final class SpeciesType {
             public int taxonomyId;
             public String taxonomicName;
             public String ncbiGenomeUrl;
+            public boolean isSearchable;
         }
     }
 }
