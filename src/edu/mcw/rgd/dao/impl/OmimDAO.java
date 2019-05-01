@@ -25,12 +25,12 @@ public class OmimDAO extends AbstractDAO {
     }
 
     public void insertOmim( Omim omim ) throws Exception {
-        String sql = "INSERT INTO omim (mim_number,phenotype,created_date,status,last_modified_date) VALUES(?,?,SYSDATE,?,SYSDATE)";
-        update(sql, omim.getMimNumber(), omim.getPhenotype(), omim.getStatus());
+        String sql = "INSERT INTO omim (mim_number,phenotype,created_date,status,mim_type,last_modified_date) VALUES(?,?,SYSDATE,?,?,SYSDATE)";
+        update(sql, omim.getMimNumber(), omim.getPhenotype(), omim.getStatus(), omim.getMimType());
     }
 
     public void updateOmim( Omim omim ) throws Exception {
-        String sql = "UPDATE omim SET phenotype=?,status=?,last_modified_date=SYSDATE WHERE mim_number=?";
-        update(sql, omim.getPhenotype(), omim.getStatus(), omim.getMimNumber());
+        String sql = "UPDATE omim SET phenotype=?,status=?,mim_type=?,last_modified_date=SYSDATE WHERE mim_number=?";
+        update(sql, omim.getPhenotype(), omim.getStatus(), omim.getMimType(), omim.getMimNumber());
     }
 }

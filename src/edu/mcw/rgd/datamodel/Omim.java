@@ -10,6 +10,7 @@ import java.util.Date;
 public class Omim {
     private String mimNumber;
     private String status; // 'live', etc
+    private String mimType; // 'gene','phenotype', etc
     private String phenotype; // if available
     private Date createdDate;
     private Date lastModifiedDate;
@@ -23,6 +24,7 @@ public class Omim {
 
         if (!mimNumber.equals(omim.mimNumber)) return false;
         if (!status.equals(omim.status)) return false;
+        if (!mimType.equals(omim.mimType)) return false;
         return phenotype.equals(omim.phenotype);
 
     }
@@ -31,6 +33,7 @@ public class Omim {
     public int hashCode() {
         int result = mimNumber.hashCode();
         result = 31 * result + status.hashCode();
+        result = 31 * result + mimType.hashCode();
         result = 31 * result + phenotype.hashCode();
         return result;
     }
@@ -49,6 +52,14 @@ public class Omim {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMimType() {
+        return mimType;
+    }
+
+    public void setMimType(String mimType) {
+        this.mimType = mimType;
     }
 
     public String getPhenotype() {
