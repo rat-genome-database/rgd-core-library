@@ -24,6 +24,7 @@ public class OmimQuery extends MappingSqlQuery  {
 
         o.setMimNumber(rs.getString("mim_number"));
         o.setStatus(rs.getString("status"));
+        o.setMimType(rs.getString("mim_type"));
         o.setPhenotype(rs.getString("phenotype"));
         o.setCreatedDate(rs.getTimestamp("created_date"));
         o.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
