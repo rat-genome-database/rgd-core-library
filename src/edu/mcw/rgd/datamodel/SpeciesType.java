@@ -157,7 +157,10 @@ public final class SpeciesType {
      */
     static public boolean isSearchable(int speciesTypeKey) {
 
-        return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey).isSearchable;
+    //    return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey).isSearchable;
+
+        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        return info != null && info.isSearchable;
     }
 
     /**
