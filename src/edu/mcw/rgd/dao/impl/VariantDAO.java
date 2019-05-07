@@ -17,6 +17,26 @@ public class VariantDAO extends JdbcBaseDAO {
 
     public static String lastQuery = "";
 
+    public String getVariantTable(int sampleId) {
+        if( sampleId<100 ) {
+            return "variant_clinvar";
+        }
+        if( sampleId>=6000 && sampleId<=6999 ) {
+            return "variant_dog";
+        }
+        return "variant";
+    }
+
+    public String getVariantTranscriptTable(int sampleId) {
+        if( sampleId<100 ) {
+            return "variant_transcript_clinvar";
+        }
+        if( sampleId>=6000 && sampleId<=6999 ) {
+            return "variant_transcript_dog";
+        }
+        return "variant_transcript";
+    }
+
     /**
      * @param vsb
      * @return
@@ -245,11 +265,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
 
         if (vsb.hasOnlyTranscript()) {
-            if( vsb.isHuman() ) {
-                sql += " inner join variant_transcript_human vt on v.variant_id=vt.variant_id ";
-            } else {
-                sql += " inner join variant_transcript vt on v.variant_id=vt.variant_id ";
-            }
+            sql += " inner join "+vsb.getVariantTranscriptTable()+" vt on v.variant_id=vt.variant_id ";
             sqlFrom += ",vt.* ";
             sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
@@ -458,7 +474,7 @@ public class VariantDAO extends JdbcBaseDAO {
      */
     public int saveVariants(List<Variant> variantList, int sampleId) {
 
-        String tableName = (sampleId<100) ? "VARIANT_HUMAN" : "VARIANT";
+        String tableName = getVariantTable(sampleId);
         String sqlUpdate = "UPDATE "+tableName+" SET\n" +
             " chromosome=?, end_pos=?, ref_nuc=?, sample_id=?, start_pos=?,\n" +
             " total_depth=?, var_freq=?, quality_score=?, rgd_id=?, hgvs_name=?,\n" +
@@ -526,7 +542,7 @@ public class VariantDAO extends JdbcBaseDAO {
      */
     public int insertVariants(List<Variant> variantList, int sampleId) {
 
-        String tableName = (sampleId<100) ? "VARIANT_HUMAN" : "VARIANT";
+        String tableName = getVariantTable(sampleId);
 
         BatchSqlUpdate bsu = new BatchSqlUpdate(this.getDataSource(),
             "INSERT INTO "+tableName+" (\n" +
@@ -594,8 +610,7 @@ public class VariantDAO extends JdbcBaseDAO {
  	*/
  	public List<Variant> getVariants(int sampleId, String chr, long start, long stop) {
 
-        String tableName = sampleId<100 ? "variant_human" : "variant";
-        String sql = "SELECT * FROM "+tableName+" WHERE sample_id=? AND start_pos >= ? AND start_pos <= ? AND chromosome=?";
+        String sql = "SELECT * FROM "+getVariantTable(sampleId)+" WHERE sample_id=? AND start_pos >= ? AND start_pos <= ? AND chromosome=?";
 
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -624,7 +639,6 @@ public class VariantDAO extends JdbcBaseDAO {
     }
 
     public List<String> getGeneAssemblyOfDamagingVariants(int rgdId) throws Exception {
-        List<String> res = new ArrayList<String>();
 
         String sql = "select UNIQUE(s.MAP_KEY) from VARIANT v,SAMPLE s, MAPS m where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n" +
                 "(select VARIANT_ID from VARIANT_TRANSCRIPT \n" +
@@ -635,7 +649,6 @@ public class VariantDAO extends JdbcBaseDAO {
     }
 
     public List<String> getAssemblyOfDamagingVariants(int strainRgdId) throws Exception {
-        List<String> res = new ArrayList<String>();
 
         String sql = "select UNIQUE(MAP_KEY) from SAMPLE where STRAIN_RGD_ID = " + strainRgdId;
         return getList(sql);
@@ -660,7 +673,7 @@ public class VariantDAO extends JdbcBaseDAO {
      * @return variants associated with sample
      * @throws Exception when unexpected error occurs
      */
-    public int getCountofDamagingVariantsForSample(int sampleId,String mapKey) throws Exception {
+    public int getCountofDamagingVariantsForSample(int sampleId, String mapKey) throws Exception {
         String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
                 " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
@@ -670,11 +683,12 @@ public class VariantDAO extends JdbcBaseDAO {
 
     /**
      * get the list of damaging or possibly damaging variants associated with the sample
-     * @param sampleId,mapKey
+     * @param sampleId
+     * @param mapKey
      * @return variants associated with sample
      * @throws Exception when unexpected error occurs
      */
-    public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId,int mapKey) throws Exception {
+    public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId, int mapKey) throws Exception {
         String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v\n" +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =?\n" +
                 "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 \n" +

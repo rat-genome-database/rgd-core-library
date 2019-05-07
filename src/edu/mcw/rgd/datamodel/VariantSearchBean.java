@@ -76,6 +76,10 @@ public class VariantSearchBean {
         return mapKey==17 || mapKey==38;
     }
 
+    public boolean isDog() {
+        return mapKey==631;
+    }
+
     public List<MappedGene> getMappedGenes() {
         return mappedGenes;
     }
@@ -146,12 +150,30 @@ public class VariantSearchBean {
     public String getVariantTable() {
 
         if( isHuman() ) {
-            return " variant_human ";
+            return " variant_clinvar ";
+        }
+        else if( isDog() ) {
+            return " variant_dog ";
         }
         else if( isGenic() ) {
             return " variant_genic ";
         }else {
             return " variant ";
+        }
+    }
+
+    public String getVariantTranscriptTable() {
+
+        if( isHuman() ) {
+            return " variant_transcript_clinvar ";
+        }
+        else if( isDog() ) {
+            return " variant_transcript_dog ";
+        }
+        else if( isGenic() ) {
+            return " variant_transcript_genic ";
+        }else {
+            return " variant_transcript ";
         }
     }
 
@@ -1049,29 +1071,6 @@ public class VariantSearchBean {
 
     }
 
-    public String getMappedGenesSQL2() {
-        String sql = "";
-
-        boolean first = true;
-        for (MappedGene mg : this.mappedGenes) {
-
-            if (first) {
-                sql += " and (";
-                first=false;
-            }else {
-                sql += " or ";
-            }
-
-            sql += "(v.start_pos > " + mg.getStart() + " and v.start_pos < " + mg.getStop() + ")";
-        }
-
-        if (!first) {
-            sql += ")";
-        }
-
-        return sql;
-    }
-
     /**
      * Returns the sql needed to limit the search results based on the DB_SNP query parameters.
      *
@@ -1101,7 +1100,7 @@ public class VariantSearchBean {
      */
     public String[] getTableJoinSQL (String sqlFrom, boolean limit) {
 
-        String vtTable = isHuman() ? "variant_transcript_human" : "variant_transcript";
+        String vtTable = getVariantTranscriptTable();
         String sql = "";
 
 
