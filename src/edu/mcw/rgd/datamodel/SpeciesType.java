@@ -155,7 +155,7 @@ public final class SpeciesType {
      * @param speciesTypeKey species type key
      * @return true if species is available in RGD search
      */
-    static public boolean isSearchable(int speciesTypeKey) {
+    static public synchronized boolean isSearchable(int speciesTypeKey) {
 
     //    return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey).isSearchable;
 
