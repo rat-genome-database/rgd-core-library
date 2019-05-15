@@ -2197,11 +2197,8 @@ public class PhenominerDAO extends AbstractDAO {
 
     public String checkUnitConversion(String termAcc, String unitFrom) {
         try {
-            String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id='" + termAcc + "'";
-            StringListQuery sq = new StringListQuery(this.getDataSource(), sqlStr);
-
-            sq.compile();
-            List<String> result = sq.execute();
+            String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
+            List<String> result = StringListQuery.execute(this, sqlStr, termAcc);
 
             if (result.size() == 0) {
                 sqlStr = "insert into PHENOMINER_STANDARD_UNITS (ont_id,standard_unit)" +
@@ -2220,10 +2217,9 @@ public class PhenominerDAO extends AbstractDAO {
 
             String unitTo = result.get(0);
 
-            sqlStr = "select count(*) from PHENOMINER_TERM_UNIT_SCALES " +
-                                "where ont_id='" + termAcc + "' and unit_from='" + unitFrom + "' and unit_to='" + unitTo +
-                                "'";
-            int cnt = getCount(sqlStr);
+            sqlStr = "SELECT count(*) from PHENOMINER_TERM_UNIT_SCALES " +
+                                "WHERE ont_id=? AND unit_from=? AND unit_to=?";
+            int cnt = getCount(sqlStr, termAcc, unitFrom, unitTo);
             if (cnt > 0) return "";
 
             sqlStr = "select count(*) from PHENOMINER_UNIT_SCALES " +
@@ -2439,9 +2435,6 @@ public class PhenominerDAO extends AbstractDAO {
 
 
 
-    /**
-     * Get ordinality counts of records
-     */
     public List<Record> getFullRecords(List<String> sampleIds, List<String> measurementMethodIds, List<String> clinicalMeasurementIds,
                        List<String> experimentalConditionIds, int speciesTypeKey) throws Exception {
 
@@ -2450,6 +2443,26 @@ public class PhenominerDAO extends AbstractDAO {
                 "and er.measurement_method_id=mm.measurement_method_id  " +
                 "and er.experiment_id=e.experiment_id and e.study_id=st.study_id " +
                 "and er.curation_status=40 and er.species_type_key=" + speciesTypeKey + " ";
+
+        query += this.buildInclauseForgetFullRecords("s.strain_ont_id", sampleIds);
+        query += this.buildInclauseForgetFullRecords("mm.measurement_method_ont_id", measurementMethodIds);
+        query += this.buildInclauseForgetFullRecords("cm.clinical_measurement_ont_id", clinicalMeasurementIds);
+
+        String conditionGroupSQL = this.getCondtionGroupIdsSQL(experimentalConditionIds);
+
+        query += " and er.experiment_record_id in (" + conditionGroupSQL + ")";
+
+        return runFullRecordsQuery(query);
+    }
+
+    public List<Record> getFullRecords(List<String> sampleIds, List<String> measurementMethodIds, List<String> clinicalMeasurementIds,
+                                       List<String> experimentalConditionIds, int speciesTypeKey, int refRgdId) throws Exception {
+
+        String query = "SELECT * FROM experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "WHERE er.clinical_measurement_id=cm.clinical_measurement_id  AND er.sample_id=s.sample_id " +
+                " AND er.measurement_method_id=mm.measurement_method_id " +
+                " AND er.experiment_id=e.experiment_id  AND e.study_id=st.study_id  AND st.ref_rgd_id=" + refRgdId + " " +
+                " AND er.curation_status=40  AND er.species_type_key=" + speciesTypeKey + " ";
 
         query += this.buildInclauseForgetFullRecords("s.strain_ont_id", sampleIds);
         query += this.buildInclauseForgetFullRecords("mm.measurement_method_ont_id", measurementMethodIds);
