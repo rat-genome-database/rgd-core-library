@@ -35,6 +35,7 @@ public class Variant implements Serializable {
     String hgvsName;
     int rgdId;
     String variantType;
+    String paddingBase;
 
     String spliceSitePrediction = "";
     String regionName = "";
@@ -51,7 +52,7 @@ public class Variant implements Serializable {
                    String zygosityRefAllele, int zygosityNumberAllele, String zygosityInPseudo,
                    String spliceSitePrediction, String regionName, int sampleId,
                    List<ConservationScore> conservationScore, String genicStatus, int variantFrequency,
-                   String hgvsName, int rgdId, String variantType ) {
+                   String hgvsName, int rgdId, String variantType, String paddingBase ) {
         this.id = id;
         this.chromosome = chromosome;
         this.startPos = startPos;
@@ -76,6 +77,7 @@ public class Variant implements Serializable {
         this.hgvsName = hgvsName;
         this.rgdId = rgdId;
         this.variantType = variantType;
+        this.paddingBase = paddingBase;
     }
 
     /**
@@ -94,7 +96,7 @@ public class Variant implements Serializable {
                 aVar.getZygosityStatus(), aVar.getZygosityPercentRead(), aVar.getZygosityPossibleError(),
                 aVar.getZygosityRefAllele(), aVar.getZygosityNumberAllele(), aVar.getZygosityInPseudo(),
                 aVar.getSpliceSitePrediction(), aVar.getRegionName(), aVar.getSampleId(),
-                b, aVar.getGenicStatus(), aVar.getVariantFrequency(), aVar.getHgvsName(), aVar.getRgdId(), aVar.getVariantType());
+                b, aVar.getGenicStatus(), aVar.getVariantFrequency(), aVar.getHgvsName(), aVar.getRgdId(), aVar.getVariantType(), aVar.getPaddingBase());
     }
 
     public List<ConservationScore> getConservationScore() {
@@ -291,5 +293,13 @@ public class Variant implements Serializable {
 
     public void setVariantType(String variantType) {
         this.variantType = variantType;
+    }
+
+    public String getPaddingBase() {
+        return paddingBase;
+    }
+
+    public void setPaddingBase(String paddingBase) {
+        this.paddingBase = paddingBase;
     }
 }

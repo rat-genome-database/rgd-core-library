@@ -44,6 +44,7 @@ public class VariantMapper extends MappingSqlQuery {
         v.setHgvsName(rs.getString("HGVS_NAME"));
         v.setRgdId(rs.getInt("RGD_ID"));
         v.setVariantType(rs.getString("VARIANT_TYPE"));
+        v.setPaddingBase(rs.getString("PADDING_BASE"));
         try{
             v.setRegionName(rs.getString("GENE_SYMBOL"));
         }catch(SQLException e){
