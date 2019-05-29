@@ -8,11 +8,8 @@ import edu.mcw.rgd.process.Utils;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Jun 18, 2010
- * Time: 4:28:57 PM
- * <p>
+ * @author mtutaj
+ * @since Jun 18, 2010
  * manages gene transcripts and transcripts features: exons, utrs, ...
  */
 public class TranscriptDAO extends AbstractDAO {
@@ -482,44 +479,6 @@ public class TranscriptDAO extends AbstractDAO {
         return rowsAffected;
     }
 
-    /**
-     * delete all features and coordinates for given transcript and assembly map
-     * @param transcriptRgdId transcript rgd id
-     * @param mapKey map key
-     * @return number of rows affected
-     * @throws Exception on error in framework
-     */
-    public int deleteFeaturesForMap(int transcriptRgdId, int mapKey) throws Exception {
-
-        int rowsAffected = 0;
-
-        // select all rgd ids for given feature and map
-        String query = "select RGD_ID from TRANSCRIPT_FEATURES,MAPS_DATA where TRANSCRIPT_RGD_ID=? and FEATURE_RGD_ID=RGD_ID and MAP_KEY=?";
-        List<Integer> rgdIds = IntListQuery.execute(this, query, transcriptRgdId, mapKey);
-        if( rgdIds.size()==0 )
-            return rowsAffected;
-        
-        // create a IN clause of rgd_ids
-        String inClause = Utils.buildInPhrase(rgdIds);
-
-        // delete maps position for transcript feature
-        query = "delete from MAPS_DATA where MAP_KEY=? AND RGD_ID in("+inClause+")";
-        rowsAffected += update(query, mapKey);
-
-        // delete the transcript features too
-        query = "delete from TRANSCRIPT_FEATURES where FEATURE_RGD_ID in("+inClause+")";
-        rowsAffected += update(query);
-
-        // delete maps positions genes as well
-        query = "delete from MAPS_DATA where MAP_KEY=? and RGD_ID in(select GENE_RGD_ID from TRANSCRIPTS where TRANSCRIPT_RGD_ID=?)";
-        rowsAffected += update(query, mapKey, transcriptRgdId);
-
-        // delete the transcript features too
-        query = "delete from RGD_IDS where RGD_ID in("+inClause+")";
-        rowsAffected += update(query);
-
-        return rowsAffected;
-    }
 
     public List<Transcript> getTranscripts(int mapKey) throws Exception {
         String query = "SELECT t.* " +
