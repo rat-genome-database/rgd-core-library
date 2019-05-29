@@ -479,14 +479,14 @@ public class VariantDAO extends JdbcBaseDAO {
             " chromosome=?, end_pos=?, ref_nuc=?, sample_id=?, start_pos=?,\n" +
             " total_depth=?, var_freq=?, quality_score=?, rgd_id=?, hgvs_name=?,\n" +
             " variant_type=?, var_nuc=?, zygosity_status=?, genic_status=?, zygosity_percent_read=?,\n" +
-            " zygosity_num_allele=?, zygosity_poss_error=?, zygosity_ref_allele=?, zygosity_in_pseudo=?\n" +
+            " zygosity_num_allele=?, zygosity_poss_error=?, zygosity_ref_allele=?, zygosity_in_pseudo=?, padding_base=?\n" +
             "WHERE variant_id=?";
         String sqlInsert = "INSERT INTO "+tableName+" (\n" +
             " chromosome, end_pos, ref_nuc, sample_id, start_pos,\n" +
             " total_depth, var_freq, quality_score, rgd_id, hgvs_name,\n" +
             " variant_type, var_nuc, zygosity_status, genic_status, zygosity_percent_read,\n" +
-            " zygosity_num_allele, zygosity_poss_error, zygosity_ref_allele, zygosity_in_pseudo, variant_id)\n" +
-            "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,VARIANT_SEQ.NEXTVAL)";
+            " zygosity_num_allele, zygosity_poss_error, zygosity_ref_allele, zygosity_in_pseudo, padding_base, variant_id)\n" +
+            "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, VARIANT_SEQ.NEXTVAL)";
 
         int countInserted = 0;
         try(Connection conn = this.getDataSource().getConnection() ) {
@@ -517,9 +517,10 @@ public class VariantDAO extends JdbcBaseDAO {
                 ps.setString(17, variantToSave.getZygosityPossibleError());
                 ps.setString(18, variantToSave.getZygosityRefAllele());
                 ps.setString(19, variantToSave.getZygosityInPseudo());
+                ps.setString(20, variantToSave.getPaddingBase());
 
                 if( sql.equals(sqlUpdate) ) {
-                    ps.setLong(20, variantToSave.getId());
+                    ps.setLong(21, variantToSave.getId());
                 } else {
                     countInserted++;
                 }
@@ -546,40 +547,23 @@ public class VariantDAO extends JdbcBaseDAO {
 
         BatchSqlUpdate bsu = new BatchSqlUpdate(this.getDataSource(),
             "INSERT INTO "+tableName+" (\n" +
-                "        VARIANT_ID,\n" +
-                "        CHROMOSOME,\n" +
-                "        END_POS,\n" +
-                "        REF_NUC,\n" +
-                "        SAMPLE_ID,\n" +
-
-                "        START_POS,\n" +
-                "        TOTAL_DEPTH,\n" +
-                "        VAR_FREQ,\n" +
-                "        QUALITY_SCORE,\n" +
-                "        RGD_ID,\n" +
-
-                "        HGVS_NAME,\n" +
-                "        VARIANT_TYPE,\n" +
-                "        VAR_NUC,\n" +
-                "        ZYGOSITY_STATUS,\n" +
-                "        GENIC_STATUS,\n" +
-
-                "        ZYGOSITY_PERCENT_READ,\n" +
-                "        ZYGOSITY_NUM_ALLELE,\n" +
-                "        ZYGOSITY_POSS_ERROR,\n" +
-                "        ZYGOSITY_REF_ALLELE,\n" +
-                "        ZYGOSITY_IN_PSEUDO\n" +
-                "    )\n" +
-                "    VALUES (\n" +
-                "        VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
-                "        ?,?,?,?,?,\n" +
-                "        ?,?,?,?,?,\n" +
-                "        ?,?,?,?,?\n" +
-                "    )",
+            " VARIANT_ID, CHROMOSOME, END_POS, REF_NUC, SAMPLE_ID,\n" +
+            " START_POS, TOTAL_DEPTH, VAR_FREQ, QUALITY_SCORE, RGD_ID,\n" +
+            " HGVS_NAME, VARIANT_TYPE, VAR_NUC, ZYGOSITY_STATUS, GENIC_STATUS,\n" +
+            " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
+            " PADDING_BASE,\n" +
+            ")\n" +
+            "VALUES (\n" +
+            "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
+            "  ?,?,?,?,?,\n" +
+            "  ?,?,?,?,?,\n" +
+            "  ?,?,?,?,?,\n" +
+            "  ?)",
             new int[]{Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER,
                 Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
                 Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                 Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                Types.VARCHAR,
             }, 10000);
         bsu.compile();
 
@@ -588,7 +572,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 v.getStartPos(), v.getDepth(), v.getVariantFrequency(), v.getQualityScore(), v.getRgdId(),
                 v.getHgvsName(), v.getVariantType(), v.getVariantNucleotide(), v.getZygosityStatus(), v.getGenicStatus(),
                 v.getZygosityPercentRead(), v.getZygosityNumberAllele(), v.getZygosityPossibleError(),
-                v.getZygosityRefAllele(), v.getZygosityInPseudo()
+                v.getZygosityRefAllele(), v.getZygosityInPseudo(), v.getPaddingBase()
                 );
         }
         bsu.flush();
