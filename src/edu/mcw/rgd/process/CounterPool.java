@@ -66,4 +66,11 @@ public class CounterPool {
         buf.append("=========\n");
         return buf.toString();
     }
+
+    /// add values from another pool of counters
+    public void merge(CounterPool p) {
+        for( Map.Entry<String,AtomicInteger> entry: p._map.entrySet() ) {
+           add(entry.getKey(), entry.getValue().intValue());
+        }
+    }
 }
