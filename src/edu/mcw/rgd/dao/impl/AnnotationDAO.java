@@ -1769,7 +1769,17 @@ public class AnnotationDAO extends AbstractDAO {
 
                 for (Object list : enrichmentList) {
                     HashMap hm1 = (HashMap) list;
-                    hm.putAll(hm1);
+                    for(Object key: hm1.keySet())
+                    {
+                        String term = (String)key;
+                        if(hm.keySet().contains(term)){
+                            int count = (int)hm1.get(term);
+                            count += (int)hm.get(key);
+                            hm.put(key,count);
+                        }else
+                            hm.put(key,hm1.get(key));
+                    }
+
                 }
             }
         }
