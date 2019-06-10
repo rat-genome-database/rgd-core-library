@@ -1742,27 +1742,38 @@ public class AnnotationDAO extends AbstractDAO {
      * @throws Exception
      */
     public LinkedHashMap<String,Integer> getGeneCounts(List<Integer> rgdIds, List<String> termAccs, List<String> aspects) throws Exception {
-
-        String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
-
-        query += buildInPhrase1000(rgdIds, "annotated_object_rgd_id", "");
-
-        if (aspects != null && aspects.size() > 0) {
-            query +=" AND aspect IN(" +  Utils.buildInPhraseQuoted(aspects) + ")) ";
-        }
-
-        query +="GROUP BY term_acc ORDER BY tcount desc, term_acc ";
-
-        GeneCountQuery gcq = new GeneCountQuery(this.getDataSource(), query);
-        gcq.compile();
-        List enrichmentList =  gcq.execute();
         LinkedHashMap hm = new LinkedHashMap();
+        int i = 0, j = 0;
+        int size = rgdIds.size();
+        for( i=0; i < size; i++ ) {
 
-        for (Object list : enrichmentList) {
-            HashMap hm1 = (HashMap) list;
-            hm.putAll(hm1);
+            if (i % 999 == 0 || size-1 < i+998) {
+                if (size - 1 >= i + 998)
+                    j = i + 998;
+                else
+                    j = size - 1;
+                List<Integer> idList = rgdIds.subList(i, j);
+                String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
+
+                query += buildInPhrase1000(idList, "annotated_object_rgd_id", "");
+
+                if (aspects != null && aspects.size() > 0) {
+                    query += " AND aspect IN(" + Utils.buildInPhraseQuoted(aspects) + ")) ";
+                }
+
+                query += "GROUP BY term_acc ORDER BY tcount desc, term_acc ";
+
+                GeneCountQuery gcq = new GeneCountQuery(this.getDataSource(), query);
+                gcq.compile();
+                List enrichmentList = gcq.execute();
+
+                for (Object list : enrichmentList) {
+                    HashMap hm1 = (HashMap) list;
+                    hm.putAll(hm1);
+                }
+            }
         }
-
+        
         return hm;
 
     }
