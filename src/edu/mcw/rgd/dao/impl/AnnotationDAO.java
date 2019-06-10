@@ -1747,11 +1747,9 @@ public class AnnotationDAO extends AbstractDAO {
         int size = rgdIds.size();
         for( i=0; i < size; i++ ) {
 
-            if (i % 999 == 0 || size-1 < i+998) {
+            if (i % 999 == 0) {
                 if (size - 1 >= i + 998)
                     j = i + 998;
-                else
-                    j = size - 1;
                 List<Integer> idList = rgdIds.subList(i, j);
                 String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
 
@@ -1773,7 +1771,7 @@ public class AnnotationDAO extends AbstractDAO {
                 }
             }
         }
-        
+
         return hm;
 
     }
