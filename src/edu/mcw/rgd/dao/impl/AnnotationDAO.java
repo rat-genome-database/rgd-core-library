@@ -1874,6 +1874,7 @@ public class AnnotationDAO extends AbstractDAO {
         int i = 0, j = 0;
         int size = rgdIds.size();
         OntologyEnrichment oe = new OntologyEnrichment();
+        List<Enrichment> enrichmentList = new ArrayList<>();
         for( i=0; i < size; i++ ) {
 
             if (i % 999 == 0) {
@@ -1902,29 +1903,27 @@ public class AnnotationDAO extends AbstractDAO {
 
                 EnrichmentQuery gq = new EnrichmentQuery(this.getDataSource(), query);
                 gq.compile();
-                List<Enrichment> enrichmentList = gq.execute();
+                enrichmentList.addAll(gq.execute());
+            }
+        }
+        for (Enrichment e : enrichmentList) {
 
+            Term t = new Term();
+            t.setAccId(e.getTerm_acc());
+            t.setTerm(e.getTerm());
 
-                for (Enrichment e : enrichmentList) {
+            Gene g = new Gene();
+            g.setRgdId(e.getObjectId());
+            g.setSymbol(e.getObjectSymbol());
 
-                    Term t = new Term();
-                    t.setAccId(e.getTerm_acc());
-                    t.setTerm(e.getTerm());
+            if (e.getTerm_acc().equals(e.getRoot_acc())) {
+                oe.addAssociation(t, g);
+            } else {
+                Term root = new Term();
+                root.setAccId(e.getRoot_acc());
+                root.setTerm(e.getRoot());
 
-                    Gene g = new Gene();
-                    g.setRgdId(e.getObjectId());
-                    g.setSymbol(e.getObjectSymbol());
-
-                    if (e.getTerm_acc().equals(e.getRoot_acc())) {
-                        oe.addAssociation(t, g);
-                    } else {
-                        Term root = new Term();
-                        root.setAccId(e.getRoot_acc());
-                        root.setTerm(e.getRoot());
-
-                        oe.addAssociation(t, g, root);
-                    }
-                }
+                oe.addAssociation(t, g, root);
             }
         }
         return oe;
