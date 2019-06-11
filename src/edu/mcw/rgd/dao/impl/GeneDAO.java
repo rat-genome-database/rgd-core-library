@@ -837,34 +837,13 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-            if (i % 999 == 0 && i != 0) {
-                j = i - 999;
-                    List<Integer> idList = rgdIds.subList(j, i-1);
-       query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
-
-
-        boolean first = true;
-        for (Integer rgdId: idList) {
-
-            if (first) {
-                query += rgdId;
-            }else {
-                query += "," + rgdId;
-            }
-            first=false;
-        }
-
-        query += ")";
-                    if (i != size - 1)
-                        query += "UNION ";
-
-            }
-        }
-        j += 999;
-        List<Integer> idList = rgdIds.subList(j,size-1);
+            if (( i % 999 == 0 && i != 0 )|| i == size-1) {
+                if( i == size -1) {
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+        List<Integer> idList = rgdIds.subList(j, i);
         query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
-
-
         boolean first = true;
         for (Integer rgdId: idList) {
 
@@ -875,8 +854,12 @@ public class GeneDAO extends AbstractDAO {
             }
             first=false;
         }
-
         query += ")";
+        if (i != size - 1)
+            query += "UNION ";
+        }
+        }
+
         List<Gene> genes = GeneQuery.execute(this, query);
         return genes;
     }
