@@ -1752,7 +1752,7 @@ public class AnnotationDAO extends AbstractDAO {
                     j += 999;
                     i += 1;
                 } else j = i - 999;
-                List<Integer> idList = rgdIds.subList(j, i-1);
+                List<Integer> idList = rgdIds.subList(j, i);
                 String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
 
                 query += buildInPhrase1000(idList, "annotated_object_rgd_id", "");
@@ -1882,7 +1882,7 @@ public class AnnotationDAO extends AbstractDAO {
                     j += 999;
                     i += 1;
                 } else j = i - 999;
-                List<Integer> idList = rgdIds.subList(j, i-1);
+                List<Integer> idList = rgdIds.subList(j, i);
                 String query = "select fa.aspect, ot.term, ot.term_acc, fa.term as root, fa.term_acc as root_acc, fa.object_symbol, fa.annotated_object_rgd_id, fa.evidence " +
                         "from full_annot_index fae, full_annot fa, ont_terms ot ";
 
