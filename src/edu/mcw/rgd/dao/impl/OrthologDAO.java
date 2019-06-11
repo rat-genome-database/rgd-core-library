@@ -160,7 +160,7 @@ public class OrthologDAO extends AbstractDAO {
 
         query += ") AND s.object_status='ACTIVE' AND d.object_status='ACTIVE' AND d.species_type_key ="+speciesTypeKey+ " ";
 
-                if (j != size)
+                if (i != size)
                     query += "UNION ";
             }
         }
