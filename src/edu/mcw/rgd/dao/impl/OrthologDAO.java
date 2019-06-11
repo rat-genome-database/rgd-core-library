@@ -133,11 +133,22 @@ public class OrthologDAO extends AbstractDAO {
      */
     public List<Ortholog> getOrthologsForSourceRgdIds(List<Integer> rgdIds, int speciesTypeKey) throws Exception {
 
-        String query = "SELECT o.*,s.species_type_key src_species_type_key,d.species_type_key dest_species_type_key \n" +
+        int size = rgdIds.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
+
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                List<Integer> idList = rgdIds.subList(j, i);
+                query += "SELECT o.*,s.species_type_key src_species_type_key,d.species_type_key dest_species_type_key \n" +
                 "FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d \n" +
                 "WHERE o.src_rgd_id=s.rgd_id AND o.dest_rgd_id=d.rgd_id AND o.src_rgd_id in ( ";
         boolean first = true;
-        for (Integer rgdId: rgdIds) {
+        for (Integer rgdId: idList) {
 
             if (first) {
                 query += rgdId;
@@ -147,10 +158,13 @@ public class OrthologDAO extends AbstractDAO {
             first=false;
         }
 
-        query += ") AND s.object_status='ACTIVE' AND d.object_status='ACTIVE' AND d.species_type_key = ?";
+        query += ") AND s.object_status='ACTIVE' AND d.object_status='ACTIVE' AND d.species_type_key ="+speciesTypeKey+ " ";
 
-        System.out.println(query);
-        return executeOrthologQuery(query, speciesTypeKey);
+                if (j != size)
+                    query += "UNION ";
+            }
+        }
+        return executeOrthologQuery(query);
     }
 
     /**
