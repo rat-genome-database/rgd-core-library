@@ -697,24 +697,23 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-            if (i % 999 == 0 && i != 0) {
-                j = i - 999;
-            List<String> idList = geneSymbols.subList(j, i-1);
-            query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+
+            List<String> idList = geneSymbols.subList(j, i);
+            query += "SELECT g.rgd_id FROM genes g, rgd_ids r "+
                 "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
                 Utils.concatenate(",", idList, "toLowerCase", "'")+
                 ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
-                    if (i != size - 1)
+                    if (i != size)
                         query += "UNION ";
 
             }
         }
-        j += 999;
-        List<String> idList = geneSymbols.subList(j,size-1);
-        query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
-                "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
-                Utils.concatenate(",", idList, "toLowerCase", "'")+
-                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+        
         return IntListQuery.execute(this, query);
     }
 
@@ -862,7 +861,7 @@ public class GeneDAO extends AbstractDAO {
             query += "UNION ";
         }
         }
-       
+
         List<Gene> genes = GeneQuery.execute(this, query);
         return genes;
     }
