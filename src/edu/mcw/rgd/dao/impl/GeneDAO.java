@@ -837,8 +837,8 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-            if (( i % 999 == 0 && i != 0 )|| i == size-1) {
-                if( i == size -1) {
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
                     j += 999;
                     i += 1;
                 } else j = i - 999;
