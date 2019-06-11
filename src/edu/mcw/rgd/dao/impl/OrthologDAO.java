@@ -140,6 +140,7 @@ public class OrthologDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
+                    if( j != 0)
                     j += 999;
                     i += 1;
                 } else j = i - 999;

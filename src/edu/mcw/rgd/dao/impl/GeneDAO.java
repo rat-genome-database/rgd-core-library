@@ -359,29 +359,23 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-
-            if( i%999 == 0 ) {
-                if (size - 1 >= i+998) {
-                    j = i + 998;
-                    List<String> idList = geneSymbols.subList(i, j);
+        if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+            if( i == (size - 1)) {
+                if( j != 0)
+                j += 999;
+                i += 1;
+            } else j = i - 999;
+            List<String> idList = geneSymbols.subList(j, i);
              query += "SELECT g.*, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md\n" +
                 "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key="+mapKey+
 				" AND g.gene_symbol_lc IN ("+
                 Utils.concatenate(",", idList, "toLowerCase", "'")+
                 ") ";
-                    if(j != size-1)
+                    if(j != size)
                         query += "UNION ";
                 }
             }
-        }
-        List<String> idList = geneSymbols.subList(j,size-1);
-        query += "SELECT g.*, r.species_type_key, md.* \n" +
-                "FROM genes g, rgd_ids r, maps_data md\n" +
-                "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key="+mapKey+
-                " AND g.gene_symbol_lc IN ("+
-                Utils.concatenate(",", idList, "toLowerCase", "'")+
-                ") ";
 
         return MappedGeneQuery.run(this, query);
     }
@@ -400,6 +394,7 @@ public class GeneDAO extends AbstractDAO {
 
                 if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                     if( i == (size - 1)) {
+                        if( j != 0)
                         j += 999;
                         i += 1;
                     } else j = i - 999;
@@ -438,6 +433,7 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
+                    if( j != 0)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -683,7 +679,8 @@ public class GeneDAO extends AbstractDAO {
         for( i=0; i < size; i++ ) {
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    j += 999;
+                   if( j != 0)
+                        j += 999;
                     i += 1;
                 } else j = i - 999;
 
@@ -719,7 +716,8 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    j += 999;
+                    if( j != 0)
+                        j += 999;
                     i += 1;
                 } else j = i - 999;
                     List<String> idList = geneSymbols.subList(j, i);
@@ -820,7 +818,8 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    j += 999;
+                    if( j != 0)
+                        j += 999;
                     i += 1;
                 } else j = i - 999;
 
@@ -1030,6 +1029,7 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
+                    if( j != 0)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
