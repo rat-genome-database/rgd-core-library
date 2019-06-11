@@ -1747,12 +1747,12 @@ public class AnnotationDAO extends AbstractDAO {
         int size = rgdIds.size();
         for( i=0; i < size; i++ ) {
 
-            if (i % 999 == 0) {
-                if (size - 1 >= i + 998)
-                    j = i + 998;
-                else
-                    j = size-1;
-                List<Integer> idList = rgdIds.subList(i, j);
+            if ((i % 999 == 0 && i != 0) || i == size-1) {
+                if( i == size -1) {
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                List<Integer> idList = rgdIds.subList(j, i-1);
                 String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
 
                 query += buildInPhrase1000(idList, "annotated_object_rgd_id", "");
@@ -1877,12 +1877,12 @@ public class AnnotationDAO extends AbstractDAO {
         List<Enrichment> enrichmentList = new ArrayList<>();
         for( i=0; i < size; i++ ) {
 
-            if (i % 999 == 0) {
-                if (size - 1 >= i + 998)
-                    j = i + 998;
-                else
-                    j = size - 1;
-                List<Integer> idList = rgdIds.subList(i, j);
+            if ((i % 999 == 0 && i != 0) || i == size-1) {
+                if( i == size -1) {
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                List<Integer> idList = rgdIds.subList(j, i-1);
                 String query = "select fa.aspect, ot.term, ot.term_acc, fa.term as root, fa.term_acc as root_acc, fa.object_symbol, fa.annotated_object_rgd_id, fa.evidence " +
                         "from full_annot_index fae, full_annot fa, ont_terms ot ";
 

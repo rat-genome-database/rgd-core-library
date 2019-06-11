@@ -697,20 +697,19 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-
-            if (i % 999 == 0) {
-                if (size - 1 >= i + 998) {
-                    j = i + 998;
-                    List<String> idList = geneSymbols.subList(i, j);
+            if (i % 999 == 0 && i != 0) {
+                j = i - 999;
+            List<String> idList = geneSymbols.subList(j, i-1);
             query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
                 "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
                 Utils.concatenate(",", idList, "toLowerCase", "'")+
                 ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
-                    if (j != size - 1)
+                    if (i != size - 1)
                         query += "UNION ";
-                }
+
             }
         }
+        j += 999;
         List<String> idList = geneSymbols.subList(j,size-1);
         query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
                 "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
@@ -838,11 +837,9 @@ public class GeneDAO extends AbstractDAO {
         int i,j=0;
         String query = "";
         for( i=0; i < size; i++ ) {
-
-            if (i % 999 == 0) {
-                if (size - 1 >= i + 998) {
-                    j = i + 998;
-                    List<Integer> idList = rgdIds.subList(i, j);
+            if (i % 999 == 0 && i != 0) {
+                j = i - 999;
+                    List<Integer> idList = rgdIds.subList(j, i-1);
        query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
 
 
@@ -858,11 +855,12 @@ public class GeneDAO extends AbstractDAO {
         }
 
         query += ")";
-                    if (j != size - 1)
+                    if (i != size - 1)
                         query += "UNION ";
-                }
+
             }
         }
+        j += 999;
         List<Integer> idList = rgdIds.subList(j,size-1);
         query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
 
