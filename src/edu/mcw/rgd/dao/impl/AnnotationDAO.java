@@ -1747,12 +1747,13 @@ public class AnnotationDAO extends AbstractDAO {
         int size = rgdIds.size();
         for( i=0; i < size; i++ ) {
 
-            if (i % 999 == 0 || size-1 < i+998) {
-                if (size - 1 >= i + 998)
-                    j = i + 998;
-                else
-                    j = size - 1;
-                List<Integer> idList = rgdIds.subList(i, j);
+            if ((i % 999 == 0 && i != 0) || i == size-1) {
+                if( i == size -1) {
+                    if( j != 0)
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                List<Integer> idList = rgdIds.subList(j, i);
                 String query = "SELECT COUNT(*) as tcount, term_acc FROM ga_index WHERE (";
 
                 query += buildInPhrase1000(idList, "annotated_object_rgd_id", "");
@@ -1769,11 +1770,21 @@ public class AnnotationDAO extends AbstractDAO {
 
                 for (Object list : enrichmentList) {
                     HashMap hm1 = (HashMap) list;
-                    hm.putAll(hm1);
+                    for(Object key: hm1.keySet())
+                    {
+                        String term = (String)key;
+                        if(hm.keySet().contains(term)){
+                            int count = (int)hm1.get(term);
+                            count += (int)hm.get(key);
+                            hm.put(key,count);
+                        }else
+                            hm.put(key,hm1.get(key));
+                    }
+
                 }
             }
         }
-        
+
         return hm;
 
     }
@@ -1861,32 +1872,43 @@ public class AnnotationDAO extends AbstractDAO {
      * @throws Exception
      */
     public OntologyEnrichment getOntologyEnrichment(List<Integer> rgdIds, List<String> termAccs, List<String> aspects) throws Exception {
-
-        String query = "select fa.aspect, ot.term, ot.term_acc, fa.term as root, fa.term_acc as root_acc, fa.object_symbol, fa.annotated_object_rgd_id, fa.evidence " +
-                "from full_annot_index fae, full_annot fa, ont_terms ot ";
-
-        query += "where fa.full_annot_key=fae.full_annot_key and ot.term_acc = fae.term_acc ";
-
-        if (termAccs != null && termAccs.size() > 0) {
-            query +=" and ot.term_acc in (" + Utils.buildInPhraseQuoted(termAccs) + ") ";
-        }
-
-        query += buildInPhrase1000(rgdIds, "fa.annotated_object_rgd_id", " AND ");
-
-
-        if (aspects != null && aspects.size() > 0) {
-            query +=" and fa.aspect in (" +  Utils.buildInPhraseQuoted(aspects) + ") ";
-        }
-
-        query +=" order by fa.aspect, ot.term, fa.object_symbol ";
-
-        EnrichmentQuery gq = new EnrichmentQuery(this.getDataSource(), query);
-        gq.compile();
-        List<Enrichment> enrichmentList =  gq.execute();
-
+        int i = 0, j = 0;
+        int size = rgdIds.size();
         OntologyEnrichment oe = new OntologyEnrichment();
+        List<Enrichment> enrichmentList = new ArrayList<>();
+        for( i=0; i < size; i++ ) {
 
-        for (Enrichment e : enrichmentList ) {
+            if ((i % 999 == 0 && i != 0) || i == size-1) {
+                if( i == size -1) {
+                    if( j != 0)
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                List<Integer> idList = rgdIds.subList(j, i);
+                String query = "select fa.aspect, ot.term, ot.term_acc, fa.term as root, fa.term_acc as root_acc, fa.object_symbol, fa.annotated_object_rgd_id, fa.evidence " +
+                        "from full_annot_index fae, full_annot fa, ont_terms ot ";
+
+                query += "where fa.full_annot_key=fae.full_annot_key and ot.term_acc = fae.term_acc ";
+
+                if (termAccs != null && termAccs.size() > 0) {
+                    query += " and ot.term_acc in (" + Utils.buildInPhraseQuoted(termAccs) + ") ";
+                }
+
+                query += buildInPhrase1000(idList, "fa.annotated_object_rgd_id", " AND ");
+
+
+                if (aspects != null && aspects.size() > 0) {
+                    query += " and fa.aspect in (" + Utils.buildInPhraseQuoted(aspects) + ") ";
+                }
+
+                query += " order by fa.aspect, ot.term, fa.object_symbol ";
+
+                EnrichmentQuery gq = new EnrichmentQuery(this.getDataSource(), query);
+                gq.compile();
+                enrichmentList.addAll(gq.execute());
+            }
+        }
+        for (Enrichment e : enrichmentList) {
 
             Term t = new Term();
             t.setAccId(e.getTerm_acc());
@@ -1898,7 +1920,7 @@ public class AnnotationDAO extends AbstractDAO {
 
             if (e.getTerm_acc().equals(e.getRoot_acc())) {
                 oe.addAssociation(t, g);
-            }else {
+            } else {
                 Term root = new Term();
                 root.setAccId(e.getRoot_acc());
                 root.setTerm(e.getRoot());
@@ -1906,7 +1928,6 @@ public class AnnotationDAO extends AbstractDAO {
                 oe.addAssociation(t, g, root);
             }
         }
-
         return oe;
     }
 
