@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: 11/18/11
- * Time: 9:12 AM
+ * @author jdepons
+ * @since 11/18/11
  */
 public class FastaParser {
 
@@ -31,7 +29,7 @@ public class FastaParser {
     }
 
     public void setMapKey(int mapKey) {
-        final String dir = "/data/ref/fasta/";
+        final String dir = "/ref/fasta/";
 
         String chrDir;
         switch(mapKey) {
@@ -44,6 +42,8 @@ public class FastaParser {
             case 360: chrDir=dir+"rn6"; break;
             case 511: chrDir=dir+"panPan2"; break;
             case 631: chrDir=dir+"canFam3"; break;
+            case 910: chrDir=dir+"susScr3"; break;
+            case 911: chrDir=dir+"susScr11"; break;
             default: chrDir = null; lastError="ERROR: Unsupported mapKey="+mapKey; break;
         }
         setMapKey(mapKey, chrDir);
