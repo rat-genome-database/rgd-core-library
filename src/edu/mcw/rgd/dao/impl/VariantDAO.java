@@ -267,10 +267,11 @@ public class VariantDAO extends JdbcBaseDAO {
         if (vsb.hasOnlyTranscript()) {
             sql += " inner join "+vsb.getVariantTranscriptTable()+" vt on v.variant_id=vt.variant_id ";
             sqlFrom += ",vt.* ";
-            sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
-
+            // this join is not needed, unless you want very strong QC
+            // sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
         }
+
         if (vsb.hasPolyphen()) {
             sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
