@@ -169,9 +169,6 @@ public class VariantSearchBean {
         }
         else if( isDog() ) {
             return " variant_transcript_dog ";
-        }
-        else if( isGenic() ) {
-            return " variant_transcript_genic ";
         }else {
             return " variant_transcript ";
         }
