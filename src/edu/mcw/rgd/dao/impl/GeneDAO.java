@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -354,15 +355,29 @@ public class GeneDAO extends AbstractDAO {
 
         if( geneSymbols.isEmpty() )
             return Collections.emptyList();
-
-        String query = "SELECT g.*, r.species_type_key, md.* \n" +
+        int size = geneSymbols.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
+        if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+            if( i == (size - 1)) {
+                if( j != 0)
+                j += 999;
+                i += 1;
+            } else j = i - 999;
+            List<String> idList = geneSymbols.subList(j, i);
+             query += "SELECT g.*, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md\n" +
-                "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=? "+
+                "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key="+mapKey+
 				" AND g.gene_symbol_lc IN ("+
-                Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") ORDER BY md.start_pos";
+                Utils.concatenate(",", idList, "toLowerCase", "'")+
+                ") ";
+                    if(j != size)
+                        query += "UNION ";
+                }
+            }
 
-        return MappedGeneQuery.run(this, query, mapKey);
+        return MappedGeneQuery.run(this, query);
     }
 
     public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
@@ -370,37 +385,72 @@ public class GeneDAO extends AbstractDAO {
         if( rgdIds.isEmpty() )
             return Collections.emptyList();
 
-        String query = "SELECT g.*, r.species_type_key, md.* \n" +
-                "FROM genes g, rgd_ids r, maps_data md\n" +
-                "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=? "+
-                " AND g.rgd_id IN (";
-        boolean first = true;
-        for (Integer rgdId: rgdIds) {
+        int size = rgdIds.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
 
-            if (first) {
-                query += rgdId;
-            }else {
-                query += "," + rgdId;
+            for( i=0; i < size; i++ ) {
+
+                if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                    if( i == (size - 1)) {
+                        if( j != 0)
+                        j += 999;
+                        i += 1;
+                    } else j = i - 999;
+                    List<Integer> rgdIdsList = rgdIds.subList(j, i);
+                    query += "SELECT g.*, r.species_type_key, md.* \n" +
+                            "FROM genes g, rgd_ids r, maps_data md\n" +
+                            "WHERE r.object_status='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=" + mapKey +
+                            " AND g.rgd_id IN (";
+                    boolean first = true;
+                    for (Integer rgdId : rgdIdsList) {
+
+                        if (first) {
+                            query += rgdId;
+                        } else {
+                            query += "," + rgdId;
+                        }
+                        first = false;
+                    }
+                    query += ") ";
+                    if(i != size)
+                        query += "UNION ";
+                }
             }
-            first=false;
         }
-         query += ") ORDER BY md.chromosome,md.start_pos";
 
-        return MappedGeneQuery.run(this, query, mapKey);
+        return MappedGeneQuery.run(this, query);
     }
     public List<MappedGene> getActiveMappedGenesByGeneList(int mapKey, List<Gene> genes) throws Exception {
 
         if( genes.isEmpty() )
             return Collections.emptyList();
+        int size = genes.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
 
-        String query = "SELECT g.*, r.species_type_key, md.* \n" +
-                "from Genes g, RGD_IDS r , maps_data md\n" +
-                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=? "+
-				" AND g.gene_symbol IN ("+
-                Utils.concatenate(",", genes, "getSymbol", "'")+
-                ") ORDER BY md.start_pos";
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    if( j != 0)
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                    List<Gene> idList = genes.subList(j, i);
+                    query += "SELECT g.*, r.species_type_key, md.* \n" +
+                            "from Genes g, RGD_IDS r , maps_data md\n" +
+                            "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key="+mapKey +
+                            " AND g.gene_symbol IN (" +
+                            Utils.concatenate(",", idList, "getSymbol", "'") +
+                            ") ";
+                    if (j != size)
+                        query += "UNION ";
 
-        return MappedGeneQuery.run(this, query, mapKey);
+            }
+        }
+
+        return MappedGeneQuery.run(this, query );
     }
 
     public List<MappedGene> getActiveMappedGenes(int mapKey) throws Exception {
@@ -623,11 +673,27 @@ public class GeneDAO extends AbstractDAO {
 
         if( geneSymbols == null)
             return null;
+        int size = geneSymbols.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                   if( j != 0)
+                        j += 999;
+                    i += 1;
+                } else j = i - 999;
 
-        String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
+            List<String> idList = geneSymbols.subList(j, i);
+            query += "SELECT g.rgd_id FROM genes g, rgd_ids r "+
                 "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
-                Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+                Utils.concatenate(",", idList, "toLowerCase", "'")+
+                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
+                    if (i != size)
+                        query += "UNION ";
+
+            }
+        }
 
         return IntListQuery.execute(this, query);
     }
@@ -643,11 +709,26 @@ public class GeneDAO extends AbstractDAO {
 
         if( geneSymbols == null)
             return null;
+        int size = geneSymbols.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
 
-        String query = "SELECT * FROM genes g, rgd_ids r "+
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    if( j != 0)
+                        j += 999;
+                    i += 1;
+                } else j = i - 999;
+                    List<String> idList = geneSymbols.subList(j, i);
+         query += "SELECT * FROM genes g, rgd_ids r "+
                 "WHERE r.species_type_key="+ speciesKey + " AND g.gene_symbol_lc IN ("+
-                Utils.concatenate(",", geneSymbols, "toLowerCase", "'")+
-                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+                Utils.concatenate(",", idList, "toLowerCase", "'")+
+                ") AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
+                    if (j != size - 1)
+                        query += "UNION ";
+                }
+            }
 
 
         return GeneQuery.execute(this, query);
@@ -729,11 +810,24 @@ public class GeneDAO extends AbstractDAO {
      * @throws Exception thrown when there is no gene with such rgd id
      */
     public List<Gene> getGeneByRgdIds(List<Integer> rgdIds) throws Exception {
-        String query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
+
+        int size = rgdIds.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
+
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    if( j != 0)
+                        j += 999;
+                    i += 1;
+                } else j = i - 999;
 
 
+        List<Integer> idList = rgdIds.subList(j, i);
+        query += "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
         boolean first = true;
-        for (Integer rgdId: rgdIds) {
+        for (Integer rgdId: idList) {
 
             if (first) {
                 query += rgdId;
@@ -742,8 +836,12 @@ public class GeneDAO extends AbstractDAO {
             }
             first=false;
         }
+        query += ") ";
+        if (i != size)
+            query += "UNION ";
+        }
+        }
 
-        query += ")";
         List<Gene> genes = GeneQuery.execute(this, query);
         return genes;
     }
@@ -924,11 +1022,27 @@ public class GeneDAO extends AbstractDAO {
     }
     public List<Gene> getActiveAnnotatedGenes(List<Integer> rgdIds,String termAcc, int speciesTypeKey) throws Exception {
 
-        String query = "select * from genes g, rgd_ids ri where g.rgd_id=ri.rgd_id and g.rgd_id in ( " +
+        int size = rgdIds.size();
+        int i,j=0;
+        String query = "";
+        for( i=0; i < size; i++ ) {
+
+            if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
+                if( i == (size - 1)) {
+                    if( j != 0)
+                    j += 999;
+                    i += 1;
+                } else j = i - 999;
+                    List<Integer> idList = rgdIds.subList(j, i);
+        query += "select * from genes g, rgd_ids ri where g.rgd_id=ri.rgd_id and g.rgd_id in ( " +
                 " select distinct(annotated_object_rgd_id) from full_annot_index fai,  full_annot fa " +
                 " where fai.full_annot_key=fa.full_annot_key and fai.term_acc='"+termAcc+"') " +
                 " and ri.object_status='ACTIVE' and ri.species_type_key=" +speciesTypeKey+
-                " and g.rgd_id in ("+Utils.concatenate(rgdIds,",") +")";
+                " and g.rgd_id in ("+Utils.concatenate(idList,",") +") ";
+                    if (j != size)
+                        query += "UNION ";
+                }
+            }
 
         return GeneQuery.execute(this, query);
     }
