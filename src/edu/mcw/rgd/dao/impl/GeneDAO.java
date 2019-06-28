@@ -351,7 +351,7 @@ public class GeneDAO extends AbstractDAO {
     }
 
 
-    public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
+   /* public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
 
         if( geneSymbols.isEmpty() )
             return Collections.emptyList();
@@ -378,6 +378,14 @@ public class GeneDAO extends AbstractDAO {
             }
 
         return MappedGeneQuery.run(this, query);
+    }*/
+    public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
+        if(geneSymbols.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            String query = "SELECT g.*, r.species_type_key, md.* \nFROM genes g, rgd_ids r, maps_data md\nWHERE r.object_status=\'ACTIVE\' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=?  AND g.gene_symbol_lc IN (" + Utils.concatenate(",", geneSymbols, "toLowerCase", "\'") + ") ORDER BY md.start_pos";
+            return MappedGeneQuery.run(this, query, new Object[]{Integer.valueOf(mapKey)});
+        }
     }
 
     public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
