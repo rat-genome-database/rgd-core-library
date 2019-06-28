@@ -7,10 +7,7 @@ import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author jdepons
@@ -351,7 +348,7 @@ public class GeneDAO extends AbstractDAO {
     }
 
 
-    public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
+  /*  public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
 
         if( geneSymbols.isEmpty() )
             return Collections.emptyList();
@@ -378,9 +375,16 @@ public class GeneDAO extends AbstractDAO {
             }
 
         return MappedGeneQuery.run(this, query);
+    }*/
+    public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {
+        if(geneSymbols.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            String query = "SELECT g.*, r.species_type_key, md.* \nFROM genes g, rgd_ids r, maps_data md\nWHERE r.object_status=\'ACTIVE\' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=?  AND g.gene_symbol_lc IN (" + Utils.concatenate(",", geneSymbols, "toLowerCase", "\'") + ") ORDER BY md.start_pos";
+            return MappedGeneQuery.run(this, query, new Object[]{Integer.valueOf(mapKey)});
+        }
     }
-
-    public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
+  /*  public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
 
         if( rgdIds.isEmpty() )
             return Collections.emptyList();
@@ -421,8 +425,28 @@ public class GeneDAO extends AbstractDAO {
         }
 
         return MappedGeneQuery.run(this, query);
-    }
-    public List<MappedGene> getActiveMappedGenesByGeneList(int mapKey, List<Gene> genes) throws Exception {
+    }*/
+  public List<MappedGene> getActiveMappedGenesByIds(int mapKey, List<Integer> rgdIds) throws Exception {
+      if(rgdIds.isEmpty()) {
+          return Collections.emptyList();
+      } else {
+          String query = "SELECT g.*, r.species_type_key, md.* \nFROM genes g, rgd_ids r, maps_data md\nWHERE r.object_status=\'ACTIVE\' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=?  AND g.rgd_id IN (";
+          boolean first = true;
+
+          for(Iterator var5 = rgdIds.iterator(); var5.hasNext(); first = false) {
+              Integer rgdId = (Integer)var5.next();
+              if(first) {
+                  query = query + rgdId;
+              } else {
+                  query = query + "," + rgdId;
+              }
+          }
+
+          query = query + ") ORDER BY md.chromosome,md.start_pos";
+          return MappedGeneQuery.run(this, query, new Object[]{Integer.valueOf(mapKey)});
+      }
+  }
+ /*   public List<MappedGene> getActiveMappedGenesByGeneList(int mapKey, List<Gene> genes) throws Exception {
 
         if( genes.isEmpty() )
             return Collections.emptyList();
@@ -451,8 +475,15 @@ public class GeneDAO extends AbstractDAO {
         }
 
         return MappedGeneQuery.run(this, query );
+    }*/
+    public List<MappedGene> getActiveMappedGenesByGeneList(int mapKey, List<Gene> genes) throws Exception {
+        if(genes.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            String query = "SELECT g.*, r.species_type_key, md.* \nfrom Genes g, RGD_IDS r , maps_data md\nwhere r.OBJECT_STATUS=\'ACTIVE\' and r.RGD_ID=g.RGD_ID and md.rgd_id=g.rgd_id and md.map_key=?  AND g.gene_symbol IN (" + Utils.concatenate(",", genes, "getSymbol", "\'") + ") ORDER BY md.start_pos";
+            return MappedGeneQuery.run(this, query, new Object[]{Integer.valueOf(mapKey)});
+        }
     }
-
     public List<MappedGene> getActiveMappedGenes(int mapKey) throws Exception {
         String query = "SELECT g.*, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md\n" +
@@ -669,7 +700,7 @@ public class GeneDAO extends AbstractDAO {
      * @return list of all rgd ids for genes with exact matching symbol (empty list possible)
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public List<Integer> getActiveGeneRgdIdsBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
+   /* public List<Integer> getActiveGeneRgdIdsBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
 
         if( geneSymbols == null)
             return null;
@@ -696,8 +727,15 @@ public class GeneDAO extends AbstractDAO {
         }
 
         return IntListQuery.execute(this, query);
+    }*/
+    public List<Integer> getActiveGeneRgdIdsBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
+        if(geneSymbols == null) {
+            return null;
+        } else {
+            String query = "SELECT g.rgd_id FROM genes g, rgd_ids r WHERE r.species_type_key=" + speciesKey + " AND g.gene_symbol_lc IN (" + Utils.concatenate(",", geneSymbols, "toLowerCase", "\'") + ") AND g.rgd_id=r.rgd_id AND r.object_status=\'ACTIVE\'";
+            return IntListQuery.execute(this, query, new Object[0]);
+        }
     }
-
     /**
      * get active rgd ids for genes given gene symbols and species type key;
      * @param geneSymbols gene symbol to be searched for
@@ -705,7 +743,7 @@ public class GeneDAO extends AbstractDAO {
      * @return list of all active genes with exact matching symbol (empty list possible)
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public List<Gene> getActiveGenesBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
+  /*  public List<Gene> getActiveGenesBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
 
         if( geneSymbols == null)
             return null;
@@ -732,6 +770,14 @@ public class GeneDAO extends AbstractDAO {
 
 
         return GeneQuery.execute(this, query);
+    }*/
+    public List<Gene> getActiveGenesBySymbols(List<String> geneSymbols, int speciesKey) throws Exception {
+        if(geneSymbols == null) {
+            return null;
+        } else {
+            String query = "SELECT * FROM genes g, rgd_ids r WHERE r.species_type_key=" + speciesKey + " AND g.gene_symbol_lc IN (" + Utils.concatenate(",", geneSymbols, "toLowerCase", "\'") + ") AND g.rgd_id=r.rgd_id AND r.object_status=\'ACTIVE\'";
+            return GeneQuery.execute(this, query, new Object[0]);
+        }
     }
     /**
      * Returns a count of all active genes with nomenclature review date between given pair of dates.
@@ -809,7 +855,7 @@ public class GeneDAO extends AbstractDAO {
      * @return List<Gene> object for given rgd id
      * @throws Exception thrown when there is no gene with such rgd id
      */
-    public List<Gene> getGeneByRgdIds(List<Integer> rgdIds) throws Exception {
+ /*   public List<Gene> getGeneByRgdIds(List<Integer> rgdIds) throws Exception {
 
         int size = rgdIds.size();
         int i,j=0;
@@ -844,6 +890,23 @@ public class GeneDAO extends AbstractDAO {
 
         List<Gene> genes = GeneQuery.execute(this, query);
         return genes;
+    }*/
+    public List<Gene> getGeneByRgdIds(List<Integer> rgdIds) throws Exception {
+        String query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r where r.RGD_ID=g.RGD_ID and r.RGD_ID in (";
+        boolean first = true;
+
+        for(Iterator genes = rgdIds.iterator(); genes.hasNext(); first = false) {
+            Integer rgdId = (Integer)genes.next();
+            if(first) {
+                query = query + rgdId;
+            } else {
+                query = query + "," + rgdId;
+            }
+        }
+
+        query = query + ")";
+        List genes1 = GeneQuery.execute(this, query, new Object[0]);
+        return genes1;
     }
     /**
      * get gene object by gene key
