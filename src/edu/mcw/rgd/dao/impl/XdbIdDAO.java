@@ -267,7 +267,7 @@ public class XdbIdDAO extends AbstractDAO {
      */
     public List<XdbId> getXdbIdsModifiedBefore(java.util.Date modDate, String srcPipeline, int speciesTypeKey) throws Exception{
 
-        String query = "SELECT * FROM rgd_acc_xdb x WHERE modification_date<? AND src_pipeline=? ";
+        String query = "SELECT * FROM rgd_acc_xdb x WHERE NVL(modification_date,creation_date)<? AND src_pipeline=? ";
         if( speciesTypeKey!=0 )
             query += "AND EXISTS(SELECT 1 FROM rgd_ids r WHERE r.rgd_id=x.rgd_id AND r.species_type_key=?)";
 

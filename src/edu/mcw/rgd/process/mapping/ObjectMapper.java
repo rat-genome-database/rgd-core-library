@@ -27,7 +27,7 @@ public class ObjectMapper {
     private List mapped = new ArrayList();
     Set seenIds = new HashSet();
 
-    int maxGenes = 2000;
+    int maxGenes = 4000;
 
 
     public void addToMap(Gene g) throws Exception {
