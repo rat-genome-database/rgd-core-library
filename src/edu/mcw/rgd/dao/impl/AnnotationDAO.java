@@ -1749,7 +1749,7 @@ public class AnnotationDAO extends AbstractDAO {
 
             if ((i % 999 == 0 && i != 0) || i == size-1) {
                 if( i == size -1) {
-                    if( j != 0)
+                    if( i > 999)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -1880,7 +1880,7 @@ public class AnnotationDAO extends AbstractDAO {
 
             if ((i % 999 == 0 && i != 0) || i == size-1) {
                 if( i == size -1) {
-                    if( j != 0)
+                    if(i > 999)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -1920,7 +1920,7 @@ public class AnnotationDAO extends AbstractDAO {
 
             if (e.getTerm_acc().equals(e.getRoot_acc())) {
                 oe.addAssociation(t, g);
-            }else {
+            } else {
                 Term root = new Term();
                 root.setAccId(e.getRoot_acc());
                 root.setTerm(e.getRoot());
@@ -1928,7 +1928,6 @@ public class AnnotationDAO extends AbstractDAO {
                 oe.addAssociation(t, g, root);
             }
         }
-
         return oe;
     }
 
