@@ -361,8 +361,8 @@ public class GeneDAO extends AbstractDAO {
         for( i=0; i < size; i++ ) {
         if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
             if( i == (size - 1)) {
-                if( j != 0)
-                j += 999;
+                if( i > 999)
+                    j += 999;
                 i += 1;
             } else j = i - 999;
             List<String> idList = geneSymbols.subList(j, i);
@@ -394,7 +394,7 @@ public class GeneDAO extends AbstractDAO {
 
                 if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                     if( i == (size - 1)) {
-                        if( j != 0)
+                        if( i > 999)
                         j += 999;
                         i += 1;
                     } else j = i - 999;
@@ -433,7 +433,7 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    if( j != 0)
+                    if( i > 999)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -679,7 +679,7 @@ public class GeneDAO extends AbstractDAO {
         for( i=0; i < size; i++ ) {
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                   if( j != 0)
+                   if( i > 999)
                         j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -715,7 +715,7 @@ public class GeneDAO extends AbstractDAO {
         for( i=0; i < size; i++ ) {
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    if( j != 0)
+                    if( i > 999)
                         j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -818,7 +818,7 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    if( j != 0)
+                    if( i > 999)
                         j += 999;
                     i += 1;
                 } else j = i - 999;
@@ -1029,7 +1029,7 @@ public class GeneDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    if( j != 0)
+                    if( i > 999)
                     j += 999;
                     i += 1;
                 } else j = i - 999;
