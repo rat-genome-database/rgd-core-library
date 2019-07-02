@@ -64,13 +64,10 @@ public class InteractionsDAO  extends AbstractDAO{
         return update(sql, interactionKey);
     }
 
-    /**
-     * Returns a list of interactors of given interactor
-     * @param uniprotId
-     * @return
-     */
-    public List<Protein> getInteractorsByUniprotId(String uniprotId) throws Exception {
-       String sql = "select rgd_id_1, rgd_id_2 from interactions where rgd_id_1 in (select rgd_id from proteins where uniprot_id=?) or rgd_id_2 in (select rgd_id from proteins where uniprot_id =?)";
+   
+   /*public List<Protein> getInteractorsByUniprotId(String uniprotId) throws Exception {
+       String sql = "select rgd_id_1, rgd_id_2 from interactions " +
+               "where rgd_id_1 in (select rgd_id from proteins where uniprot_id=?) or rgd_id_2 in (select rgd_id from proteins where uniprot_id =?)";
        ProteinQuery q = new ProteinQuery(this.getDataSource(), sql);
        return execute(q, uniprotId, uniprotId);
     }
@@ -80,37 +77,89 @@ public class InteractionsDAO  extends AbstractDAO{
      * @param rgdId
      * @return
     */
-    public List<Protein> getInteractorsByRgdId(int rgdId) throws Exception{
-        String sql ="select rgd_id_1, gd_id_2 from interactions where rgd_id_1 =? or rgd_id_2  =?";
-        ProteinQuery q = new ProteinQuery(this.getDataSource(), sql);
-        return execute(q, rgdId, rgdId);
-    }
+   /* public List<Protein> getInteractorsByRgdId(int rgdId) throws Exception{
+     //   String sql ="select rgd_id_1, gd_id_2 from interactions where rgd_id_1 =? or rgd_id_2  =?";
+        String sql="(select i1.rgd_id_1, i1.rgd_id_2 from interactions i1" +
+                "where i1.rgd_id_1 =? ) " +
+                "union all " +
+                "(Select i2.rgd_id_1, i2.rgd_id_2 from interactions i2 where i2.rgd_id_2 =?" +
+                "AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where i.rgd_id_1 <> ? ))";
 
+        ProteinQuery q = new ProteinQuery(this.getDataSource(), sql);
+        return execute(q, rgdId, rgdId, rgdId);
+    }
+*/
     public List<Interaction> getInteractionsByRgdId(int rgdId) throws Exception{
-        String sql="select * from interactions where rgd_id_1=? or rgd_id_2=?";
+     //   String sql="select * from interactions where rgd_id_1=? or rgd_id_2=?";
+
+        String sql="(select i1.rgd_id_1, i1.rgd_id_2 from interactions i1" +
+                "where i1.rgd_id_1 =? ) " +
+                "union all " +
+                "(Select i2.rgd_id_1, i2.rgd_id_2 from interactions i2 where i2.rgd_id_2 =?" +
+                "AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where i.rgd_id_1 <> ? ))";
+
+
         InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
         return execute(q, rgdId, rgdId);
     }
 
     public List<Interaction> getInteractionsByUniprotId(String uniprotId) throws Exception{
-        String sql="select * from interactions where rgd_id_1 in (select rgd_id from proteins where uniprot_id=?) or rgd_id_2 in (select rgd_id from proteins where uniprot_id=?)";
+        String sql="(select i1.* from interactions i1" +
+                "where i1.rgd_id_1 in (select rgd_id from proteins where uniprot_id=?)) " +
+                "union all " +
+                "(Select i2.* from interactions i2 where i2.rgd_id_2 in" +
+                "(select rgd_id from proteins where uniprot_id=?) " +
+                "AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where i.rgd_id_1 not in (select rgd_id from proteins where uniprot_id=?)))";
         InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
-        return execute(q, uniprotId, uniprotId);
+        return execute(q, uniprotId, uniprotId, uniprotId);
     }
 
+    public List<Interaction> getAllInteractionsBySpecies(int speciesTypeKey) throws Exception {
+        String sql="(select i1.* from interactions i1 where  " +
+                "i1.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) )" +
+                "union all " +
+                "(select i2.* from interactions i2 where i2.rgd_id_2 in  " +
+                "(select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3)" +
+                "and i2.interaction_key not in ( " +
+                "select i.interaction_key from interactions i where " +
+                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) " +
+                ")" +
+                ") " ;
+        InteractionQuery q = new InteractionQuery(this.getDataSource(), sql);
+        return this.execute(q, new Object[0]);
+    }
     public List<Interaction> getInteractionsByRgdIdsList(List<Integer> rgdIdsList) throws Exception {
-
-        String sql= "SELECT * FROM interactions WHERE rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
-            " OR rgd_id_2 IN ("+Utils.concatenate(rgdIdsList, ",")+")";
-
-        InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
-        return execute(q);
+        String sql = "(SELECT i1.* FROM interactions i1 WHERE " +
+                "i1.rgd_id_1 IN (" + Utils.concatenate(rgdIdsList, ",") + ") ) " +
+                "union all" +
+                "(select i2.* from interactions i2 where i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
+                " AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where " +
+                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) " +
+                ")" +
+                ")";
+        InteractionQuery q = new InteractionQuery(this.getDataSource(), sql);
+        return this.execute(q, new Object[0]);
     }
 
     public int getInteractionCountByRgdIdsList(List<Integer> rgdIdsList) throws Exception {
 
-        String sql= "SELECT COUNT(*) FROM interactions WHERE rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
-                " OR rgd_id_2 IN ("+Utils.concatenate(rgdIdsList, ",")+")";
+      /*  String sql= "SELECT COUNT(*) FROM interactions WHERE rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
+                " OR rgd_id_2 IN ("+Utils.concatenate(rgdIdsList, ",")+")";*/
+
+        String sql = "(SELECT i1.* FROM interactions i1 WHERE " +
+                "i1.rgd_id_1 IN (" + Utils.concatenate(rgdIdsList, ",") + ") ) " +
+                "union all" +
+                "(select i2.* from interactions i2 where i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
+                " AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where " +
+                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) " +
+                ")" +
+                ")";
+
         return getCount(sql);
     }
 
@@ -122,9 +171,18 @@ public class InteractionsDAO  extends AbstractDAO{
 
     public List<Interaction> getInteractionsByRgdIdsList(List<Integer> rgdIdsList, Date createdFrom, Date createdTo) throws Exception {
 
-        String sql= "SELECT * FROM interactions WHERE created_date between ? and ? and (rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
-                " OR rgd_id_2 IN("+Utils.concatenate(rgdIdsList, ",")+"))";
+    /*    String sql= "SELECT * FROM interactions WHERE created_date between ? and ? and (rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
+                " OR rgd_id_2 IN("+Utils.concatenate(rgdIdsList, ",")+"))";*/
 
+        String sql = "(SELECT i1.* FROM interactions i1 WHERE created_date between ? and ? and " +
+                "i1.rgd_id_1 IN (" + Utils.concatenate(rgdIdsList, ",") + ") ) " +
+                "union all" +
+                "(select i2.* from interactions i2 where created_date between ? and ? and i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
+                " AND i2.interaction_key not in (" +
+                "select i.interaction_key from interactions i where created_date between ? and ? and " +
+                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) " +
+                ")" +
+                ")";
         InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
         //System.out.println(sql);
 
