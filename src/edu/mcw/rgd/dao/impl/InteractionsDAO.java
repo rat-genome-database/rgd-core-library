@@ -102,7 +102,7 @@ public class InteractionsDAO  extends AbstractDAO{
 
 
         InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
-        return execute(q, rgdId, rgdId);
+        return execute(q, rgdId, rgdId, rgdId);
     }
 
     public List<Interaction> getInteractionsByUniprotId(String uniprotId) throws Exception{
@@ -119,17 +119,17 @@ public class InteractionsDAO  extends AbstractDAO{
 
     public List<Interaction> getAllInteractionsBySpecies(int speciesTypeKey) throws Exception {
         String sql="(select i1.* from interactions i1 where  " +
-                "i1.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) )" +
+                "i1.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=?) )" +
                 "union all " +
                 "(select i2.* from interactions i2 where i2.rgd_id_2 in  " +
-                "(select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3)" +
+                "(select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=?)" +
                 "and i2.interaction_key not in ( " +
                 "select i.interaction_key from interactions i where " +
-                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=3) " +
+                "i.rgd_id_1 in (select p1.rgd_id from proteins p1, rgd_ids r where r.rgd_id=p1.rgd_id and r.species_type_key=?) " +
                 ")" +
                 ") " ;
         InteractionQuery q = new InteractionQuery(this.getDataSource(), sql);
-        return this.execute(q, new Object[0]);
+        return this.execute(q, new Object[]{speciesTypeKey,speciesTypeKey,speciesTypeKey});
     }
     public List<Interaction> getInteractionsByRgdIdsList(List<Integer> rgdIdsList) throws Exception {
         String sql = "(SELECT i1.* FROM interactions i1 WHERE " +
@@ -155,8 +155,8 @@ public class InteractionsDAO  extends AbstractDAO{
                 "                i1.rgd_id_1 IN ( " + Utils.concatenate(rgdIdsList, ",") + "))" +
                 "                union all " +
                 "                (select i2.* from interactions i2 where i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
-                "                AND i2.interaction_key not in (\n" +
-                "               select i.interaction_key from interactions i where \n" +
+                "                AND i2.interaction_key not in ( " +
+                "               select i.interaction_key from interactions i where  " +
                 "               i.rgd_id_1 in (" + Utils.concatenate(rgdIdsList, ",") + ")" +
                 "                )" +
                 "               ) " +
@@ -188,7 +188,7 @@ public class InteractionsDAO  extends AbstractDAO{
         InteractionQuery q= new InteractionQuery(this.getDataSource(), sql);
         //System.out.println(sql);
 
-        return execute(q, createdFrom, createdTo);
+        return execute(q, createdFrom, createdTo, createdFrom, createdTo, createdFrom, createdTo);
     }
 
 
