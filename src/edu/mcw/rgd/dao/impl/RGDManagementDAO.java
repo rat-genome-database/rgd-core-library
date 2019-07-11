@@ -1,21 +1,19 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.RgdIdQuery;
 import edu.mcw.rgd.datamodel.Identifiable;
 import edu.mcw.rgd.datamodel.MapData;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.process.Utils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 
 /**
  * @author jdepons
  * @since Dec 28, 2007
- * Manages data in RGD_IDS table.
+ * Manages data in RGD_IDS and RGD_ID_HISTORY tables
  */
 public class RGDManagementDAO extends AbstractDAO {
 
@@ -66,26 +64,20 @@ public class RGDManagementDAO extends AbstractDAO {
      */
     public int getRgdIdFromHistory(int rgdId) throws Exception {
 
-        String query = "select NEW_RGD_ID from RGD_ID_HISTORY where OLD_RGD_ID=?";
-        Connection conn = null;
-        int newRgdId = 0;
-        try {
-            conn = this.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, rgdId);
-            ResultSet rs = ps.executeQuery();
-            if( rs.next() ) {
-                newRgdId = rs.getInt(1);
-            }
-            rs.close();
-        } finally {
-            try {
-                if( conn!=null )
-                    conn.close();
-            } catch (Exception ignored) {
-            }
-        }
-        return newRgdId;
+        String sql = "SELECT MAX(new_rgd_id) FROM rgd_id_history WHERE old_rgd_id=?";
+        return getCount(sql, rgdId);
+    }
+
+    /**
+     * get old rgd ids for given rgd id
+     * @param rgdId rgd id
+     * @return list, possibly empty, of old rgd ids
+     * @throws Exception
+     */
+    public List<Integer> getOldRgdIds(int rgdId) throws Exception {
+
+        String sql = "SELECT DISTINCT old_rgd_id FROM rgd_id_history START WITH new_rgd_id=? CONNECT BY PRIOR old_rgd_id=new_rgd_id";
+        return IntListQuery.execute(this, sql, rgdId);
     }
 
     /**
