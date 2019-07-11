@@ -29,6 +29,15 @@ public class VariantSearchBean {
     private String chromosome;
     private long startPosition = -1;
     private long stopPosition = -1;
+
+    public List<Integer> getSampleIds() {
+        return sampleIds;
+    }
+
+    public void setSampleIds(List<Integer> sampleIds) {
+        this.sampleIds = sampleIds;
+    }
+
     private int minDepth = -1;
     private int maxDepth = -1;
     //
