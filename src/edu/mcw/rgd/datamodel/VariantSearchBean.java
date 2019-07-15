@@ -1188,5 +1188,232 @@ public class VariantSearchBean {
             return false;
         }
     }
+
+
+    /***************************************Added get methods 07/15/2019**********************************************/
+
+    public Log getLog() {
+        return log;
+    }
+
+    public List<String> getZygosity() {
+        return zygosity;
+    }
+
+    public void setZygosity(List<String> zygosity) {
+        this.zygosity = zygosity;
+    }
+
+    public List<Integer> getAlleleCount() {
+        return alleleCount;
+    }
+
+    public void setAlleleCount(List<Integer> alleleCount) {
+        this.alleleCount = alleleCount;
+    }
+
+    public List<String> getGenicStatus() {
+        return genicStatus;
+    }
+
+    public void setGenicStatus(List<String> genicStatus) {
+        this.genicStatus = genicStatus;
+    }
+
+    public List<String> getGenes() {
+        return genes;
+    }
+
+    public void setGenes(List<String> genes) {
+        this.genes = genes;
+    }
+
+    public void setStartPosition(long startPosition) {
+        this.startPosition = startPosition;
+    }
+
+    public void setStopPosition(long stopPosition) {
+        this.stopPosition = stopPosition;
+    }
+
+    public int getMinDepth() {
+        return minDepth;
+    }
+
+    public void setMinDepth(int minDepth) {
+        this.minDepth = minDepth;
+    }
+
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    public void setMaxDepth(int maxDepth) {
+        this.maxDepth = maxDepth;
+    }
+
+    public int getMinQualityScore() {
+        return minQualityScore;
+    }
+
+    public void setMinQualityScore(int minQualityScore) {
+        this.minQualityScore = minQualityScore;
+    }
+
+    public int getMaxQualityScore() {
+        return maxQualityScore;
+    }
+
+    public void setMaxQualityScore(int maxQualityScore) {
+        this.maxQualityScore = maxQualityScore;
+    }
+
+    public int getMinPercentRead() {
+        return minPercentRead;
+    }
+
+    public void setMinPercentRead(int minPercentRead) {
+        this.minPercentRead = minPercentRead;
+    }
+
+    public int getMaxPercentRead() {
+        return maxPercentRead;
+    }
+
+    public void setMaxPercentRead(int maxPercentRead) {
+        this.maxPercentRead = maxPercentRead;
+    }
+
+    public List<String> getPolyphen() {
+        return polyphen;
+    }
+
+    public void setPolyphen(List<String> polyphen) {
+        this.polyphen = polyphen;
+    }
+
+    public List<String> getLocation() {
+        return location;
+    }
+
+    public void setLocation(List<String> location) {
+        this.location = location;
+    }
+
+    public List<String> getVariantType() {
+        return variantType;
+    }
+
+    public void setVariantType(List<String> variantType) {
+        this.variantType = variantType;
+    }
+
+    public List<String> getClinicalSignificance() {
+        return clinicalSignificance;
+    }
+
+    public void setClinicalSignificance(List<String> clinicalSignificance) {
+        this.clinicalSignificance = clinicalSignificance;
+    }
+
+    public List<String> getNearSpliceSite() {
+        return nearSpliceSite;
+    }
+
+    public void setNearSpliceSite(List<String> nearSpliceSite) {
+        this.nearSpliceSite = nearSpliceSite;
+    }
+
+    public String getIsPrematureStop() {
+        return isPrematureStop;
+    }
+
+    public String getIsReadthrough() {
+        return isReadthrough;
+    }
+
+    public List<String> getAaChange() {
+        return aaChange;
+    }
+
+    public void setAaChange(List<String> aaChange) {
+        this.aaChange = aaChange;
+    }
+
+    public String getIsNovelDBSNP() {
+        return isNovelDBSNP;
+    }
+
+    public void setIsNovelDBSNP(String isNovelDBSNP) {
+        this.isNovelDBSNP = isNovelDBSNP;
+    }
+
+    public String getIsKnownDBSNP() {
+        return isKnownDBSNP;
+    }
+
+    public void setIsKnownDBSNP(String isKnownDBSNP) {
+        this.isKnownDBSNP = isKnownDBSNP;
+    }
+
+    public boolean isHetDiffFromRef() {
+        return hetDiffFromRef;
+    }
+
+    public void setHetDiffFromRef(boolean hetDiffFromRef) {
+        this.hetDiffFromRef = hetDiffFromRef;
+    }
+
+    public boolean isExcludePossibleError() {
+        return excludePossibleError;
+    }
+
+    public void setExcludePossibleError(boolean excludePossibleError) {
+        this.excludePossibleError = excludePossibleError;
+    }
+
+    public boolean isOnlyPseudoautosomal() {
+        return onlyPseudoautosomal;
+    }
+
+    public void setOnlyPseudoautosomal(boolean onlyPseudoautosomal) {
+        this.onlyPseudoautosomal = onlyPseudoautosomal;
+    }
+
+    public boolean isExcludePseudoautosomal() {
+        return excludePseudoautosomal;
+    }
+
+    public void setExcludePseudoautosomal(boolean excludePseudoautosomal) {
+        this.excludePseudoautosomal = excludePseudoautosomal;
+    }
+
+    public float getMinConservation() {
+        return minConservation;
+    }
+
+    public void setMinConservation(float minConservation) {
+        this.minConservation = minConservation;
+    }
+
+    public float getMaxConservation() {
+        return maxConservation;
+    }
+
+    public void setMaxConservation(float maxConservation) {
+        this.maxConservation = maxConservation;
+    }
+
+    public String getIsProteinCoding() {
+        return isProteinCoding;
+    }
+
+    public void setIsProteinCoding(String isProteinCoding) {
+        this.isProteinCoding = isProteinCoding;
+    }
+
+    public String getIsFrameshift() {
+        return isFrameshift;
+    }
 }
 
