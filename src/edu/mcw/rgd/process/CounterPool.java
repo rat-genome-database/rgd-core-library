@@ -1,5 +1,6 @@
 package edu.mcw.rgd.process;
 
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,5 +73,9 @@ public class CounterPool {
         for( Map.Entry<String,AtomicInteger> entry: p._map.entrySet() ) {
            add(entry.getKey(), entry.getValue().intValue());
         }
+    }
+
+    public Enumeration<String> getCounterNames() {
+        return _map.keys();
     }
 }
