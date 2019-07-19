@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import edu.mcw.rgd.dao.impl.OntologyXDAO;
+
 import java.text.DecimalFormat;
 
 /**
@@ -25,6 +27,8 @@ public class Condition {
     private String notes;
     private String ontologyId;
     private String applicationMethod;
+
+    private String conditionDescription;
 
     public double getDurationLowerBound() {
         return durationLowerBound;
@@ -131,6 +135,52 @@ public class Condition {
         this.geneExpressionRecordId = geneExpressionRecordId;
     }
 
+    public String getConditionDescription() {
+        return conditionDescription;
+    }
+
+    public void setConditionDescription(String conditionDescription) {
+        this.conditionDescription = conditionDescription;
+    }
+
+    // if 'conditionDescription' is null, generate it and return it
+    public String getConditionDescription2() {
+        if( conditionDescription==null ) {
+            conditionDescription = generateConditionDescription();
+        }
+        return conditionDescription;
+    }
+
+    public String generateConditionDescription() throws Exception {
+        OntologyXDAO xdao = new OntologyXDAO();
+
+        String desc = xdao.getTerm(getOntologyId()).getTerm();
+
+        if (getValue() != null) {
+            desc += " (" + getValue() + " " + getUnits() + ") ";
+        }
+
+        DecimalFormat df = new DecimalFormat("###.#");
+
+        if (getDurationLowerBound() > 0 || getDurationUpperBound() > 0) {
+            if (getDurationLowerBound() == getDurationUpperBound()) {
+
+                if ((getDurationLowerBound() / 86400) < 1) {
+                    desc += " (for " + df.format(getDurationLowerBound() / 3600) + " hours)";
+                } else {
+                    desc += " (for " + df.format(getDurationLowerBound() / 86400) + " days)";
+                }
+            } else {
+                if ((getDurationLowerBound() / 86400) < 1 || (getDurationUpperBound() / 86400) < 1) {
+                    desc += " (between " + df.format(getDurationLowerBound() / 3600) + " and " + df.format(getDurationUpperBound() / 3600) + " hours)";
+                } else {
+                    desc += " (between " + df.format(getDurationLowerBound() / 86400) + " and " + df.format(getDurationUpperBound() / 86400) + " days)";
+                }
+            }
+        }
+        return desc;
+    }
+
     // String array for special values of DurationBounds
     // Get the string with SPECIAL_VALUE_STRINGS[- value]
     static final String[] SPECIAL_VALUE_STRINGS = {"", "exhaustion", "death", "end of the experiment"};
@@ -155,5 +205,4 @@ public class Condition {
         }
         return 0l;
     }
-
 }

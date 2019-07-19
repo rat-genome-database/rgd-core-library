@@ -14,7 +14,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -2507,8 +2506,6 @@ public class PhenominerDAO extends AbstractDAO {
 
     List<Record> runFullRecordsQuery(String query ) throws Exception {
 
-        OntologyXDAO xdao = new OntologyXDAO();
-
         RecordQuery rq = new RecordQuery(this.getDataSource(), query);
         rq.compile();
 
@@ -2531,33 +2528,12 @@ public class PhenominerDAO extends AbstractDAO {
                     }
                 }
 
-                conditionSetItem += xdao.getTerm(c.getOntologyId()).getTerm();
+                String desc = c.getConditionDescription2();
 
-                if (c.getValue() != null) {
-                    conditionSetItem += " (" + c.getValue() + " " + c.getUnits() + ") ";
-                }
-
-                DecimalFormat df = new DecimalFormat("###.#");
-
-                if (c.getDurationLowerBound() > 0 || c.getDurationUpperBound() > 0) {
-                    if (c.getDurationLowerBound() == c.getDurationUpperBound()) {
-
-                        if ((c.getDurationLowerBound() / 86400) < 1) {
-                            conditionSetItem += " (for " + df.format(c.getDurationLowerBound() / 3600) + " hours)";
-                        } else {
-                            conditionSetItem += " (for " + df.format(c.getDurationLowerBound() / 86400) + " days)";
-                        }
-                    } else {
-                        if ((c.getDurationLowerBound() / 86400) < 1 || (c.getDurationUpperBound() / 86400) < 1) {
-                            conditionSetItem += " (between " + df.format(c.getDurationLowerBound() / 3600) + " and " + df.format(c.getDurationUpperBound() / 3600) + " hours)";
-                        } else {
-                            conditionSetItem += " (between " + df.format(c.getDurationLowerBound() / 86400) + " and " + df.format(c.getDurationUpperBound() / 86400) + " days)";
-                        }
-                    }
-                }
-
-                r.setConditionDescription(conditionSetItem);
+                conditionSetItem += desc;
             }
+
+            r.setConditionDescription(conditionSetItem);
         }
         return recList;
     }
