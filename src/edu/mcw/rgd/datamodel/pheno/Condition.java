@@ -144,7 +144,7 @@ public class Condition {
     }
 
     // if 'conditionDescription' is null, generate it and return it
-    public String getConditionDescription2() {
+    public String getConditionDescription2() throws Exception {
         if( conditionDescription==null ) {
             conditionDescription = generateConditionDescription();
         }
