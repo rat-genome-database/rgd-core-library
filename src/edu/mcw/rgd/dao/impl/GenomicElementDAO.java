@@ -229,4 +229,18 @@ public class GenomicElementDAO extends AbstractDAO {
 
         return executeBatch(su);
     }
+
+    /// get list of protein domains associated with a given gene (possibly empty)
+    public List<GenomicElement> getProteinDomainsForGene(int geneRgdId) throws Exception {
+
+        String sql = "SELECT ge.*,i.species_type_key,i.object_status,i.object_key \n" +
+                "FROM genomic_elements ge,rgd_ids i \n" +
+                "WHERE i.rgd_id=ge.rgd_id AND ge.rgd_id IN(\n" +
+                "  SELECT a1.detail_rgd_id FROM rgd_associations a1,rgd_associations a2\n" +
+                "  WHERE a1.assoc_type='protein_to_domain' AND a2.assoc_type='protein_to_gene' AND a1.master_rgd_id=a2.master_rgd_id AND a2.detail_rgd_id=?" +
+                ") ORDER BY LOWER(symbol)";
+
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), sql);
+        return execute(q, geneRgdId);
+    }
 }
