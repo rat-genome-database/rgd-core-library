@@ -551,8 +551,7 @@ public class VariantDAO extends JdbcBaseDAO {
             " START_POS, TOTAL_DEPTH, VAR_FREQ, QUALITY_SCORE, RGD_ID,\n" +
             " HGVS_NAME, VARIANT_TYPE, VAR_NUC, ZYGOSITY_STATUS, GENIC_STATUS,\n" +
             " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
-            " PADDING_BASE,\n" +
-            ")\n" +
+            " PADDING_BASE)\n" +
             "VALUES (\n" +
             "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
             "  ?,?,?,?,?,\n" +
@@ -563,7 +562,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
                 Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                 Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.VARCHAR,
+                Types.VARCHAR
             }, 10000);
         bsu.compile();
 
