@@ -36,7 +36,13 @@ public class VariantDAO extends JdbcBaseDAO {
         }
         return "variant_transcript";
     }
+    public String getPolyphenTable(int sampleId) {
 
+        if( sampleId>=6000 && sampleId<=6999 ) {
+            return "polyphen_dog";
+        }
+        return "polyphen";
+    }
     /**
      * @param vsb
      * @return
@@ -272,7 +278,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
         }
         if (vsb.hasPolyphen()) {
-            sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+            sql += " inner join "+vsb.getPolyphenTable()+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
         }
 
