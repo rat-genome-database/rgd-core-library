@@ -183,6 +183,14 @@ public class VariantSearchBean {
         }
     }
 
+    public String getPolyphenTable() {
+         if( isDog() ) {
+            return " polyphen_dog ";
+        }else {
+            return " polyphen ";
+        }
+    }
+
     public String getConScoreTable() {
         switch(this.getMapKey()) {
             case 60: // rn3.4
