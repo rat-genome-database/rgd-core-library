@@ -8,14 +8,12 @@ import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author jdepons
  * @since Dec 28, 2007
- * <p>
  * DAO for manipulating/accessing GENES table
  */
 public class GeneDAO extends AbstractDAO {
@@ -43,7 +41,6 @@ public class GeneDAO extends AbstractDAO {
         return executeGeneQuery(query, accId);
     }
 
-
     public List<Gene> getAnnotatedGenesAndOrthologs(String accId, List<Integer> speciesTypeKeys, List<String> evidenceCodes) throws Exception{
 
         String speciesInClause = "(";
@@ -58,35 +55,23 @@ public class GeneDAO extends AbstractDAO {
         }
         speciesInClause += ")";
 
-        String evidenceInClause = "(";
-        first = true;
-        for (String evidence: evidenceCodes) {
-            if (first) {
-                evidenceInClause +="'" + evidence + "'";
-                first=false;
-            }else {
-                evidenceInClause += ",'" + evidence + "'";
-            }
-        }
-        evidenceInClause += ")";
-
+        String evidenceInClause = Utils.buildInPhraseQuoted(evidenceCodes);
 
         String query = "SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
-                " WHERE term_acc='" + accId + "' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause;
-        query += " AND object_status='ACTIVE' and rgd_object_key=1 " +
-                " and evidence in " + evidenceInClause + " and r.rgd_id=g.rgd_id ";
-        query += " union ";
-        query += " SELECT distinct g.*, s.species_type_key " +
-        "         FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d, genes g " +
-        " WHERE o.src_rgd_id=s.rgd_id AND s.rgd_id=g.rgd_id and o.dest_rgd_id=d.rgd_id AND s.object_status='ACTIVE' " +
+            " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key IN " + speciesInClause +
+            " AND object_status='ACTIVE' and rgd_object_key=1 " +
+            " AND evidence IN (" + evidenceInClause + ") AND r.rgd_id=g.rgd_id " +
+            "UNION " +
+            " SELECT distinct g.*, s.species_type_key " +
+            "         FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d, genes g " +
+            " WHERE o.src_rgd_id=s.rgd_id AND s.rgd_id=g.rgd_id and o.dest_rgd_id=d.rgd_id AND s.object_status='ACTIVE' " +
                 " AND d.object_status='ACTIVE' and s.species_type_key in " + speciesInClause +
                 " AND o.dest_rgd_id in ( " +
-        "        SELECT a.annotated_object_rgd_id FROM full_annot a,rgd_ids r " +
-                " WHERE term_acc='" + accId + "' AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key in " + speciesInClause +
-        " AND object_status='ACTIVE' and rgd_object_key=1 and evidence in " + evidenceInClause + ")";
+            "        SELECT a.annotated_object_rgd_id FROM full_annot a,rgd_ids r " +
+                " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key IN " + speciesInClause +
+            " AND object_status='ACTIVE' AND rgd_object_key=1 AND evidence in (" + evidenceInClause + ") )";
 
-
-        return executeGeneQuery(query);
+        return executeGeneQuery(query, accId, accId);
     }
 
 
@@ -1115,5 +1100,18 @@ public class GeneDAO extends AbstractDAO {
                 "ORDER BY r.object_status"; // active genes are returned first
 
         return GeneQuery.execute(this, query, (geneSymbol.trim().toLowerCase())+'%', speciesKey);
+    }
+
+    /// get list of protein domains associated with a given gene (possibly empty)
+    public List<Gene> getGenesForProteinDomain(int proteinDomainRgdId) throws Exception {
+
+        String sql = "SELECT g.*,i.species_type_key\n" +
+                "FROM genes g,rgd_ids i \n" +
+                "WHERE g.rgd_id=i.rgd_id AND g.rgd_id IN(\n" +
+                "  SELECT a2.detail_rgd_id FROM rgd_associations a1,rgd_associations a2\n" +
+                "  WHERE a1.assoc_type='protein_to_domain' AND a2.assoc_type='protein_to_gene' AND a1.master_rgd_id=a2.master_rgd_id AND a1.detail_rgd_id=?\n" +
+                ")";
+
+        return GeneQuery.execute(this, sql, proteinDomainRgdId);
     }
 }
