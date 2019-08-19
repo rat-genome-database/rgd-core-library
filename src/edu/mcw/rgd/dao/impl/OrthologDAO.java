@@ -140,8 +140,8 @@ public class OrthologDAO extends AbstractDAO {
 
             if (( i % 999 == 0 && i != 0 )|| (i == (size - 1))) {
                 if( i == (size - 1)) {
-                    if( j != 0)
-                    j += 999;
+                    if( i > 999)
+                        j += 999;
                     i += 1;
                 } else j = i - 999;
                 List<Integer> idList = rgdIds.subList(j, i);

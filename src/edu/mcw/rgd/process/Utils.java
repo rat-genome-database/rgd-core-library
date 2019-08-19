@@ -583,7 +583,7 @@ public class Utils {
         while (matcher.find()) {
             String match = matcher.group();
             symbolList.add(match);
-            System.out.println(match);
+         //   System.out.println(match);
         }
         return symbolList;
 

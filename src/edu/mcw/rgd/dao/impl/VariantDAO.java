@@ -36,7 +36,13 @@ public class VariantDAO extends JdbcBaseDAO {
         }
         return "variant_transcript";
     }
+    public String getPolyphenTable(int sampleId) {
 
+        if( sampleId>=6000 && sampleId<=6999 ) {
+            return "polyphen_dog";
+        }
+        return "polyphen";
+    }
     /**
      * @param vsb
      * @return
@@ -272,7 +278,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
         }
         if (vsb.hasPolyphen()) {
-            sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+            sql += " inner join "+vsb.getPolyphenTable()+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
         }
 
@@ -551,8 +557,7 @@ public class VariantDAO extends JdbcBaseDAO {
             " START_POS, TOTAL_DEPTH, VAR_FREQ, QUALITY_SCORE, RGD_ID,\n" +
             " HGVS_NAME, VARIANT_TYPE, VAR_NUC, ZYGOSITY_STATUS, GENIC_STATUS,\n" +
             " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
-            " PADDING_BASE,\n" +
-            ")\n" +
+            " PADDING_BASE)\n" +
             "VALUES (\n" +
             "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
             "  ?,?,?,?,?,\n" +
@@ -563,7 +568,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
                 Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                 Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.VARCHAR,
+                Types.VARCHAR
             }, 10000);
         bsu.compile();
 

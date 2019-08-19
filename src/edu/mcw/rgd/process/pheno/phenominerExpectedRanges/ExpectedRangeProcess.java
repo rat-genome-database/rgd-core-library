@@ -455,7 +455,7 @@ public class ExpectedRangeProcess extends OntologyXDAO{
             int count= dao.getExpectedRangesByTrait(t);
             Term term= getTermByAccId(t);
             tMap.put(term, count);
-            System.out.println(getTerm(t).getTerm()+"\t"+ count);
+            //System.out.println(getTerm(t).getTerm()+"\t"+ count);
         }
         return tMap;
     }
