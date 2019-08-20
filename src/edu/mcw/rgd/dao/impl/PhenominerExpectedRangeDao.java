@@ -474,23 +474,23 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     public List<PhenominerExpectedRange> getExpectedRanges(String clinicalMeasurementOntId, List<Integer> strainGroupIds, List<String> sex, List<Integer> ageLow, List<Integer> ageHigh, List<String> selectedMethods, boolean isPGA) throws Exception {
         String sql = "SELECT * FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID=? ";
-        if(strainGroupIds != null) {
+        if(strainGroupIds != null && strainGroupIds.size()>0) {
             sql = sql + this.buildIntQuery(strainGroupIds, "strain_group_id");
         }
 
-        if(ageLow != null) {
+        if(ageLow != null && ageLow.size()>0) {
             sql = sql + this.buildIntQuery(ageLow, "AGE_DAYS_FROM_DOB_LOW_BOUND");
         }
 
-        if(ageHigh != null) {
+        if(ageHigh != null && ageHigh.size()>0) {
             sql = sql + this.buildIntQuery(ageHigh, "AGE_DAYS_FROM_DOB_HIGH_BOUND");
         }
 
-        if(sex != null) {
+        if(sex != null && sex.size()>0) {
             sql = sql + this.buildStringQuery(sex, "SEX");
         }
 
-        if(selectedMethods != null) {
+        if(selectedMethods != null && selectedMethods.size()>0) {
             String query1 = this.buildMethodQuery(selectedMethods, "expected_range_name");
             if(query1 != null) {
                 sql = sql + query1;
