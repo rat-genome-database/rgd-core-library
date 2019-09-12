@@ -78,6 +78,36 @@ public final class SpeciesType {
     }
 
 
+    public static String getImageUrl(int speciesTypeKey) {
+        if (speciesTypeKey == SpeciesType.HUMAN) {
+            return "humanS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.MOUSE) {
+            return "mouseS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.RAT) {
+            return "ratS.png";
+        }
+        if (speciesTypeKey == SpeciesType.CHINCHILLA) {
+            return "chinchillaS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.BONOBO) {
+            return "bonoboS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.DOG) {
+            return "dogS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.SQUIRREL) {
+            return "squirrelS.jpg";
+        }
+        if (speciesTypeKey == SpeciesType.PIG) {
+            return "pig.jpg";
+        }
+
+        return "";
+    }
+
+
     public static int getSpeciesTypeKeyForMap(int mapKey) {
 
         try {
