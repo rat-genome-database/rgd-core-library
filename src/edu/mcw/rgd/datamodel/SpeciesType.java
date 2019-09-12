@@ -101,7 +101,7 @@ public final class SpeciesType {
             return "squirrelS.jpg";
         }
         if (speciesTypeKey == SpeciesType.PIG) {
-            return "pig.jpg";
+            return "pig.png";
         }
 
         return "";
