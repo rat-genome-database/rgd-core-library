@@ -8,6 +8,7 @@ import edu.mcw.rgd.datamodel.RGDUser;
 import edu.mcw.rgd.datamodel.RGDUserList;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import java.sql.Types;
 import java.util.Date;
@@ -120,5 +121,25 @@ public class RGDUserDAO extends AbstractDAO {
         }
     }
 
+    public int getCurationId(String userName) throws Exception {
+
+        String query = "select user_key from users where username='" +userName+"'";
+        JdbcTemplate jt = new JdbcTemplate(getDataSource());
+        int userKey = jt.queryForInt(query);
+        return userKey;
+
+    }
+
+    public String getCurationUser(int id) throws Exception {
+
+        String query = "select username from users where user_key=" +id;
+        JdbcTemplate jt = new JdbcTemplate(getDataSource());
+        SqlRowSet row = jt.queryForRowSet(query);
+        String user = "";
+        while(row.next())
+            user = row.getString("username");
+        return user;
+
+    }
 
 }

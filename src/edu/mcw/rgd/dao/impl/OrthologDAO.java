@@ -2,9 +2,11 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.GeneQuery;
+import edu.mcw.rgd.dao.spring.MappedOrthologQuery;
 import edu.mcw.rgd.dao.spring.OrthologQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Gene;
+import edu.mcw.rgd.datamodel.MappedOrtholog;
 import edu.mcw.rgd.datamodel.Ortholog;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 import org.springframework.jdbc.object.MappingSqlQuery;
@@ -70,6 +72,27 @@ public class OrthologDAO extends AbstractDAO {
         return executeOrthologQuery(sql, speciesTypeKey1, speciesTypeKey2);
     }
 
+    /**
+     * get all active gene ortholog mappings for given pair of species
+     *
+     * @param speciesTypeKey1 species type key for first species
+     * @param speciesTypeKey2 species type key for second species
+     * @return List of MappedOrtholog objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<MappedOrtholog> getAllMappedOrthologs(int speciesTypeKey1, int speciesTypeKey2, int mapKey1, int mapKey2) throws Exception {
+
+        String sql = "SELECT o.genetogene_key, o.src_rgd_id,o.dest_rgd_id,s.species_type_key src_species_type_key,d.species_type_key dest_species_type_key," +
+                " gs.gene_symbol src_gene_symbol, mds.chromosome src_chromosome, mds.start_pos src_start_pos, mds.stop_pos src_stop_pos, mds.strand src_strand," +
+                "gd.gene_symbol dest_gene_symbol, mdd.chromosome dest_chromosome, mdd.start_pos dest_start_pos, mdd.stop_pos dest_stop_pos, mdd.strand dest_strand" +
+                " FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d, genes gs, maps_data mds, genes gd, maps_data mdd "+
+                " WHERE o.src_rgd_id=s.rgd_id AND s.object_status='ACTIVE' AND s.species_type_key=? " +
+                "AND o.dest_rgd_id=d.rgd_id AND d.object_status='ACTIVE' AND d.species_type_key=? "+
+                "AND gs.rgd_id = s.rgd_id AND gd.rgd_id = d.rgd_id AND mds.rgd_id = s.rgd_id AND mdd.rgd_id = d.rgd_id AND mds.map_key = ? AND mdd.map_key = ? AND gs.gene_type_lc = 'protein-coding'" +
+                "ORDER BY src_chromosome, src_start_pos";
+
+        return executeMappedOrthologQuery(sql, speciesTypeKey1, speciesTypeKey2, mapKey1, mapKey2);
+    }
     /**
      * get ortholog count for given pair of species
      *
@@ -447,6 +470,12 @@ public class OrthologDAO extends AbstractDAO {
     /// Ortholog query implementation helper
     public List<Ortholog> executeOrthologQuery(String query, Object... params) throws Exception {
         OrthologQuery q = new OrthologQuery(this.getDataSource(), query);
+        return execute(q, params);
+    }
+
+    /// Mapped Ortholog query implementation helper
+    public List<MappedOrtholog> executeMappedOrthologQuery(String query, Object... params) throws Exception {
+        MappedOrthologQuery q = new MappedOrthologQuery(this.getDataSource(), query);
         return execute(q, params);
     }
 
