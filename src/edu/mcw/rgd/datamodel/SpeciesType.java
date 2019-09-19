@@ -187,10 +187,25 @@ public final class SpeciesType {
      */
     static public synchronized boolean isSearchable(int speciesTypeKey) {
 
-    //    return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey).isSearchable;
-
         SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
         return info != null && info.isSearchable;
+    }
+
+    // patch because isSearchable() method does not work sometimes
+    static public synchronized boolean isSearchable2(int speciesTypeKey) throws Exception {
+        String sql = "SELECT is_searchable FROM species_types WHERE speciesTypeKey=?";
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if( rs.next() ) {
+                boolean isSearchable = rs.getInt("is_searchable")!=0;
+                return isSearchable;
+            }
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
+        throw new Exception("database problem when querying SPECIES_TYPES table");
     }
 
     /**
