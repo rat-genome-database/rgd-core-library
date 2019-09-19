@@ -185,14 +185,14 @@ public final class SpeciesType {
      * @param speciesTypeKey species type key
      * @return true if species is available in RGD search
      */
-    static public synchronized boolean isSearchable(int speciesTypeKey) {
+    static public boolean isSearchable(int speciesTypeKey) {
 
         SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
         return info != null && info.isSearchable;
     }
 
     // patch because isSearchable() method does not work sometimes
-    static public synchronized boolean isSearchable2(int speciesTypeKey) throws Exception {
+    static public boolean isSearchable2(int speciesTypeKey) throws Exception {
         String sql = "SELECT is_searchable FROM species_types WHERE speciesTypeKey=?";
         try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
 
@@ -235,7 +235,7 @@ public final class SpeciesType {
             return _map.keySet();
         }
 
-        void lazyLoadSpeciesInfo() {
+        synchronized void lazyLoadSpeciesInfo() {
             if( _map==null ) {
                 _map = new HashMap<>();
 
