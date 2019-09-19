@@ -193,10 +193,11 @@ public final class SpeciesType {
 
     // patch because isSearchable() method does not work sometimes
     static public boolean isSearchable2(int speciesTypeKey) throws Exception {
-        String sql = "SELECT is_searchable FROM species_types WHERE speciesTypeKey=?";
+        String sql = "SELECT is_searchable FROM species_types WHERE species_type_key=?";
         try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
 
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, speciesTypeKey);
             ResultSet rs = ps.executeQuery();
             if( rs.next() ) {
                 boolean isSearchable = rs.getInt("is_searchable")!=0;
