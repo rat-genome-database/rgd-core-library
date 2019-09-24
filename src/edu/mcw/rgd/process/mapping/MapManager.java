@@ -47,6 +47,8 @@ public class MapManager {
                map.put(631, "GCF_000002285.3");          //Dog CanFam3.1
                map.put(720, "GCF_000236235.1");          //Squirrel SpeTri2.0
 
+               map.put(911, "GCF_000003025.6");         //Sscrofa11.1
+               map.put(910, "GCF_000003025.5");         //Sscrofa10.2
 
         refSeqAccMap=Collections.unmodifiableMap(map);
     }
