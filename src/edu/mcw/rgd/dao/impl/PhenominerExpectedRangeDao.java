@@ -316,6 +316,13 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     }
 
+    public List<PhenominerExpectedRange> getExpectedRangesByCMIdNStrainOntId(String clinicalId, String strainOntId, String sex) throws Exception {
+        String sql= "select * from phenominer_expected_range where strain_group_id in (select strain_group_id from phenominer_strain_group where strain_ont_id = ?)" +
+                " and clinical_measurement_ont_id = ? and lower(sex) = ?";
+        PhenominerExpectedRangeQuery query = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
+        return execute(query, new Object[]{strainOntId, clinicalId, sex});
+
+    }
     public List<PhenominerExpectedRange> getExpectedRanges(List<String> clinicalMeasurementOntIds, List<Integer> strainGroupIds, List<String> sex, List<Integer> ageLow, List<Integer> ageHigh, List<String> selectedMethods, boolean isPGA, String traitOntId) throws Exception {
         String sql = "SELECT * FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID in ( ";
         boolean first=true;
