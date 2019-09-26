@@ -139,7 +139,6 @@ public class Utils {
      */
     static public String addDaysToDate( String date, int daysToAdd ) throws ParseException {
 
-        // convert dataSyncDate string to java.util.Date
         java.util.Date syncDate = date==null ? new Date() : dateFormat.parse(date);
         java.util.Date adjustedDate = addDaysToDate(syncDate, daysToAdd);
         return dateFormat.format(adjustedDate);
@@ -155,14 +154,25 @@ public class Utils {
      * @throws ParseException
      */
     static public Date addDaysToDate( Date date, int daysToAdd ) throws ParseException {
+        int hoursToAdd = 24*daysToAdd;
+        return addHoursToDate(date, hoursToAdd);
+    }
 
-        // convert dataSyncDate string to java.util.Date
+    /**
+     * given a date, add some hours to the date
+     * note: you can pass 'null' for todays date!
+     * @param date date object, or null for today's date
+     * @param hoursToAdd number of days to add; could be negative
+     * @return return date object incremented by given amount of days
+     * @throws ParseException
+     */
+    static public Date addHoursToDate( Date date, int hoursToAdd ) throws ParseException {
+
         java.util.Date syncDate = date==null ? new Date() : date;
 
-        // date1 = dataSyncDate + 1 day
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(syncDate);
-        calendar.add(Calendar.DATE, daysToAdd);
+        calendar.add(Calendar.HOUR, hoursToAdd);
         return calendar.getTime();
     }
 
