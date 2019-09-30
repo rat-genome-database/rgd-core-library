@@ -35,8 +35,26 @@ public final class SpeciesType {
     public static final int ALL = 0;
     public static final int UNKNOWN = -1;
 
-    private SpeciesTypeManager speciesTypeManager = new SpeciesTypeManager();
-    static private SpeciesType _instance = new SpeciesType();
+    /// SINGLETON  ###
+    /// lazy initialization with double check locking
+    /// safe in multithreaded env
+    private static SpeciesType __instance = null;
+
+    private SpeciesType() {
+        loadDataFromDatabase();
+    }
+
+    public static SpeciesType getInstance() {
+        if( __instance==null ) {
+            synchronized( SpeciesType.class ) {
+                if( __instance==null ) {
+                    __instance = new SpeciesType();
+                }
+            }
+        }
+        return __instance;
+    }
+    /// SINGLETON ### end
 
     /**
      * Parses a common or taxonomic name and returns the species type key.  This method returns
@@ -50,8 +68,8 @@ public final class SpeciesType {
             return SpeciesType.UNKNOWN;
 
         // iterate through all known species, looking for species type key, taxonomic name and common name
-        for( int speciesTypeKey: _instance.speciesTypeManager.getSpeciesTypeKeys() ) {
-            SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        for( int speciesTypeKey: getInstance()._getSpeciesTypeKeys() ) {
+            SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
 
             // look for common name
             if( type.compareToIgnoreCase(info.commonName)==0  ||
@@ -61,10 +79,11 @@ public final class SpeciesType {
                 type.compareToIgnoreCase(info.taxonomicName)==0  ||
                 // look for species type key
                 type.compareTo(Integer.toString(speciesTypeKey))==0  ||
-                // look for taxonomic id: f.e. 'taxon:10090'
-                (type.startsWith("taxon:") && type.equals("taxon:"+info.taxonomyId)) ) {
-
-                    return speciesTypeKey;
+                // look for taxonomic id: f.e. 'taxon:10090' or 'NCBITaxon:10090'
+                (type.startsWith("taxon:") && type.equals("taxon:"+info.taxonomyId)) ||
+                (type.startsWith("NCBITaxon:") && type.equals("NCBITaxon:"+info.taxonomyId)) )
+            {
+                return speciesTypeKey;
             }
         }
 
@@ -73,7 +92,7 @@ public final class SpeciesType {
     }
 
     public static String getNCBIAssemblyDescriptionForSpecies(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.ncbiGenomeUrl;
     }
 
@@ -126,7 +145,7 @@ public final class SpeciesType {
      * @return common name
      */
     public static String getCommonName(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.commonName;
     }
 
@@ -136,7 +155,7 @@ public final class SpeciesType {
      * @return Genebank common name
      */
     public static String getGenebankCommonName(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.genebankCommonName;
     }
 
@@ -146,7 +165,7 @@ public final class SpeciesType {
      * @return taxonomic name
      */
     public static String getTaxonomicName(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.taxonomicName;
     }
 
@@ -156,7 +175,7 @@ public final class SpeciesType {
      * @return taxonomic id or 0 if species type key is invalid
      */
     public static int getTaxonomicId(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? 0 : info.taxonomyId;
     }
 
@@ -166,7 +185,7 @@ public final class SpeciesType {
      * @return organism genus
      */
     public static String getOrganismGenus(int speciesTypeKey) {
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.genus;
     }
 
@@ -177,7 +196,7 @@ public final class SpeciesType {
      */
     static public boolean isValidSpeciesTypeKey(int speciesTypeKey) {
 
-        return _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey)!=null;
+        return getInstance()._getSpeciesInfo(speciesTypeKey)!=null;
     }
 
     /**
@@ -187,7 +206,7 @@ public final class SpeciesType {
      */
     static public boolean isSearchable(int speciesTypeKey) {
 
-        SpeciesTypeManager.SpeciesInfo info = _instance.speciesTypeManager.getSpeciesInfo(speciesTypeKey);
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info != null && info.isSearchable;
     }
 
@@ -215,85 +234,70 @@ public final class SpeciesType {
      */
     static public Collection<Integer> getSpeciesTypeKeys() {
 
-        return _instance.speciesTypeManager.getSpeciesTypeKeys();
+        return getInstance()._getSpeciesTypeKeys();
     }
 
 
-    // internal class to manage species information loaded from database
-    class SpeciesTypeManager {
+    /// internal preloaded data for performance
+    ///
+    private Map<Integer, SpeciesInfo> _map = null;
 
-        Map<Integer, SpeciesInfo> _map = null;
+    private SpeciesInfo _getSpeciesInfo(int speciesTypeKey) {
+        return _map.get(speciesTypeKey);
+    }
 
-        // lazily load species info
-        SpeciesInfo getSpeciesInfo(int speciesTypeKey) {
+    private Collection<Integer> _getSpeciesTypeKeys() {
+        return _map.keySet();
+    }
 
-            lazyLoadSpeciesInfo();
-            return _map.get(speciesTypeKey);
-        }
+    private void loadDataFromDatabase() {
+        _map = new HashMap<>();
 
-        Collection<Integer> getSpeciesTypeKeys() {
-            lazyLoadSpeciesInfo();
-            return _map.keySet();
-        }
+        // create special species type for any species
+        SpeciesInfo info = new SpeciesInfo();
+        info.speciesTypeKey = SpeciesType.ALL;
+        info.taxonomyId = 0;
+        info.genus = "All";
+        info.species = "species";
+        info.commonName = "All";
+        info.genebankCommonName = "";
+        info.taxonomicName = info.genus + " " + info.species;
+        _map.put(info.speciesTypeKey, info);
 
-        synchronized void lazyLoadSpeciesInfo() {
-            if( _map==null ) {
-                _map = new HashMap<>();
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ){
 
-                // create special species type for any species
-                SpeciesInfo info = new SpeciesInfo();
-                info.speciesTypeKey = SpeciesType.ALL;
-                info.taxonomyId = 0;
-                info.genus = "All";
-                info.species = "species";
-                info.commonName = "All";
-                info.genebankCommonName = "";
-                info.taxonomicName = info.genus+" "+info.species;
+            String sql = "SELECT * FROM species_types";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+
+                info = new SpeciesInfo();
+                info.speciesTypeKey = rs.getInt("species_type_key");
+                info.taxonomyId = rs.getInt("taxonomy_id");
+                info.species = rs.getString("organism_species");
+                info.genus = rs.getString("organism_genus");
+                info.commonName = rs.getString("common_name");
+                info.genebankCommonName = rs.getString("genebank_common_name");
+                info.ncbiGenomeUrl = XDBIndex.getInstance().getXDB(61).getUrl(info.speciesTypeKey);
+                info.taxonomicName = info.genus + " " + info.species;
+                info.isSearchable = rs.getInt("is_searchable") != 0;
                 _map.put(info.speciesTypeKey, info);
-
-                Connection conn = null;
-                try {
-
-                    conn = DataSourceFactory.getInstance().getDataSource().getConnection();
-                    String sql = "SELECT * FROM species_types";
-
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ResultSet rs = ps.executeQuery();
-                    while( rs.next() ) {
-
-                        info = new SpeciesInfo();
-                        info.speciesTypeKey = rs.getInt("species_type_key");
-                        info.taxonomyId = rs.getInt("taxonomy_id");
-                        info.species = rs.getString("organism_species");
-                        info.genus = rs.getString("organism_genus");
-                        info.commonName = rs.getString("common_name");
-                        info.genebankCommonName = rs.getString("genebank_common_name");
-                        info.ncbiGenomeUrl = XDBIndex.getInstance().getXDB(61).getUrl(info.speciesTypeKey);
-                        info.taxonomicName = info.genus+" "+info.species;
-                        info.isSearchable = rs.getInt("is_searchable")!=0;
-                        _map.put(info.speciesTypeKey, info);
-                    }
-                } catch (Exception ignore) {
-                    ignore.printStackTrace();
-                } finally {
-                    try {
-                       conn.close();
-                    }catch (Exception ignored) {
-                    }
-                }
             }
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
         }
+    }
 
-        class SpeciesInfo {
-            public int speciesTypeKey;
-            public String genus;
-            public String species;
-            public String commonName;
-            public String genebankCommonName;
-            public int taxonomyId;
-            public String taxonomicName;
-            public String ncbiGenomeUrl;
-            public boolean isSearchable;
-        }
+    class SpeciesInfo {
+        public int speciesTypeKey;
+        public String genus;
+        public String species;
+        public String commonName;
+        public String genebankCommonName;
+        public int taxonomyId;
+        public String taxonomicName;
+        public String ncbiGenomeUrl;
+        public boolean isSearchable;
     }
 }
