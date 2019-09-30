@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
+import edu.mcw.rgd.process.mapping.MapManager;
 import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Types;
@@ -445,6 +446,18 @@ public class GeneDAO extends AbstractDAO {
                 "ORDER BY md.chromosome";
 
         return MappedGeneQuery.run(this, query, mapKey);
+    }
+
+    public List<MappedGene> getActiveMappedGenesBySpecies(int species, String chr) throws Exception {
+        String query = "SELECT g.*, r.species_type_key, md.* \n" +
+                " FROM genes g, rgd_ids r, maps_data md\n" +
+                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id "+
+                " AND md.map_key=?" +
+                " and md.chromosome='" + chr + "'" +
+                " ORDER BY md.start_pos";
+
+        System.out.println(query);
+        return MappedGeneQuery.run(this, query,  MapManager.getInstance().getReferenceAssembly(species).getKey());
     }
 
     public List<String> getGeneSymbolMapping(String dbsnpId, int mapKey, String dbSnpVersion) throws Exception{
