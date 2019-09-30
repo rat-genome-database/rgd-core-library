@@ -79,10 +79,11 @@ public final class SpeciesType {
                 type.compareToIgnoreCase(info.taxonomicName)==0  ||
                 // look for species type key
                 type.compareTo(Integer.toString(speciesTypeKey))==0  ||
-                // look for taxonomic id: f.e. 'taxon:10090'
-                (type.startsWith("taxon:") && type.equals("taxon:"+info.taxonomyId)) ) {
-
-                    return speciesTypeKey;
+                // look for taxonomic id: f.e. 'taxon:10090' or 'NCBITaxon:10090'
+                (type.startsWith("taxon:") && type.equals("taxon:"+info.taxonomyId)) ||
+                (type.startsWith("NCBITaxon:") && type.equals("NCBITaxon:"+info.taxonomyId)) )
+            {
+                return speciesTypeKey;
             }
         }
 
