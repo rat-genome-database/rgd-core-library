@@ -147,22 +147,35 @@ public class InteractionsDAO  extends AbstractDAO{
 
     public int getInteractionCountByRgdIdsList(List<Integer> rgdIdsList) throws Exception {
 
-      /*  String sql= "SELECT COUNT(*) FROM interactions WHERE rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
-                " OR rgd_id_2 IN ("+Utils.concatenate(rgdIdsList, ",")+")";*/
+        // original query
+        // note: it yields the same results but it is up to 50% slower than the query below  --mt
+        //
+        // String sql= "SELECT COUNT(*) FROM interactions WHERE rgd_id_1 IN ("+Utils.concatenate(rgdIdsList,",")+") "+
+        //        " OR rgd_id_2 IN ("+Utils.concatenate(rgdIdsList, ",")+")";
 
         String sql="select count(*) from (" +
-                "(SELECT i1.* FROM interactions i1 WHERE " +
-                "                i1.rgd_id_1 IN ( " + Utils.concatenate(rgdIdsList, ",") + "))" +
-                "                union all " +
-                "                (select i2.* from interactions i2 where i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
-                "                AND i2.interaction_key not in ( " +
-                "               select i.interaction_key from interactions i where  " +
-                "               i.rgd_id_1 in (" + Utils.concatenate(rgdIdsList, ",") + ")" +
-                "                )" +
-                "               ) " +
-                "               ) ";
+            "(SELECT i1.* FROM interactions i1 WHERE i1.rgd_id_1 IN (" + Utils.concatenate(rgdIdsList, ",") + ")) " +
+            "UNION ALL " +
+            "(SELECT i2.* FROM interactions i2 WHERE i2.rgd_id_2 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
+            "        AND i2.interaction_key NOT IN (" +
+            "            SELECT i.interaction_key FROM interactions i WHERE i.rgd_id_1 IN (" + Utils.concatenate(rgdIdsList, ",") + ")" +
+            "        )" +
+            "))";
 
         return getCount(sql);
+    }
+
+    public int getInteractionCountByGeneRgdId(int geneRgdId) throws Exception {
+
+        String sql = "select count(*) from (" +
+            "(SELECT i1.* FROM interactions i1 WHERE i1.rgd_id_1 IN (SELECT master_rgd_id FROM rgd_associations WHERE assoc_type='protein_to_gene' AND detail_rgd_id=?)) " +
+            "UNION ALL " +
+            "(SELECT i2.* FROM interactions i2 WHERE i2.rgd_id_2 IN (SELECT master_rgd_id FROM rgd_associations WHERE assoc_type='protein_to_gene' AND detail_rgd_id=?)" +
+            " AND i2.interaction_key NOT IN ( " +
+            "   SELECT i.interaction_key FROM interactions i WHERE i.rgd_id_1 IN (SELECT master_rgd_id FROM rgd_associations WHERE assoc_type='protein_to_gene' AND detail_rgd_id=?)" +
+            ")))";
+
+        return getCount(sql, geneRgdId, geneRgdId, geneRgdId);
     }
 
     public List<Interaction> getInteractions() throws Exception{
