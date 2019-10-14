@@ -138,11 +138,11 @@ public class XdbIdDAO extends AbstractDAO {
      * get active xdb ids for given xdb key and object key
      * @param xdbKey - external db key
      * @param objectKey - object key
-     * @return list of Gene objects
+     * @return list of external ids
      */
     public List<XdbId> getActiveXdbIds(int xdbKey, int objectKey) throws Exception {
 
-        String sql = "SELECT x.* FROM rgd_acc_xdb x,rgd_id r "+
+        String sql = "SELECT x.* FROM rgd_acc_xdb x,rgd_ids r "+
                 "WHERE x.xdb_key=? AND object_key=? AND object_status='ACTIVE' AND x.rgd_id=r.rgd_id";
 
         return executeXdbIdQuery(sql, xdbKey, objectKey);
