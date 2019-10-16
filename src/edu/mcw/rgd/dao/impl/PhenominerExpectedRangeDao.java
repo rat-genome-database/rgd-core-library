@@ -69,13 +69,6 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         }else
             return this.update(sql, new Object[]{Integer.valueOf(range.getExpectedRangeId()), range.getStrainGroupName() + "_" + range.getExpectedRangeName(), range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId(), range.getUnits(), Double.valueOf(range.getRangeValue()), Double.valueOf(range.getRangeLow()), Double.valueOf(range.getRangeHigh()), Double.valueOf(range.getRangeSD())});
     }
-    public List<PhenominerExpectedRange> getNormalRangeRecordUnstratified(String phenotypeAccId) throws Exception {
-        String sql="select * from phenominer_expected_range where clinical_measurement_ont_id=? and expected_range_name like 'NormalStrain%'" +
-                " and  AGE_DAYS_FROM_DOB_LOW_BOUND=0 and AGE_DAYS_FROM_DOB_HIGH_BOUND=999 AND SEX='Mixed'";
-        PhenominerExpectedRangeQuery q= new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
-        return execute(q, phenotypeAccId);
-    }
-
     public List<PhenominerExpectedRange> getExpectedRangeOfMixedAndAll(String phenotype, int strainGroupId, String ageLow, String ageHigh, String sex) throws Exception {
         String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=?  and clinical_measurement_ont_id=? and sex=?" +
                 "and expected_range_name like '%Mixed%'";
@@ -323,6 +316,12 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     }
 
+    public List<PhenominerExpectedRange> getNormalRangesByCMId(String clinicalId) throws Exception {
+        String sql= "select * from phenominer_expected_range where clinical_measurement_ont_id = ? and expected_range_name like 'Normal%'";
+        PhenominerExpectedRangeQuery query = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
+        return execute(query, new Object[]{clinicalId});
+
+    }
     public List<PhenominerExpectedRange> getExpectedRanges(List<String> clinicalMeasurementOntIds, List<Integer> strainGroupIds, List<String> sex, List<Integer> ageLow, List<Integer> ageHigh, List<String> selectedMethods, boolean isPGA, String traitOntId) throws Exception {
         String sql = "SELECT * FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID in ( ";
         boolean first=true;
@@ -460,7 +459,6 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         return   update(sql, o.getTrait().getAccId(), o.getSubTrait().getAccId(), expectedRangeId);
     }
     public List<PhenominerExpectedRange> getExpectedRangesByParentTrait(String clinicalMeasurementOntId, boolean isPGA, String subTraitOntId) throws Exception {
-
         String sql = "SELECT * FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID=?  AND   EXPECTED_RANGE_ID in ( SELECT EXPECTED_RANGE_ID FROM PHENOMINER_RANGE_TRAIT WHERE SUBTRAIT_ONT_ID=? )";
         if(isPGA) {
             sql = sql + " OR EXPECTED_RANGE_ID IN (SELECT EXPECTED_RANGE_ID FROM PHENOMINER_EXPECTED_RANGE WHERE CLINICAL_MEASUREMENT_ONT_ID=? AND TRAIT_ONT_ID IS NULL)";

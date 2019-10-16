@@ -42,14 +42,6 @@ public class ExpectedRangeProcess extends OntologyXDAO{
             }
             return null;
         }
-    public PhenominerExpectedRange getNormalRange1(List<PhenominerExpectedRange> records) throws Exception {
-            String phenotypeAccId= records.get(0).getClinicalMeasurementOntId();
-            List<PhenominerExpectedRange> normalRecords=dao.getNormalRangeRecordUnstratified(phenotypeAccId);
-            if(normalRecords!=null && normalRecords.size()>0){
-                return normalRecords.get(0);
-            }
-        return null;
-    }
         public String getStrainGroupName(int strainGroupId) throws Exception {
             return  sdao.getStrainGroupName(strainGroupId);
         }
@@ -707,7 +699,6 @@ public class ExpectedRangeProcess extends OntologyXDAO{
                 for (TraitObject t : phenoTraits) {
                     if (t != null) {
                         rangerecs = dao.getExpectedRangesByParentTrait(p, selectBytrait, t.getSubTrait().getAccId());
-
                         PhenotypeObject overAllObj = getOverAllObject(rangerecs, p);
                         if (rangerecs.size() > 0)
                             overAllObj.setTraits(getTraitTerms(rangerecs));
@@ -783,8 +774,7 @@ public class ExpectedRangeProcess extends OntologyXDAO{
        PhenotypeObject overAllObj = new PhenotypeObject();
        overAllObj.setClinicalMeasurement(this.getClinicalMeasurement(rangeRecs));
        overAllObj.setClinicalMeasurementOntId(p);
-    //   PhenominerExpectedRange normalRecord = this.getNormalRange(rangeRecs, "Mixed");
-       PhenominerExpectedRange normalRecord = this.getNormalRange1(rangeRecs);
+       PhenominerExpectedRange normalRecord = this.getNormalRange(rangeRecs, "Mixed");
        if(normalRecord != null) {
            overAllObj.setNormalRange(normalRecord.getRangeLow() + " - " + normalRecord.getRangeHigh());
        }

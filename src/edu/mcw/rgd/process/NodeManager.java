@@ -468,7 +468,7 @@ public class NodeManager {
         List<Integer> rgdIdsList = new ArrayList<>();
 
         Iterator i$ = resultSet.iterator();
-    //    System.out.println("Iterate OM Result Start time: " + new Date());
+
         List<Integer> proteinRgdIds= new ArrayList<>();
         List<Gene> geneList= new ArrayList<>();
         List<String> matched = new ArrayList<>();
@@ -515,12 +515,12 @@ public class NodeManager {
                 rgdIdsList.add(rgdId1);
                 rgdIdsList.add(rgdId2);
             }
-        //    System.out.println("Iterate OM Resultset END time: " + new Date());
+       //     System.out.println("Iterate OM Resultset END time: " + new Date());
 
             if (rgdIdsList.size() > 0) {
-         //       System.out.println("getNodes(rgdidsList) : start time: " + new Date());
+      //          System.out.println("getNodes(rgdidsList) : start time: " + new Date());
                 nodes = this.getNodes(rgdIdsList);
-        //        System.out.println("getNodes(rgdIdsList): END time: " + new Date());
+      //          System.out.println("getNodes(rgdIdsList): END time: " + new Date());
                 Set<String> matchedSet = new HashSet<>(matched);
                 this.setMatched(matchedSet);
                 this.setInteractions(iList);
@@ -529,7 +529,7 @@ public class NodeManager {
             return null;
         }
 
-    //    System.out.println("getNodes(q,s) : End time: " + new Date());
+        System.out.println("getNodes(q,s) : End time: " + new Date());
         return nodes;
     }
 
