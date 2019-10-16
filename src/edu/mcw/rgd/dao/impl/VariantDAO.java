@@ -24,10 +24,6 @@ public class VariantDAO extends JdbcBaseDAO {
         if( sampleId>=6000 && sampleId<=6999 ) {
             return "variant_dog";
         }
-
-        if( sampleId>=10000 && sampleId<=13999 ) {
-            return "variant_human";
-        }
         return "variant";
     }
 
@@ -38,10 +34,6 @@ public class VariantDAO extends JdbcBaseDAO {
         if( sampleId>=6000 && sampleId<=6999 ) {
             return "variant_transcript_dog";
         }
-        if( sampleId>=10000 && sampleId<=13999 ) {
-            return "variant_transcript_human";
-        }
-
         return "variant_transcript";
     }
     public String getPolyphenTable(int sampleId) {
