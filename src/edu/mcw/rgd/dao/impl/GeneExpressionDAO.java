@@ -186,7 +186,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
      * @throws Exception
      */
     public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGene(int rgdId) throws Exception {
-        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=?";
+        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=? order by gene_expression_exp_record_id";
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
         return execute(q, rgdId);
