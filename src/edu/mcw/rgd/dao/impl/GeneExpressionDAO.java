@@ -178,4 +178,33 @@ public class GeneExpressionDAO extends PhenominerDAO {
             }
         }
     }
+
+    /**
+     * Returns a list of values for given gene expression experiment record
+     * @param rgdId expressed Object Rgd id
+     * @return list of GeneExpressionRecordValue objects; could be empty
+     * @throws Exception
+     */
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGene(int rgdId) throws Exception {
+        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=?";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, rgdId);
+    }
+
+    /**
+     * For given  id, get all gene expression record
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public GeneExpressionRecord getGeneExpressionRecordById(int id) throws Exception {
+
+        String sql = "SELECT * FROM gene_expression_exp_record WHERE gene_expression_exp_record_id=?";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(), sql);
+        List<GeneExpressionRecord> record = execute(q, id);
+        if( record.isEmpty() )
+            return null;
+        return record.get(0);
+    }
 }

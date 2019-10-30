@@ -1304,6 +1304,24 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     * Return a sample based on an sample ID
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Sample getSample(int  id) throws Exception {
+        String query = "SELECT * from sample where sample_id=?";
+
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.INTEGER));
+        sq.compile();
+
+        List<Sample> samples = sq.execute(id);
+        return samples.get(0);
+    }
+
+
+    /**
      * Insert a sample in the datastore
      * @param s Sample object
      * @return just generated sample key
