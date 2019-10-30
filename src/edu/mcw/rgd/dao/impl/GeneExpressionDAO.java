@@ -185,11 +185,11 @@ public class GeneExpressionDAO extends PhenominerDAO {
      * @return list of GeneExpressionRecordValue objects; could be empty
      * @throws Exception
      */
-    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGene(int rgdId) throws Exception {
-        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=? order by gene_expression_exp_record_id";
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGene(int rgdId,String unit) throws Exception {
+        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=? and expression_unit =? order by gene_expression_exp_record_id";
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
-        return execute(q, rgdId);
+        return execute(q, rgdId,unit);
     }
 
     /**
