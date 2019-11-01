@@ -257,7 +257,7 @@ public class GeneDAO extends AbstractDAO {
 
         String sql = "insert into GENES (GENE_KEY, GENE_SYMBOL, GENE_SYMBOL_LC, " +
                 "FULL_NAME, GENE_DESC, AGR_DESC, MERGED_DESC, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, "+
-                "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID) values (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?)";
+                "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID,GENE_SOURCE,ENSEMBL_GENE_SYMBOL,ENSEMBL_GENE_TYPE,ENSEMBL_FULL_NAME) values (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?,?,?,?,?)";
 
         int key = this.getNextKey("genes","gene_key");
         gene.setKey(key);

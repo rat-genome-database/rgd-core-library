@@ -32,6 +32,10 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
     private String soAccId;
     private String agrDescription;
     private String mergedDescription;
+    private String geneSource;
+    private String ensemblGeneSymbol;
+    private String ensemblGeneType;
+    private String ensemblFullName;
 
     /**
      * two genes are equal if either they have same rgd_id or gene key
@@ -187,6 +191,18 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
     public void setMergedDescription(String mergedDescription) {
         this.mergedDescription = mergedDescription;
     }
+
+    public void setGeneSource(String geneSource){this.geneSource=geneSource;}
+    public String getGeneSource(){return geneSource;}
+
+    public void setEnsemblGeneSymbol(String ensemblGeneSymbol){this.ensemblGeneSymbol=ensemblGeneSymbol;}
+    public String getEnsemblGeneSymbol(){return ensemblGeneSymbol;}
+
+    public void setEnsemblGeneType(String ensemblGeneType){this.ensemblGeneType=ensemblGeneType;}
+    public String getEnsemblGeneType(){return ensemblGeneType;}
+
+    public void setEnsemblFullName(String ensemblFullName){this.ensemblFullName=ensemblFullName;}
+    public String getEnsemblFullName(){return ensemblFullName;}
 
     public String toString() {
        return "RGD:" + rgdId + ", " + symbol + ", " + name;
