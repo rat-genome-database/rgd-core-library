@@ -13,6 +13,7 @@ public class GeneExpressionRecordValue {
     private Double expressionValue;
     private String expressionUnit;
     private int mapKey;
+    private String expressionLevel;
 
     public boolean deleteFlag; // if true, the value should be deleted
 
@@ -78,5 +79,13 @@ public class GeneExpressionRecordValue {
 
     public void setMapKey(int mapKey) {
         this.mapKey = mapKey;
+    }
+
+    public String getExpressionLevel() {
+        return expressionLevel;
+    }
+
+    public void setExpressionLevel(String expressionLevel) {
+        this.expressionLevel = expressionLevel;
     }
 }
