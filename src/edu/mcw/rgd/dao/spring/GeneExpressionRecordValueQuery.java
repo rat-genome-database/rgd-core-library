@@ -29,6 +29,7 @@ public class GeneExpressionRecordValueQuery  extends MappingSqlQuery {
         rec.setExpressionValue(rs.getDouble("expression_value"));
         rec.setExpressionUnit(rs.getString("expression_unit"));
         rec.setMapKey(rs.getInt("map_key"));
+        rec.setExpressionLevel(rs.getString("expression_level"));
         return rec;
     }
 }

@@ -178,4 +178,50 @@ public class GeneExpressionDAO extends PhenominerDAO {
             }
         }
     }
+
+    /**
+     * Returns a list of values for given gene expression experiment record
+     * @param rgdId expressed Object Rgd id
+     * @return list of GeneExpressionRecordValue objects; could be empty
+     * @throws Exception
+     */
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGene(int rgdId,String unit) throws Exception {
+        String query = "SELECT * FROM gene_expression_values WHERE expressed_object_rgd_id=? and expression_unit =? order by gene_expression_exp_record_id";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, rgdId,unit);
+    }
+
+    /**
+     * Returns a list of values for given gene expression experiment record
+     * @param rgdId expressed Object Rgd id
+     * @return list of GeneExpressionRecordValue objects; could be empty
+     * @throws Exception
+     */
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneByTissue(int rgdId,String unit,String level,String tissueOntId) throws Exception {
+        String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id\n" +
+                "        join sample s on s.sample_id = gr.sample_id\n" +
+                "        join experiment e on gr.experiment_id = e.experiment_id\n" +
+                "        join study st on st.study_id = e.study_id " +
+                "WHERE ge.expressed_object_rgd_id=? and ge.expression_unit =? and ge.expression_level =? and s.tissue_ont_id =? order by ge.gene_expression_exp_record_id";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, rgdId,unit,level,tissueOntId);
+    }
+
+    /**
+     * For given  id, get all gene expression record
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public GeneExpressionRecord getGeneExpressionRecordById(int id) throws Exception {
+
+        String sql = "SELECT * FROM gene_expression_exp_record WHERE gene_expression_exp_record_id=?";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(), sql);
+        List<GeneExpressionRecord> record = execute(q, id);
+        if( record.isEmpty() )
+            return null;
+        return record.get(0);
+    }
 }
