@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
+import edu.mcw.rgd.process.mapping.MapManager;
 import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.Types;
@@ -133,24 +134,11 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getActiveOrthologs(List<Integer> rgdIds, int speciesTypeKey) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key "+
-                " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( ";
-
-                boolean first = true;
-                for (Integer rgdId: rgdIds) {
-
-                    if (first) {
-                        query += rgdId;
-                    }else {
-                        query += "," + rgdId;
-                    }
-                    first=false;
-                }
-
-                query += ")  AND r.species_type_key=? " +
-                " ORDER BY r.species_type_key ";
-
-        System.out.println(query);
+            " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
+            " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( "+
+            Utils.buildInPhrase(rgdIds)+
+            ")  AND r.species_type_key=? " +
+            " ORDER BY r.species_type_key ";
 
         return executeGeneQuery(query, speciesTypeKey);
     }
@@ -165,24 +153,11 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getActiveOrthologs(List<Integer> rgdIds) throws Exception{
 
         String query = "SELECT g.*, r.species_type_key "+
-                " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( ";
-
-        boolean first = true;
-        for (Integer rgdId: rgdIds) {
-
-            if (first) {
-                query += rgdId;
-            }else {
-                query += "," + rgdId;
-            }
-            first=false;
-        }
-
-        query += ")  AND r.species_type_key in (1,2,3) " +
-                " ORDER BY r.species_type_key ";
-
-        System.out.println(query);
+            " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
+            " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( "+
+            Utils.buildInPhrase(rgdIds)+
+            ")  AND r.species_type_key in (1,2,3) " +
+            " ORDER BY r.species_type_key ";
 
         return executeGeneQuery(query);
     }
@@ -199,8 +174,8 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
         String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
-                "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,"+
-                "g.ncbi_annot_status,r.species_type_key " +
+                "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,g.gene_source,"+
+                "g.ncbi_annot_status,r.species_type_key,g.ensembl_gene_symbol,g.ensembl_gene_type,g.ensembl_full_name " +
                 "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
                 "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
                 " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
@@ -239,11 +214,13 @@ public class GeneDAO extends AbstractDAO {
 
         String sql = "update GENES set GENE_KEY=?, GENE_SYMBOL=?, GENE_SYMBOL_LC=LOWER(?), "+
                 "FULL_NAME=?, GENE_DESC=?, AGR_DESC=?, MERGED_DESC=?, NOTES=?, FULL_NAME_LC=LOWER(?), "+
-                "GENE_TYPE_LC=LOWER(?), NOMEN_REVIEW_DATE=?, REFSEQ_STATUS=?, NCBI_ANNOT_STATUS=? where RGD_ID=?";
+                "GENE_TYPE_LC=LOWER(?), NOMEN_REVIEW_DATE=?, REFSEQ_STATUS=?, NCBI_ANNOT_STATUS=?, "+
+                "GENE_SOURCE=?, ENSEMBL_GENE_SYMBOL=?, ENSEMBL_GENE_TYPE=?, ENSEMBL_FULL_NAME=? where RGD_ID=?";
 
         update(sql, gene.getKey(), gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(),
                 gene.getAgrDescription(), gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(),
-                gene.getNomenReviewDate(), gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId());
+                gene.getNomenReviewDate(), gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getGeneSource(),
+                gene.getEnsemblGeneSymbol(), gene.getEnsemblGeneType(), gene.getEnsemblFullName(), gene.getRgdId());
     }
 
     /**
@@ -256,14 +233,16 @@ public class GeneDAO extends AbstractDAO {
 
         String sql = "insert into GENES (GENE_KEY, GENE_SYMBOL, GENE_SYMBOL_LC, " +
                 "FULL_NAME, GENE_DESC, AGR_DESC, MERGED_DESC, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, "+
-                "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID) values (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?)";
+                "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID, GENE_SOURCE, ENSEMBL_GENE_SYMBOL, ENSEMBL_GENE_TYPE, ENSEMBL_FULL_NAME) "+
+                "VALUES (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?,?,?,?,?)";
 
         int key = this.getNextKey("genes","gene_key");
         gene.setKey(key);
 
         update(sql, key, gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(), gene.getAgrDescription(),
                 gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(), gene.getNomenReviewDate(),
-                gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId());
+                gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId(), gene.getGeneSource(), gene.getEnsemblGeneSymbol(),
+                gene.getEnsemblGeneType(), gene.getEnsemblFullName());
     }
 
     /**
@@ -445,6 +424,18 @@ public class GeneDAO extends AbstractDAO {
                 "ORDER BY md.chromosome";
 
         return MappedGeneQuery.run(this, query, mapKey);
+    }
+
+    public List<MappedGene> getActiveMappedGenesBySpecies(int species, String chr) throws Exception {
+        String query = "SELECT g.*, r.species_type_key, md.* \n" +
+                " FROM genes g, rgd_ids r, maps_data md\n" +
+                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id "+
+                " AND md.map_key=?" +
+                " and md.chromosome='" + chr + "'" +
+                " ORDER BY md.start_pos";
+
+        System.out.println(query);
+        return MappedGeneQuery.run(this, query,  MapManager.getInstance().getReferenceAssembly(species).getKey());
     }
 
     public List<String> getGeneSymbolMapping(String dbsnpId, int mapKey, String dbSnpVersion) throws Exception{

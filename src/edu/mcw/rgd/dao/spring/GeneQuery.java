@@ -39,8 +39,13 @@ public class GeneQuery extends MappingSqlQuery {
         gene.setAgrDescription(rs.getString("agr_desc"));
         gene.setMergedDescription(rs.getString("merged_desc"));
 
+
         try {
             gene.setSpeciesTypeKey(rs.getInt("species_type_key"));
+            gene.setGeneSource(rs.getString("gene_source"));
+            gene.setEnsemblGeneSymbol(rs.getString("ensembl_gene_symbol"));
+            gene.setEnsemblGeneType(rs.getString("ensembl_gene_type"));
+            gene.setEnsemblFullName(rs.getString("ensembl_full_name"));
         }catch (Exception ignored) {
         }
 
