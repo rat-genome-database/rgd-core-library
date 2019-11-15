@@ -304,14 +304,14 @@ public class GeneDAO extends AbstractDAO {
         return GeneQuery.execute(this, query, chr, stopPos, startPos, mapKey);
     }
 
-    public List<MappedGene> getActiveMappedGenes(String chr, long startPos, long stopPos, int mapKey) throws Exception {
-        String query = "SELECT g.*, r.species_type_key, md.* \n" +
+    public List<MappedGenePosition> getActiveMappedGenes(String chr, long startPos, long stopPos, int mapKey) throws Exception {
+        String query = "SELECT g.rgd_id as rgd_id, g.gene_symbol as symbol, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md \n" +
                 "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
                 " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? \n"+
                 "ORDER BY md.start_pos";
 
-        return MappedGeneQuery.run(this, query, chr, stopPos, startPos, mapKey);
+        return MappedGenePositionQuery.run(this, query, chr, stopPos, startPos, mapKey);
     }
 
 
@@ -437,6 +437,9 @@ public class GeneDAO extends AbstractDAO {
         System.out.println(query);
         return MappedGeneQuery.run(this, query,  MapManager.getInstance().getReferenceAssembly(species).getKey());
     }
+
+
+
 
     public List<String> getGeneSymbolMapping(String dbsnpId, int mapKey, String dbSnpVersion) throws Exception{
 
