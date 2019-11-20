@@ -315,7 +315,7 @@ public class GeneDAO extends AbstractDAO {
     }
 
     public List<MappedGene> getActiveMappedGenes(String chr, long startPos, long stopPos, int mapKey) throws Exception {
-        String query = "SELECT g.rgd_id as rgd_id, g.gene_symbol as symbol, r.species_type_key, md.* \n" +
+        String query = "SELECT g.*, r.species_type_key, g.gene_symbol as symbol, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md \n" +
                 "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
                 " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? \n"+
