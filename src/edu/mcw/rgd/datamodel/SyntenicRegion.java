@@ -9,77 +9,85 @@ package edu.mcw.rgd.datamodel;
  */
 public class SyntenicRegion {
 
-    private int backboneMapKey;
-    private String backboneChromosome;
-    private long backboneStart;
-    private long backboneStop;
+    private int mapKey1;
+    private int mapKey2;
+    private String chromosome1;
+    private String chromosome2;
+    private int startPos1;
+    private int startPos2;
+    private int stopPos1;
+    private int stopPos2;
+    private int orientation;
 
-    private int mapKey;
-    private String chromosome;
-    private long start;
-    private long stop;
-
-    public int getBackboneMapKey() {
-        return backboneMapKey;
+    public int getMapKey1() {
+        return mapKey1;
     }
 
-    public void setBackboneMapKey(int backboneMapKey) {
-        this.backboneMapKey = backboneMapKey;
+    public void setMapKey1(int mapKey1) {
+        this.mapKey1 = mapKey1;
     }
 
-    public String getBackboneChromosome() {
-        return backboneChromosome;
+    public int getMapKey2() {
+        return mapKey2;
     }
 
-    public void setBackboneChromosome(String backboneChromosome) {
-        this.backboneChromosome = backboneChromosome;
+    public void setMapKey2(int mapKey2) {
+        this.mapKey2 = mapKey2;
     }
 
-    public long getBackboneStart() {
-        return backboneStart;
+    public String getChromosome1() {
+        return chromosome1;
     }
 
-    public void setBackboneStart(long backboneStart) {
-        this.backboneStart = backboneStart;
+    public void setChromosome1(String chromosome1) {
+        this.chromosome1 = chromosome1;
     }
 
-    public long getBackboneStop() {
-        return backboneStop;
+    public String getChromosome2() {
+        return chromosome2;
     }
 
-    public void setBackboneStop(long backboneStop) {
-        this.backboneStop = backboneStop;
+    public void setChromosome2(String chromosome2) {
+        this.chromosome2 = chromosome2;
     }
 
-    public int getMapKey() {
-        return mapKey;
+    public int getStartPos1() {
+        return startPos1;
     }
 
-    public void setMapKey(int mapKey) {
-        this.mapKey = mapKey;
+    public void setStartPos1(int startPos1) {
+        this.startPos1 = startPos1;
     }
 
-    public String getChromosome() {
-        return chromosome;
+    public int getStartPos2() {
+        return startPos2;
     }
 
-    public void setChromosome(String chromosome) {
-        this.chromosome = chromosome;
+    public void setStartPos2(int startPos2) {
+        this.startPos2 = startPos2;
     }
 
-    public long getStart() {
-        return start;
+    public int getStopPos1() {
+        return stopPos1;
     }
 
-    public void setStart(long start) {
-        this.start = start;
+    public void setStopPos1(int stopPos1) {
+        this.stopPos1 = stopPos1;
     }
 
-    public long getStop() {
-        return stop;
+    public int getStopPos2() {
+        return stopPos2;
     }
 
-    public void setStop(long stop) {
-        this.stop = stop;
+    public void setStopPos2(int stopPos2) {
+        this.stopPos2 = stopPos2;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
     }
 }

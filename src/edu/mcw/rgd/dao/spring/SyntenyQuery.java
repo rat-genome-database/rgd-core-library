@@ -27,15 +27,15 @@ public class SyntenyQuery extends MappingSqlQuery {
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         SyntenicRegion sr = new SyntenicRegion();
-        sr.setBackboneChromosome(rs.getString("backbone_chr"));
-        sr.setBackboneMapKey(rs.getInt("backbone_map_key"));
-        sr.setBackboneStart(rs.getLong("backbone_start_pos"));
-        sr.setBackboneStop(rs.getLong("backbone_stop_pos"));
-
-        sr.setChromosome(rs.getString("chr"));
-        sr.setMapKey(rs.getInt("map_key"));
-        sr.setStart(rs.getLong("start_pos"));
-        sr.setStop(rs.getLong("stop_pos"));
+        sr.setMapKey1(rs.getInt("map_key1"));
+        sr.setMapKey2(rs.getInt("map_key2"));
+        sr.setChromosome1(rs.getString("chromosome1"));
+        sr.setChromosome2(rs.getString("chromosome2"));
+        sr.setStartPos1(rs.getInt("start_pos1"));
+        sr.setStartPos2(rs.getInt("start_pos2"));
+        sr.setStopPos1(rs.getInt("stop_pos1"));
+        sr.setStopPos2(rs.getInt("stop_pos2"));
+        sr.setOrientation(rs.getInt("orientation"));
 
         return sr;
     }
