@@ -27,4 +27,11 @@ public class SyntenyDAO extends AbstractDAO {
         SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
         return execute(q, backboneMapKey, mapKey, stop, start, chromosome);
     }
+
+    public List<SyntenicRegion> get(int backboneMapKey, String chromosome, int mapKey) throws Exception {
+        String query = "select * from synteny where backbone_map_key=? and map_key=? " +
+                " and backbone_chr=? order by chr, start_pos";
+        SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
+        return execute(q, backboneMapKey, mapKey, chromosome);
+    }
 }
