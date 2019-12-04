@@ -13,17 +13,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 1:31:52 PM
+ * @author jdepons
+ * @since May 19, 2008
  */
 public class AliasDAO extends AbstractDAO {
 
     public Alias getAliasByKey(int key) throws Exception {
-        String query = "select a.*, r.SPECIES_TYPE_KEY from aliases a,  RGD_IDS r where r.RGD_ID=a.RGD_ID and a.alias_key=" + key;
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        List<Alias> aliases = execute(q);
+        String query = "SELECT a.*, r.species_type_key FROM aliases a, rgd_ids r WHERE r.rgd_id=a.rgd_id AND a.alias_key=?";
+        List<Alias> aliases = AliasQuery.execute(this, query, key);
 
         if (aliases.size() == 0) {
             throw new AliasDAOException("Alias " + key + " not found");
@@ -39,15 +36,13 @@ public class AliasDAO extends AbstractDAO {
      */
     public List<Alias> getAliases(int rgdId) throws Exception {
         String query = "SELECT a.*,r.species_type_key FROM aliases a, rgd_ids r WHERE a.rgd_id=? AND a.rgd_id=r.rgd_id";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, rgdId);
+        return AliasQuery.execute(this, query, rgdId);
     }
 
     public List<Alias> getAliases(List<Integer> rgdIdsList) throws Exception {
         String query = "SELECT a.*,r.species_type_key FROM aliases a, rgd_ids r WHERE a.rgd_id in ("+
                 Utils.buildInPhrase(rgdIdsList) + ") AND a.rgd_id=r.rgd_id";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q);
+        return AliasQuery.execute(this, query);
     }
 
     /**
@@ -59,8 +54,7 @@ public class AliasDAO extends AbstractDAO {
      */
     public List<Alias> getAliases(int rgdId, String aliasType) throws Exception {
         String query = "SELECT a.*,r.species_type_key FROM aliases a, rgd_ids r WHERE a.rgd_id=? AND a.rgd_id=r.rgd_id AND a.alias_type_name_lc=LOWER(?)";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, rgdId, aliasType);
+        return AliasQuery.execute(this, query, rgdId, aliasType);
     }
 
     /**
@@ -73,8 +67,7 @@ public class AliasDAO extends AbstractDAO {
     public List<Alias> getAliases(int rgdId, String[] aliasTypes) throws Exception {
         String query = "SELECT a.*,r.species_type_key FROM aliases a, rgd_ids r WHERE a.rgd_id=? AND a.rgd_id=r.rgd_id "+
                 "AND a.alias_type_name_lc IN("+Utils.concatenate(aliasTypes,",","'")+')';
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, rgdId);
+        return AliasQuery.execute(this, query, rgdId);
     }
 
     /**
@@ -85,8 +78,7 @@ public class AliasDAO extends AbstractDAO {
      */
     public List<Alias> getAliasesByType(String aliasType) throws Exception {
         String query = "SELECT a.*,r.species_type_key FROM aliases a, rgd_ids r WHERE a.rgd_id=r.rgd_id AND a.alias_type_name_lc=LOWER(?)";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, aliasType);
+        return AliasQuery.execute(this, query, aliasType);
     }
 
     /**
@@ -101,8 +93,7 @@ public class AliasDAO extends AbstractDAO {
                 "FROM aliases a, rgd_ids i " +
                 "WHERE a.rgd_id=i.rgd_id AND i.object_status='ACTIVE' AND i.object_key=? "+
                 "AND i.species_type_key<>8";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, objType);
+        return AliasQuery.execute(this, query, objType);
     }
 
     /**
@@ -115,8 +106,7 @@ public class AliasDAO extends AbstractDAO {
         String query  = "SELECT a.*,r.species_type_key FROM aliases a,rgd_ids r\n" +
                 "WHERE a.rgd_id=r.rgd_id AND object_status='ACTIVE' AND object_key=? AND species_type_key=?\n" +
                 "  AND alias_type_name_lc LIKE 'array%ensembl'";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        return execute(q, objType, speciesTypeKey);
+        return AliasQuery.execute(this, query, objType, speciesTypeKey);
     }
 
     /**
@@ -232,14 +222,15 @@ public class AliasDAO extends AbstractDAO {
     }
 
     /**
-     * delete all aliases that are the same as a gene name or gene symbol
-     * @return number of deleted aliases
+     * get aliases that are the same as a gene name or gene symbol
+     * @return List of Alias objects
      * @throws Exception if something wrong happens in spring framework
      */
-    public int deleteRedundantGeneAliases() throws Exception {
-        String sql = "DELETE FROM aliases a " +
-                "WHERE EXISTS(SELECT 1 FROM genes g WHERE a.rgd_id=g.rgd_id AND (alias_value_lc=gene_symbol_lc OR alias_value_lc=full_name_lc))";
-        return update(sql);
+    public List<Alias> getRedundantGeneAliases() throws Exception {
+        String sql = "SELECT a.*,i.species_type_key FROM aliases a,rgd_ids i " +
+                "WHERE EXISTS(SELECT 1 FROM genes g WHERE a.rgd_id=g.rgd_id AND (alias_value_lc=gene_symbol_lc OR alias_value_lc=full_name_lc))" +
+                " AND i.rgd_id=a.rgd_id";
+        return AliasQuery.execute(this, sql);
     }
 
     /**
@@ -251,12 +242,11 @@ public class AliasDAO extends AbstractDAO {
      */
     public Alias getAliasByValue(int rgdId, String aliasValue) throws Exception{
         String query = "SELECT * FROM aliases WHERE rgd_id=? AND alias_value_lc=LOWER(?)";
-        AliasQuery q = new AliasQuery(this.getDataSource(), query);
-        List aliases = execute(q, rgdId, aliasValue);
+        List<Alias> aliases = AliasQuery.execute(this, query, rgdId, aliasValue);
         if(aliases.isEmpty()){
             return null;
         }else{
-            return (Alias) aliases.get(0);
+            return aliases.get(0);
         }
     }
 

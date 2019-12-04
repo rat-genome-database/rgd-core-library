@@ -1,21 +1,17 @@
 package edu.mcw.rgd.dao.spring;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.Alias;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * To change this template use File | Settings | File Templates.
- */
-
-/**
+ * @author jdepons
+ * @since Jan 17, 2008
  * Returns a row from the Alias table
  */
 public class AliasQuery extends MappingSqlQuery {
@@ -40,4 +36,8 @@ public class AliasQuery extends MappingSqlQuery {
         return alias;
     }
 
+    public static List<Alias> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+        AliasQuery q = new AliasQuery(dao.getDataSource(), sql);
+        return dao.execute(q, params);
+    }
 }
