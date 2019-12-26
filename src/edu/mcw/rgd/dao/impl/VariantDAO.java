@@ -49,6 +49,9 @@ public class VariantDAO extends JdbcBaseDAO {
         if( sampleId>=6000 && sampleId<=6999 ) {
             return "polyphen_dog";
         }
+        if( sampleId>=10000 && sampleId<=13999 ) {
+            return "polyphen_human";
+        }
         return "polyphen";
     }
     /**
