@@ -1,11 +1,13 @@
 package edu.mcw.rgd.dao.spring;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.Association;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author mtutaj
@@ -34,5 +36,10 @@ public class AssociationQuery extends MappingSqlQuery {
         assoc.setMasterRgdId(rs.getInt("master_rgd_id"));
         assoc.setDetailRgdId(rs.getInt("detail_rgd_id"));
         assoc.setSrcPipeline(rs.getString("src_pipeline"));
+    }
+
+    public static List<Association> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+        AssociationQuery q = new AssociationQuery(dao.getDataSource(), sql);
+        return dao.execute(q, params);
     }
 }
