@@ -7,10 +7,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA. <br>
- * User: mtutaj <br>
- * Date: 10/27/11 <br>
- * <p/>
+ * @author mtutaj
+ * @since 10/27/11
  * an association between two RGD objects; represents one row from RGD_ASSOCIATIONS table
  */
 public class Association implements Dumpable, Cloneable, Serializable {
@@ -32,7 +30,7 @@ public class Association implements Dumpable, Cloneable, Serializable {
      */
     public String dump(String delimiter) {
 
-        return new Dumper(delimiter)
+        return new Dumper(delimiter, true, true)
             .put("ASSOC_KEY", assocKey)
             .put("ASSOC_TYPE", assocType)
             .put("ASSOC_SUBTYPE", assocSubType)
