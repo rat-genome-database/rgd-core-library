@@ -23,7 +23,7 @@ public class MapDAOTest extends TestCase {
     public void testAll() throws Exception {
 
         //TranscriptDAO tdao = new TranscriptDAO();
-        //tdao.deleteTranscript(9478523, 11460505);
+        //tdao.deleteTranscript(11290799, 14777962);
 
         testMapDAO();
 
