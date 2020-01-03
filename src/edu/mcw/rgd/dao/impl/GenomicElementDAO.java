@@ -9,6 +9,7 @@ import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -181,25 +182,41 @@ public class GenomicElementDAO extends AbstractDAO {
     }
 
     /**
+     * get expression data for given source
+     * @param source source name
+     * @return List of ExpressionData objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<ExpressionData> getExpressionDataForSource(String source) throws Exception {
+
+        String sql = "SELECT e.* FROM expression_data e WHERE source=?";
+
+        ExpressionDataQuery q = new ExpressionDataQuery(this.getDataSource(), sql);
+        return execute(q, source);
+    }
+
+    /**
      * insert a list of expression data objects
      * @param list list of expression data objects
      * @return count of rows affected
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public int insertExpressionData(List<ExpressionData> list) throws Exception {
+    public int insertExpressionData(Collection<ExpressionData> list) throws Exception {
 
         String sql = "INSERT INTO expression_data "+
-                "(rgd_id, tissue, transcripts, chip_seq_read_density, experiment_methods, regulation, expression_data_key) "+
-                "VALUES(?,?,?,?,?,?,expression_data_seq.nextval)";
+                "(rgd_id, tissue, transcripts, chip_seq_read_density, experiment_methods, regulation, tissue_term_acc," +
+                "strain_term_acc, source, notes, expression_data_key) "+
+                "VALUES(?,?,?,?,?,?,?,?,?,?,expression_data_seq.nextval)";
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
-            new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.VARCHAR, Types.VARCHAR});
+            new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
+                    , Types.VARCHAR, Types.VARCHAR, Types.VARCHAR});
         su.compile();
 
         for( ExpressionData ee: list ) {
 
-            su.update(ee.getRgdId(), ee.getTissue(), ee.getTranscripts(), ee.getChipSeqReadDensity(),
-                    ee.getExperimentMethods(), ee.getRegulation());
+            su.update(ee.getRgdId(), ee.getTissue(), ee.getTranscripts(), ee.getChipSeqReadDensity(), ee.getExperimentMethods(),
+                    ee.getRegulation(), ee.getTissueTermAcc(), ee.getStrainTermAcc(), ee.getSource(), ee.getNotes());
         }
 
         return executeBatch(su);
@@ -211,20 +228,41 @@ public class GenomicElementDAO extends AbstractDAO {
      * @return count of rows affected
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public int updateExpressionData(List<ExpressionData> list) throws Exception {
+    public int updateExpressionData(Collection<ExpressionData> list) throws Exception {
 
         String sql = "UPDATE expression_data SET transcripts=?, chip_seq_read_density=?, tissue=?, rgd_id=?, " +
-                "experiment_methods=?, regulation=? "+
+                "experiment_methods=?, regulation=?, tissue_term_acc=?, strain_term_acc=?, source=?, notes=? "+
                 "WHERE expression_data_key=?";
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
-            new int[]{Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER});
+            new int[]{Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER});
         su.compile();
 
         for( ExpressionData ee: list ) {
 
-            su.update(ee.getTissue(), ee.getTranscripts(), ee.getChipSeqReadDensity(), ee.getRgdId(),
-                    ee.getExperimentMethods(), ee.getRegulation(), ee.getKey());
+            su.update(ee.getTissue(), ee.getTranscripts(), ee.getChipSeqReadDensity(), ee.getRgdId(), ee.getExperimentMethods(),
+                    ee.getRegulation(), ee.getTissueTermAcc(), ee.getStrainTermAcc(), ee.getSource(), ee.getNotes(), ee.getKey());
+        }
+
+        return executeBatch(su);
+    }
+
+    /**
+     * update a list of expression data objects
+     * @param list list of expression data objects
+     * @return count of rows affected
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public int deleteExpressionData(Collection<ExpressionData> list) throws Exception {
+
+        String sql = "DELETE FROM expression_data WHERE expression_data_key=?";
+
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql, new int[]{Types.INTEGER});
+        su.compile();
+
+        for( ExpressionData ee: list ) {
+            su.update(ee.getKey());
         }
 
         return executeBatch(su);

@@ -1,12 +1,11 @@
 package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Dumper;
+import edu.mcw.rgd.process.Utils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:28 AM
+ * @author mtutaj
+ * @since 2/22/12
  * represents a row in EXPRESSION_DATA table
  */
 public class ExpressionData implements Identifiable, Dumpable {
@@ -20,8 +19,7 @@ public class ExpressionData implements Identifiable, Dumpable {
     private String regulation;
     private String tissueTermAcc; // MA acc id
     private String strainTermAcc; // RS acc id
-    private String absCall; // the call in an absolute analysis that indicates if the transcript was present (P), absent (A), marginal (M), or no call (NC)
-    private String geoAccId;
+    private String source;
     private String notes;
 
     public long getKey() {
@@ -96,20 +94,12 @@ public class ExpressionData implements Identifiable, Dumpable {
         this.strainTermAcc = strainTermAcc;
     }
 
-    public String getAbsCall() {
-        return absCall;
+    public String getSource() {
+        return source;
     }
 
-    public void setAbsCall(String absCall) {
-        this.absCall = absCall;
-    }
-
-    public String getGeoAccId() {
-        return geoAccId;
-    }
-
-    public void setGeoAccId(String geoAccId) {
-        this.geoAccId = geoAccId;
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getNotes() {
@@ -131,9 +121,37 @@ public class ExpressionData implements Identifiable, Dumpable {
             .put("REGULATION", regulation)
             .put("TISSUE_TERM_ACC", tissueTermAcc)
             .put("STRAIN_TERM_ACC", strainTermAcc)
-            .put("ABS_CALL", absCall)
-            .put("GEO_ACC_ID", geoAccId)
+            .put("SOURCE", source)
             .put("NOTES", notes)
             .dump();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        ExpressionData o = (ExpressionData) obj;
+        return rgdId==o.rgdId
+            && Utils.stringsAreEqual(tissue, o.tissue)
+            && Utils.stringsAreEqual(transcripts, o.transcripts)
+            && Utils.doublesAreEqual(chipSeqReadDensity, o.chipSeqReadDensity, 2)
+            && Utils.stringsAreEqual(experimentMethods, o.experimentMethods)
+            && Utils.stringsAreEqual(regulation, o.regulation)
+            && Utils.stringsAreEqual(tissueTermAcc, o.tissueTermAcc)
+            && Utils.stringsAreEqual(strainTermAcc, o.strainTermAcc)
+            && Utils.stringsAreEqual(source, o.source);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = rgdId
+            ^ (tissue != null ? tissue.hashCode() : 0)
+            ^ (transcripts != null ? transcripts.hashCode() : 0)
+            ^ (chipSeqReadDensity != null ? chipSeqReadDensity.hashCode() : 0)
+            ^ (experimentMethods != null ? experimentMethods.hashCode() : 0)
+            ^ (regulation != null ? regulation.hashCode() : 0)
+            ^ (tissueTermAcc != null ? tissueTermAcc.hashCode() : 0)
+            ^ (strainTermAcc != null ? strainTermAcc.hashCode() : 0)
+            ^ (source != null ? source.hashCode() : 0);
+        return result;
     }
 }
