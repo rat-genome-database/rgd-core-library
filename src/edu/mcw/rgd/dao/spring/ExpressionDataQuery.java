@@ -8,13 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:31 AM
- * <p>
- *     mapping sql query to work with lists of ExpressionData objects
- * </p>
+ * @author mtutaj
+ * @since 2/22/12
+ * class to work with lists of ExpressionData objects
  */
 public class ExpressionDataQuery extends MappingSqlQuery {
 
@@ -35,8 +31,7 @@ public class ExpressionDataQuery extends MappingSqlQuery {
        obj.setRegulation(rs.getString("regulation"));
        obj.setTissueTermAcc(rs.getString("tissue_term_acc"));
        obj.setStrainTermAcc(rs.getString("strain_term_acc"));
-       obj.setAbsCall(rs.getString("abs_call"));
-       obj.setGeoAccId(rs.getString("geo_acc_id"));
+       obj.setSource(rs.getString("source"));
        obj.setNotes(rs.getString("notes"));
        return obj;
    }
