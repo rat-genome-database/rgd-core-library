@@ -242,6 +242,21 @@ public class MapDAO extends AbstractDAO {
     }
 
     /**
+     * return all positions for given map, and object type
+     * @param mapKey map key
+     * @param objectKey object key
+     * @param srcPipeline source pipeline
+     * @return List of MapData objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<MapData> getMapDataByMapKeyObject(int mapKey, int objectKey, String srcPipeline) throws Exception {
+
+        String query = "SELECT md.* FROM maps_data md,rgd_ids r "+
+                "WHERE map_key=? AND object_key=? AND r.rgd_id=md.rgd_id AND src_pipeline=?";
+        return executeMapDataQuery(query, mapKey, objectKey, srcPipeline);
+    }
+
+    /**
      * update a single MapData object
      * @param md MapData object
      * @return number of rows affected
