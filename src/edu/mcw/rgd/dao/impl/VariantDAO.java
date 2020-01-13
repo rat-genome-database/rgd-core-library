@@ -779,7 +779,13 @@ public class VariantDAO extends JdbcBaseDAO {
         }
         return res;
     }
-
+    public List<Variant> getVariantsBySampleId(int sampleId, String tableName) throws Exception {
+      //  String sql="select * from variant_dog where sample_id=?";
+        String sql="select * from "+tableName+" where sample_id=?";
+        VariantMapper mapper= new VariantMapper(this.getDataSource(), sql);
+        mapper.declareParameter(new SqlParameter(Types.INTEGER));
+        return mapper.execute(sampleId);
+    }
     public String getGeneSymbolByVariantId(long id) throws Exception {
         String query = "select GENE_SYMBOL from POLYPHEN where VARIANT_ID ="+id;
         return getList(query).get(0);
