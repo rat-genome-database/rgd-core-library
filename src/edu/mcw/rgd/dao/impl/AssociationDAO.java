@@ -11,10 +11,8 @@ import java.util.*;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 20, 2008
- * Time: 9:03:53 AM
+ * @author jdepons
+ * @since May 20, 2008
  */
 public class AssociationDAO extends AbstractDAO {
 
@@ -125,12 +123,10 @@ public class AssociationDAO extends AbstractDAO {
     }
 
 
-    public void removeStrainAssociation(int strainRGDID, int associationRgdId) throws Exception{
+    public void removeStrainAssociation(int strainRgdId, int associationRgdId) throws Exception{
 
-        int strainKey = getStrainDAO().getStrain(strainRGDID).getKey();
-
-        String sql = "delete from rgd_strains_rgd where strain_key=? and rgd_id = ?";
-        update(sql, strainKey, associationRgdId);
+        String sql = "DELETE FROM rgd_strains_rgd WHERE strain_key=(SELECT strain_key FROM strains WHERE rgd_id=?) AND rgd_id=?";
+        update(sql, strainRgdId, associationRgdId);
     }
 
     /**
@@ -561,8 +557,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String query = "SELECT g.* FROM genes g, qtls q, rgd_gene_qtl gq "+
                 "WHERE q.rgd_id=? AND q.qtl_key=gq.qtl_key AND g.gene_key=gq.gene_key";
-        GeneQuery q = new GeneQuery(this.getDataSource(), query);
-        return execute(q, rgdId);
+        return GeneQuery.execute(this, query, rgdId);
     }
 
     /**
@@ -623,13 +618,11 @@ public class AssociationDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Gene> getGeneAssociationsBySslp(int sslpKey) throws Exception {
-        GeneQuery query = new GeneQuery(this.getDataSource(),
+        String query =
                 "SELECT g.*,r.species_type_key "+
                 "FROM genes g, rgd_ids r, rgd_gene_sslp gs "+
-                "WHERE gs.sslp_key=? AND g.gene_key=gs.gene_key AND g.rgd_id=r.rgd_id");
-        query.declareParameter(new SqlParameter(Types.INTEGER));
-        query.compile();
-        return query.execute(sslpKey);
+                "WHERE gs.sslp_key=? AND g.gene_key=gs.gene_key AND g.rgd_id=r.rgd_id";
+        return GeneQuery.execute(this, query, sslpKey);
     }
 
     /**
@@ -772,8 +765,7 @@ public class AssociationDAO extends AbstractDAO {
                 "FROM genes g, rgd_associations a, rgd_ids r " +
                 "WHERE a.master_rgd_id=? AND a.assoc_type=? AND g.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND g.rgd_id=r.rgd_id";
 
-        GeneQuery q = new GeneQuery(this.getDataSource(), query);
-        return execute(q, masterRgdId, assocType);
+        return GeneQuery.execute(this, query, masterRgdId, assocType);
     }
 
     public List<Gene> getAssociatedGenesForMasterRgdIdList(List<Integer> masterRgdIdList, String assocType) throws Exception {
@@ -783,8 +775,7 @@ public class AssociationDAO extends AbstractDAO {
                 "WHERE a.master_rgd_id in (" + Utils.buildInPhrase(masterRgdIdList) +
                 ") AND a.assoc_type=? AND g.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND g.rgd_id=r.rgd_id";
 
-        GeneQuery q = new GeneQuery(this.getDataSource(), query);
-        return execute(q,  assocType);
+        return GeneQuery.execute(this, query, assocType);
     }
 
     /**
@@ -916,9 +907,24 @@ public class AssociationDAO extends AbstractDAO {
         return getCount(query, assocType, masterSpeciesTypeKey, detailSpeciesTypeKey);
     }
 
+    /**
+     * return list of associations for given assoc type and source
+     * @param assocType assoc type
+     * @param source source pipeline
+     * @return list of Association objects; never null, but returned list could be empty
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Association> getAssociationsByTypeAndSource(String assocType, String source) throws Exception {
+
+        String query = "SELECT a.* "+
+                "FROM rgd_associations a " +
+                "WHERE a.assoc_type=LOWER(?) AND src_pipeline=?";
+
+        return executeAssocQuery(query, assocType, source);
+    }
+
     public List<Association> executeAssocQuery(String query, Object ... params) throws Exception {
-        AssociationQuery q = new AssociationQuery(this.getDataSource(), query);
-        return execute(q, params);
+        return AssociationQuery.execute(this, query, params);
     }
 }
 

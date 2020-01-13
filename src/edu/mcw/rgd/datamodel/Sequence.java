@@ -1,6 +1,7 @@
 package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Dumper;
+import edu.mcw.rgd.process.Utils;
 
 import java.util.Date;
 
@@ -79,5 +80,16 @@ public class Sequence implements Identifiable, Dumpable {
                 .put("MD5", seqMD5)
                 .put("SEQ", seqData)
                 .dump();
+    }
+
+    public boolean equals(Object obj) {
+        Sequence o = (Sequence)obj;
+        return getRgdId()==o.getRgdId()
+           &&  Utils.stringsAreEqual(getSeqType(), o.getSeqType())
+           &&  Utils.stringsAreEqual(getSeqMD5(), o.getSeqMD5());
+    }
+
+    public int hashCode() {
+        return getRgdId() ^ Utils.defaultString(getSeqType()).hashCode() ^ Utils.defaultString(getSeqMD5()).hashCode();
     }
 }
