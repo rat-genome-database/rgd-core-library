@@ -126,7 +126,7 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
-     * get terms matching given synonym; match could be exact or partial;
+     * get active terms matching given synonym; match could be exact or partial;
      * exact match is when synonym-to-match matches the whole term synonym name;
      * partial match is when synonym-to-match matches part of the term synonym name;
      * <p>
@@ -140,7 +140,7 @@ public class OntologyXDAO extends AbstractDAO {
     public List<Term> getTermsBySynonym(String ontologyId, String synonymToMatch, String matchType) throws Exception {
 
         String query = "SELECT t.* FROM ont_terms t \n"+
-                "WHERE ont_id=? AND t.term_acc IN(SELECT term_acc FROM ont_synonyms WHERE LOWER(synonym_name) LIKE ?)";
+                "WHERE ont_id=? AND is_obsolete=0 AND t.term_acc IN(SELECT term_acc FROM ont_synonyms WHERE LOWER(synonym_name) LIKE ?)";
 
         if( matchType.equals("partial") ) {
             synonymToMatch = "%"+synonymToMatch+"%";
