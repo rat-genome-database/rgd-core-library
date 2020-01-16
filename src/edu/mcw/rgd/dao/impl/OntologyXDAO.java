@@ -1337,8 +1337,7 @@ public class OntologyXDAO extends AbstractDAO {
             " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
             ") WHERE parent_term_acc=term_acc"+
             ")";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, termAcc, termAcc);
+        return StringMapQuery.execute(this, sql, termAcc, termAcc);
     }
 
     /**
@@ -1372,8 +1371,7 @@ public class OntologyXDAO extends AbstractDAO {
                         " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
                         ") WHERE parent_term_acc=term_acc"+
                         ")";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, anchorTerm, rdoTermAcc);
+        return StringMapQuery.execute(this, sql, anchorTerm, rdoTermAcc);
     }
 
     /** get all orphaned terms for given ontology: orphaned terms are active terms
@@ -1511,8 +1509,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql = "SELECT DISTINCT term_acc,xref_value FROM ont_xrefs x "+
                 "WHERE xref_description='CAS Registry Number' OR xref_type='CAS'";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q);
+        return StringMapQuery.execute(this, sql);
     }
 
     /**
@@ -1526,8 +1523,7 @@ public class OntologyXDAO extends AbstractDAO {
         String sql = "SELECT DISTINCT term_acc,synonym_name mesh_id FROM ont_synonyms s "+
                 "WHERE synonym_name LIKE 'MESH:%' "+
                 "AND EXISTS(SELECT 1 FROM ont_terms t WHERE t.term_acc=s.term_acc AND is_obsolete=0 AND ont_id=?)";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, ontId);
+        return StringMapQuery.execute(this, sql, ontId);
     }
 
     public List<TermXRef> getTermXRefs(String termAcc) throws Exception {
