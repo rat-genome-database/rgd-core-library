@@ -126,7 +126,7 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
-     * get terms matching given synonym; match could be exact or partial;
+     * get active terms matching given synonym; match could be exact or partial;
      * exact match is when synonym-to-match matches the whole term synonym name;
      * partial match is when synonym-to-match matches part of the term synonym name;
      * <p>
@@ -140,7 +140,7 @@ public class OntologyXDAO extends AbstractDAO {
     public List<Term> getTermsBySynonym(String ontologyId, String synonymToMatch, String matchType) throws Exception {
 
         String query = "SELECT t.* FROM ont_terms t \n"+
-                "WHERE ont_id=? AND t.term_acc IN(SELECT term_acc FROM ont_synonyms WHERE LOWER(synonym_name) LIKE ?)";
+                "WHERE ont_id=? AND is_obsolete=0 AND t.term_acc IN(SELECT term_acc FROM ont_synonyms WHERE LOWER(synonym_name) LIKE ?)";
 
         if( matchType.equals("partial") ) {
             synonymToMatch = "%"+synonymToMatch+"%";
@@ -1337,8 +1337,7 @@ public class OntologyXDAO extends AbstractDAO {
             " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
             ") WHERE parent_term_acc=term_acc"+
             ")";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, termAcc, termAcc);
+        return StringMapQuery.execute(this, sql, termAcc, termAcc);
     }
 
     /**
@@ -1372,8 +1371,7 @@ public class OntologyXDAO extends AbstractDAO {
                         " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
                         ") WHERE parent_term_acc=term_acc"+
                         ")";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, anchorTerm, rdoTermAcc);
+        return StringMapQuery.execute(this, sql, anchorTerm, rdoTermAcc);
     }
 
     /** get all orphaned terms for given ontology: orphaned terms are active terms
@@ -1511,8 +1509,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql = "SELECT DISTINCT term_acc,xref_value FROM ont_xrefs x "+
                 "WHERE xref_description='CAS Registry Number' OR xref_type='CAS'";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q);
+        return StringMapQuery.execute(this, sql);
     }
 
     /**
@@ -1526,8 +1523,7 @@ public class OntologyXDAO extends AbstractDAO {
         String sql = "SELECT DISTINCT term_acc,synonym_name mesh_id FROM ont_synonyms s "+
                 "WHERE synonym_name LIKE 'MESH:%' "+
                 "AND EXISTS(SELECT 1 FROM ont_terms t WHERE t.term_acc=s.term_acc AND is_obsolete=0 AND ont_id=?)";
-        StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
-        return execute(q, ontId);
+        return StringMapQuery.execute(this, sql, ontId);
     }
 
     public List<TermXRef> getTermXRefs(String termAcc) throws Exception {
