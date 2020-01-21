@@ -10,11 +10,8 @@ import java.util.List;
 import edu.mcw.rgd.datamodel.RgdId;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 1:31:52 PM
- * <p>
+ * @author jdepons
+ * @since May 19, 2008
  * API to manipulate data in QTLS table
  */
 public class QTLDAO extends AbstractDAO {
@@ -191,7 +188,6 @@ public class QTLDAO extends AbstractDAO {
 
     /// QTL query implementation helper
     public List<QTL> executeQtlQuery(String query, Object ... params) throws Exception {
-        QTLQuery q = new QTLQuery(this.getDataSource(), query);
-        return execute(q, params);
+        return QTLQuery.execute(this, query, params);
     }
 }

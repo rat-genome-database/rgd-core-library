@@ -20,14 +20,13 @@ public class AssociationDAO extends AbstractDAO {
     //gene  reference, strain, gene, qtl, sslp
     //strain   reference, strain  , gene, sslp qtl 
     // sslp   gene
-    //notes...reference
+    //reference
 
     GeneDAO geneDAO = null;
     QTLDAO qtlDAO = null;
     SSLPDAO sslpDAO = null;
     StrainDAO strainDAO = null;
     ReferenceDAO refDAO = null;
-    NotesDAO notesDAO = null;
 
     // lazy creation of DAO objects
     public GeneDAO getGeneDAO() {
@@ -58,12 +57,6 @@ public class AssociationDAO extends AbstractDAO {
         if( refDAO==null )
             refDAO = new ReferenceDAO();
         return refDAO;
-    }
-
-    NotesDAO getNotesDAO() {
-        if( notesDAO==null )
-            notesDAO = new NotesDAO();
-        return notesDAO;
     }
 
     /**
@@ -311,37 +304,12 @@ public class AssociationDAO extends AbstractDAO {
         update(sql, assoc.getMarkerType(), assoc.getRegionName(), assoc.getMarkerRgdId(), assoc.getStrainRgdId());
     }
 
-    public List getQTLAssociationsForStrain(int strainRGDID) throws Exception{
+    public List<QTL> getQTLAssociationsForStrain(int strainRgdId) throws Exception{
 
-        List acc = new ArrayList();
-        RGDManagementDAO rgdDao = new RGDManagementDAO();
-        int strainKey = getStrainDAO().getStrain(strainRGDID).getKey();
-
-        Connection conn = null;
-        try {
-
-            conn =  this.getConnection();
-            String sql = "select qtl_key from rgd_qtl_strain where strain_key=?";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1,strainKey);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                QTL qtlObj = getQtlDAO().getQTLByKey(rs.getInt("qtl_key"));
-                RgdId qtlRgdObj = rgdDao.getRgdId2(qtlObj.getRgdId());
-                if(qtlRgdObj.getObjectStatus().equals("ACTIVE")){
-                    acc.add(qtlObj);
-                }
-            }
-
-        } finally {
-            try {
-               conn.close();
-            }catch (Exception ignored) {
-            }
-        }
-        return acc;
+        String sql = "SELECT q.*,i.species_type_key  FROM qtls q, rgd_ids i\n" +
+                "WHERE q.rgd_id=i.rgd_id AND i.object_status='ACTIVE' AND qtl_key IN \n" +
+                "   (SELECT qtl_key FROM rgd_qtl_strain WHERE strain_key=(SELECT strain_key FROM strains WHERE rgd_id=?))";
+        return QTLQuery.execute(this, sql, strainRgdId);
     }
 
     /**
