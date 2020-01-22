@@ -175,7 +175,7 @@ public class VariantSearchBean {
        if(mapKey==17 && isHuman()){
           return  " variant_human";
        }
-        if( isHuman() ) {
+        if( isHuman() && mapKey!=17 ) {
             return " variant_clinvar ";
         }
         else if( isDog() ) {
@@ -193,6 +193,10 @@ public class VariantSearchBean {
         if(mapKey==17&& isHuman() ) {
             return " variant_transcript_clinvar ";
         }
+        if(mapKey!=17&& isHuman() ) {
+            return " variant_transcript_clinvar ";
+        }
+
         else if( isDog() ) {
             return " variant_transcript_dog ";
         }else {
