@@ -67,7 +67,7 @@ public class VariantDAO extends JdbcBaseDAO {
         String sql = " ";
         String sqlFrom = "select ";
 
-        sql += vsb.getVariantTable() + " v ";
+        sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
         sqlFrom += "v.* ";
         String[] results = vsb.getTableJoinSQL(sqlFrom,false);
         sql += results[1];
@@ -171,7 +171,7 @@ public class VariantDAO extends JdbcBaseDAO {
         String sql = " ";
         String sqlFrom = "select ";
 
-        sql += vsb.getVariantTable() + " v ";
+        sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
         sqlFrom += " count(*) as count ";
         String[] results = vsb.getTableJoinSQL(sqlFrom, true);
         sql += results[1];
@@ -218,7 +218,7 @@ public class VariantDAO extends JdbcBaseDAO {
         String sql = " ";
         String sqlFrom = "select ";
 
-        sql += vsb.getVariantTable() + " v ";
+        sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
         sqlFrom += " count(distinct(start_pos)) as count ";
         String[] results = vsb.getTableJoinSQL(sqlFrom, true);
         sql += results[1];
@@ -272,7 +272,7 @@ public class VariantDAO extends JdbcBaseDAO {
         String sqlFrom = "select ";
 
 
-        sql += vsb.getVariantTable() + " v ";
+        sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
 
         sqlFrom += "v.* ";
 
@@ -282,7 +282,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
 
         if (vsb.hasOnlyTranscript()) {
-            sql += " inner join "+vsb.getVariantTranscriptTable()+" vt on v.variant_id=vt.variant_id ";
+            sql += " inner join "+vsb.getVariantTranscriptTable(vsb.getMapKey())+" vt on v.variant_id=vt.variant_id ";
             sqlFrom += ",vt.* ";
             sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
@@ -417,7 +417,7 @@ public class VariantDAO extends JdbcBaseDAO {
         String sql = "SELECT gene_symbols as gene_symbol, sample_id, count(*) as count FROM (" +
                 "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
 
-        sql += vsb.getVariantTable() +  " v ";
+        sql += vsb.getVariantTable(vsb.getMapKey()) +  " v ";
 
         if (vsb.getGeneMap().size() > 0) {
             sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=v.chromosome and gl.pos=v.start_pos) ";
