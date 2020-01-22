@@ -191,7 +191,7 @@ public class VariantSearchBean {
     public String getVariantTranscriptTable(int mapKey) {
 
         if(mapKey==17&& isHuman() ) {
-            return " variant_transcript_clinvar ";
+            return " variant_transcript_human ";
         }
         if(mapKey!=17&& isHuman() ) {
             return " variant_transcript_clinvar ";
