@@ -1,19 +1,18 @@
 package edu.mcw.rgd.dao.spring;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import edu.mcw.rgd.datamodel.QTL;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * <p>
+ * @author jdepons
+ * @since Jan 17, 2008
  * query to return a row from QTLS table; in addition it returns species type key
  */
 public class QTLQuery extends MappingSqlQuery {
@@ -55,4 +54,8 @@ public class QTLQuery extends MappingSqlQuery {
         return qtl;
     }
 
+    public static List<QTL> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+        QTLQuery q = new QTLQuery(dao.getDataSource(), sql);
+        return dao.execute(q, params);
+    }
 }
