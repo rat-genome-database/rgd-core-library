@@ -1939,7 +1939,7 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public int insertEnumerable(Enumerable e) throws Exception{
 
-        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,?)";
 
         return update(sql,e.getType(),e.getLabel(),e.getValue(),e.getDescription(),e.getOntId(),e.getValueInt());
     }
