@@ -1933,7 +1933,16 @@ public class PhenominerDAO extends AbstractDAO {
             return null;
         }
     }
+    /**
+     * Insert a unit in the data store;
+     * @throws Exception
+     */
+    public int insertEnumerable(Enumerable e) throws Exception{
 
+        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,?,?)";
+
+        return update(sql,e.getType(),e.getLabel(),e.getValue(),e.getDescription(),e.getOntId(),e.getValueInt());
+    }
     /**
      * Returns the label of the enumerable given its type and int value.
      * @param type
