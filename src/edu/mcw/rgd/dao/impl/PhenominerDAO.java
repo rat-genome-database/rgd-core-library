@@ -2269,7 +2269,16 @@ public class PhenominerDAO extends AbstractDAO {
             return "Cannot convert the units!";
         }
     }
-
+    /**
+     * return standard Unit for the input term acc in phenominer
+     * @param accId termAcc
+     * @return standard Unit for term . Returns null if no unit exists
+     * @throws Exception on error in spring framework
+     */
+    public String getStandardUnit(String accId) throws Exception{
+        String query = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
+        return getStringResult(query, accId);
+    }
     /**
      * return number of data entries for the input RGD ID in phenominer
      * @param rgdId rgd id
