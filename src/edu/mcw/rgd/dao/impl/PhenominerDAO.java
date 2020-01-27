@@ -2280,15 +2280,13 @@ public class PhenominerDAO extends AbstractDAO {
                 sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,?,0)";
                 update(sqlStr, unitFrom, unitTo, termScale);
 
-                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES select '" + termAcc + "'," +
-                        "unit_from,unit_to,scale,zero_offset from PHENOMINER_UNIT_SCALES where unit_from=? and " +
-                        "unit_to=?";
+                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES (ont_id,unit_from,unit_to,term_specific_scale,zero_offset) values(?,?,?,?,0)";
 
-                update(sqlStr, unitFrom, unitTo);
+                update(sqlStr, termAcc,unitFrom, unitTo,termScale);
             }
             return "";
         } catch (Exception e) {
-            return "Conversion Falied!";
+            return "Conversion Failed!";
         }
     }
     /**
