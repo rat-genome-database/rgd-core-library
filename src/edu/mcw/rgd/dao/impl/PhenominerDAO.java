@@ -2269,6 +2269,28 @@ public class PhenominerDAO extends AbstractDAO {
             return "Cannot convert the units!";
         }
     }
+
+    public String insertUnitConversion(String termAcc, String unitTo, String termScale) {
+        try {
+            String msg = checkUnitConversion(termAcc,unitTo);
+            if(msg != "") {
+                String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
+                List<String> result = StringListQuery.execute(this, sqlStr, termAcc);
+                String unitFrom = result.get(0);
+                sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,?,0)";
+                update(sqlStr, unitFrom, unitTo, termScale);
+
+                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES select '" + termAcc + "'," +
+                        "unit_from,unit_to,scale,zero_offset from PHENOMINER_UNIT_SCALES where unit_from=? and " +
+                        "unit_to=?";
+
+                update(sqlStr, unitFrom, unitTo);
+            }
+            return "";
+        } catch (Exception e) {
+            return "Conversion Falied!";
+        }
+    }
     /**
      * return standard Unit for the input term acc in phenominer
      * @param accId termAcc
