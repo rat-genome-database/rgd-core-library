@@ -2247,7 +2247,6 @@ public class PhenominerDAO extends AbstractDAO {
                                 "WHERE ont_id=? AND unit_from=? AND unit_to=?";
             int cnt = getCount(sqlStr, termAcc, unitFrom, unitTo);
             if (cnt > 0) return "";
-
             sqlStr = "select count(*) from PHENOMINER_UNIT_SCALES " +
                     "where unit_from='" + unitFrom + "' and unit_to='" + unitTo + "'";
             cnt = getCount(sqlStr);
@@ -2270,13 +2269,13 @@ public class PhenominerDAO extends AbstractDAO {
         }
     }
 
-    public String insertUnitConversion(String termAcc, String unitTo, String termScale) {
+    public String insertUnitConversion(String termAcc, String unitFrom, String termScale) {
         try {
-            String msg = checkUnitConversion(termAcc,unitTo);
+            String msg = checkUnitConversion(termAcc,unitFrom);
             if(msg != "") {
                 String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
                 List<String> result = StringListQuery.execute(this, sqlStr, termAcc);
-                String unitFrom = result.get(0);
+                String unitTo = result.get(0);
                 sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,?,0)";
                 update(sqlStr, unitFrom, unitTo, termScale);
 
