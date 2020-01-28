@@ -1933,7 +1933,16 @@ public class PhenominerDAO extends AbstractDAO {
             return null;
         }
     }
+    /**
+     * Insert a unit in the data store;
+     * @throws Exception
+     */
+    public int insertEnumerable(Enumerable e) throws Exception{
 
+        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,?)";
+
+        return update(sql,e.getType(),e.getLabel(),e.getValue(),e.getDescription(),e.getOntId(),e.getValueInt());
+    }
     /**
      * Returns the label of the enumerable given its type and int value.
      * @param type
@@ -2238,7 +2247,6 @@ public class PhenominerDAO extends AbstractDAO {
                                 "WHERE ont_id=? AND unit_from=? AND unit_to=?";
             int cnt = getCount(sqlStr, termAcc, unitFrom, unitTo);
             if (cnt > 0) return "";
-
             sqlStr = "select count(*) from PHENOMINER_UNIT_SCALES " +
                     "where unit_from='" + unitFrom + "' and unit_to='" + unitTo + "'";
             cnt = getCount(sqlStr);
@@ -2261,6 +2269,35 @@ public class PhenominerDAO extends AbstractDAO {
         }
     }
 
+    public String insertUnitConversion(String termAcc, String unitFrom, String termScale) {
+        try {
+            String msg = checkUnitConversion(termAcc,unitFrom);
+            if(msg != "") {
+                String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
+                List<String> result = StringListQuery.execute(this, sqlStr, termAcc);
+                String unitTo = result.get(0);
+                sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,?,0)";
+                update(sqlStr, unitFrom, unitTo, termScale);
+
+                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES (ont_id,unit_from,unit_to,term_specific_scale,zero_offset) values(?,?,?,?,0)";
+
+                update(sqlStr, termAcc,unitFrom, unitTo,termScale);
+            }
+            return "";
+        } catch (Exception e) {
+            return "Conversion Failed!";
+        }
+    }
+    /**
+     * return standard Unit for the input term acc in phenominer
+     * @param accId termAcc
+     * @return standard Unit for term . Returns null if no unit exists
+     * @throws Exception on error in spring framework
+     */
+    public String getStandardUnit(String accId) throws Exception{
+        String query = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
+        return getStringResult(query, accId);
+    }
     /**
      * return number of data entries for the input RGD ID in phenominer
      * @param rgdId rgd id
