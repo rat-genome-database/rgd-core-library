@@ -15,6 +15,23 @@ public class GeneLociDAO extends AbstractDAO {
         GeneLociQuery query=new GeneLociQuery(this.getDataSource(), sql);
          return execute(query, mapKey, chr);
        }
+    public List<GeneLoci> getGeneLociByRegionName(int mapKey, String chr, List<String> regionNames) throws Exception {
+        String sql="select * from gene_loci where map_key=? and chromosome=? and GENE_SYMBOLS in (";
+        boolean first =true;
+        for(String r:regionNames){
+            if(first) {
+                sql = sql +"'"+ r+"'";
+                first=false;
+            }else{
+                sql=sql+", '"+r+"'";
+            }
+
+        }
+                sql=sql+") order by pos";
+        GeneLociQuery query=new GeneLociQuery(this.getDataSource(), sql);
+        return execute(query, mapKey, chr);
+    }
+
     public static void main(String[] args) throws Exception {
         GeneLociDAO dao= new GeneLociDAO();
         List<GeneLoci> loci=dao.getGeneLociByMapKeyAndChr(17, "21");
