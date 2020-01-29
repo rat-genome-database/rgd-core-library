@@ -1,4 +1,4 @@
-package edu.mcw.rgd.eva;
+package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Dumper;
 import edu.mcw.rgd.process.Utils;
