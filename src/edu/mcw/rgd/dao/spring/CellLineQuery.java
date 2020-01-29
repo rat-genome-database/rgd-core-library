@@ -7,13 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:31 AM
- * <p>
- *     mapping sql query to work with lists of CellLine objects
- * </p>
+ * @author mtutaj
+ * @since 2/22/12
+ * mapping sql query to work with lists of CellLine objects
  */
 public class CellLineQuery extends GenomicElementQuery {
 
@@ -36,6 +32,10 @@ public class CellLineQuery extends GenomicElementQuery {
        obj.setOrigin(rs.getString("origin"));
        obj.setPhenotype(rs.getString("phenotype"));
        obj.setResearchUse(rs.getString("research_use"));
+
+       try {
+           obj.setSrcPipeline(rs.getString("src_pipeline"));
+       } catch( Exception ignore ) {}
 
        return obj;
    }
