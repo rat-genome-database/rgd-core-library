@@ -1,6 +1,8 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.EvaQuery;
+import edu.mcw.rgd.datamodel.Eva;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Types;
@@ -13,8 +15,9 @@ import java.util.List;
 public class EvaDAO extends AbstractDAO{
     public EvaDAO(){}
 
-    public List<Eva> getEvaObjectsFromMapKey( int mapKey) throws Exception {
+    public List<Eva> getEvaObjectsFromMapKey(int mapKey) throws Exception {
         String query  = "SELECT * FROM eva where map_key=?";
+        Eva test = new Eva();
         return EvaQuery.execute(this, query, mapKey);
     }
 

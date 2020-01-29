@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.spring;
 
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.datamodel.Eva;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.*;
