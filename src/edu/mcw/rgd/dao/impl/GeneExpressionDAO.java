@@ -197,15 +197,14 @@ public class GeneExpressionDAO extends PhenominerDAO {
      * @return list of GeneExpressionRecordValue objects; could be empty
      * @throws Exception
      */
-    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneByTrait(int rgdId,String unit,String level,String traitOntId) throws Exception {
-        String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id\n" +
-                "        join sample s on s.sample_id = gr.sample_id\n" +
-                "        join experiment e on gr.experiment_id = e.experiment_id\n" +
-                "        join study st on st.study_id = e.study_id " +
-                "WHERE ge.expressed_object_rgd_id=? and ge.expression_unit =? and ge.expression_level =? and e.trait_ont_id =? order by ge.gene_expression_exp_record_id";
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneBySlim(int rgdId,String unit,String level,String termAcc) throws Exception {
+        String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
+                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
+                " CONNECT BY PRIOR child_term_acc=parent_term_acc ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
+                " and ge.expression_level=? order by ge.gene_expression_exp_record_id";
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
-        return execute(q, rgdId,unit,level,traitOntId);
+        return execute(q, termAcc,rgdId,unit,level);
     }
 
     /**

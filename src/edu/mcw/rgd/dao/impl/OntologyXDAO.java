@@ -632,6 +632,17 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
+     * get slim terms of given ontology and source, recursively
+     * @param ontId ontology
+     * @param source source of slim
+     * @return list of terms
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getAllSlimTerms(String ontId,String source) throws Exception {
+        String sql = "SELECT term_acc FROM ont_slims WHERE ont_id = ? and source = ?";
+        return StringListQuery.execute(this, sql, ontId,source);
+    }
+    /**
      * get count of descendants for given term (including the most remote descendants)
      * @param termAcc term accession id
      * @return count of descendant terms
