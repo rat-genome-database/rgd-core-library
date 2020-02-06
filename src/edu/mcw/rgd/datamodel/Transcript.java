@@ -23,7 +23,7 @@ public class Transcript implements Identifiable, Dumpable {
     String refSeqStatus; // REFSEQ_STATUS for the current reference assembly
     String proteinAccId; // protein acc id
     String peptideLabel; // peptide label - contains information about isoforms and precursor preproteins
-
+    String type;
     // genomic position of the transcript on one or more genomic maps
     List<MapData> genomicPositions = new ArrayList<MapData>();
 
@@ -112,6 +112,14 @@ public class Transcript implements Identifiable, Dumpable {
 
     public void setPeptideLabel(String proteinLabel) {
         this.peptideLabel = proteinLabel;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String dump(String delimiter) {
