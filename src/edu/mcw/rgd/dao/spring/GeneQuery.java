@@ -46,6 +46,7 @@ public class GeneQuery extends MappingSqlQuery {
             gene.setEnsemblGeneSymbol(rs.getString("ensembl_gene_symbol"));
             gene.setEnsemblGeneType(rs.getString("ensembl_gene_type"));
             gene.setEnsemblFullName(rs.getString("ensembl_full_name"));
+            gene.setNomenSource(rs.getString("nomen_source"));
         }catch (Exception ignored) {
         }
 
