@@ -323,9 +323,9 @@ public class TranscriptDAO extends AbstractDAO {
 
         // add an entry to transcripts table
         String query = "INSERT INTO transcripts (transcript_rgd_id,gene_rgd_id,acc_id,is_non_coding_ind,refseq_status,"+
-            "protein_acc_id,peptide_label) VALUES(?,?,?,?,?,?,?)";
+            "protein_acc_id,peptide_label,biotype) VALUES(?,?,?,?,?,?,?,?)";
         int rowsAffected = update(query, rgdId.getRgdId(), tr.getGeneRgdId(), tr.getAccId(), tr.isNonCoding()?"Y":"N",
-                tr.getRefSeqStatus(), tr.getProteinAccId(), tr.getPeptideLabel());
+                tr.getRefSeqStatus(), tr.getProteinAccId(), tr.getPeptideLabel(), tr.getType());
 
         tr.setDateCreated(new Date());
 
@@ -348,11 +348,11 @@ public class TranscriptDAO extends AbstractDAO {
 
         // update a row in transcripts table
         String query = "UPDATE transcripts "+
-                "SET gene_rgd_id=?,acc_id=?,is_non_coding_ind=?,refseq_status=?,protein_acc_id=?,peptide_label=? "+
+                "SET gene_rgd_id=?,acc_id=?,is_non_coding_ind=?,refseq_status=?,protein_acc_id=?,peptide_label=?,biotype=? "+
                 "WHERE transcript_rgd_id=?";
 
         return update(query, tr.getGeneRgdId(), tr.getAccId(), tr.isNonCoding()?"Y":"N",
-                tr.getRefSeqStatus(), tr.getProteinAccId(), tr.getPeptideLabel(), tr.getRgdId());
+                tr.getRefSeqStatus(), tr.getProteinAccId(), tr.getPeptideLabel(), tr.getType(), tr.getRgdId());
     }
 
     /**

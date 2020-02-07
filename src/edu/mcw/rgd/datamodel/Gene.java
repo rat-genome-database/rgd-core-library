@@ -36,6 +36,7 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
     private String ensemblGeneSymbol;
     private String ensemblGeneType;
     private String ensemblFullName;
+    private String nomenSource;
 
     /**
      * two genes are equal if either they have same rgd_id or gene key
@@ -203,6 +204,9 @@ public class Gene implements Identifiable, Speciated, ObjectWithName, ObjectWith
 
     public void setEnsemblFullName(String ensemblFullName){this.ensemblFullName=ensemblFullName;}
     public String getEnsemblFullName(){return ensemblFullName;}
+
+    public void setNomenSource(String nomenSource){this.nomenSource=nomenSource;}
+    public String getNomenSource(){return nomenSource;}
 
     public String toString() {
        return "RGD:" + rgdId + ", " + symbol + ", " + name;

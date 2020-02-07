@@ -30,6 +30,7 @@ public class TranscriptQuery extends MappingSqlQuery {
         tr.setRefSeqStatus(rs.getString("refseq_status"));
         tr.setProteinAccId(rs.getString("protein_acc_id"));
         tr.setPeptideLabel(rs.getString("peptide_label"));
+        tr.setType(rs.getString("biotype"));
         return tr;
     }
 
