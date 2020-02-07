@@ -35,12 +35,8 @@ public class MapQuery extends MappingSqlQuery {
         map.setSpeciesTypeKey(rs.getInt("species_type_key"));        
         map.setDbsnpVersion(rs.getString("dbsnp_version"));
         map.setRank(rs.getInt("rank"));
-
-        try {
-            // field added in August 2017
-            map.setUcscAssemblyId(rs.getString("ucsc_assembly_id"));
-        } catch(SQLException ignore) {
-        }
+        map.setUcscAssemblyId(rs.getString("ucsc_assembly_id"));
+        map.setRefSeqAssemblyAcc(rs.getString("refseq_assembly_acc"));
 
         return map;
     }
