@@ -17,6 +17,8 @@ public class CellLine extends GenomicElement {
     private String phenotype;
     private String germlineCompetent;
     private String srcPipeline;
+    private String caution;
+    private String groups;
 
     @Override
     public boolean equals(Object o) {
@@ -24,20 +26,18 @@ public class CellLine extends GenomicElement {
         if (!(o instanceof CellLine)) return false;
         if (!super.equals(o)) return false;
 
-        CellLine cellLine = (CellLine) o;
+        CellLine that = (CellLine) o;
 
-        if (origin != null ? !origin.equals(cellLine.origin) : cellLine.origin != null) return false;
-        if (researchUse != null ? !researchUse.equals(cellLine.researchUse) : cellLine.researchUse != null)
-            return false;
-        if (availability != null ? !availability.equals(cellLine.availability) : cellLine.availability != null)
-            return false;
-        if (gender != null ? !gender.equals(cellLine.gender) : cellLine.gender != null) return false;
-        if (characteristics != null ? !characteristics.equals(cellLine.characteristics) : cellLine.characteristics != null)
-            return false;
-        if (phenotype != null ? !phenotype.equals(cellLine.phenotype) : cellLine.phenotype != null) return false;
-        if (germlineCompetent != null ? !germlineCompetent.equals(cellLine.germlineCompetent) : cellLine.germlineCompetent != null)
-            return false;
-        return srcPipeline != null ? srcPipeline.equals(cellLine.srcPipeline) : cellLine.srcPipeline == null;
+        return Utils.stringsAreEqual(this.origin, that.origin)
+            && Utils.stringsAreEqual(this.researchUse, that.researchUse)
+            && Utils.stringsAreEqual(this.availability, that.availability)
+            && Utils.stringsAreEqual(this.gender, that.gender)
+            && Utils.stringsAreEqual(this.characteristics, that.characteristics)
+            && Utils.stringsAreEqual(this.phenotype, that.phenotype)
+            && Utils.stringsAreEqual(this.germlineCompetent, that.germlineCompetent)
+            && Utils.stringsAreEqual(this.srcPipeline, that.srcPipeline)
+            && Utils.stringsAreEqual(this.caution, that.caution)
+            && Utils.stringsAreEqual(this.groups, that.groups);
     }
 
     @Override
@@ -50,7 +50,9 @@ public class CellLine extends GenomicElement {
             ^ Utils.defaultString(characteristics).hashCode()
             ^ Utils.defaultString(phenotype).hashCode()
             ^ Utils.defaultString(germlineCompetent).hashCode()
-            ^ Utils.defaultString(srcPipeline).hashCode();
+            ^ Utils.defaultString(srcPipeline).hashCode()
+            ^ Utils.defaultString(caution).hashCode()
+            ^ Utils.defaultString(groups).hashCode();
     }
 
     public String getOrigin() {
@@ -115,5 +117,21 @@ public class CellLine extends GenomicElement {
 
     public void setSrcPipeline(String srcPipeline) {
         this.srcPipeline = srcPipeline;
+    }
+
+    public String getCaution() {
+        return caution;
+    }
+
+    public void setCaution(String caution) {
+        this.caution = caution;
+    }
+
+    public String getGroups() {
+        return groups;
+    }
+
+    public void setGroups(String groups) {
+        this.groups = groups;
     }
 }

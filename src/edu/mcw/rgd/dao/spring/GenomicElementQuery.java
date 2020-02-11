@@ -8,13 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:31 AM
- * <p>
- *     mapping sql query to work with lists of GenomicElement objects
- * </p>
+ * @author mtutaj
+ * @since 2/22/12
+ * mapping sql query to work with lists of GenomicElement objects
  */
 public class GenomicElementQuery extends MappingSqlQuery {
 
@@ -41,6 +37,7 @@ public class GenomicElementQuery extends MappingSqlQuery {
         obj.setNotes(rs.getString("notes"));
 
         try {
+            obj.setGenomicAlteration(rs.getString("genomic_alteration"));
             obj.setSpeciesTypeKey(rs.getInt("species_type_key"));
             obj.setObjectStatus(rs.getString("object_status"));
             obj.setObjectKey(rs.getInt("object_key"));

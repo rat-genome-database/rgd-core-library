@@ -4,10 +4,8 @@ import edu.mcw.rgd.process.Dumper;
 import edu.mcw.rgd.process.Utils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/22/12
- * Time: 9:28 AM
+ * @author mtutaj
+ * @since 2/22/12
  * represents a row in GENOMIC_ELEMENTS table
  */
 public class GenomicElement implements Identifiable, Speciated, ObjectWithName, ObjectWithSymbol, Dumpable {
@@ -20,6 +18,7 @@ public class GenomicElement implements Identifiable, Speciated, ObjectWithName, 
     private String source;
     private String soAccId; // sequence ontology accession id
     private String notes;
+    private String genomicAlteration;
 
     private int speciesTypeKey;
     private int objectKey;
@@ -33,17 +32,17 @@ public class GenomicElement implements Identifiable, Speciated, ObjectWithName, 
 
         GenomicElement that = (GenomicElement) o;
 
-        if (speciesTypeKey != that.speciesTypeKey) return false;
-        if (objectKey != that.objectKey) return false;
-        if (objectType != null ? !objectType.equals(that.objectType) : that.objectType != null) return false;
-        if (symbol != null ? !symbol.equals(that.symbol) : that.symbol != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (source != null ? !source.equals(that.source) : that.source != null) return false;
-        if (soAccId != null ? !soAccId.equals(that.soAccId) : that.soAccId != null) return false;
-        if (notes != null ? !notes.equals(that.notes) : that.notes != null) return false;
-        return objectStatus != null ? objectStatus.equals(that.objectStatus) : that.objectStatus == null;
-
+        return this.speciesTypeKey == that.speciesTypeKey
+            && this.objectKey == that.objectKey
+            && Utils.stringsAreEqual(this.objectType, that.objectType)
+            && Utils.stringsAreEqual(this.symbol, that.symbol)
+            && Utils.stringsAreEqual(this.name, that.name)
+            && Utils.stringsAreEqual(this.description, that.description)
+            && Utils.stringsAreEqual(this.source, that.source)
+            && Utils.stringsAreEqual(this.soAccId, that.soAccId)
+            && Utils.stringsAreEqual(this.notes, that.notes)
+            && Utils.stringsAreEqual(this.genomicAlteration, that.genomicAlteration)
+            && Utils.stringsAreEqual(this.objectStatus, that.objectStatus);
     }
 
     @Override
@@ -57,6 +56,7 @@ public class GenomicElement implements Identifiable, Speciated, ObjectWithName, 
             ^ Utils.defaultString(source).hashCode()
             ^ Utils.defaultString(soAccId).hashCode()
             ^ Utils.defaultString(notes).hashCode()
+            ^ Utils.defaultString(genomicAlteration).hashCode()
             ^ Utils.defaultString(objectStatus).hashCode();
     }
 
@@ -157,6 +157,14 @@ public class GenomicElement implements Identifiable, Speciated, ObjectWithName, 
         this.objectKey = objectKey;
     }
 
+    public String getGenomicAlteration() {
+        return genomicAlteration;
+    }
+
+    public void setGenomicAlteration(String genomicAlteration) {
+        this.genomicAlteration = genomicAlteration;
+    }
+
     public String dump(String delimiter) {
 
         Dumper dumper = new Dumper(delimiter);
@@ -174,6 +182,7 @@ public class GenomicElement implements Identifiable, Speciated, ObjectWithName, 
         .put("SOURCE", source)
         .put("SO_ACC_ID", soAccId)
         .put("NOTES", notes)
+        .put("GENOMIC_ALTERATION", genomicAlteration)
         .put("SPECIES_TYPE_KEY", speciesTypeKey)
         .put("OBJECT_KEY", objectKey)
         .put("OBJECT_STATUS", objectStatus);
