@@ -20,7 +20,11 @@ public class EvaDAO extends AbstractDAO{
         Eva test = new Eva();
         return EvaQuery.execute(this, query, mapKey);
     }
-
+    public List<Eva> getEvaObjectsFromMapKeyAndChromosome(int mapKey, String chromosome) throws Exception {
+        String query  = "SELECT * FROM eva where map_key=? AND chromosome=?";
+        Eva test = new Eva();
+        return EvaQuery.execute(this, query, mapKey, chromosome);
+    }
     public int deleteEva(int EvaKey) throws Exception{
         String sql = "DELETE FROM EVA WHERE EVA_ID=?";
         return update(sql, EvaKey);
