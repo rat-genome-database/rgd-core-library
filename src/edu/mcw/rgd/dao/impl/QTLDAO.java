@@ -1,8 +1,10 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.MappedQTLQuery;
 import edu.mcw.rgd.dao.spring.QTLQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
+import edu.mcw.rgd.datamodel.MappedQTL;
 import edu.mcw.rgd.datamodel.QTL;
 
 import java.util.List;
@@ -27,6 +29,13 @@ public class QTLDAO extends AbstractDAO {
                 "from QTLs q, RGD_IDS r , maps_data md\n" +
                 "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=q.RGD_ID and md.rgd_id=q.rgd_id and md.chromosome=? and md.start_pos<=? and md.stop_pos>=? and md.map_key=?";
         return executeQtlQuery(query, chr, stopPos, startPos, mapKey);
+    }
+
+    public List<MappedQTL> getActiveMappedQTLs(String chr, long startPos, long stopPos, int mapKey) throws Exception {
+        String query = "select q.*, r.SPECIES_TYPE_KEY,md.* \n" +
+                "from QTLs q, RGD_IDS r , maps_data md\n" +
+                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=q.RGD_ID and md.rgd_id=q.rgd_id and md.chromosome=? and md.start_pos<=? and md.stop_pos>=? and md.map_key=?";
+        return MappedQTLQuery.run(this,query, chr, stopPos, startPos, mapKey);
     }
 
     public List<QTL> getActiveQTLs(int speciesType) throws Exception {
