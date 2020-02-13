@@ -43,7 +43,7 @@ public class EvaDAO extends AbstractDAO{
                 "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY) SELECT ?,?,?,?,?,?,?,? FROM dual" +
                 " WHERE NOT EXISTS(SELECT 1 FROM EVA WHERE CHROMOSOME=? AND POS=? AND RS_ID=? AND REF_NUC=? AND VAR_NUC=?)",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR});
+                        Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR});
         su.compile();
 
         for( Eva eva: tobeInserted ) {
