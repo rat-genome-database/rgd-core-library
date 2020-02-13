@@ -26,7 +26,7 @@ public class MappedQTL {
         return q;
     }
 
-    public void setQTL(QTL g) {
+    public void setQTL(QTL q) {
         this.q = q;
     }
 
