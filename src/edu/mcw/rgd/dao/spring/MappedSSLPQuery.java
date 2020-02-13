@@ -16,7 +16,7 @@ import java.util.List;
  * User: hsnalabolu
  * Date: 2/13/20
  */
-public class MappedSSLPQuery extends GeneQuery {
+public class MappedSSLPQuery extends SSLPQuery {
 
     public MappedSSLPQuery(DataSource ds, String query) {
         super(ds, query);        
