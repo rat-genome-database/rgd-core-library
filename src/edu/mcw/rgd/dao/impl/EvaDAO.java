@@ -40,7 +40,7 @@ public class EvaDAO extends AbstractDAO{
     }
     public int insertEva(Collection<Eva> tobeInserted) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO EVA (EVA_ID, CHROMOSOME, POS, RS_ID, " +
-                "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY) SELECT (?,?,?,?,?,?,?,?),
+                "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY) values (?,?,?,?,?,?,?,?)",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                         Types.VARCHAR, Types.INTEGER});
         su.compile();
