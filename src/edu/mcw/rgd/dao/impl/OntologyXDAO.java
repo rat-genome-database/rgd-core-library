@@ -639,7 +639,7 @@ public class OntologyXDAO extends AbstractDAO {
      * @throws Exception if something wrong happens in spring framework
      */
     public List<String> getAllSlimTerms(String ontId,String source) throws Exception {
-        String sql = "SELECT term_acc FROM ont_slims WHERE ont_id = ? and source = ?";
+        String sql = "SELECT term_acc FROM ont_slims WHERE ont_id = ? and source = ? order by rank";
         return StringListQuery.execute(this, sql, ontId,source);
     }
     /**

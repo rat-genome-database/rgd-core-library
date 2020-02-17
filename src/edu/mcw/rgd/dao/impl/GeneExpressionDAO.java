@@ -208,6 +208,17 @@ public class GeneExpressionDAO extends PhenominerDAO {
     }
 
     /**
+     * Returns count values for given gene
+     * @return count of GeneExpressionRecordValue objects
+     * @throws Exception
+     */
+    public String getGeneExprReValCountForGeneBySlim(int rgdId,String unit,String level,String termAcc) throws Exception {
+        String query = "select value_count FROM gene_expression_value_counts ge where ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
+                " and ge.expression_level=? and ge.term_acc = ?";
+
+       return getStringResult(query,rgdId,unit,level,termAcc);
+    }
+    /**
      * For given  id, get all gene expression record
      * @param id
      * @return
