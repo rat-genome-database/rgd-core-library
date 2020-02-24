@@ -295,17 +295,20 @@ public class RGDManagementDAO extends AbstractDAO {
     /**
      * Update properties of rgd id object
      *
-     * @param rgdId  rgd id
+     * @param id  RgdId object
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public void updateRgdId(RgdId rgdId) throws Exception {
+    public void updateRgdId(RgdId id) throws Exception {
 
         String sql = "update Rgd_Ids set object_key=?, created_date=?, released_date=?, " +
                 "last_modified_date=?, rgd_flag=?, notes=?, object_status=?, species_type_key=? where RGD_ID=?";
 
-        update(sql, rgdId.getObjectKey(), rgdId.getCreatedDate(), rgdId.getReleasedDate(),
-                rgdId.getLastModifiedDate(), rgdId.getRgdFlag(), rgdId.getNotes(), rgdId.getObjectStatus(),
-                rgdId.getSpeciesTypeKey(), rgdId.getValue());
+        // by specifying 0, foreign key will be violated, because there is no species with species_type_key=0
+        // you must specify NULL
+        Integer speciesKey = id.getSpeciesTypeKey()<=0 ? null : id.getSpeciesTypeKey();
+
+        update(sql, id.getObjectKey(), id.getCreatedDate(), id.getReleasedDate(), id.getLastModifiedDate(),
+            id.getRgdFlag(), id.getNotes(), id.getObjectStatus(), speciesKey, id.getValue());
     }
 
     /**

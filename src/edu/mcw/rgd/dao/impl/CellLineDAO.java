@@ -18,6 +18,14 @@ public class CellLineDAO extends GenomicElementDAO {
         return execute(q);
     }
 
+    public List<CellLine> getActiveCellLines(String srcPipeline) throws Exception {
+
+        String query = "SELECT g.*,r.*,c.* FROM rgd_ids r,genomic_elements g,cell_lines c "+
+                "WHERE r.rgd_id=g.rgd_id AND g.rgd_id=c.rgd_id AND object_status='ACTIVE' AND src_pipeline=?";
+        CellLineQuery q = new CellLineQuery(this.getDataSource(), query);
+        return execute(q, srcPipeline);
+    }
+
     public CellLine getCellLine(int rgdId) throws Exception {
 
         String query = "SELECT g.*,r.*,c.* FROM rgd_ids r,genomic_elements g,cell_lines c "+
@@ -45,12 +53,11 @@ public class CellLineDAO extends GenomicElementDAO {
 
         // insert a row into CELL_LINE table
         String sql =
-            "INSERT INTO cell_lines(availability,characteristics,gender, germline_competent,origin,phenotype,research_use,rgd_id) "+
-            "VALUES(?,?,?,?, ?,?,?,?)";
+            "INSERT INTO cell_lines(availability,characteristics,gender, germline_competent,origin,phenotype,research_use,src_pipeline,caution,groups,rgd_id) "+
+            "VALUES(?,?,?,?, ?,?,?,?,?,?,?)";
 
-        return r + update(sql,
-                obj.getAvailability(), obj.getCharacteristics(), obj.getGender(), obj.getGermlineCompetent(),
-                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getRgdId()
+        return r + update(sql, obj.getAvailability(), obj.getCharacteristics(), obj.getGender(), obj.getGermlineCompetent(),
+                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(), obj.getCaution(), obj.getGroups(), obj.getRgdId()
         );
     }
 
@@ -67,13 +74,13 @@ public class CellLineDAO extends GenomicElementDAO {
 
         // update a row in CELL_LINE table
         String sql =
-            "UPDATE cell_lines "+
-            "SET availability=?,characteristics=?,gender=?, germline_competent=?,origin=?,phenotype=?,research_use=? "+
+            "UPDATE cell_lines  SET availability=?, characteristics=?, gender=?, germline_competent=?,"+
+            "  origin=?, phenotype=?, research_use=?, src_pipeline=?, caution=?, groups=? "+
             "WHERE rgd_id=?";
 
         return r + update(sql,
                 obj.getAvailability(), obj.getCharacteristics(), obj.getGender(), obj.getGermlineCompetent(),
-                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getRgdId()
+                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(), obj.getCaution(), obj.getGroups(), obj.getRgdId()
         );
     }
 

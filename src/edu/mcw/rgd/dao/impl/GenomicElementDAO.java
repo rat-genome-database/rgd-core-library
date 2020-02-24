@@ -136,17 +136,17 @@ public class GenomicElementDAO extends AbstractDAO {
     public int insertElements(List<GenomicElement> elements) throws Exception{
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "INSERT INTO genomic_elements(symbol,name,description,source, so_acc_id,rgd_id,object_type,notes) "+
-                "VALUES(?,?,?,?, ?,?,?,?)",
+                "INSERT INTO genomic_elements(symbol,name,description,source, so_acc_id,rgd_id,object_type,notes,genomic_alteration) "+
+                "VALUES(?,?,?,?, ?,?,?,?,?)",
                 new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
+                        Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR});
 
         su.compile();
 
         for( GenomicElement ge: elements ) {
 
             su.update(ge.getSymbol(), ge.getName(), ge.getDescription(), ge.getSource(),
-                    ge.getSoAccId(), ge.getRgdId(), ge.getObjectType(), ge.getNotes());
+                    ge.getSoAccId(), ge.getRgdId(), ge.getObjectType(), ge.getNotes(), ge.getGenomicAlteration());
         }
         return executeBatch(su);
     }
@@ -161,10 +161,10 @@ public class GenomicElementDAO extends AbstractDAO {
     public int updateElement(GenomicElement ge) throws Exception{
 
         String sql = "UPDATE genomic_elements SET symbol=?, name=?, description=?, source=?, "+
-                "so_acc_id=?, object_type=?, notes=? WHERE rgd_id=?";
+                "so_acc_id=?, object_type=?, notes=?, genomic_alteration=? WHERE rgd_id=?";
 
         return update(sql, ge.getSymbol(), ge.getName(), ge.getDescription(), ge.getSource(),
-                ge.getSoAccId(), ge.getObjectType(), ge.getNotes(), ge.getRgdId());
+                ge.getSoAccId(), ge.getObjectType(), ge.getNotes(), ge.getGenomicAlteration(), ge.getRgdId());
     }
 
     /**
