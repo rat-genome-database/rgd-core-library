@@ -1,5 +1,6 @@
 package edu.mcw.rgd.datamodel;
 
+import edu.mcw.rgd.process.Dumper;
 import edu.mcw.rgd.process.Utils;
 
 /**
@@ -23,7 +24,6 @@ public class CellLine extends GenomicElement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CellLine)) return false;
         if (!super.equals(o)) return false;
 
         CellLine that = (CellLine) o;
@@ -133,5 +133,27 @@ public class CellLine extends GenomicElement {
 
     public void setGroups(String groups) {
         this.groups = groups;
+    }
+
+    public String dump(String delimiter) {
+
+        Dumper dumper = new Dumper(delimiter);
+        super.populateDumper(dumper);
+        this.populateDumper(dumper);
+        return dumper.dump();
+    }
+
+    protected void populateDumper(Dumper dumper) {
+        dumper
+            .put("ORIGIN", origin)
+            .put("RESEARCH_USE", researchUse)
+            .put("AVAILABILITY", availability)
+            .put("GENDER", gender)
+            .put("CHARACTERISTICS", characteristics)
+            .put("PHENOTYPE", phenotype)
+            .put("GERMLINE_COMPETENT", germlineCompetent)
+            .put("SRC_PIPELINE", srcPipeline)
+            .put("CAUTION", caution)
+            .put("GROUPS", groups);
     }
 }
