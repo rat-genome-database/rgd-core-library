@@ -1,13 +1,11 @@
 package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Dumper;
+import edu.mcw.rgd.process.Utils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Dec 21, 2007
- * Time: 9:28:50 AM
- * <p>
+ * @author jdepons
+ * @since Dec 21, 2007
  * Bean class for an RGD Alias.
  * <p>
  * Data is currently contained in the aliases table
@@ -33,17 +31,17 @@ public class Alias implements Identifiable, Speciated, Dumpable {
 
         Alias alias = (Alias) o;
 
-        if (rgdId != alias.rgdId) return false;
-        if (typeName != null ? !typeName.equals(alias.typeName) : alias.typeName != null) return false;
-        if (value != null ? !value.equals(alias.value) : alias.value != null) return false;
+        return rgdId == alias.rgdId
+            && Utils.stringsAreEqual(typeName, alias.typeName)
+            && Utils.stringsAreEqualIgnoreCase(value, alias.value);
 
-        return true;
+        // note: due to DB constraint, no two synonyms can have the same lowercase value
     }
 
     @Override
     public int hashCode() {
         int result = typeName != null ? typeName.hashCode() : 0;
-        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (value != null ? value.toLowerCase().hashCode() : 0);
         result = 31 * result + rgdId;
         return result;
     }
@@ -102,7 +100,7 @@ public class Alias implements Identifiable, Speciated, Dumpable {
      */
     public String dump(String delimiter) {
 
-        return new Dumper(delimiter)
+        return new Dumper(delimiter, true, true)
             .put("ALIAS_KEY", getKey())
             .put("ALIAS_TYPE", getTypeName())
             .put("ALIAS_VALUE", getValue())
