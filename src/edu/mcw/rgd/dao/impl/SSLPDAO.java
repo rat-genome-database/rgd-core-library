@@ -1,8 +1,10 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.MappedSSLPQuery;
 import edu.mcw.rgd.dao.spring.SSLPQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
+import edu.mcw.rgd.datamodel.MappedSSLP;
 import edu.mcw.rgd.datamodel.SSLP;
 
 import java.util.List;
@@ -33,7 +35,15 @@ public class SSLPDAO extends AbstractDAO {
 
         return executeSSLPQuery(query, chr, stopPos, startPos, mapKey);
     }
+    public List<MappedSSLP> getActiveMappedSSLPs(String chr, long startPos, long stopPos, int mapKey) throws Exception {
+        String query = "select s.*, r.SPECIES_TYPE_KEY,md.* \n" +
+                "from SSLPs s, RGD_IDS r , maps_data md\n" +
+                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID " +
+                "and md.rgd_id=s.rgd_id and md.chromosome=? and md.start_pos<=? " +
+                "and md.stop_pos>=? and md.map_key=? order by md.start_pos";
 
+        return MappedSSLPQuery.run(this,query, chr, stopPos, startPos, mapKey);
+    }
 
     /**
      * get all active SSLP objects for given species
