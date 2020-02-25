@@ -38,7 +38,9 @@ public class SSLPDAO extends AbstractDAO {
     public List<MappedSSLP> getActiveMappedSSLPs(String chr, long startPos, long stopPos, int mapKey) throws Exception {
         String query = "select s.*, r.SPECIES_TYPE_KEY,md.* \n" +
                 "from SSLPs s, RGD_IDS r , maps_data md\n" +
-                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID and md.rgd_id=s.rgd_id and md.chromosome=? and md.start_pos<=? and md.stop_pos>=? and md.map_key=?";
+                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID " +
+                "and md.rgd_id=s.rgd_id and md.chromosome=? and md.start_pos<=? " +
+                "and md.stop_pos>=? and md.map_key=? order by md.start_pos";
 
         return MappedSSLPQuery.run(this,query, chr, stopPos, startPos, mapKey);
     }
