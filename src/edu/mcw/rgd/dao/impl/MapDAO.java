@@ -74,10 +74,19 @@ public class MapDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Map> getPrimaryRefAssemblies() throws Exception {
+        return getPrimaryRefAssemblies("NCBI");
+    }
+
+    /**
+     * get primary reference assemblies for all species
+     * @return list of primary reference assemblies for all species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getPrimaryRefAssemblies(String source) throws Exception {
 
         String sql = "select m.*, i.species_type_key from rgd_ids i, maps m " +
-                     "where i.rgd_id = m.rgd_id and m.primary_ref_assembly_ind='Y'";
-        return executeMapQuery(sql);
+                     "where i.rgd_id = m.rgd_id and m.primary_ref_assembly_ind='Y' and m.source=?";
+        return executeMapQuery(sql,source);
     }
 
     /**
@@ -89,10 +98,22 @@ public class MapDAO extends AbstractDAO {
      *   error in spring framework occurs
      */
     public Map getPrimaryRefAssembly(int speciesTypeKey) throws Exception {
+        return getPrimaryRefAssembly(speciesTypeKey,"NCBI");
+    }
+
+    /**
+     * get primary ref assembly for given species
+     * @param speciesTypeKey species type key
+     * @return primary ref assembly for given species
+     * @throws Exception throws MapDAOException either if there is no primary ref assembly for the given species
+     *   or if there are multiple primary ref assemblies for the species; Exception is also thrown when unexpected
+     *   error in spring framework occurs
+     */
+    public Map getPrimaryRefAssembly(int speciesTypeKey,String source) throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id=m.rgd_id AND m.primary_ref_assembly_ind='Y' AND i.species_type_key=?";
-        List<Map> maps = executeMapQuery(sql, speciesTypeKey);
+                     "WHERE i.rgd_id=m.rgd_id AND m.primary_ref_assembly_ind='Y' AND i.species_type_key=? and source=?";
+        List<Map> maps = executeMapQuery(sql, speciesTypeKey,source);
         if( maps.isEmpty() )
             throw new MapDAOException("No primary reference assembly found for species type key "+speciesTypeKey);
         if( maps.size()>1 )
