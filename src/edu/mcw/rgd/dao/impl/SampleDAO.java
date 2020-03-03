@@ -42,7 +42,7 @@ public class SampleDAO extends JdbcBaseDAO {
                 "WHERE patient_id IN(SELECT patient_id FROM patient WHERE map_key=?) "+
                 " and (analysis_name != 'CDR' and analysis_name != 'CDS') " +
                 " and analysis_name like '"+ population+"%'" +
-                "ORDER BY analysis_name";
+                " ORDER BY analysis_name";
         return runSamplesQuery(query, mapKey);
     }
 
