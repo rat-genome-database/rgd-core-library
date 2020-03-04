@@ -29,7 +29,7 @@ public class MapDAO extends AbstractDAO {
     public List<Map> getActiveMaps() throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE'";
+                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' AND m.source='NCBI'";
         return executeMapQuery(sql);
     }
 
@@ -49,7 +49,7 @@ public class MapDAO extends AbstractDAO {
     public List<Map> getMaps(int speciesTypeKey) throws Exception {
 
         String sql = "select m.*, i.species_type_key from rgd_ids i, maps m " +
-                     "where i.rgd_id = m.rgd_id and i.object_key=10 and i.object_status = 'ACTIVE' and i.species_type_key=?";
+                     "where i.rgd_id = m.rgd_id and i.object_key=10 and i.object_status = 'ACTIVE' and i.species_type_key=? AND m.source='NCBI'";
         return executeMapQuery(sql, speciesTypeKey);
     }
 
@@ -61,13 +61,24 @@ public class MapDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Map> getMaps(int speciesTypeKey, String mapUnit) throws Exception {
-
-        String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' "+
-                     "  AND i.species_type_key=? AND m.map_unit=? ORDER BY rank";
-        return executeMapQuery(sql, speciesTypeKey, mapUnit);
+        return getMaps(speciesTypeKey,mapUnit,"NCBI");
     }
 
+    /**
+     * get all active maps for given species
+     * @param speciesTypeKey species type key
+     * @param mapUnit map unit
+     * @param source source of assembly
+     * @return list of all active maps for given species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getMaps(int speciesTypeKey, String mapUnit, String source) throws Exception {
+
+        String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' "+
+                "  AND i.species_type_key=? AND m.map_unit=? AND m.source=? ORDER BY rank";
+        return executeMapQuery(sql, speciesTypeKey, mapUnit,source);
+    }
     /**
      * get primary reference assemblies for all species
      * @return list of primary reference assemblies for all species
