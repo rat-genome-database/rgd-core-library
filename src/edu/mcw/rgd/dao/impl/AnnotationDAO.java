@@ -2052,5 +2052,10 @@ public class AnnotationDAO extends AbstractDAO {
 
         return executeAnnotationQuery(sql, termAcc );
     }
+    public List<Annotation> getModels(String aspect) throws Exception {
+        String sql="select * from full_annot where (qualifier like '%MODEL%' or qualifier like '%odel') and aspect=?";
+        return  executeAnnotationQuery(sql, aspect);
+
+    }
 
 }
