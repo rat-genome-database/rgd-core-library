@@ -13,10 +13,8 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jun 24, 2008
- * Time: 2:52:57 PM
+ * @author jdepons
+ * @since Jun 24, 2008
  */
 @SuppressWarnings("unchecked")
 public class MapDAO extends AbstractDAO {
@@ -27,10 +25,20 @@ public class MapDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Map> getActiveMaps() throws Exception {
+        return getActiveMaps("NCBI");
+    }
+
+    /**
+     * get all active maps for all species, for given assembly source
+     * @param source assembly source: 'NCBI','Ensembl' etc
+     * @return list of all active maps
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getActiveMaps(String source) throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' AND m.source='NCBI'";
-        return executeMapQuery(sql);
+                "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' AND m.source=?";
+        return executeMapQuery(sql, source);
     }
 
     public int getSpeciesTypeKeyForMap(int mapKey) throws Exception{
@@ -120,15 +128,15 @@ public class MapDAO extends AbstractDAO {
      *   or if there are multiple primary ref assemblies for the species; Exception is also thrown when unexpected
      *   error in spring framework occurs
      */
-    public Map getPrimaryRefAssembly(int speciesTypeKey,String source) throws Exception {
+    public Map getPrimaryRefAssembly(int speciesTypeKey, String source) throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
                      "WHERE i.rgd_id=m.rgd_id AND m.primary_ref_assembly_ind='Y' AND i.species_type_key=? and source=?";
         List<Map> maps = executeMapQuery(sql, speciesTypeKey,source);
         if( maps.isEmpty() )
-            throw new MapDAOException("No primary reference assembly found for species type key "+speciesTypeKey);
+            throw new MapDAOException("No primary reference assembly found for species type key "+speciesTypeKey+" and source "+source);
         if( maps.size()>1 )
-            throw new MapDAOException("Multiple primary reference assemblies found for species type key "+speciesTypeKey);
+            throw new MapDAOException("Multiple primary reference assemblies found for species type key "+speciesTypeKey+" and source "+source);
         return maps.get(0);
     }
 

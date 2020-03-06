@@ -37,6 +37,8 @@ public class MapQuery extends MappingSqlQuery {
         map.setRank(rs.getInt("rank"));
         map.setUcscAssemblyId(rs.getString("ucsc_assembly_id"));
         map.setRefSeqAssemblyAcc(rs.getString("refseq_assembly_acc"));
+        map.setRefSeqAssemblyName(rs.getString("refseq_assembly_name"));
+        map.setSource(rs.getString("source"));
 
         return map;
     }
