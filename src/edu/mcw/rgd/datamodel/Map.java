@@ -20,6 +20,8 @@ public class Map implements Identifiable, ObjectWithName, Speciated {
     private int rank;
     private String ucscAssemblyId;
     private String refSeqAssemblyAcc; // GCF_xxxx
+    private String refSeqAssemblyName;
+    private String source;
 
     public String getDbsnpVersion() {
         return dbsnpVersion;
@@ -135,5 +137,21 @@ public class Map implements Identifiable, ObjectWithName, Speciated {
 
     public void setRefSeqAssemblyAcc(String refSeqAssemblyAcc) {
         this.refSeqAssemblyAcc = refSeqAssemblyAcc;
+    }
+
+    public String getRefSeqAssemblyName() {
+        return refSeqAssemblyName;
+    }
+
+    public void setRefSeqAssemblyName(String refSeqAssemblyName) {
+        this.refSeqAssemblyName = refSeqAssemblyName;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }
