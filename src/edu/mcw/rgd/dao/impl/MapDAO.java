@@ -29,7 +29,7 @@ public class MapDAO extends AbstractDAO {
     public List<Map> getActiveMaps() throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE'";
+                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' AND m.source='NCBI'";
         return executeMapQuery(sql);
     }
 
@@ -49,7 +49,7 @@ public class MapDAO extends AbstractDAO {
     public List<Map> getMaps(int speciesTypeKey) throws Exception {
 
         String sql = "select m.*, i.species_type_key from rgd_ids i, maps m " +
-                     "where i.rgd_id = m.rgd_id and i.object_key=10 and i.object_status = 'ACTIVE' and i.species_type_key=?";
+                     "where i.rgd_id = m.rgd_id and i.object_key=10 and i.object_status = 'ACTIVE' and i.species_type_key=? AND m.source='NCBI'";
         return executeMapQuery(sql, speciesTypeKey);
     }
 
@@ -61,11 +61,31 @@ public class MapDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Map> getMaps(int speciesTypeKey, String mapUnit) throws Exception {
+        return getMaps(speciesTypeKey,mapUnit,"NCBI");
+    }
+
+    /**
+     * get all active maps for given species
+     * @param speciesTypeKey species type key
+     * @param mapUnit map unit
+     * @param source source of assembly
+     * @return list of all active maps for given species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getMaps(int speciesTypeKey, String mapUnit, String source) throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' "+
-                     "  AND i.species_type_key=? AND m.map_unit=? ORDER BY rank";
-        return executeMapQuery(sql, speciesTypeKey, mapUnit);
+                "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE' "+
+                "  AND i.species_type_key=? AND m.map_unit=? AND m.source=? ORDER BY rank";
+        return executeMapQuery(sql, speciesTypeKey, mapUnit,source);
+    }
+    /**
+     * get primary reference assemblies for all species
+     * @return list of primary reference assemblies for all species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getPrimaryRefAssemblies() throws Exception {
+        return getPrimaryRefAssemblies("NCBI");
     }
 
     /**
@@ -73,11 +93,11 @@ public class MapDAO extends AbstractDAO {
      * @return list of primary reference assemblies for all species
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public List<Map> getPrimaryRefAssemblies() throws Exception {
+    public List<Map> getPrimaryRefAssemblies(String source) throws Exception {
 
         String sql = "select m.*, i.species_type_key from rgd_ids i, maps m " +
-                     "where i.rgd_id = m.rgd_id and m.primary_ref_assembly_ind='Y'";
-        return executeMapQuery(sql);
+                     "where i.rgd_id = m.rgd_id and m.primary_ref_assembly_ind='Y' and m.source=?";
+        return executeMapQuery(sql,source);
     }
 
     /**
@@ -89,10 +109,22 @@ public class MapDAO extends AbstractDAO {
      *   error in spring framework occurs
      */
     public Map getPrimaryRefAssembly(int speciesTypeKey) throws Exception {
+        return getPrimaryRefAssembly(speciesTypeKey,"NCBI");
+    }
+
+    /**
+     * get primary ref assembly for given species
+     * @param speciesTypeKey species type key
+     * @return primary ref assembly for given species
+     * @throws Exception throws MapDAOException either if there is no primary ref assembly for the given species
+     *   or if there are multiple primary ref assemblies for the species; Exception is also thrown when unexpected
+     *   error in spring framework occurs
+     */
+    public Map getPrimaryRefAssembly(int speciesTypeKey,String source) throws Exception {
 
         String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                     "WHERE i.rgd_id=m.rgd_id AND m.primary_ref_assembly_ind='Y' AND i.species_type_key=?";
-        List<Map> maps = executeMapQuery(sql, speciesTypeKey);
+                     "WHERE i.rgd_id=m.rgd_id AND m.primary_ref_assembly_ind='Y' AND i.species_type_key=? and source=?";
+        List<Map> maps = executeMapQuery(sql, speciesTypeKey,source);
         if( maps.isEmpty() )
             throw new MapDAOException("No primary reference assembly found for species type key "+speciesTypeKey);
         if( maps.size()>1 )
@@ -277,7 +309,7 @@ public class MapDAO extends AbstractDAO {
      */
     public int updateMapData(List<MapData> mdList) throws Exception{
 
-        String sql = "UPDATE maps_data SET band_type=?, f_or_p=?, " +
+        String sql = "UPDATE maps_data SET f_or_p=?, " +
                 "chromosome=?, fish_band=?, abs_position=?, lod=?, notes=?, map_key=?, rgd_id=?, " +
                 "rgd_id_up=?, rgd_id_dw=?, start_pos=?, stop_pos=?, multiple_chromosome=?, strand=?, " +
                 "maps_data_position_method_id=?, src_pipeline=? WHERE maps_data_key=?";
@@ -306,10 +338,10 @@ public class MapDAO extends AbstractDAO {
      */
     public int insertMapData(List<MapData> mds) throws Exception{
 
-        String sql = "INSERT INTO maps_data (band_type, f_or_p, " +
+        String sql = "INSERT INTO maps_data (f_or_p, " +
                 "chromosome, fish_band, abs_position, lod, notes, map_key, rgd_id, rgd_id_up, rgd_id_dw, " +
                 "start_pos, stop_pos, multiple_chromosome, strand, maps_data_position_method_id, src_pipeline, maps_data_key) " +
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         int mdKey = getNextKey("MAPS_DATA", "MAPS_DATA_KEY");
         for( MapData md: mds ) {
@@ -321,14 +353,14 @@ public class MapDAO extends AbstractDAO {
     private int upsertMapData(String sql, List<MapData> mds) throws Exception{
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
-                new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                 Types.DOUBLE, Types.DOUBLE, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
                 Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
                 Types.INTEGER, Types.VARCHAR, Types.INTEGER});
         su.compile();
 
         for( MapData md: mds ) {
-            su.update(md.getBandType(), md.getFOrP(), md.getChromosome(), md.getFishBand(),
+            su.update(md.getFOrP(), md.getChromosome(), md.getFishBand(),
                 md.getAbsPosition(), md.getLod(), md.getNotes(), md.getMapKey(), md.getRgdId(), md.getRgdIdUp(),
                 md.getRgdIdDown(), md.getStartPos(), md.getStopPos(), md.getMultipleChromosome(), md.getStrand(),
                 md.getMapsDataPositionMethodId(), md.getSrcPipeline(), md.getKey());
@@ -581,7 +613,7 @@ public class MapDAO extends AbstractDAO {
      */
     public List<MapData> getDbSnpPositions(String rsId, int mapKey) throws Exception {
 
-        String query = "SELECT DISTINCT 0 maps_data_key,NULL band_type,NULL f_or_p,chromosome,NULL fish_band,NULL abs_position,\n" +
+        String query = "SELECT DISTINCT 0 maps_data_key,NULL f_or_p,chromosome,NULL fish_band,NULL abs_position,\n" +
             "  NULL lod,NULL notes,d.map_key,NULL rgd_id,NULL rgd_id_up,NULL rgd_id_dw,position start_pos,position stop_pos,\n" +
             "  NULL multiple_chromosome,NULL strand,NULL maps_data_position_method_id,NULL src_pipeline\n" +
             "FROM db_snp d,maps m\n" +
