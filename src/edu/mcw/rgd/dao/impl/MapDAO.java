@@ -20,9 +20,10 @@ import java.util.*;
 public class MapDAO extends AbstractDAO {
 
     /**
-     * get all active maps for all species
+     * get all active NCBI maps for all species
      * @return list of all active maps
      * @throws Exception when unexpected error in spring framework occurs
+     * @deprecated
      */
     public List<Map> getActiveMaps() throws Exception {
         return getActiveMaps("NCBI");
@@ -30,15 +31,41 @@ public class MapDAO extends AbstractDAO {
 
     /**
      * get all active maps for all species, for given assembly source
-     * @param source assembly source: 'NCBI','Ensembl' etc
+     * @param source assembly source: 'NCBI','Ensembl', or null if any
      * @return list of all active maps
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Map> getActiveMaps(String source) throws Exception {
 
-        String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' AND m.source=?";
-        return executeMapQuery(sql, source);
+        if( source==null ) {
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE'";
+            return executeMapQuery(sql);
+        } else {
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' AND m.source=?";
+            return executeMapQuery(sql, source);
+        }
+    }
+
+    /**
+     * get all active maps for given species and assembly source
+     * @param speciesTypeKey species type key
+     * @param source assembly source: 'NCBI','Ensembl',or null
+     * @return List of Map objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getActiveMaps(int speciesTypeKey, String source) throws Exception {
+
+        if( source==null ) {
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' AND i.species_type_key=?";
+            return executeMapQuery(sql, speciesTypeKey);
+        } else {
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' AND i.species_type_key=? AND m.source=?";
+            return executeMapQuery(sql, speciesTypeKey, source);
+        }
     }
 
     public int getSpeciesTypeKeyForMap(int mapKey) throws Exception{

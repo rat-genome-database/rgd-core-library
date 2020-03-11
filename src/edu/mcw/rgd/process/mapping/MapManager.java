@@ -3,18 +3,14 @@ package edu.mcw.rgd.process.mapping;
 import edu.mcw.rgd.dao.impl.MapDAO;
 import edu.mcw.rgd.datamodel.Chromosome;
 import edu.mcw.rgd.datamodel.Map;
-import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Jun 27, 2008
- * Time: 4:06:53 PM
- * <p>
+ * @author jdepons
+ * @since Jun 27, 2008
  * Hold references to maps in the system.  The maps are loaded from the maps table.
  * This class is a singleton.
  * Initialization-on-demand holder idiom is used for thread-safe lazy loading of this singleton.
@@ -23,7 +19,8 @@ public class MapManager {
 
     private java.util.Map<Integer,List<Map>> mapHash = new ConcurrentHashMap<>(); // species_type_key => List<Map>
     private java.util.Map<Integer, Map> keyedHash = new ConcurrentHashMap<>(); // map_key => Map
-    private java.util.Map<Integer,Map> primaryRefMapHash = new ConcurrentHashMap<>(); // species_type_key => Map
+    private java.util.Map<Integer, Map> primaryMapsForNCBI = new ConcurrentHashMap<>(); // species_type_key => Map
+    private java.util.Map<Integer, Map> primaryMapsForEnsembl = new ConcurrentHashMap<>(); // species_type_key => Map
 
     private java.util.Map<Integer,List<Chromosome>> chromosomeHash = new ConcurrentHashMap<>(); // contains the chromosomes
     private static final java.util.Map<Integer, String> refSeqAccMap;
@@ -76,30 +73,22 @@ public class MapManager {
         MapDAO dao = new MapDAO();
         List<Map> maps;
         try {
-            maps = dao.getMaps(speciesTypeKey);
+            maps = dao.getActiveMaps(speciesTypeKey, null);
         } catch(Exception e) {
             e.printStackTrace();
             return e;
         }
 
-        // put if absent (java 1.7 does not have putIfAbsent method)
-        List<Map> prevMaps = mapHash.get(speciesTypeKey);
-        if( prevMaps==null ) {
-            mapHash.put(speciesTypeKey, maps);
-        }
+        mapHash.putIfAbsent(speciesTypeKey, maps);
 
         for( Map map: maps ) {
-            // put if absent (java 1.7 does not have putIfAbsent method)
-            Map prevMap = keyedHash.get(map.getKey());
-            if( prevMap==null ) {
-                keyedHash.put(map.getKey(), map);
-            }
+            keyedHash.putIfAbsent(map.getKey(), map);
 
             if( map.isPrimaryRefAssembly() ) {
-                // put if absent (java 1.7 does not have putIfAbsent method)
-                prevMap = primaryRefMapHash.get(speciesTypeKey);
-                if( prevMap==null ) {
-                    primaryRefMapHash.put(speciesTypeKey, map);
+                if( map.getSource().equals("NCBI") ) {
+                    primaryMapsForNCBI.putIfAbsent(speciesTypeKey, map);
+                } else if( map.getSource().equals("Ensembl") ) {
+                    primaryMapsForEnsembl.putIfAbsent(speciesTypeKey, map);
                 }
             }
 
@@ -107,7 +96,6 @@ public class MapManager {
                 //ensure map is loaded
                 chromosomeHash.put(map.getKey(),dao.getChromosomes(map.getKey()));
             }
-
         }
         return null;
     }
@@ -115,8 +103,6 @@ public class MapManager {
     public List<Chromosome> getChromosomes(int mapKey) {
         Map m = getMap(mapKey);
         return chromosomeHash.get(mapKey);
-
-
     }
 
 
@@ -192,17 +178,31 @@ public class MapManager {
         return false;
     }
 
-    public Map getReferenceAssembly(int speciesTypeKey) throws Exception{
+    /// source: NCBI or Ensembl
+    public Map getReferenceAssembly(int speciesTypeKey, String source) throws Exception{
 
-        Map map = primaryRefMapHash.get(speciesTypeKey);
+        java.util.Map<Integer, Map> primaryMap;
+        if( source.equals("NCBI") ) {
+            primaryMap = primaryMapsForNCBI;
+        } else if( source.equals("Ensembl") ) {
+            primaryMap = primaryMapsForEnsembl;
+        } else {
+            return null;
+        }
+
+        Map map = primaryMap.get(speciesTypeKey);
         if( map==null ) {
             Exception e = loadForSpecies(speciesTypeKey);
             if( e!=null ) {
-                throw new Exception("Problem loading reference assembly for species type " + speciesTypeKey, e);
+                throw new Exception("Problem loading reference assembly for species " + speciesTypeKey+" and assembly source ="+source, e);
             }
-            map = primaryRefMapHash.get(speciesTypeKey);
+            map = primaryMap.get(speciesTypeKey);
         }
         return map;
+    }
+
+    public Map getReferenceAssembly(int speciesTypeKey) throws Exception{
+        return getReferenceAssembly(speciesTypeKey, "NCBI");
     }
 
     /**
@@ -213,12 +213,17 @@ public class MapManager {
     public boolean isMapKeyForPrimaryRefAssembly(int mapKey) {
 
         // iterate through all species
-        for( Map map: primaryRefMapHash.values() ) {
+        for( Map map: primaryMapsForNCBI.values() ) {
+            if( map.getKey()==mapKey )
+                return true;
+        }
+        for( Map map: primaryMapsForEnsembl.values() ) {
             if( map.getKey()==mapKey )
                 return true;
         }
         return false;
     }
+
     public java.util.Map<Integer, String> getReqSeqAccIdMap(){
         return refSeqAccMap;
 }
