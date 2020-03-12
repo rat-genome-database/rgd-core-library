@@ -8,6 +8,7 @@ import edu.mcw.rgd.datamodel.MapData;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.process.Utils;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -343,13 +344,21 @@ public class RGDManagementDAO extends AbstractDAO {
         // you must specify NULL
         Integer speciesKey = speciesTypeKey==0 ? null : speciesTypeKey;
 
+        RgdId id = new RgdId(rgdId);
+        id.setSpeciesTypeKey(speciesTypeKey);
+        id.setObjectKey(objectKey);
+        id.setObjectStatus(objectStatus);
+        id.setNotes(notes);
+        id.setCreatedDate(new Date());
+        id.setLastModifiedDate(id.getCreatedDate());
+
         String sql =  "INSERT INTO rgd_ids (object_key, created_date, notes, " +
                 "last_modified_date, object_status, species_type_key, rgd_id) " +
-                "VALUES (?,SYSDATE,?,SYSDATE,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?)";
 
-        update(sql, objectKey, notes, objectStatus, speciesKey, rgdId);
+        update(sql, objectKey, id.getCreatedDate(), notes, id.getLastModifiedDate(), objectStatus, speciesKey, rgdId);
 
-        return this.getRgdId(rgdId);
+        return id;
     }
 
     /**
