@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * groups utility functions frequently used by many applications
@@ -808,5 +809,21 @@ public class Utils {
         } else
             reader = new BufferedReader(new FileReader(fileName));
         return reader;
+    }
+
+    /**
+     * given file name, return BufferedWriter object;
+     * if file name ends with '.gz', the file will be 'gzip'-compressed
+     * @param fileName file name to create/overwrite
+     * @return BufferedWriter object
+     * @throws IOException
+     */
+    static public BufferedWriter openWriter(String fileName) throws IOException {
+        BufferedWriter writer;
+        if( fileName.endsWith(".gz") || fileName.contains(".gz_") ) {
+            writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fileName))));
+        } else
+            writer = new BufferedWriter(new FileWriter(fileName));
+        return writer;
     }
 }
