@@ -38,9 +38,9 @@ public class EvaDAO extends AbstractDAO{
     }
     public int insertEva(Collection<Eva> tobeInserted) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO EVA (EVA_ID, CHROMOSOME, POS, RS_ID, " +
-                "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY) values (?,?,?,?,?,?,?,?)",
+                "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY, PADDING_BASE) values (?,?,?,?,?,?,?,?,?)",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.VARCHAR, Types.INTEGER});
+                Types.VARCHAR, Types.INTEGER, Types.VARCHAR});
         su.compile();
 
         for( Eva eva: tobeInserted ) {
@@ -48,7 +48,7 @@ public class EvaDAO extends AbstractDAO{
             eva.setEvaid(evaId);
 
             su.update(eva.getEvaId(), eva.getChromosome(), eva.getPos(), eva.getRsId(),eva.getRefNuc(),
-                    eva.getVarNuc(), eva.getSoTerm(), eva.getMapkey());
+                    eva.getVarNuc(), eva.getSoTerm(), eva.getMapkey(), eva.getPadBase());
         }
 
         return executeBatch(su);

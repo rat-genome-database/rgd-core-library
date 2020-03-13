@@ -10,6 +10,7 @@ public class Eva {
     private String rsId;
     private String refNuc;
     private String varNuc;
+    private String padBase;
     private String soTerm;
     private int mapKey;
 
@@ -21,6 +22,7 @@ public class Eva {
     public String getRsId(){ return rsId; }
     public String getRefNuc(){ return refNuc; }
     public String getVarNuc(){ return varNuc; }
+    public String getPadBase(){ return padBase; }
     public String getSoTerm(){ return soTerm; }
     public int getMapkey(){ return mapKey; }
 
@@ -30,12 +32,13 @@ public class Eva {
     public void setRsid(String rsid) {this.rsId = rsid;}
     public void setRefnuc(String refNuc) {this.refNuc = refNuc;}
     public void setVarnuc(String varNuc) {this.varNuc = varNuc;}
+    public void setPadBase(Strring padBase) {this.padBase = padBase;}
     public void setSoterm(String soTerm) {this.soTerm = soTerm;}
     public void setMapkey(int mapKey) {this.mapKey = mapKey;}
 
     public String dump(String delimeter)
     {
-        return (new Dumper(delimeter).put("CHROMOSOME", this.chromosome).put("POS", this.pos).put("RS_ID",this.rsId).put("REF_NUC", this.refNuc).put("VAR_NUC", this.varNuc).put("SO_TERM_ACC", this.soTerm).put("MAP_KEY",this.mapKey).dump());
+        return (new Dumper(delimeter).put("CHROMOSOME", this.chromosome).put("POS", this.pos).put("RS_ID",this.rsId).put("REF_NUC", this.refNuc).put("VAR_NUC", this.varNuc).put("PADDING_BASE", this.padBase).put("SO_TERM_ACC", this.soTerm).put("MAP_KEY",this.mapKey).dump());
     }
 
     @Override
@@ -43,12 +46,12 @@ public class Eva {
         Eva e = (Eva)obj;
         return Utils.stringsAreEqual(chromosome, e.getChromosome()) && pos==e.getPos()
                 && Utils.stringsAreEqual(rsId,e.getRsId()) && Utils.stringsAreEqual(refNuc,e.getRefNuc())
-                && Utils.stringsAreEqual(varNuc, e.getVarNuc());
+                && Utils.stringsAreEqual(varNuc, e.getVarNuc()) && Utils.stringsAreEqual(padBase, e.padBase);
     }
 
     @Override
     public int hashCode() {
         return getPos() ^ Utils.defaultString(chromosome).hashCode() ^ Utils.defaultString(rsId).hashCode()
-                ^ Utils.defaultString(refNuc).hashCode() ^ Utils.defaultString(varNuc).hashCode();
+                ^ Utils.defaultString(refNuc).hashCode() ^ Utils.defaultString(varNuc).hashCode() ^ Utils.defaultString(padBase).hashCode();
     }
 }
