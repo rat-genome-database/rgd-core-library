@@ -2,8 +2,6 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.StringListQuery;
-import edu.mcw.rgd.datamodel.Portal;
-import edu.mcw.rgd.datamodel.PortalCat;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
@@ -20,8 +18,6 @@ import java.util.Date;
  * Time: 1:31:52 PM
  */
 public class StatisticsDAO extends AbstractDAO {
-
-    PortalDAO portalDAO = new PortalDAO();
 
     public java.util.Map<String,String> getActiveCount(int speciesTypeKey) throws Exception {
         String sql = "SELECT count(distinct(ri.rgd_id)) as tot, ro.object_name from rgd_ids ri, rgd_objects ro " +
@@ -512,6 +508,7 @@ public class StatisticsDAO extends AbstractDAO {
 
     /**
      * return counts of annotated objects per portal
+     * NOTE: due to changes in portal tables, this is a noop at the moment
      * @param speciesTypeKey species type key
      * @param objectKey object key; if 0, return count of annotated objects of any type
      * @return map of counts of active annotated objects to portal
@@ -519,18 +516,7 @@ public class StatisticsDAO extends AbstractDAO {
      */
     public java.util.Map<String,String> getPortalAnnotatedObjectCount(int speciesTypeKey, int objectKey) throws Exception {
 
-        TreeMap sb = new TreeMap();
-        for(Portal portal: portalDAO.getPortals() ) {
-            // process only 'Standard' portals
-            if( !portal.getPortalType().equals("Standard") )
-                continue;
-
-            PortalCat cat = portalDAO.getSummaryForPortal(portal.getKey());
-            if( cat!=null ) {
-                sb.put(portal.getUrlName(), getPortalValue(speciesTypeKey, objectKey, cat.getSummaryTableHtml()));
-            }
-        }
-        return sb;
+        return new TreeMap();
     }
 
     /**
@@ -552,79 +538,6 @@ public class StatisticsDAO extends AbstractDAO {
 
         return name;
     }
-
-    private String getPortalValue(int speciesTypeKey, int objectKey, String summaryTable) {
-
-        int sum = 0;
-
-        int ratGenesSum = extractValue(summaryTable, "genes-sum");
-        int humanGenesSum = extractValue(summaryTable, "human-genes-sum");
-        int mouseGenesSum = extractValue(summaryTable, "mouse-genes-sum");
-        int ratQtlsSum = extractValue(summaryTable, "qtls-sum");
-        int humanQtlsSum = extractValue(summaryTable, "human-qtls-sum");
-        int mouseQtlsSum = extractValue(summaryTable, "mouse-qtls-sum");
-        int ratStrainsSum = extractValue(summaryTable, "strains-sum");
-        int humanStrainsSum = extractValue(summaryTable, "human-strains-sum");
-        int mouseStrainsSum = extractValue(summaryTable, "mouse-strains-sum");
-
-        // handle rats
-        if( speciesTypeKey==SpeciesType.RAT ) {
-            if( objectKey==RgdId.OBJECT_KEY_GENES )
-                sum = ratGenesSum;
-            else if( objectKey==RgdId.OBJECT_KEY_QTLS )
-                sum = ratQtlsSum;
-            else if( objectKey==RgdId.OBJECT_KEY_STRAINS )
-                sum = ratStrainsSum;
-            else
-                sum = ratGenesSum + ratQtlsSum + ratStrainsSum;
-        }
-        // handle human
-        else if( speciesTypeKey==SpeciesType.HUMAN ) {
-            if( objectKey==RgdId.OBJECT_KEY_GENES )
-                sum = humanGenesSum;
-            else if( objectKey==RgdId.OBJECT_KEY_QTLS )
-                sum = humanQtlsSum;
-            else if( objectKey==RgdId.OBJECT_KEY_STRAINS )
-                sum = humanStrainsSum;
-            else
-                sum = humanGenesSum + humanQtlsSum + humanStrainsSum;
-        }
-        // handle mouse
-        else if( speciesTypeKey==SpeciesType.MOUSE ) {
-            if( objectKey==RgdId.OBJECT_KEY_GENES )
-                sum = mouseGenesSum;
-            else if( objectKey==RgdId.OBJECT_KEY_QTLS )
-                sum = mouseQtlsSum;
-            else if( objectKey==RgdId.OBJECT_KEY_STRAINS )
-                sum = mouseStrainsSum;
-            else
-                sum = mouseGenesSum + mouseQtlsSum + mouseStrainsSum;
-        }
-        // handle all species
-        else if( speciesTypeKey==SpeciesType.ALL ){
-            if( objectKey==RgdId.OBJECT_KEY_GENES )
-                sum = ratGenesSum + humanGenesSum + mouseGenesSum;
-            else if( objectKey==RgdId.OBJECT_KEY_QTLS )
-                sum = ratQtlsSum + humanQtlsSum + mouseQtlsSum;
-            else if( objectKey==RgdId.OBJECT_KEY_STRAINS )
-                sum = ratStrainsSum + humanStrainsSum + mouseStrainsSum;
-            else
-                sum = ratGenesSum + humanGenesSum + mouseGenesSum
-                    + ratQtlsSum + humanQtlsSum + mouseQtlsSum
-                    + ratStrainsSum + humanStrainsSum + mouseStrainsSum;
-        }
-        return Integer.toString(sum);
-    }
-
-    private int extractValue(String html, String pattern) {
-
-        String tagStart = "<span id=\""+pattern+"\">";
-        String tagEnd = "</span>";
-        int pos = html.indexOf(tagStart)+tagStart.length();
-        String value = html.substring( pos, html.indexOf(tagEnd, pos) );
-        return value.isEmpty() ? 0 : Integer.parseInt(value);
-    }
-
     private java.util.Map<String,String> statQuery(int speciesTypeKey, String sql) throws Exception {
 
         return statQuery(speciesTypeKey, 0, sql);
