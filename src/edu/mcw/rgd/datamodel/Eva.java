@@ -32,7 +32,7 @@ public class Eva {
     public void setRsid(String rsid) {this.rsId = rsid;}
     public void setRefnuc(String refNuc) {this.refNuc = refNuc;}
     public void setVarnuc(String varNuc) {this.varNuc = varNuc;}
-    public void setPadBase(Strring padBase) {this.padBase = padBase;}
+    public void setPadBase(String padBase) {this.padBase = padBase;}
     public void setSoterm(String soTerm) {this.soTerm = soTerm;}
     public void setMapkey(int mapKey) {this.mapKey = mapKey;}
 
