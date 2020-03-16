@@ -226,6 +226,18 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
+     * Get 'Not4Curation' list of term accessions for given ontology.
+     * @param ontId ontology id
+     * @return List of Strings
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getNot4CurationTermAccs(String ontId) throws Exception {
+        String sql = "SELECT DISTINCT s.term_acc FROM ont_synonyms s,ont_terms t WHERE SYNONYM_NAME = 'Not4Curation'\n" +
+                "  AND s.term_acc=t.term_acc AND t.is_obsolete=0 AND t.ont_id=?";
+        return StringListQuery.execute(this, sql, ontId);
+    }
+
+    /**
      * get synonyms for all active terms in given ontology
      * @param ontologyId ontology id
      * @return List of TermSynonym objects
