@@ -678,7 +678,22 @@ public class AnnotationDAO extends AbstractDAO {
                 " AND r.object_status='ACTIVE'";
         return executeAnnotationQuery(query, refRgdId, evidence);
     }
-
+    /**
+     * get annotations by Reference and limit by evidence code
+     * @param refRgdId reference rgd id
+     * @param termAcc termAcc
+     * @return list of Annotation objects
+     * @throws Exception
+     */
+    public List<Annotation> getAnnotationsByReferenceAndTermAcc(int refRgdId, String termAcc) throws Exception {
+        String query = "SELECT a.*,r.species_type_key \n" +
+                "FROM full_annot a,rgd_ids r \n" +
+                "WHERE ref_rgd_id=? \n" +
+                " AND a.term_acc=? \n" +
+                " AND a.annotated_object_rgd_id=r.rgd_id \n" +
+                " AND r.object_status='ACTIVE'";
+        return executeAnnotationQuery(query, refRgdId, termAcc);
+    }
     /**
      * get annotations by Reference and limit by aspect
      * @param refRgdId
