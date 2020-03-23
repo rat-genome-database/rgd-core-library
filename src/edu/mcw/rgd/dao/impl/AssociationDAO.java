@@ -827,6 +827,24 @@ public class AssociationDAO extends AbstractDAO {
     }
 
     /**
+     * return active genomic elements for given detail rgd id, association type and subtype
+     * @param detailRgdId detail rgd id
+     * @param assocType association type
+     * @param assocSubType association subtype
+     * @return list of GenomicElement objects; never null, but returned list could be empty
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<GenomicElement> getAssociatedGenomicElementsForDetailRgdId(int detailRgdId, String assocType, String assocSubType) throws Exception {
+
+        String query = "SELECT ge.*,r.* "+
+                "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
+                "WHERE a.detail_rgd_id=? AND a.assoc_type=? AND a.assoc_subtype=? AND ge.rgd_id=master_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
+        return execute(q, detailRgdId, assocType, assocSubType);
+    }
+
+    /**
      * return list of associations for given assoc type
      * @param assocType assoc type
      * @return list of Association objects; never null, but returned list could be empty
