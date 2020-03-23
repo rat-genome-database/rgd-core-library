@@ -785,7 +785,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String query = "SELECT ge.*,r.* "+
                 "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
-                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND ge.rgd_id=master_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND ge.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
 
         GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
         return execute(q, masterRgdId, assocType);
@@ -803,7 +803,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String query = "SELECT ge.*,r.* "+
                 "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
-                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND a.assoc_subtype=? AND ge.rgd_id=master_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND a.assoc_subtype=? AND ge.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
 
         GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
         return execute(q, masterRgdId, assocType, assocSubType);
