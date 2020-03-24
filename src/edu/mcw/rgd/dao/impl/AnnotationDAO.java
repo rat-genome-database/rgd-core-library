@@ -691,7 +691,8 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE ref_rgd_id=? \n" +
                 " AND a.term_acc=? \n" +
                 " AND a.annotated_object_rgd_id=r.rgd_id \n" +
-                " AND r.object_status='ACTIVE'";
+                " AND r.object_status='ACTIVE' \n" +
+                "order by a.object_symbol asc";
         return executeAnnotationQuery(query, refRgdId, termAcc);
     }
     /**
