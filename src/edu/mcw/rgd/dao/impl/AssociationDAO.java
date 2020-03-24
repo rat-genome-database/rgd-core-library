@@ -331,33 +331,17 @@ public class AssociationDAO extends AbstractDAO {
 
     /**
      * removes strain association for given qtl
-     * @param strainRGDId rgd id for strain to be de-associated
-     * @param qtlRGDId rgd id for qtl
+     * @param strainRgdId rgd id for strain to be de-associated
+     * @param qtlRgdId rgd id for qtl
      * @throws Exception when something bad happens in spring framework
      */
-    public void removeStrainToQTLAssociation(int strainRGDId, int qtlRGDId) throws Exception{
+    public void removeStrainToQTLAssociation(int strainRgdId, int qtlRgdId) throws Exception{
 
-        int qtlKey = getQtlDAO().getQTL(qtlRGDId).getKey();
+        String sql = "DELETE FROM rgd_qtl_strain "+
+                "WHERE strain_key=(SELECT strain_key FROM strains s WHERE s.rgd_id=?) "+
+                " AND qtl_key=(SELECT qtl_key FROM qtls q WHERE q.rgd_id=?)";
 
-        int strainKey = getStrainDAO().getStrain(strainRGDId).getKey();
-
-        Connection conn = null;
-        try {
-
-            conn =  this.getConnection();
-            String sql = "delete from rgd_qtl_strain where qtl_key=? and strain_key=? ";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1,qtlKey);
-            ps.setInt(2,strainKey);
-
-            ps.execute();
-        } finally {
-            try {
-               conn.close();
-            }catch (Exception ignored) {
-            }
-        }
+        update(sql, strainRgdId, qtlRgdId);
     }
 
     public void insertStrainToQTLAssociation(int strainRGDId, int qtlRGDId) throws Exception{
@@ -789,6 +773,42 @@ public class AssociationDAO extends AbstractDAO {
 
         return executeAssocQuery(query,  assocType);
     }
+
+    /**
+     * return active genomic elements for given master rgd id and association type
+     * @param masterRgdId master rgd id
+     * @param assocType association type
+     * @return list of GenomicElement objects; never null, but returned list could be empty
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<GenomicElement> getAssociatedGenomicElementsForMasterRgdId(int masterRgdId, String assocType) throws Exception {
+
+        String query = "SELECT ge.*,r.* "+
+                "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
+                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND ge.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
+        return execute(q, masterRgdId, assocType);
+    }
+
+    /**
+     * return active genomic elements for given master rgd id, association type and subtype
+     * @param masterRgdId master rgd id
+     * @param assocType association type
+     * @param assocSubType association subtype
+     * @return list of GenomicElement objects; never null, but returned list could be empty
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<GenomicElement> getAssociatedGenomicElementsForMasterRgdId(int masterRgdId, String assocType, String assocSubType) throws Exception {
+
+        String query = "SELECT ge.*,r.* "+
+                "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
+                "WHERE a.master_rgd_id=? AND a.assoc_type=? AND a.assoc_subtype=? AND ge.rgd_id=detail_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
+        return execute(q, masterRgdId, assocType, assocSubType);
+    }
+
     /**
      * return active genomic elements for given detail rgd id and association type
      * @param detailRgdId detail rgd id
@@ -804,6 +824,24 @@ public class AssociationDAO extends AbstractDAO {
 
         GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
         return execute(q, detailRgdId, assocType);
+    }
+
+    /**
+     * return active genomic elements for given detail rgd id, association type and subtype
+     * @param detailRgdId detail rgd id
+     * @param assocType association type
+     * @param assocSubType association subtype
+     * @return list of GenomicElement objects; never null, but returned list could be empty
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<GenomicElement> getAssociatedGenomicElementsForDetailRgdId(int detailRgdId, String assocType, String assocSubType) throws Exception {
+
+        String query = "SELECT ge.*,r.* "+
+                "FROM genomic_elements ge, rgd_associations a, rgd_ids r " +
+                "WHERE a.detail_rgd_id=? AND a.assoc_type=? AND a.assoc_subtype=? AND ge.rgd_id=master_rgd_id AND object_status='ACTIVE' AND ge.rgd_id=r.rgd_id";
+
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), query);
+        return execute(q, detailRgdId, assocType, assocSubType);
     }
 
     /**
