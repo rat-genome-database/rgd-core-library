@@ -25,9 +25,8 @@ public class OLGAParser {
         List newList = new ArrayList();
         ArrayList<String> urlParts = new ArrayList<String>();
 
-        HashMap<String, Object> allObjects = new HashMap<String, Object>();
+        HashMap<Integer, Object> allObjects = new HashMap<Integer, Object>();
 
-        int speciesType = SpeciesType.getSpeciesTypeKeyForMap(mapKey);
 
         if (!oql.equals("")) {
             String[] tmpArray = oql.split("\\|");
@@ -83,19 +82,19 @@ public class OLGAParser {
                 if (oKey == 1) {
                     while (it.hasNext()) {
                         Gene g = (Gene) it.next();
-                        allObjects.put(g.getSymbol(), g);
+                        allObjects.put(g.getRgdId(), g);
                     }
                 } else if (oKey == 6) {
                     //qtl
                     while (it.hasNext()) {
                         QTL q = (QTL) it.next();
-                        allObjects.put(q.getSymbol(), q);
+                        allObjects.put(q.getRgdId(), q);
                     }
                 } else if (oKey == 5) {
                     //strain
                     while (it.hasNext()) {
                         Strain s = (Strain) it.next();
-                        allObjects.put(s.getSymbol(), s);
+                        allObjects.put(s.getRgdId(), s);
                     }
 
                 }
@@ -136,12 +135,13 @@ public class OLGAParser {
 
         }
 
+        System.out.println(allObjects.keySet());
 
-        Iterator it = newList.iterator();
+        Iterator it = allObjects.keySet().iterator();
         HashMap seen = new HashMap();
 
         while (it.hasNext()) {
-            String gene = (String) it.next();
+            Integer gene = (Integer) it.next();
 
             if (!seen.containsKey(gene)) {
                 or.resultSet.put(gene, allObjects.get(gene));
