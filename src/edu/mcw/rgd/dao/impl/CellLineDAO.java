@@ -26,6 +26,29 @@ public class CellLineDAO extends GenomicElementDAO {
         return execute(q, srcPipeline);
     }
 
+    /**
+     * get a subset of active cell lines for paging scenario
+     * @param pageNr page number
+     * @param pageSize page size
+     * @return List of CellLine objects
+     * @throws Exception
+     */
+    public List<CellLine> getActiveCellLines(int pageNr, int pageSize) throws Exception {
+
+        int firstRow = 1 + pageNr*pageSize;
+        int lastRow = (1+pageNr)*pageSize;
+
+        String query = "SELECT * FROM (\n" +
+            " SELECT g.symbol,g.name,g.object_type,g.description,g.notes,g.source,g.so_acc_id,g.genomic_alteration,r.species_type_key,r.object_status,r.object_key,c.*,row_number() over (order by g.symbol asc) rn\n" +
+            " FROM rgd_ids r,genomic_elements g,cell_lines c\n" +
+            " WHERE r.rgd_id=g.rgd_id AND g.rgd_id=c.rgd_id AND object_status='ACTIVE'\n" +
+            ") WHERE rn BETWEEN ? AND ?";
+        CellLineQuery q = new CellLineQuery(this.getDataSource(), query);
+        return execute(q, firstRow, lastRow);
+    }
+
+
+
     public CellLine getCellLine(int rgdId) throws Exception {
 
         String query = "SELECT g.*,r.*,c.* FROM rgd_ids r,genomic_elements g,cell_lines c "+
