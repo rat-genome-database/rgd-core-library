@@ -6,8 +6,12 @@ import edu.mcw.rgd.dao.spring.StrainStatusQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.process.Utils;
+import org.springframework.jdbc.object.BatchSqlUpdate;
+import org.springframework.jdbc.object.SqlUpdate;
 
 import java.util.List;
+import java.io.InputStream;
+import java.sql.*;
 
 /**
  * DAO code to query and update STRAINS table
@@ -206,6 +210,45 @@ public class StrainDAO extends AbstractDAO {
                 strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getRgdId());
     }
 
+    /**
+     * insert new strain attachment
+     *
+     * @throws Exception
+     */
+    public void insertStrainAttachment(int strainId,String type,InputStream data,String desc) throws Exception{
+
+        String sql = "insert into strain_files(strain_id,file_type,file_data,description) values (?,?,?,?) ";
+        Connection conn = null;
+        PreparedStatement stmt;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1,strainId);
+        stmt.setString(2,type);
+        stmt.setBlob(3,data);
+        stmt.setString(4,desc);
+        stmt.execute();
+        conn.close();
+    }
+
+    public Blob getStrainAttachment(int rgdId, String type) throws Exception {
+        String sql = "select file_data from strain_files where strain_id = ? and file_type = ?";
+        Connection conn = null;
+        PreparedStatement stmt;
+        ResultSet rs;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1,rgdId);
+        stmt.setString(2,type);
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            Blob data = rs.getBlob("file_data");
+            return data;
+        }
+        rs.close();
+        stmt.close();
+        conn.close();
+        return null;
+    }
     public List<Strain> getStrainsByGroupId(int strain_group_id,int speciesTypeKey) throws Exception {
         String sql= "select s.*, ? as species_type_key from STRAINS s,ont_terms o,PHENOMINER_STRAIN_GROUP p "+
                 "where p.strain_group_id=? and p.strain_ont_id = o.term_acc and s.STRAIN_SYMBOL = o.term";
