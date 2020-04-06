@@ -133,8 +133,8 @@ public class AbstractDAO implements DAO {
      * @return db user name and url
      */
     public String getConnectionInfo() {
-        try {
-            DatabaseMetaData meta = getConnection().getMetaData();
+        try( Connection conn = getConnection() ) {
+            DatabaseMetaData meta = conn.getMetaData();
             return "DB user="+meta.getUserName()+", url="+meta.getURL();
         }
         catch( Exception e ) {
