@@ -215,9 +215,9 @@ public class StrainDAO extends AbstractDAO {
      *
      * @throws Exception
      */
-    public void insertStrainAttachment(int strainId,String type,InputStream data,String desc) throws Exception{
+    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType) throws Exception{
 
-        String sql = "insert into strain_files(strain_id,file_type,file_data,description) values (?,?,?,?) ";
+        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type) values (?,?,?,?) ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
@@ -225,11 +225,14 @@ public class StrainDAO extends AbstractDAO {
         stmt.setInt(1,strainId);
         stmt.setString(2,type);
         stmt.setBlob(3,data);
-        stmt.setString(4,desc);
+        stmt.setString(4,contentType);
         stmt.execute();
         conn.close();
     }
-
+    public String getContentType(int rgdId,String type) throws Exception{
+        String sql ="select content_type from strain_files where strain_id = ? and file_type = ?";
+        return getStringResult(sql,rgdId,type);
+    }
     public Blob getStrainAttachment(int rgdId, String type) throws Exception {
         String sql = "select file_data from strain_files where strain_id = ? and file_type = ?";
         Connection conn = null;
