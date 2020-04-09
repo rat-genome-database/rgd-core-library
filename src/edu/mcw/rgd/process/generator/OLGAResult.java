@@ -16,7 +16,7 @@ public class OLGAResult {
     ArrayList<String> operators = new ArrayList<String>();
     ArrayList<String> accIds = new ArrayList<String>();
     ArrayList<ArrayList<String>> objectSymbols = new ArrayList<ArrayList<String>>();
-    LinkedHashMap<Integer, Object> resultSet = new LinkedHashMap<Integer, Object>();
+    LinkedHashMap<String, Object> resultSet = new LinkedHashMap<String, Object>();
     HashMap exclude = new HashMap();
     int oKey;
     ObjectMapper om = new ObjectMapper();
@@ -40,7 +40,7 @@ public class OLGAResult {
         return objectSymbols;
     }
 
-    public LinkedHashMap<Integer, Object> getResultSet() {
+    public LinkedHashMap<String, Object> getResultSet() {
         return resultSet;
     }
 
