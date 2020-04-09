@@ -3,12 +3,7 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
-import edu.mcw.rgd.dao.spring.VariantMapper;
-import edu.mcw.rgd.datamodel.*;
-import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.object.BatchSqlUpdate;
 
-import java.sql.*;
 import java.util.*;
 
 /**
@@ -25,9 +20,9 @@ public class VariantSampleGroupDAO extends AbstractDAO {
     }
 
     public List<Integer> getVariantSamples(String groupName) throws Exception {
-        String sql = "select * from variant_sample_group where group_name=" + groupName;
+        String sql = "select * from variant_sample_group where group_name='" + groupName + "'";
         IntListQuery il = new IntListQuery(this.getDataSource(),sql);
-        return (List<Integer>) il.execute();
+        return il.execute();
 
     }
 
