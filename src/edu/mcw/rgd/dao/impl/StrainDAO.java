@@ -229,6 +229,20 @@ public class StrainDAO extends AbstractDAO {
         stmt.execute();
         conn.close();
     }
+    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType) throws Exception{
+
+        String sql = "update strain_files set file_data =?,content_type=? where strain_id = ? and file_type= ? ";
+        Connection conn = null;
+        PreparedStatement stmt;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setBlob(1,data);
+        stmt.setString(2,contentType);
+        stmt.setInt(3,strainId);
+        stmt.setString(4,type);
+         stmt.execute();
+        conn.close();
+    }
     public String getContentType(int rgdId,String type) throws Exception{
         String sql ="select content_type from strain_files where strain_id = ? and file_type = ?";
         return getStringResult(sql,rgdId,type);
