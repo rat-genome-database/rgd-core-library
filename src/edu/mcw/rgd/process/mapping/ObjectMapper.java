@@ -318,12 +318,14 @@ public class ObjectMapper {
             }
 
 
-            List<IndexRow> lst1 = sdao.findGenomicObject(symbol, speciesTypeKey);
-            List<IndexRow> lst = new ArrayList<IndexRow>();
-            if (lst1.size() > 1) {
-                for (IndexRow row: lst1) {
+            List<IndexRow> lst = sdao.findGenomicObject(symbol, speciesTypeKey);
+
+            if (lst.size() > 1) {
+                for (IndexRow row: lst) {
                     if (row.getDataType().equals("symbol")) {
+                        lst = new ArrayList<IndexRow>();
                         lst.add(row);
+                        break;
                     }
                 }
             }
