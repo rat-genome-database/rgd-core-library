@@ -19,8 +19,8 @@ public class VariantSampleGroupDAO extends AbstractDAO {
 
     public List<String> getAllSampleNames(int speciesTypeKey) throws Exception{
         String sql = "select distinct group_name from variant_sample_group";
-        StringListQuery sl = new StringListQuery();
-        return sl.execute(this.getDataSource(),sql);
+        StringListQuery sl = new StringListQuery(this.getDataSource(),sql);
+        return sl.execute();
 
     }
 
