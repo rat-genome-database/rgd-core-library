@@ -320,7 +320,7 @@ public class ObjectMapper {
 
             List<IndexRow> lst = sdao.findGenomicObject(symbol, speciesTypeKey);
 
-           /* if (lst.size() > 1) {
+            if (lst.size() > 1) {
                 for (IndexRow row: lst) {
                     if (row.getDataType().equals("symbol")) {
                         lst = new ArrayList<IndexRow>();
@@ -328,7 +328,7 @@ public class ObjectMapper {
                         break;
                     }
                 }
-            }*/
+            }
 
             for (IndexRow row: lst) {
                 String newSymbol="";
