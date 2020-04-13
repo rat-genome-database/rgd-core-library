@@ -215,9 +215,9 @@ public class StrainDAO extends AbstractDAO {
      *
      * @throws Exception
      */
-    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType) throws Exception{
+    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
 
-        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type) values (?,?,?,?) ";
+        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type,file_name) values (?,?,?,?,?) ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
@@ -226,25 +226,31 @@ public class StrainDAO extends AbstractDAO {
         stmt.setString(2,type);
         stmt.setBlob(3,data);
         stmt.setString(4,contentType);
+        stmt.setString(5,fileName);
         stmt.execute();
         conn.close();
     }
-    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType) throws Exception{
+    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
 
-        String sql = "update strain_files set file_data =?,content_type=? where strain_id = ? and file_type= ? ";
+        String sql = "update strain_files set file_data =?,content_type=?,file_name=? where strain_id = ? and file_type= ? ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
         stmt = conn.prepareStatement(sql);
         stmt.setBlob(1,data);
         stmt.setString(2,contentType);
-        stmt.setInt(3,strainId);
-        stmt.setString(4,type);
+        stmt.setString(3,fileName);
+        stmt.setInt(4,strainId);
+        stmt.setString(5,type);
          stmt.execute();
         conn.close();
     }
     public String getContentType(int rgdId,String type) throws Exception{
         String sql ="select content_type from strain_files where strain_id = ? and file_type = ?";
+        return getStringResult(sql,rgdId,type);
+    }
+    public String getFileName(int rgdId,String type) throws Exception{
+        String sql ="select file_name from strain_files where strain_id = ? and file_type = ?";
         return getStringResult(sql,rgdId,type);
     }
     public Blob getStrainAttachment(int rgdId, String type) throws Exception {
