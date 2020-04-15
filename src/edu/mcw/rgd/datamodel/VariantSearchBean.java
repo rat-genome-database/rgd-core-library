@@ -1157,6 +1157,7 @@ public class VariantSearchBean {
     public String[] getTableJoinSQL (String sqlFrom, boolean limit) {
 
         String vtTable = getVariantTranscriptTable(mapKey);
+        String polyTable = getPolyphenTable(mapKey);
         String sql = "";
 
 
@@ -1170,7 +1171,7 @@ public class VariantSearchBean {
 
             }
              if (this.hasPolyphen()) {
-                    sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+                    sql += " inner join "+polyTable+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
                     sqlFrom += ",p.* ";
                 }
 
@@ -1207,7 +1208,7 @@ public class VariantSearchBean {
             sql += " left outer join transcripts t on vt.transcript_rgd_id = t.transcript_rgd_id   ";
             sqlFrom += ",t.* ";
 
-            sql += " left outer join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
+            sql += " left outer join "+polyTable+" p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
 
             sql += " left outer join clinvar cv on (v.rgd_id=cv.rgd_id) ";
