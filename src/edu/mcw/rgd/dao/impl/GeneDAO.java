@@ -437,14 +437,12 @@ public class GeneDAO extends AbstractDAO {
 
     public List<MappedGene> getActiveMappedGenesBySpecies(int species, String chr) throws Exception {
         String query = "SELECT g.*, r.species_type_key, md.* \n" +
-                " FROM genes g, rgd_ids r, maps_data md\n" +
-                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id "+
-                " AND md.map_key=?" +
-                " and md.chromosome='" + chr + "'" +
+                "FROM genes g, rgd_ids r, maps_data md\n" +
+                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id"+
+                " AND md.map_key=? AND md.chromosome=?" +
                 " ORDER BY md.start_pos";
 
-        System.out.println(query);
-        return MappedGeneQuery.run(this, query,  MapManager.getInstance().getReferenceAssembly(species).getKey());
+        return MappedGeneQuery.run(this, query,  MapManager.getInstance().getReferenceAssembly(species).getKey(), chr);
     }
 
 
