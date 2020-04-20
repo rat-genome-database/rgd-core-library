@@ -73,6 +73,26 @@ public class GenomicElementDAO extends AbstractDAO {
         List<GenomicElement> list = execute(q, rgdId);
         return list.isEmpty() ? null : list.get(0);
     }
+    public List<GenomicElement> getElementsByRgdIds(List<Integer> rgdIds) throws Exception {
+
+        StringBuilder sql = new StringBuilder("SELECT ge.*,r.species_type_key,r.object_status,r.object_key " +
+                "FROM genomic_elements ge, rgd_ids r " +
+                "WHERE ge.rgd_id=r.rgd_id " +
+                " AND ge.rgd_id in ( ");
+        boolean first=true;
+        for(int rgdId:rgdIds){
+            if(first) {
+                sql.append(" ").append(rgdId);
+                first = false;
+            }else{
+                sql.append(", ").append(rgdId);
+            }
+        }
+        sql.append(")");
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), sql.toString());
+        return execute(q);
+
+    }
 
     /**
      * get GenomicElement object given its symbol and object type
