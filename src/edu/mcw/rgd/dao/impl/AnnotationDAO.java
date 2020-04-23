@@ -3,7 +3,6 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.Gene;
-import edu.mcw.rgd.datamodel.Portal;
 import edu.mcw.rgd.datamodel.annotation.Enrichment;
 import edu.mcw.rgd.datamodel.annotation.OntologyEnrichment;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
@@ -452,21 +451,6 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "UPDATE full_annot SET created_date=SYSDATE,last_modified_date=SYSDATE " +
                 "WHERE full_annot_key IN (" + Utils.buildInPhrase(fullAnnotKeys)+ " )";
         return update(sql);
-    }
-
-    /**
-     * get list of portal given list of ontology terms is associated with
-     * @param accIds list of accession ids
-     * @return list of portals
-     * @throws Exception on spring framework dao failure
-     */
-    public List<Portal> getPortals(List accIds) throws Exception {
-
-        String query = "SELECT * FROM portal_termset1 pt, portal1 p WHERE term_acc IN ("+
-            Utils.buildInPhraseQuoted(accIds) + ") AND pt.portal_key=p.portal_key";
-
-        PortalQuery q = new PortalQuery(this.getDataSource(), query);
-        return execute(q);
     }
 
     /**
