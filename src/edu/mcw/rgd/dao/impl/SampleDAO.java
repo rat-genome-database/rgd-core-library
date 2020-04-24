@@ -53,6 +53,29 @@ public class SampleDAO extends JdbcBaseDAO {
         return !samples.isEmpty() ? samples.get(0) : null;
     }
 
+    public List<Sample> getSampleBySampleId(List<Integer> sampleIds) {
+
+        String query = "SELECT * FROM sample WHERE sample_id in (";
+
+        boolean first = true;
+        for (Integer id: sampleIds) {
+            if (first) {
+                query = query + id;
+            }else {
+                query += "," + id;
+            }
+            first=false;
+        }
+        query += ") order by analysis_name";
+
+        System.out.println(query);
+
+        SampleQuery q = new SampleQuery(this.getDataSource(), query);
+        q.compile();
+        return q.execute();
+
+    }
+
     private List<Sample> runSamplesQuery(String query, int param) {
         SampleQuery q = new SampleQuery(this.getDataSource(), query);
         q.declareParameter(new SqlParameter(Types.INTEGER));
