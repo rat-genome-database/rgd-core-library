@@ -9,11 +9,8 @@ import edu.mcw.rgd.datamodel.VariantInfo;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 2/12/14
- * Time: 4:29 PM
- * <p>
+ * @author mtutaj
+ * @since 2/12/14
  * represents a row from CLINVAR+GENOMIC_ELEMENT+RGD_IDS table join
  */
 public class VariantInfoDAO extends GenomicElementDAO {
@@ -74,7 +71,7 @@ public class VariantInfoDAO extends GenomicElementDAO {
             "UPDATE clinvar "+
             "SET clinical_significance=?, date_last_evaluated=?, review_status=?, method_type=?, "+
             "    nucleotide_change=?, trait_name=?, age_of_onset=?, prevalence=?, molecular_consequence=?, "+
-            "    submitter=?"+
+            "    submitter=? "+
             "WHERE rgd_id=?";
 
         return r + update(sql,
