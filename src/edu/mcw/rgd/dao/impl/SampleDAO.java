@@ -37,12 +37,43 @@ public class SampleDAO extends JdbcBaseDAO {
                 "ORDER BY analysis_name";
         return runSamplesQuery(query, mapKey);
     }
+    public List<Sample> getSamplesByMapKey(int mapKey, String population) {
+        String query = "SELECT * FROM sample "+
+                "WHERE patient_id IN(SELECT patient_id FROM patient WHERE map_key=?) "+
+                " and (analysis_name != 'CDR' and analysis_name != 'CDS') " +
+                " and analysis_name like '"+ population+"%'" +
+                " ORDER BY analysis_name";
+        return runSamplesQuery(query, mapKey);
+    }
 
     public Sample getSampleBySampleId(int sampleId) {
 
         String query = "SELECT * FROM sample WHERE sample_id=?";
         List<Sample> samples = runSamplesQuery(query, sampleId);
         return !samples.isEmpty() ? samples.get(0) : null;
+    }
+
+    public List<Sample> getSampleBySampleId(List<Integer> sampleIds) {
+
+        String query = "SELECT * FROM sample WHERE sample_id in (";
+
+        boolean first = true;
+        for (Integer id: sampleIds) {
+            if (first) {
+                query = query + id;
+            }else {
+                query += "," + id;
+            }
+            first=false;
+        }
+        query += ") order by analysis_name";
+
+        System.out.println(query);
+
+        SampleQuery q = new SampleQuery(this.getDataSource(), query);
+        q.compile();
+        return q.execute();
+
     }
 
     private List<Sample> runSamplesQuery(String query, int param) {
