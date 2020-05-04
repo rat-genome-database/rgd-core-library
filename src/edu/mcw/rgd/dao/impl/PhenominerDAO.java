@@ -53,6 +53,26 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     *  Return all GEO studies
+     *  @return list of all studies
+     */
+    public List<Study> getGeoStudies(String species) throws Exception {
+
+        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' ORDER BY geo_accession_id desc";
+
+        GeoStudyQuery q = new GeoStudyQuery(this.getDataSource(), query);
+        List<Study> result = execute(q,species+"%");
+        HashMap r = new HashMap();
+        if(result != null) {
+            for(Study s:result){
+                r.put(s.getGeoSeriesAcc(),s);
+            }
+             return (List)r.values();
+        }
+
+        return null;
+    }
+    /**
      * get list of studies given list of study ids
      * <p>
      * Note: only first 1000 studies is returned, due to Oracle limitations
@@ -730,31 +750,6 @@ public class PhenominerDAO extends AbstractDAO {
         }
         return recordCountMap;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Returns ids of all records (annotations) associated with given term
