@@ -170,7 +170,39 @@ public class VariantSearchBean {
             return " variant ";
         }
     }
+    public String getVariantTable(int mapKey) {
 
+       if(mapKey==17 && isHuman()){
+          return  " variant_human";
+       }
+        if( isHuman() && mapKey!=17 ) {
+            return " variant_clinvar ";
+        }
+        else if( isDog() ) {
+            return " variant_dog ";
+        }
+        else if( isGenic() ) {
+            return " variant_genic ";
+        }else {
+            return " variant ";
+        }
+    }
+
+    public String getVariantTranscriptTable(int mapKey) {
+
+        if(mapKey==17&& isHuman() ) {
+            return " variant_transcript_human ";
+        }
+        if(mapKey!=17&& isHuman() ) {
+            return " variant_transcript_clinvar ";
+        }
+
+        else if( isDog() ) {
+            return " variant_transcript_dog ";
+        }else {
+            return " variant_transcript ";
+        }
+    }
     public String getVariantTranscriptTable() {
 
         if( isHuman() ) {
@@ -187,6 +219,16 @@ public class VariantSearchBean {
          if( isDog() ) {
             return " polyphen_dog ";
         }else {
+            return " polyphen ";
+        }
+    }
+    public String getPolyphenTable(int mapKey) {
+        if( isDog() ) {
+            return " polyphen_dog ";
+        }else {
+            if(mapKey==17 && isHuman()){
+                return " polyphen_human ";
+            }else
             return " polyphen ";
         }
     }
@@ -1114,7 +1156,8 @@ public class VariantSearchBean {
      */
     public String[] getTableJoinSQL (String sqlFrom, boolean limit) {
 
-        String vtTable = getVariantTranscriptTable();
+        String vtTable = getVariantTranscriptTable(mapKey);
+        String polyTable = getPolyphenTable(mapKey);
         String sql = "";
 
 
@@ -1128,7 +1171,7 @@ public class VariantSearchBean {
 
             }
              if (this.hasPolyphen()) {
-                    sql += " inner join polyphen p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+                    sql += " inner join "+polyTable+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
                     sqlFrom += ",p.* ";
                 }
 
@@ -1165,7 +1208,7 @@ public class VariantSearchBean {
             sql += " left outer join transcripts t on vt.transcript_rgd_id = t.transcript_rgd_id   ";
             sqlFrom += ",t.* ";
 
-            sql += " left outer join polyphen p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
+            sql += " left outer join "+polyTable+" p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
 
             sql += " left outer join clinvar cv on (v.rgd_id=cv.rgd_id) ";
