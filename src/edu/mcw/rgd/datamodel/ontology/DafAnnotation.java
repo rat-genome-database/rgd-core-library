@@ -26,9 +26,9 @@ public class DafAnnotation {
     private String createdDate;
     // array of data providers; every data provider is a hashmap; currently it is:
     // "type" : "curated" or "loaded"
-    // hashmap of:
+    // "crossReference" hashmap of:
     //   "id": "OMIM:xxx" or "DOID:xxx" etc
-    //   "pages: array of ["page1_name", "page2_name", ...]
+    //   "pages": array of ["page1_name", "page2_name", ...]
     private List<HashMap> dataProviders;
 
     public String getTaxon() {
