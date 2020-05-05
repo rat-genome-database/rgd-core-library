@@ -1,7 +1,7 @@
 package edu.mcw.rgd.datamodel.ontology;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author mtutaj
@@ -29,7 +29,7 @@ public class DafAnnotation {
     // hashmap of:
     //   "id": "OMIM:xxx" or "DOID:xxx" etc
     //   "pages: array of ["page1_name", "page2_name", ...]
-    private List<Map> dataProviders;
+    private List<HashMap> dataProviders;
 
     public String getTaxon() {
         return taxon;
@@ -143,11 +143,11 @@ public class DafAnnotation {
         this.createdDate = createdDate;
     }
 
-    public List<Map> getDataProviders() {
+    public List<HashMap> getDataProviders() {
         return dataProviders;
     }
 
-    public void setDataProviders(List<Map> dataProviders) {
+    public void setDataProviders(List<HashMap> dataProviders) {
         this.dataProviders = dataProviders;
     }
 }
