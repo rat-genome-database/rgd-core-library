@@ -337,7 +337,7 @@ public class RGDManagementDAO extends AbstractDAO {
      */
     public RgdId createRgdId(int objectKey, String objectStatus, String notes, int speciesTypeKey) throws Exception {
 
-        int rgdId = this.getNextKey("rgd_ids", "rgd_id");
+        int rgdId = this.getNextKeyFromSequence("rgd_ids_seq");
 
         // references do not have species type key defined;
         // by specifying 0, foreign key will be violated, because there is no species with species_type_key=0
