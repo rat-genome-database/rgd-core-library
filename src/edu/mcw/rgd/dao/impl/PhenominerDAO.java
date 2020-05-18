@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.GeoRecord;
 import edu.mcw.rgd.datamodel.HistogramRecord;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
@@ -56,22 +57,29 @@ public class PhenominerDAO extends AbstractDAO {
      *  Return all GEO studies
      *  @return list of all studies
      */
-    public HashMap<String,Study> getGeoStudies(String species) throws Exception {
+    public HashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
 
-        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' ORDER BY geo_accession_id desc";
+        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY geo_accession_id desc";
 
-        GeoStudyQuery q = new GeoStudyQuery(this.getDataSource(), query);
-        List<Study> result = execute(q,species+"%");
+        GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
+        List<GeoRecord> result = execute(q,species+"%",status);
         HashMap r = new HashMap();
         List<String> studyList = new ArrayList<>();
         if(result != null) {
-            for(Study s:result){
-                r.put(s.getGeoSeriesAcc(),s);
+            for(GeoRecord s:result){
+                r.put(s.getGeoAccessionId(),s);
             }
              return r;
         }
 
         return null;
+    }
+
+    public void updateGeoStudyStatus(String gse,String status) throws Exception{
+
+        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =?";
+        update(query, status,gse);
+
     }
     /**
      * get list of studies given list of study ids
@@ -1314,6 +1322,22 @@ public class PhenominerDAO extends AbstractDAO {
 
         List<Sample> samples = sq.execute(id);
         return samples.get(0);
+    }
+    /**
+     * Return geo records based on an Geo  ID
+     * @param geoId
+     * @return
+     * @throws Exception
+     */
+    public List<GeoRecord> getGeoRecords(String  geoId) throws Exception {
+        String query = "SELECT * from rna_seq where geo_accession_id=?";
+
+        GeoRecordQuery sq = new GeoRecordQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        List<GeoRecord> records = sq.execute(geoId);
+        return records;
     }
 
 
