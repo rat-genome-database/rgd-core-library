@@ -6,8 +6,12 @@ import edu.mcw.rgd.dao.spring.StrainStatusQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.process.Utils;
+import org.springframework.jdbc.object.BatchSqlUpdate;
+import org.springframework.jdbc.object.SqlUpdate;
 
 import java.util.List;
+import java.io.InputStream;
+import java.sql.*;
 
 /**
  * DAO code to query and update STRAINS table
@@ -206,6 +210,68 @@ public class StrainDAO extends AbstractDAO {
                 strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getRgdId());
     }
 
+    /**
+     * insert new strain attachment
+     *
+     * @throws Exception
+     */
+    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
+
+        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type,file_name) values (?,?,?,?,?) ";
+        Connection conn = null;
+        PreparedStatement stmt;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1,strainId);
+        stmt.setString(2,type);
+        stmt.setBlob(3,data);
+        stmt.setString(4,contentType);
+        stmt.setString(5,fileName);
+        stmt.execute();
+        conn.close();
+    }
+    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
+
+        String sql = "update strain_files set file_data =?,content_type=?,file_name=? where strain_id = ? and file_type= ? ";
+        Connection conn = null;
+        PreparedStatement stmt;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setBlob(1,data);
+        stmt.setString(2,contentType);
+        stmt.setString(3,fileName);
+        stmt.setInt(4,strainId);
+        stmt.setString(5,type);
+         stmt.execute();
+        conn.close();
+    }
+    public String getContentType(int rgdId,String type) throws Exception{
+        String sql ="select content_type from strain_files where strain_id = ? and file_type = ?";
+        return getStringResult(sql,rgdId,type);
+    }
+    public String getFileName(int rgdId,String type) throws Exception{
+        String sql ="select file_name from strain_files where strain_id = ? and file_type = ?";
+        return getStringResult(sql,rgdId,type);
+    }
+    public Blob getStrainAttachment(int rgdId, String type) throws Exception {
+        String sql = "select file_data from strain_files where strain_id = ? and file_type = ?";
+        Connection conn = null;
+        PreparedStatement stmt;
+        ResultSet rs;
+        conn = this.getDataSource().getConnection();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1,rgdId);
+        stmt.setString(2,type);
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            Blob data = rs.getBlob("file_data");
+            return data;
+        }
+        rs.close();
+        stmt.close();
+        conn.close();
+        return null;
+    }
     public List<Strain> getStrainsByGroupId(int strain_group_id,int speciesTypeKey) throws Exception {
         String sql= "select s.*, ? as species_type_key from STRAINS s,ont_terms o,PHENOMINER_STRAIN_GROUP p "+
                 "where p.strain_group_id=? and p.strain_ont_id = o.term_acc and s.STRAIN_SYMBOL = o.term";
