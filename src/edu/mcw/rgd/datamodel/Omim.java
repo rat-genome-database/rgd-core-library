@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel;
 
+import edu.mcw.rgd.process.Utils;
+
 import java.util.Date;
 
 /**
@@ -12,30 +14,28 @@ public class Omim {
     private String status; // 'live', etc
     private String mimType; // 'gene','phenotype', etc
     private String phenotype; // if available
+    private String approvedGeneSymbols; // HGNC approved gene symbols
     private Date createdDate;
     private Date lastModifiedDate;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        Omim o = (Omim) obj;
 
-        Omim omim = (Omim) o;
-
-        if (!mimNumber.equals(omim.mimNumber)) return false;
-        if (!status.equals(omim.status)) return false;
-        if (!mimType.equals(omim.mimType)) return false;
-        return phenotype.equals(omim.phenotype);
-
+        return Utils.stringsAreEqual(mimNumber, o.mimNumber)
+            && Utils.stringsAreEqual(status, o.status)
+            && Utils.stringsAreEqual(mimType, o.mimType)
+            && Utils.stringsAreEqual(phenotype, o.phenotype)
+            && Utils.stringsAreEqual(approvedGeneSymbols, o.approvedGeneSymbols);
     }
 
     @Override
     public int hashCode() {
-        int result = mimNumber.hashCode();
-        result = 31 * result + status.hashCode();
-        result = 31 * result + mimType.hashCode();
-        result = 31 * result + phenotype.hashCode();
-        return result;
+        return Utils.defaultString(mimNumber).hashCode()
+            ^ Utils.defaultString(status).hashCode()
+            ^ Utils.defaultString(mimType).hashCode()
+            ^ Utils.defaultString(phenotype).hashCode()
+            ^ Utils.defaultString(approvedGeneSymbols).hashCode();
     }
 
     public String getMimNumber() {
@@ -68,6 +68,14 @@ public class Omim {
 
     public void setPhenotype(String phenotype) {
         this.phenotype = phenotype;
+    }
+
+    public String getApprovedGeneSymbols() {
+        return approvedGeneSymbols;
+    }
+
+    public void setApprovedGeneSymbols(String approvedGeneSymbols) {
+        this.approvedGeneSymbols = approvedGeneSymbols;
     }
 
     public Date getCreatedDate() {
