@@ -75,10 +75,10 @@ public class PhenominerDAO extends AbstractDAO {
         return null;
     }
 
-    public void updateGeoStudyStatus(String gse,String status) throws Exception{
+    public void updateGeoStudyStatus(String gse,String status,String species) throws Exception{
 
-        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =?";
-        update(query, status,gse);
+        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =? and sample_organism like ? ";
+        update(query, status,gse,species+"%");
 
     }
     /**
@@ -1329,14 +1329,15 @@ public class PhenominerDAO extends AbstractDAO {
      * @return
      * @throws Exception
      */
-    public List<GeoRecord> getGeoRecords(String  geoId) throws Exception {
-        String query = "SELECT * from rna_seq where geo_accession_id=?";
+    public List<GeoRecord> getGeoRecords(String  geoId,String species) throws Exception {
+        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ?";
 
         GeoRecordQuery sq = new GeoRecordQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
         sq.compile();
 
-        List<GeoRecord> records = sq.execute(geoId);
+        List<GeoRecord> records = sq.execute(geoId,species+"%");
         return records;
     }
 
