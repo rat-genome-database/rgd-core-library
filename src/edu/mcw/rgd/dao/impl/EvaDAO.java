@@ -29,12 +29,14 @@ public class EvaDAO extends AbstractDAO{
         String sql = "DELETE FROM EVA WHERE EVA_ID=?";
         return update(sql, EvaKey);
     }
-    public void deleteEvaBatch(Collection<Eva> tobeDeleted) throws Exception {
+    public int deleteEvaBatch(Collection<Eva> tobeDeleted) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM EVA WHERE EVA_ID=?",
                 new int[] {Types.INTEGER});
 
         for(Eva eva : tobeDeleted)
             su.update(eva.getEvaId());
+
+        return executeBatch(su);
     }
     public int insertEva(Collection<Eva> tobeInserted) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO EVA (EVA_ID, CHROMOSOME, POS, RS_ID, " +
