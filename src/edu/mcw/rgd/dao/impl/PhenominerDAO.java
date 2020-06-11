@@ -1199,11 +1199,11 @@ public class PhenominerDAO extends AbstractDAO {
     public void updateSample(Sample s) throws Exception{
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
-                "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, subcell_component_ont_id=?, "+
+                "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
                 "geo_sample_acc=?, biosample_id=? WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
-                s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getSubcellComponentAccId(), s.getGeoSampleAcc(),
+                s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
                 s.getBioSampleId(), s.getId());
     }
 
@@ -1324,6 +1324,24 @@ public class PhenominerDAO extends AbstractDAO {
         return samples.get(0);
     }
     /**
+     * Return a sample based on an Geo Sample ID
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Sample getSampleByGeoId(String  id) throws Exception {
+        String query = "SELECT * from sample where geo_sample_acc=?";
+
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        List<Sample> samples = sq.execute(id);
+        if(samples.size() != 0)
+            return samples.get(0);
+        else return null;
+    }
+    /**
      * Return geo records based on an Geo  ID
      * @param geoId
      * @return
@@ -1354,11 +1372,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "subcell_component_ont_id, geo_sample_acc, biosample_id, sample_id) "+
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id) "+
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
-                s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getSubcellComponentAccId(),
+                s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
                 s.getGeoSampleAcc(), s.getBioSampleId(), next);
         return next;
     }
