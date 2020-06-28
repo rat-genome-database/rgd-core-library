@@ -25,6 +25,7 @@ public class EvaQuery extends MappingSqlQuery {
         eva.setRsid(rs.getString("RS_ID"));
         eva.setRefnuc(rs.getString("REF_NUC"));
         eva.setVarnuc(rs.getString("VAR_NUC"));
+        eva.setPadBase(rs.getString("PADDING_BASE"));
         eva.setSoterm(rs.getString("SO_TERM_ACC"));
         eva.setMapkey(rs.getInt("MAP_KEY"));
 
