@@ -1560,7 +1560,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         xref.setKey(this.getNextKey("ont_xrefs_seq"));
 
-        String sql = "INSERT INTO ont_xrefs(xref_key,term_acc,xref_type,xref_value,xref_description) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO ont_xrefs(xref_key,term_acc,xref_value,xref_description) VALUES(?,?,?,?)";
         return update(sql, xref.getKey(), xref.getTermAcc(), xref.getXrefValue(), xref.getXrefDescription());
     }
 
