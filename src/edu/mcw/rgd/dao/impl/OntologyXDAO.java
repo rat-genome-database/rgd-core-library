@@ -1560,8 +1560,8 @@ public class OntologyXDAO extends AbstractDAO {
 
         xref.setKey(this.getNextKey("ont_xrefs_seq"));
 
-        String sql = "INSERT INTO ont_xrefs(xref_key,term_acc,xref_type,xref_value,xref_description) VALUES(?,?,?,?,?)";
-        return update(sql, xref.getKey(), xref.getTermAcc(), xref.getXrefType(), xref.getXrefValue(), xref.getXrefDescription());
+        String sql = "INSERT INTO ont_xrefs(xref_key,term_acc,xref_type,xref_value,xref_description) VALUES(?,?,?,?)";
+        return update(sql, xref.getKey(), xref.getTermAcc(), xref.getXrefValue(), xref.getXrefDescription());
     }
 
     public int deleteTermXRef(TermXRef xref) throws Exception {
@@ -1572,8 +1572,8 @@ public class OntologyXDAO extends AbstractDAO {
 
     public int updateTermXRef(TermXRef xref) throws Exception {
 
-        String sql = "UPDATE ont_xrefs SET term_acc=?,xref_type=?,xref_value=?,xref_description=? WHERE xref_key=?";
-        return update(sql, xref.getTermAcc(), xref.getXrefType(), xref.getXrefValue(), xref.getXrefDescription(), xref.getKey());
+        String sql = "UPDATE ont_xrefs SET term_acc=?,xref_value=?,xref_description=? WHERE xref_key=?";
+        return update(sql, xref.getTermAcc(), xref.getXrefValue(), xref.getXrefDescription(), xref.getKey());
     }
 
     public int updateTermXRefDescription(TermXRef xref) throws Exception {

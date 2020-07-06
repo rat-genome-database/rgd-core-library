@@ -4,17 +4,14 @@ import edu.mcw.rgd.datamodel.Dumpable;
 import edu.mcw.rgd.process.Dumper;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 8/21/13
- * Time: 12:30 PM
+ * @author mtutaj
+ * @since 8/21/13
  * represent a dbxref for term definition
  */
 public class TermXRef implements Dumpable {
 
     private int key;
     private String termAcc;
-    private String xrefType;
     private String xrefValue;
     private String xrefDescription;
 
@@ -26,7 +23,6 @@ public class TermXRef implements Dumpable {
         TermXRef termXRef = (TermXRef) o;
 
         if (termAcc != null ? !termAcc.equals(termXRef.termAcc) : termXRef.termAcc != null) return false;
-        if (xrefType != null ? !xrefType.equals(termXRef.xrefType) : termXRef.xrefType != null) return false;
         if (xrefValue != null ? !xrefValue.equals(termXRef.xrefValue) : termXRef.xrefValue != null) return false;
 
         return true;
@@ -35,7 +31,6 @@ public class TermXRef implements Dumpable {
     @Override
     public int hashCode() {
         int result = termAcc != null ? termAcc.hashCode() : 0;
-        result = 31 * result + (xrefType != null ? xrefType.hashCode() : 0);
         result = 31 * result + (xrefValue != null ? xrefValue.hashCode() : 0);
         return result;
     }
@@ -46,10 +41,6 @@ public class TermXRef implements Dumpable {
         if( termAcc!=null ) {
             buf.append(termAcc).append(" ");
         }
-        if( xrefType!=null ) {
-            buf.append(xrefType);
-        }
-        buf.append(":");
         if( xrefValue!=null ) {
             buf.append(xrefValue);
         }
@@ -64,7 +55,6 @@ public class TermXRef implements Dumpable {
         return new Dumper(delimiter)
             .put("XREF_KEY", key)
             .put("TERM_ACC", termAcc)
-            .put("XREF_TYPE", xrefType)
             .put("XREF_VALUE", xrefValue)
             .put("XREF_DESC", xrefDescription)
             .dump();
@@ -84,14 +74,6 @@ public class TermXRef implements Dumpable {
 
     public void setTermAcc(String termAcc) {
         this.termAcc = termAcc;
-    }
-
-    public String getXrefType() {
-        return xrefType;
-    }
-
-    public void setXrefType(String xrefType) {
-        this.xrefType = xrefType;
     }
 
     public String getXrefValue() {
