@@ -228,12 +228,13 @@ public class StrainDAO extends AbstractDAO {
         stmt.setString(4,contentType);
         stmt.setString(5,fileName);
         stmt.setString(6,login);
+
         stmt.execute();
         conn.close();
     }
     public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
-        String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ? where strain_id = ? and file_type= ? ";
+        String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ?,last_modified_date = sysdate where strain_id = ? and file_type= ? ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
