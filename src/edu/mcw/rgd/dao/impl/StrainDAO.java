@@ -1,10 +1,12 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.StrainFilesQuery;
 import edu.mcw.rgd.dao.spring.StrainQuery;
 import edu.mcw.rgd.dao.spring.StrainStatusQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Strain;
+import edu.mcw.rgd.datamodel.StrainFiles;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 import org.springframework.jdbc.object.SqlUpdate;
@@ -78,6 +80,16 @@ public class StrainDAO extends AbstractDAO {
         return executeStrainQuery(query);
     }
 
+
+    /**
+     * get list of all strain files
+     * @return list of strain files
+     * @throws Exception when something really bad happens in spring framework
+     */
+    public List<StrainFiles> getStrainFiles() throws Exception{
+        String query = "SELECT * FROM STRAIN_FILES";
+        return StrainFilesQuery.execute(this, query);
+    }
 
 
     /**
