@@ -29,7 +29,7 @@ public class PhenoSampleQuery extends MappingSqlQuery {
         s.setStrainAccId(rs.getString("strain_ont_id"));
         s.setTissueAccId(rs.getString("tissue_ont_id"));
         s.setCellTypeAccId(rs.getString("cell_type_ont_id"));
-        s.setSubcellComponentAccId(rs.getString("subcell_component_ont_id"));
+        s.setCellLineId(rs.getString("cellLine_id"));
         s.setGeoSampleAcc(rs.getString("geo_sample_acc"));
         s.setBioSampleId(rs.getString("biosample_id"));
 

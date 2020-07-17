@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.GeoRecord;
 import edu.mcw.rgd.datamodel.HistogramRecord;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
@@ -52,6 +53,34 @@ public class PhenominerDAO extends AbstractDAO {
         return execute(q);
     }
 
+    /**
+     *  Return all GEO studies
+     *  @return list of all studies
+     */
+    public HashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
+
+        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY geo_accession_id desc";
+
+        GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
+        List<GeoRecord> result = execute(q,species+"%",status);
+        HashMap r = new HashMap();
+        List<String> studyList = new ArrayList<>();
+        if(result != null) {
+            for(GeoRecord s:result){
+                r.put(s.getGeoAccessionId(),s);
+            }
+             return r;
+        }
+
+        return null;
+    }
+
+    public void updateGeoStudyStatus(String gse,String status,String species) throws Exception{
+
+        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =? and sample_organism like ? ";
+        update(query, status,gse,species+"%");
+
+    }
     /**
      * get list of studies given list of study ids
      * <p>
@@ -731,31 +760,6 @@ public class PhenominerDAO extends AbstractDAO {
         return recordCountMap;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Returns ids of all records (annotations) associated with given term
      * @param accId term accession id; must belong to one of the following ontologies: 'RS,'CS','MMO','CMO','XCO'
@@ -1195,11 +1199,11 @@ public class PhenominerDAO extends AbstractDAO {
     public void updateSample(Sample s) throws Exception{
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
-                "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, subcell_component_ont_id=?, "+
+                "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
                 "geo_sample_acc=?, biosample_id=? WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
-                s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getSubcellComponentAccId(), s.getGeoSampleAcc(),
+                s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
                 s.getBioSampleId(), s.getId());
     }
 
@@ -1319,6 +1323,41 @@ public class PhenominerDAO extends AbstractDAO {
         List<Sample> samples = sq.execute(id);
         return samples.get(0);
     }
+    /**
+     * Return a sample based on an Geo Sample ID
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Sample getSampleByGeoId(String  id) throws Exception {
+        String query = "SELECT * from sample where geo_sample_acc=?";
+
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        List<Sample> samples = sq.execute(id);
+        if(samples.size() != 0)
+            return samples.get(0);
+        else return null;
+    }
+    /**
+     * Return geo records based on an Geo  ID
+     * @param geoId
+     * @return
+     * @throws Exception
+     */
+    public List<GeoRecord> getGeoRecords(String  geoId,String species) throws Exception {
+        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ?";
+
+        GeoRecordQuery sq = new GeoRecordQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        List<GeoRecord> records = sq.execute(geoId,species+"%");
+        return records;
+    }
 
 
     /**
@@ -1333,11 +1372,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "subcell_component_ont_id, geo_sample_acc, biosample_id, sample_id) "+
+                "cellLine_id, geo_sample_acc, biosample_id, sample_id) "+
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
-                s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getSubcellComponentAccId(),
+                s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
                 s.getGeoSampleAcc(), s.getBioSampleId(), next);
         return next;
     }
