@@ -1372,7 +1372,7 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cellLine_id, geo_sample_acc, biosample_id, sample_id) "+
+                "cell_Line_id, geo_sample_acc, biosample_id, sample_id) "+
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
