@@ -8,10 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Apr 13, 2011
- * Time: 9:57:23 AM
+ * @author mtutaj
+ * @since Apr 13, 2011
  * query to browse ONT_XREFS table
  */
 public class TermXRefQuery extends MappingSqlQuery {
@@ -26,7 +24,6 @@ public class TermXRefQuery extends MappingSqlQuery {
         obj.setKey(rs.getInt("xref_key"));
         obj.setTermAcc(rs.getString("term_acc"));
         obj.setXrefValue(rs.getString("xref_value"));
-        obj.setXrefType(rs.getString("xref_type"));
         obj.setXrefDescription(rs.getString("xref_description"));
         return obj;
     }

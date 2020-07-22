@@ -643,18 +643,15 @@ public class MapDAO extends AbstractDAO {
      * get positions of given DB_SNP for given assembly
      * @param rsId DB_SNP rsId, like 'rs8143345'
      * @param mapKey map key
-     * @return list of map positions for this DB_SNP on the specified assembly
+     * @return list of map positions for this DB_SNP on the specified assembly (chromosome and position)
      * @throws Exception when something really bad happens
      */
-    public List<MapData> getDbSnpPositions(String rsId, int mapKey) throws Exception {
+    public List<IntStringMapQuery.MapPair> getDbSnpPositions(String rsId, int mapKey) throws Exception {
 
-        String query = "SELECT DISTINCT 0 maps_data_key,NULL f_or_p,chromosome,NULL fish_band,NULL abs_position,\n" +
-            "  NULL lod,NULL notes,d.map_key,NULL rgd_id,NULL rgd_id_up,NULL rgd_id_dw,position start_pos,position stop_pos,\n" +
-            "  NULL multiple_chromosome,NULL strand,NULL maps_data_position_method_id,NULL src_pipeline\n" +
-            "FROM db_snp d,maps m\n" +
+        String query = "SELECT DISTINCT d.position,d.chromosome FROM db_snp d,maps m " +
             "WHERE d.snp_name=? AND m.map_key=d.map_key AND m.dbsnp_version=d.source AND m.map_key=?";
 
-        return executeMapDataQuery(query, rsId, mapKey);
+        return IntStringMapQuery.execute(this, query, rsId, mapKey);
     }
 
 

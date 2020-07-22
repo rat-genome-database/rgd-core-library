@@ -15,7 +15,7 @@ public class Sample {
     private String strainAccId;
     private String tissueAccId;
     private String cellTypeAccId;
-    private String subcellComponentAccId;
+    private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
 
@@ -91,12 +91,12 @@ public class Sample {
         this.cellTypeAccId = cellTypeAccId;
     }
 
-    public String getSubcellComponentAccId() {
-        return subcellComponentAccId;
+    public String getCellLineId() {
+        return cellLineId;
     }
 
-    public void setSubcellComponentAccId(String subcellComponentAccId) {
-        this.subcellComponentAccId = subcellComponentAccId;
+    public void setCellLineId(String cellLineId) {
+        this.cellLineId = cellLineId;
     }
 
     public String getGeoSampleAcc() {

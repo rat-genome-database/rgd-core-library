@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel;
 
+import edu.mcw.rgd.process.Utils;
+
 import java.util.Date;
 
 /**
@@ -25,8 +27,7 @@ public class Omim {
         if (!mimNumber.equals(omim.mimNumber)) return false;
         if (!status.equals(omim.status)) return false;
         if (!mimType.equals(omim.mimType)) return false;
-        return phenotype.equals(omim.phenotype);
-
+        return Utils.stringsAreEqual(phenotype, omim.phenotype);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class Omim {
         int result = mimNumber.hashCode();
         result = 31 * result + status.hashCode();
         result = 31 * result + mimType.hashCode();
-        result = 31 * result + phenotype.hashCode();
+        result = 31 * result + Utils.defaultString(phenotype).hashCode();
         return result;
     }
 

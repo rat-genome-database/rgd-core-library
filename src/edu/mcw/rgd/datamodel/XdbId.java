@@ -28,12 +28,12 @@ public class XdbId implements Identifiable, Dumpable {
 
     // some commonly used XDB_KEYs (taken from RGD_XDB database)
     static public final int XDB_KEY_BIND = 19;
+    static public final int XDB_KEY_CELLOSAURUS = 128;
     static public final int XDB_KEY_COSMIC = 45;
     static public final int XDB_KEY_ENSEMBL_GENES = 20;
     static public final int XDB_KEY_ENSEMBL_PROTEIN = 27;
     static public final int XDB_KEY_ENSEMBL_TRANSCRIPT = 42;
     static public final int XDB_KEY_ENTREZGENE = 3;
-    static public final int XDB_KEY_GDB = 12;
     static public final int XDB_KEY_GENE3D = 39;
     static public final int XDB_KEY_GENEBANKNU = 1;
     static public final int XDB_KEY_GENEBANKPROT = 7;
@@ -45,7 +45,6 @@ public class XdbId implements Identifiable, Dumpable {
     static public final int XDB_KEY_INTERPRO = 29;
     static public final int XDB_KEY_KEGGPATHWAY = 23;
     static public final int XDB_KEY_KEGGREPORT = 17;
-    static public final int XDB_KEY_MEDLINE = 13;
     static public final int XDB_KEY_MGCCLONE = 41;
     static public final int XDB_KEY_MGD = 5;
     static public final int XDB_KEY_MIRBASE = 58;

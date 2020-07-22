@@ -46,12 +46,14 @@ public class Eva {
         Eva e = (Eva)obj;
         return Utils.stringsAreEqual(chromosome, e.getChromosome()) && pos==e.getPos()
                 && Utils.stringsAreEqual(rsId,e.getRsId()) && Utils.stringsAreEqual(refNuc,e.getRefNuc())
-                && Utils.stringsAreEqual(varNuc, e.getVarNuc()) && Utils.stringsAreEqual(padBase, e.padBase);
+                && Utils.stringsAreEqual(varNuc, e.getVarNuc()) && Utils.stringsAreEqual(padBase, e.padBase)
+                && Utils.stringsAreEqualIgnoreCase(soTerm,e.soTerm);
     }
 
     @Override
     public int hashCode() {
         return getPos() ^ Utils.defaultString(chromosome).hashCode() ^ Utils.defaultString(rsId).hashCode()
-                ^ Utils.defaultString(refNuc).hashCode() ^ Utils.defaultString(varNuc).hashCode() ^ Utils.defaultString(padBase).hashCode();
+                ^ Utils.defaultString(refNuc).hashCode() ^ Utils.defaultString(varNuc).hashCode() ^
+                Utils.defaultString(padBase).hashCode() ^ Utils.defaultString(soTerm).hashCode();
     }
 }

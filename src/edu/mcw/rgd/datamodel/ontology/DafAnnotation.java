@@ -1,6 +1,7 @@
 package edu.mcw.rgd.datamodel.ontology;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author mtutaj
@@ -23,10 +24,12 @@ public class DafAnnotation {
     private String evidenceCode;
     private String dbReference;
     private String createdDate;
-    // map of data providers: {data-provider-name, provider-type}
-    // data-provider-name: 'RGD','OMIM', ...
-    // provider-type: 'curated','loaded'
-    private HashMap<String,String> dataProviders;
+    // array of data providers; every data provider is a hashmap; currently it is:
+    // "type" : "curated" or "loaded"
+    // "crossReference" hashmap of:
+    //   "id": "OMIM:xxx" or "DOID:xxx" etc
+    //   "pages": array of ["page1_name", "page2_name", ...]
+    private List<HashMap> dataProviders;
 
     public String getTaxon() {
         return taxon;
@@ -140,11 +143,11 @@ public class DafAnnotation {
         this.createdDate = createdDate;
     }
 
-    public HashMap<String, String> getDataProviders() {
+    public List<HashMap> getDataProviders() {
         return dataProviders;
     }
 
-    public void setDataProviders(HashMap<String, String> dataProviders) {
+    public void setDataProviders(List<HashMap> dataProviders) {
         this.dataProviders = dataProviders;
     }
 }

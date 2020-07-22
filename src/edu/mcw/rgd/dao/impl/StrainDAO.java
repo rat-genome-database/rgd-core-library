@@ -1,10 +1,12 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.spring.StrainFilesQuery;
 import edu.mcw.rgd.dao.spring.StrainQuery;
 import edu.mcw.rgd.dao.spring.StrainStatusQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.Strain;
+import edu.mcw.rgd.datamodel.StrainFiles;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 import org.springframework.jdbc.object.SqlUpdate;
@@ -78,6 +80,16 @@ public class StrainDAO extends AbstractDAO {
         return executeStrainQuery(query);
     }
 
+
+    /**
+     * get list of all strain files
+     * @return list of strain files
+     * @throws Exception when something really bad happens in spring framework
+     */
+    public List<StrainFiles> getStrainFiles() throws Exception{
+        String query = "SELECT * FROM STRAIN_FILES";
+        return StrainFilesQuery.execute(this, query);
+    }
 
 
     /**
@@ -215,9 +227,9 @@ public class StrainDAO extends AbstractDAO {
      *
      * @throws Exception
      */
-    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
+    public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
-        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type,file_name) values (?,?,?,?,?) ";
+        String sql = "insert into strain_files(strain_id,file_type,file_data,content_type,file_name,modified_by) values (?,?,?,?,?,?) ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
@@ -227,12 +239,14 @@ public class StrainDAO extends AbstractDAO {
         stmt.setBlob(3,data);
         stmt.setString(4,contentType);
         stmt.setString(5,fileName);
+        stmt.setString(6,login);
+
         stmt.execute();
         conn.close();
     }
-    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName) throws Exception{
+    public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
-        String sql = "update strain_files set file_data =?,content_type=?,file_name=? where strain_id = ? and file_type= ? ";
+        String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ?,last_modified_date = sysdate where strain_id = ? and file_type= ? ";
         Connection conn = null;
         PreparedStatement stmt;
         conn = this.getDataSource().getConnection();
@@ -240,8 +254,9 @@ public class StrainDAO extends AbstractDAO {
         stmt.setBlob(1,data);
         stmt.setString(2,contentType);
         stmt.setString(3,fileName);
-        stmt.setInt(4,strainId);
-        stmt.setString(5,type);
+		stmt.setString(4,login);
+        stmt.setInt(5,strainId);
+        stmt.setString(6,type);
          stmt.execute();
         conn.close();
     }
