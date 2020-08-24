@@ -42,6 +42,16 @@ public class PhenominerDAO extends AbstractDAO {
         return studies.get(0);
     }
 
+    public Study getStudyByGeoId(String  id) throws Exception {
+        String query = "SELECT * FROM study WHERE geo_series_acc=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        return studies.get(0);
+    }
+
     /**
      *  Return all studies
      *  @return list of all studies
@@ -1200,11 +1210,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
-                "geo_sample_acc=?, biosample_id=? WHERE sample_id=?";
+                "geo_sample_acc=?, biosample_id=?, developmental_stage=? WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
                 s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
-                s.getBioSampleId(), s.getId());
+                s.getBioSampleId(),s.getDevelopmentalStage(), s.getId());
     }
 
     /**
@@ -1372,12 +1382,12 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cell_line_id, geo_sample_acc, biosample_id, sample_id) "+
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id,developmental_stage) "+
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
-                s.getGeoSampleAcc(), s.getBioSampleId(), next);
+                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage());
         return next;
     }
 

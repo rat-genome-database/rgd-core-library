@@ -18,6 +18,7 @@ public class Sample {
     private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
+    private String developmentalStage;
 
     public int getId() {
         return id;
@@ -113,5 +114,13 @@ public class Sample {
 
     public void setBioSampleId(String bioSampleId) {
         this.bioSampleId = bioSampleId;
+    }
+
+    public String getDevelopmentalStage() {
+        return developmentalStage;
+    }
+
+    public void setDevelopmentalStage(String developmentalStage) {
+        this.developmentalStage = developmentalStage;
     }
 }
