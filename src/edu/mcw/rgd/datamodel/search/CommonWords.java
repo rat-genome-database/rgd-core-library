@@ -1,19 +1,18 @@
 package edu.mcw.rgd.datamodel.search;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 28, 2008
- * Time: 9:39:01 AM
+ * @author jdepons
+ * @since May 28, 2008
  * <p>
  * Contains a list of common words used by the search.
  * Words in this list are not indexed or searchable
  */
 public final class CommonWords {
 
-    private static HashMap ignore = new HashMap();
+    private static Set<String> ignore = new HashSet<>();
 
     /**
      * Returns true if term is contained in the common words list
@@ -25,72 +24,71 @@ public final class CommonWords {
             return true;
         }
 
-        if (ignore.get(term) == null) {
-           return false;
-       }
-       return true;
+        return ignore.contains(term);
     }
         
     static {
-        ignore.put("an", "true");
-        ignore.put("and", "true");
-        ignore.put("are", "true");
-        ignore.put("as", "true");
-        ignore.put("at", "true");
-        ignore.put("be", "true");
-        ignore.put("been", "true");
-        ignore.put("by", "true");
-        ignore.put("for", "true");
-        ignore.put("from", "true");
-        ignore.put("has", "true");
-        ignore.put("have", "true");
-        ignore.put("in", "true");
-        ignore.put("is", "true");
-        ignore.put("it", "true");
-        ignore.put("may", "true");
-        ignore.put("of", "true");
-        ignore.put("on", "true");
-        ignore.put("or", "true");
-        ignore.put("the", "true");
-        ignore.put("they", "true");
-        ignore.put("to", "true");
-        ignore.put("was", "true");
-        ignore.put("which", "true");
-        ignore.put("that", "true");
-        ignore.put("there", "true");
-        ignore.put("these", "true");
-        ignore.put("this", "true");
-        ignore.put("were", "true");
-        ignore.put("when", "true");
-        ignore.put("where", "true");
-        ignore.put("with", "true");
+        ignore.add("an");
+        ignore.add("and");
+        ignore.add("are");
+        ignore.add("as");
+        ignore.add("at");
+        ignore.add("be");
+        ignore.add("been");
+        ignore.add("by");
+        ignore.add("for");
+        ignore.add("from");
+        ignore.add("has");
+        ignore.add("have");
+        ignore.add("in");
+        ignore.add("is");
+        ignore.add("it");
+        ignore.add("may");
+        ignore.add("of");
+        ignore.add("on");
+        ignore.add("or");
+        ignore.add("the");
+        ignore.add("they");
+        ignore.add("to");
+        ignore.add("was");
+        ignore.add("which");
+        ignore.add("that");
+        ignore.add("there");
+        ignore.add("these");
+        ignore.add("this");
+        ignore.add("were");
+        ignore.add("when");
+        ignore.add("where");
+        ignore.add("with");
 
-        ignore.put("role", "true");
-        ignore.put("plays", "true");
-        ignore.put("play", "true");
-        ignore.put("act", "true");
-        ignore.put("acts", "true");
+        ignore.add("role");
+        ignore.add("plays");
+        ignore.add("play");
+        ignore.add("act");
+        ignore.add("acts");
 
-        ignore.put("id", "true");
-        ignore.put("pmid", "true");
-        ignore.put("egid", "true");
-        ignore.put("gene", "true");
-        ignore.put("strain", "true");
-        ignore.put("strains", "true");
-        ignore.put("genes", "true");
-        ignore.put("qtl", "true");
-        ignore.put("qtls", "true");
-        ignore.put("reference", "true");
-        ignore.put("references", "true");
-        ignore.put("marker", "true");
-        ignore.put("markers", "true");
-        ignore.put("pubmed", "true");
-        ignore.put("xdb", "true");
-        ignore.put("uniprot", "true");
-        ignore.put("interpro", "true");
-        ignore.put("entrez", "true");
-        ignore.put("entrezgene", "true");
-        ignore.put("pfam", "true");
-        ignore.put("geneid", "true");
+        ignore.add("id");
+        ignore.add("pmid");
+        ignore.add("egid");
+        ignore.add("gene");
+        ignore.add("strain");
+        ignore.add("strains");
+        ignore.add("genes");
+        ignore.add("qtl");
+        ignore.add("qtls");
+        ignore.add("reference");
+        ignore.add("references");
+        ignore.add("marker");
+        ignore.add("markers");
+        ignore.add("pubmed");
+        ignore.add("xdb");
+        ignore.add("uniprot");
+        ignore.add("interpro");
+        ignore.add("entrez");
+        ignore.add("entrezgene");
+        ignore.add("pfam");
+        ignore.add("geneid");
+
+        ignore.add("**"); // patch to filter out some sql injection attacks
     }
 }
