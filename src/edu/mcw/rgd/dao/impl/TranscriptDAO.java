@@ -3,7 +3,6 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.process.Utils;
 
 import java.util.*;
 
@@ -510,6 +509,25 @@ public class TranscriptDAO extends AbstractDAO {
         sql = "DELETE FROM transcripts WHERE transcript_rgd_id=? AND gene_rgd_id=?";
         return update(sql, transcriptRgdId, geneRgdId);
     }
+
+
+    ///// STABLE_TRANSCRIPTS - transcript versions
+
+    public String getTranscriptVersionInfo(String acc) throws Exception {
+        String sql = "SELECT MAX(last_version) FROM stable_transcripts WHERE accession=?";
+        return getStringResult(sql, acc);
+    }
+
+    public void updateTranscriptVersionInfo(String acc, String version) throws Exception {
+        String sql = "UPDATE stable_transcripts SET last_version=?, last_version_date=SYSDATE WHERE accession=?";
+        update(sql, version, acc);
+    }
+
+    public void insertTranscriptVersionInfo(String acc, String version, int rgdId) throws Exception {
+        String sql = "INSERT INTO stable_transcripts (accession,last_version,last_version_date,rgd_id) VALUES(?,?,SYSDATE,?)";
+        update(sql, acc, version, rgdId);
+    }
+
 
     /// Transcript query implementation helper
     public List<Transcript> executeTranscriptQuery(String query, Object ... params) throws Exception {
