@@ -100,29 +100,20 @@ public class ReportDAO extends AbstractDAO {
     }
 
     public Map<String,String> getAnnotationCounts(Map rgdIds) throws Exception {
-        Connection conn = null;
         HashMap<String,String> annotCounts = new HashMap<>();
         if( rgdIds==null || rgdIds.isEmpty() )
             return annotCounts;
 
-        try {
+        try( Connection conn = this.getConnection() ) {
 
             String query = "select annotated_object_rgd_id, count(*) as count from full_annot where ";
             query = query + " annotated_object_rgd_id in (" + Utils.buildInPhrase(rgdIds.keySet()) + ") group by annotated_object_rgd_id";
 
-            conn = this.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
 
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()) {
                 annotCounts.put(rs.getString("annotated_object_rgd_id"), rs.getString("count"));
-            }
-
-        } finally {
-            try {
-                if( conn!=null ) conn.close();
-            } catch (Exception ignored) {
             }
         }
 
@@ -302,23 +293,32 @@ public class ReportDAO extends AbstractDAO {
 
     public Report getActiveGeneReport(Map rgdIds, SearchBean sb) throws Exception {
         Report report = new Report();
-        Connection conn = null;
         RankedIndexItem iiEmpty = new RankedIndexItem();
         iiEmpty.setSpeciesTypeKey(sb.getSpeciesType());
 
-        try {
+        Map<String,String> annotCounts = this.getAnnotationCounts(rgdIds);
 
-            Map<String,String> annotCounts = this.getAnnotationCounts(rgdIds);
-            conn = this.getConnection();
+        String query = "SELECT g.*, m.* FROM genes g LEFT JOIN maps_data m " +
+                "ON g.rgd_id = m.rgd_id " + buildMappingForMapKey(sb);
 
-            String query = "SELECT g.*, m.* FROM genes g LEFT JOIN maps_data m " +
-                    "ON g.rgd_id = m.rgd_id " + buildMappingForMapKey(sb);
+        if( !rgdIds.isEmpty() )
+            query += " WHERE g.rgd_id IN (" + Utils.buildInPhrase(rgdIds.keySet()) + ") \n";
+        else {
+            // rgdIds.size()==0  meaning that the search from filter as specified by sb.required, sb.negated sb.optional returned 0 results
+            int searchFilterKeywordCount = sb.getRequired()==null ? 0 : sb.getRequired().size();
+            searchFilterKeywordCount += sb.getNegated()==null ? 0 : sb.getNegated().size();
+            searchFilterKeywordCount += sb.getOptional()==null ? 0 : sb.getOptional().size();
 
-            if( !rgdIds.isEmpty() )
-                query += " WHERE g.rgd_id IN (" + Utils.buildInPhrase(rgdIds.keySet()) + ") \n";
-            else
-                query += " WHERE 1=1 \n";
-            query += this.buildMappingForPos(sb);
+            if( searchFilterKeywordCount>0 ) {
+                // there were some search terms specified, but they returned no hits
+                return report;
+            }
+            // there were no search terms specified, so no filter should be specified
+            query += " WHERE 1=1 \n";
+        }
+        query += this.buildMappingForPos(sb);
+
+        try( Connection conn = this.getConnection() ){
 
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
@@ -352,16 +352,9 @@ public class ReportDAO extends AbstractDAO {
 
                 report.append(r);
             }
-
-            return report;
-
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception ignored) {
-            }
         }
 
+        return report;
     }
 
     /**
