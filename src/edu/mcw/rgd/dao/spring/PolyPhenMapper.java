@@ -2,7 +2,9 @@ package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.prediction.PolyPhenPrediction;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.object.MappingSqlQuery;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -12,7 +14,12 @@ import java.sql.SQLException;
  * Date: 10/18/11
  * Time: 12:42 PM
  */
-public class PolyPhenMapper implements RowMapper<PolyPhenPrediction> {
+public class PolyPhenMapper extends MappingSqlQuery implements RowMapper<PolyPhenPrediction>  {
+    public PolyPhenMapper(){}
+    public PolyPhenMapper(DataSource ds, String query) {
+        super(ds, query);
+    }
+
     public PolyPhenPrediction mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         PolyPhenPrediction php = new PolyPhenPrediction();
