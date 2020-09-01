@@ -342,9 +342,9 @@ public class ReferenceDAO extends AbstractDAO {
      * @return List of the pipeline RGD IDs
      * @throws Exception
      */
-    public List<Reference> getAllReferencesByDataTransfer() throws Exception {
-        String query = "select * from REFERENCES where reference_type='DIRECT DATA TRANSFER'";
-        return executeRefQuery(query);
+    public List<Reference> getAllReferencesByReferenceType(String referenceType) throws Exception {
+        String query = "select r.* from REFERENCES r where r.REFERENCE_TYPE=?";
+        return executeRefQuery(query, referenceType);
     }
 
 
