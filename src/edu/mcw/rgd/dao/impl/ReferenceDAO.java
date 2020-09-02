@@ -343,7 +343,7 @@ public class ReferenceDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<Reference> getAllReferencesByReferenceType(String referenceType) throws Exception {
-        String query = "select r.* from REFERENCES r where r.REFERENCE_TYPE=?";
+        String query = "select r.*, s.species_type_key from REFERENCES r, rgd_ids s where r.REFERENCE_TYPE=? and r.rgd_id=s.rgd_id";
         return executeRefQuery(query, referenceType);
     }
 
