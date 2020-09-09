@@ -1451,8 +1451,8 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "INSERT INTO experiment_record (clinical_measurement_id, experiment_id, " +
                 "curation_status, last_modified_date, measurement_method_id, sample_id, measurement_sd, measurement_sem, " +
                 "measurement_units, measurement_value, measurement_error,experiment_record_id, class, has_individual_record, "+
-                "species_type_key) VALUES( " +
-                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?)";
+                "species_type_key,last_modified_by) VALUES( " +
+                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?,?)";
 
         int hasIndividualRecord = r.getHasIndividualRecord() ? 1 : 0;
 
@@ -1466,7 +1466,7 @@ public class PhenominerDAO extends AbstractDAO {
         update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
                 r.getMeasurementUnits(), r.getMeasurementValue(), r.getMeasurementError(), expRecId, hasIndividualRecord,
-                speciesTypeKey);
+                speciesTypeKey,r.getLastModifiedBy());
 
         // conditions must be added after the experiment record was inserted, due to referential integrity constraints
         for (Condition cond: r.getConditions()) {
@@ -1515,11 +1515,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE experiment_record SET clinical_measurement_id=?, experiment_id=?, curation_status=?, " +
                 "last_modified_date=SYSTIMESTAMP, measurement_method_id=?, sample_id=?, measurement_sd=?, measurement_sem=?, " +
-                "measurement_units=?, measurement_value=?, measurement_error=? WHERE experiment_record_id=?";
+                "measurement_units=?, measurement_value=?, measurement_error=?,last_modified_by=? WHERE experiment_record_id=?";
 
         update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
-                r.getMeasurementUnits(), r.getMeasurementValue(),r.getMeasurementError(), r.getId());
+                r.getMeasurementUnits(), r.getMeasurementValue(),r.getMeasurementError(),r.getLastModifiedBy(), r.getId());
     }
 
     /**
