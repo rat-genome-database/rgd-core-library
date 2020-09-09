@@ -33,7 +33,7 @@ public class ExperimentQuery extends MappingSqlQuery {
         ex.setNotes(rs.getString("experiment_notes"));
         ex.setStudyId(rs.getInt("study_id"));
         ex.setTraitOntId(rs.getString("trait_ont_id"));
-
+        ex.setLastModifiedBy(rs.getString("last_modified_by"));
         return ex;
     }
 
