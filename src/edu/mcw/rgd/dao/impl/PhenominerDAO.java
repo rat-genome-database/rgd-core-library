@@ -278,7 +278,7 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void updateExperiment(Experiment ex) throws Exception{
         
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?, trait_ont_id=? ,last_modified_by=?,last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?, trait_ont_id=? ,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(), ex.getTraitOntId(),ex.getLastModifiedBy(), ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
@@ -1383,7 +1383,7 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
                 "cell_line_id, geo_sample_acc, biosample_id, sample_id,developmental_stage,last_modified_by,last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
