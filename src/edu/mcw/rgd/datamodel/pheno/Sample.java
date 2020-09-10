@@ -19,6 +19,7 @@ public class Sample {
     private String geoSampleAcc;
     private String bioSampleId;
     private String developmentalStage;
+    private String lastModifiedBy;
 
     public int getId() {
         return id;
@@ -122,5 +123,13 @@ public class Sample {
 
     public void setDevelopmentalStage(String developmentalStage) {
         this.developmentalStage = developmentalStage;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 }

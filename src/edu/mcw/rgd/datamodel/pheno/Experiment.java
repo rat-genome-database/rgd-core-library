@@ -14,6 +14,7 @@ public class Experiment {
     private String notes;
     private int studyId;
     private int curationStatus = -1;
+    private String lastModifiedBy;
 
     public String getTraitOntId() {
         return traitOntId;
@@ -63,5 +64,13 @@ public class Experiment {
 
     public void setStudyId(int studyId) {
         this.studyId = studyId;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 }
