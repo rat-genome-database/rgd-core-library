@@ -45,7 +45,21 @@ public class SampleDAO extends JdbcBaseDAO {
                 " ORDER BY analysis_name";
         return runSamplesQuery(query, mapKey);
     }
+    public List<Sample> getLimitedSamplesByPopulation(int mapKey, String population, int limit) {
+        String query = "SELECT * FROM sample "+
+                "WHERE patient_id IN(SELECT patient_id FROM patient WHERE map_key=?) "+
+                " and (analysis_name != 'CDR' and analysis_name != 'CDS') " +
+                " and analysis_name like '"+ population+"%'" +
+                " and ROWNUM < ? "+
+                " ORDER BY analysis_name "
+               ;
+        SampleQuery q = new SampleQuery(this.getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        return q.execute(mapKey,limit);
 
+    }
     public Sample getSampleBySampleId(int sampleId) {
 
         String query = "SELECT * FROM sample WHERE sample_id=?";
