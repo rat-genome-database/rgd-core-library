@@ -1388,7 +1388,7 @@ public class PhenominerDAO extends AbstractDAO {
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
-                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy());
+                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy(),s.getCreatedBy());
         return next;
     }
 
