@@ -73,17 +73,18 @@ public class Record {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public int getLastModifiedBy() {
+    public String getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(int lastModifiedBy) {
+    public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
     private int curationStatus = 20;
     private Date lastModifiedDate;
-    private int lastModifiedBy;
+    private String lastModifiedBy;
+    private String createdBy;
 
     public String getRatIdValues() {
         return ratIdValues;
@@ -232,5 +233,13 @@ public class Record {
 
     public void setHasIndividualRecord(boolean value) {
         hasIndividualRecord = value;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

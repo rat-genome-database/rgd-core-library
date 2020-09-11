@@ -15,6 +15,7 @@ public class Study {
     private String geoSeriesAcc;
     private int curationStatus = -1;
     private String lastModifiedBy;
+    private String createdBy;
 
 
 
@@ -88,5 +89,13 @@ public class Study {
 
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

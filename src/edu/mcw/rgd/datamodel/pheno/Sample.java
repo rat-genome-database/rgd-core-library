@@ -20,6 +20,8 @@ public class Sample {
     private String bioSampleId;
     private String developmentalStage;
     private String lastModifiedBy;
+    private String createdBy;
+
 
     public int getId() {
         return id;
@@ -131,5 +133,13 @@ public class Sample {
 
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

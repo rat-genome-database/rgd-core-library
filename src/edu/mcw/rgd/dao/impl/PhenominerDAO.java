@@ -149,10 +149,10 @@ public class PhenominerDAO extends AbstractDAO {
         study.setId(studyId);
 
         String sql = "INSERT INTO study (study_name, study_source, study_type, ref_rgd_id, " +
-                "data_type, geo_series_acc, study_id,last_modified_by,last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
+                "data_type, geo_series_acc, study_id,last_modified_by,created_by,created_date, last_modified_date) VALUES(?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
         update(sql, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(),
-                study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy());
+                study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy(),study.getCreatedBy());
 
         return studyId;
     }
@@ -300,8 +300,9 @@ public class PhenominerDAO extends AbstractDAO {
         int experimentId = this.getNextKey("experiment_seq");
         ex.setId(experimentId);
 
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id, trait_ont_id,last_modified_by,last_modified_date) values (?,?,?,?,?,?,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getTraitOntId(),ex.getLastModifiedBy());
+        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id, trait_ont_id,last_modified_by,created_by,created_date,last_modified_date) " +
+                "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getTraitOntId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
         return experimentId;
     }
@@ -1382,8 +1383,8 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cell_line_id, geo_sample_acc, biosample_id, sample_id,developmental_stage,last_modified_by,last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id,developmental_stage,last_modified_by,created_by,created_date, last_modified_date) "+
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
@@ -1451,8 +1452,8 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "INSERT INTO experiment_record (clinical_measurement_id, experiment_id, " +
                 "curation_status, last_modified_date, measurement_method_id, sample_id, measurement_sd, measurement_sem, " +
                 "measurement_units, measurement_value, measurement_error,experiment_record_id, class, has_individual_record, "+
-                "species_type_key,last_modified_by) VALUES( " +
-                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?,?)";
+                "species_type_key,last_modified_by,created_by,created_date) VALUES( " +
+                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?,?,?,SYSTIMESTAMP)";
 
         int hasIndividualRecord = r.getHasIndividualRecord() ? 1 : 0;
 
@@ -1466,7 +1467,7 @@ public class PhenominerDAO extends AbstractDAO {
         update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
                 r.getMeasurementUnits(), r.getMeasurementValue(), r.getMeasurementError(), expRecId, hasIndividualRecord,
-                speciesTypeKey,r.getLastModifiedBy());
+                speciesTypeKey,r.getLastModifiedBy(),r.getCreatedBy());
 
         // conditions must be added after the experiment record was inserted, due to referential integrity constraints
         for (Condition cond: r.getConditions()) {
