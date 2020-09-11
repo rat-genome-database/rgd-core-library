@@ -14,6 +14,10 @@ public class Study {
     private String dataType;
     private String geoSeriesAcc;
     private int curationStatus = -1;
+    private String lastModifiedBy;
+    private String createdBy;
+
+
 
     public int getCurationStatus() {
         return curationStatus;
@@ -77,5 +81,21 @@ public class Study {
 
     public void setGeoSeriesAcc(String geoSeriesAcc) {
         this.geoSeriesAcc = geoSeriesAcc;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

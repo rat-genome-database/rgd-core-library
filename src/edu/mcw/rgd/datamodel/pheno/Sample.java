@@ -18,6 +18,9 @@ public class Sample {
     private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
+    private String lastModifiedBy;
+    private String createdBy;
+
 
     public int getId() {
         return id;
@@ -113,5 +116,22 @@ public class Sample {
 
     public void setBioSampleId(String bioSampleId) {
         this.bioSampleId = bioSampleId;
+    }
+
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }
