@@ -1637,8 +1637,8 @@ public class PhenominerDAO extends AbstractDAO {
             "LEFT JOIN experiment e ON st.study_id = e.study_id \n" +
             "LEFT JOIN \n" +
             "(\n" +
-            "SELECT er.experiment_id, er.measurement_error, er.last_modified_date, er.measurement_sd, er.measurement_sem, \n" +
-            "er.measurement_units, er.measurement_value, er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
+            "SELECT er.experiment_id, er.measurement_error,  er.measurement_sd, er.measurement_sem, \n" +
+            "er.measurement_units, er.measurement_value, er.curation_status, er.has_individual_record, \n" +
             "mm.measurement_method_id, mm.measurement_method_ont_id, mm.measurement_duration_in_secs, mm.measurement_site, " +
             "s1.*, cm.*, ec.*\n" +
             "FROM " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, " +
