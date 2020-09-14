@@ -337,6 +337,16 @@ public class ReferenceDAO extends AbstractDAO {
         return StringListQuery.execute(this, sql);
     }
 
+    /**
+     * get a list of all the RGD IDs report pages that are pipelines
+     * @return List of the pipeline RGD IDs
+     * @throws Exception
+     */
+    public List<Reference> getAllReferencesByReferenceType(String referenceType) throws Exception {
+        String query = "select r.*, s.species_type_key from REFERENCES r, rgd_ids s where r.REFERENCE_TYPE=? and r.rgd_id=s.rgd_id";
+        return executeRefQuery(query, referenceType);
+    }
+
 
     /**
      * find author given unique set of author properties: (last_name, first_name, suffix, initials)
