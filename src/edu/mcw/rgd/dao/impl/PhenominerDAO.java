@@ -1722,7 +1722,7 @@ public class PhenominerDAO extends AbstractDAO {
                 query.append(this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality"));
             }
         }
-        
+
         return IntListQuery.execute(this, query.toString());
     }
 
@@ -1867,9 +1867,9 @@ public class PhenominerDAO extends AbstractDAO {
                 "st.study_id = e.study_id \n" +
                 "left join \n" +
                 "(\n" +
-                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
+                "SELECT er.experiment_id, er.measurement_error,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
+                "er.curation_status, er.has_individual_record,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
                 "experiment_condition ec\n" +
