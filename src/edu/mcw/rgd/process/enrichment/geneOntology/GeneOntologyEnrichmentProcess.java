@@ -40,10 +40,9 @@ public class GeneOntologyEnrichmentProcess{
 
             return p;
         }catch(Exception e) {
-            logger.info("Ref: " +refGenes + " Ref Annotated Genes: "+refAnnotGenes+ " Input: "+inputGenes+ " Input Annotated Genes: "+inputAnnotGenes +"\n");
-            logger.info(e.getMessage());
-            return null;
+
         }
+        return null;
     }
 
     public String calculateBonferroni(String pvalue,BigDecimal terms){
