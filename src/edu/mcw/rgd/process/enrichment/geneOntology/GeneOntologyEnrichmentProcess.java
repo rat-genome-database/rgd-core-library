@@ -3,6 +3,8 @@ package edu.mcw.rgd.process.enrichment.geneOntology;
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.ontologyx.TermWithStats;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math3.distribution.HypergeometricDistribution;
 import edu.mcw.rgd.dao.impl.GeneEnrichmentDAO;
 import org.apache.commons.math3.util.FastMath;
@@ -20,7 +22,7 @@ import java.util.TreeMap;
 
 public class GeneOntologyEnrichmentProcess{
 
-
+    protected final Log logger = LogFactory.getLog(getClass());
 
     public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
@@ -28,13 +30,20 @@ public class GeneOntologyEnrichmentProcess{
         formatter.setRoundingMode(RoundingMode.HALF_UP);
         formatter.setMinimumFractionDigits(2);
         MathContext mc = new MathContext(3);
-        HypergeometricDistribution hg =
-                new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
 
-        BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes),mc);
-        String p = formatter.format(pvalue);
+        try {
+            HypergeometricDistribution hg =
+                    new HypergeometricDistribution(refGenes, refAnnotGenes, inputGenes);
 
-        return p;
+            BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes), mc);
+            String p = formatter.format(pvalue);
+
+            return p;
+        }catch(Exception e) {
+            logger.info("Ref: " +refGenes + " Ref Annotated Genes: "+refAnnotGenes+ " Input: "+inputGenes+ " Input Annotated Genes: "+inputAnnotGenes +"\n");
+            logger.info(e.getMessage());
+            return null;
+        }
     }
 
     public String calculateBonferroni(String pvalue,BigDecimal terms){
