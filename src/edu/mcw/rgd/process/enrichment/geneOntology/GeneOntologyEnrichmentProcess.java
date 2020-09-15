@@ -22,16 +22,12 @@ public class GeneOntologyEnrichmentProcess{
 
 
 
-    public String calculatePValue(int inputGenes, int refGenes, String term, int inputAnnotGenes, int speciesTypeKey) throws Exception{
+    public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
         NumberFormat formatter = new DecimalFormat("0.0E0");
         formatter.setRoundingMode(RoundingMode.HALF_UP);
         formatter.setMinimumFractionDigits(2);
         MathContext mc = new MathContext(3);
-        OntologyXDAO odao = new OntologyXDAO();
-        TermWithStats ts = odao.getTermWithStatsCached(term);
-        int withChildren = 1;
-        int refAnnotGenes = ts.getStat("annotated_object_count", speciesTypeKey, RgdId.OBJECT_KEY_GENES, withChildren);
         HypergeometricDistribution hg =
                 new HypergeometricDistribution(refGenes,refAnnotGenes,inputGenes);
 
