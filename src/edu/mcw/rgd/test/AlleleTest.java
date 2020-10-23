@@ -1,5 +1,6 @@
-package edu.mcw.rgd.dao.impl;
+package edu.mcw.rgd.test;
 
+import edu.mcw.rgd.dao.impl.GeneDAO;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -8,16 +9,12 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import edu.mcw.rgd.dao.impl.NomenclatureDAO;
-import edu.mcw.rgd.dao.spring.GeneQuery;
 import edu.mcw.rgd.datamodel.Gene;
 
 /**
  * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Dec 31, 2007
- * Time: 10:05:54 AM
- * To change this template use File | Settings | File Templates.
  */
 public class AlleleTest extends TestCase {
 
