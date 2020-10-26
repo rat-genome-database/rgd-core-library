@@ -31,6 +31,8 @@ public final class SpeciesType {
     public static final int FRUITFLY = 10;
     public static final int ROUNDWORM = 11;
     public static final int YEAST = 12;
+    public static final int VERVET = 13;
+    public static final int NAKED_MOLE_RAT = 14;
 
     public static final int ALL = 0;
     public static final int UNKNOWN = -1;
@@ -121,6 +123,12 @@ public final class SpeciesType {
         }
         if (speciesTypeKey == SpeciesType.PIG) {
             return "pig.png";
+        }
+        if (speciesTypeKey == SpeciesType.VERVET) {
+            return "green-monkeyS.png";
+        }
+        if (speciesTypeKey == SpeciesType.NAKED_MOLE_RAT) {
+            return "mole-ratS.png";
         }
 
         return "";
