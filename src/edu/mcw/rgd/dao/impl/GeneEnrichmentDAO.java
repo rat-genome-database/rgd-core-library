@@ -27,13 +27,13 @@ public class GeneEnrichmentDAO extends AbstractDAO {
      * @return count of active genes
      * @throws Exception when unexpected error in spring framework occurs
      */
-    public int getReferenceGeneCount(int speciesKey) throws Exception {
+    public int getReferenceGeneCount(int speciesKey,String aspect) throws Exception {
 
-        String query = "SELECT COUNT(*) FROM genes g, rgd_ids r " +
-                "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') " +
-                " AND r.rgd_id=g.rgd_id ";
+        String query = "SELECT COUNT(distinct(r.rgd_id)) FROM full_annot f, rgd_ids r WHERE r.object_status='ACTIVE' " +
+                "AND r.species_type_key=? AND f.rgd_object_key = ? " +
+                "AND r.rgd_id=f.annotated_object_rgd_id AND f.aspect = ? ";
 
-        return getCount(query, speciesKey);
+        return getCount(query, speciesKey,RgdId.OBJECT_KEY_GENES,aspect);
     }
 
 }
