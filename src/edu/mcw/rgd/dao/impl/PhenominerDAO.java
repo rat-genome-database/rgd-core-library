@@ -62,7 +62,15 @@ public class PhenominerDAO extends AbstractDAO {
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q);
     }
-
+    /**
+     *  Return all Phenominer Units
+     *  @return list of all phenominerUnits
+     */
+    public List<PhenominerUnit> getPhenominerUnits(String query) throws Exception {
+        //String query = "";
+        PhenominerUnitQuery pquery = new PhenominerUnitQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
     /**
      *  Return all GEO studies
      *  @return list of all studies
