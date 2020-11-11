@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dao.spring.variants;
 
+import edu.mcw.rgd.datamodel.variants.SampleManager;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
@@ -27,7 +28,11 @@ public class VariantSampleQuery extends MappingSqlQuery {
         obj.setZygosityNumberAllele(rs.getInt("zygosity_num_allele"));
         obj.setZygosityInPseudo(rs.getString("zygosity_in_pseudo"));
         obj.setQualityScore(rs.getInt("quality_score"));
-
+        try {
+            obj.setAnalysisName(SampleManager.getInstance().getSampleName(rs.getInt("sample_id")).getAnalysisName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return obj;
     }
 }

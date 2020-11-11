@@ -15,7 +15,7 @@ public class PolyphenQuery extends MappingSqlQuery {
     @Override
     protected Object mapRow(ResultSet rs, int i) throws SQLException {
 
-            PolyPhenPrediction php = new PolyPhenPrediction();
+            Polyphen php = new Polyphen();
             php.setId(rs.getLong("POLYPHEN_ID"));
             php.setScore1(rs.getString("SCORE1"));
             php.setScore2(rs.getString("SCORE2"));
@@ -31,7 +31,7 @@ public class PolyphenQuery extends MappingSqlQuery {
             php.setNumStructureFilt(rs.getString("NUM_STRUCT_FILT"));
             php.setPdbId(rs.getString("PDB_ID"));
             php.setPosition(rs.getInt("POSITION"));
-
+            php.setTranscriptRgdid(rs.getInt("TRANSCRIPT_RGD_ID"));
             return php;
         }
 
