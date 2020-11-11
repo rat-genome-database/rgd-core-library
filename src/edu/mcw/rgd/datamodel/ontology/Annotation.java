@@ -33,7 +33,8 @@ public class Annotation implements Cloneable, Dumpable {
     private Integer lastModifiedBy;
     private String xrefSource;
     private int speciesTypeKey; // optional: if 0, it is undefined
-    //private String strainTermAcc;
+    private String annotationExtension;
+    private String geneProductFormId;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -207,18 +208,26 @@ public class Annotation implements Cloneable, Dumpable {
     public void setSpeciesTypeKey(int speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
     }
-/*
-    public String getStrainTermAcc() {
-        return strainTermAcc;
+
+    public String getAnnotationExtension() {
+        return annotationExtension;
     }
 
-    public void setStrainTermAcc(String strainTermAcc) {
-        this.strainTermAcc = strainTermAcc;
+    public void setAnnotationExtension(String annotationExtension) {
+        this.annotationExtension = annotationExtension;
     }
-*/
+
+    public String getGeneProductFormId() {
+        return geneProductFormId;
+    }
+
+    public void setGeneProductFormId(String geneProductFormId) {
+        this.geneProductFormId = geneProductFormId;
+    }
+
     public String dump(String delimiter) {
 
-        return new Dumper(delimiter)
+        return new Dumper(delimiter, true, true)
             .put("FULL_ANNOT_KEY", key)
             .put("RGD_ID", annotatedObjectRgdId)
             .put("OBJ_KEY", rgdObjectKey)
@@ -240,7 +249,8 @@ public class Annotation implements Cloneable, Dumpable {
             .put("LAST_MOD_BY", lastModifiedBy)
             .put("RELATIVE_TO", relativeTo)
             .put("SPECIES_TYPE_KEY", speciesTypeKey)
-//            .put("STRAIN_TERM_ACC", strainTermAcc)
+            .put("ANNOT_EXT", annotationExtension)
+            .put("PRODUCT_ID", geneProductFormId)
             .dump();
     }
 }

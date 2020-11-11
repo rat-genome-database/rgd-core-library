@@ -96,4 +96,9 @@ public class RgdVariantDAO extends AbstractDAO {
         RgdVariantQuery q = new RgdVariantQuery(this.getDataSource(), query);
         return execute(q, params);
     }
+
+    public List<RgdVariant> getVariantsFromGeneRgdId(int rgdId) throws Exception{
+        String query = "select v.*, ri.species_type_key from rgd_associations a, variants v, rgd_ids ri where a.detail_rgd_id=? and a.master_rgd_id=v.rgd_id and v.rgd_id=ri.rgd_id";
+        return executeVariantsQuery(query, rgdId);
+    }
 }
