@@ -1125,6 +1125,7 @@ public class AnnotationDAO extends AbstractDAO {
         /* } */
     }
 
+    /*
     List<Annotation> mergeAnnotationsByRgdId(List<Annotation> annots, int maxRows) {
 
         Annotation ca = new Annotation(); // combined annot to be inserted into results
@@ -1202,7 +1203,7 @@ public class AnnotationDAO extends AbstractDAO {
             results.add(ca);
         return results;
     }
-
+    */
     /**
      * get annotations for term identified by term accession id;
      * if 'withChildren' parameter is true, annotations for child terms are also returned;
@@ -1941,18 +1942,18 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int updateAnnotation(Annotation annot) throws Exception{
 
-        String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, " +
-                "data_src=?, object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, " +
-                "object_name=?, notes=?, qualifier=?, relative_to=?, last_modified_date=?, " +
-                "term_acc=?, created_by=?, last_modified_by=?, xref_source=? " +
+        String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, " +
+                "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, notes=?, " +
+                "qualifier=?, relative_to=?, last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, " +
+                "xref_source=?, annotation_extension=?, gene_product_form_id=? " +
                 "WHERE full_annot_key=?";
 
         return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
                 annot.getDataSrc(), annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
-                annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
-                annot.getQualifier(), annot.getRelativeTo(), annot.getLastModifiedDate(),
-                annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
-                annot.getXrefSource(), annot.getKey());
+                annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(), annot.getQualifier(),
+                annot.getRelativeTo(), annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
+                annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
+                annot.getGeneProductFormId(), annot.getKey());
     }
 
     /**
@@ -1971,8 +1972,8 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
                 " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
                 " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
-                " xref_source, full_annot_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,full_annot_seq.NEXTVAL) "+
+                " xref_source, annotation_extension, gene_product_form_id, full_annot_key) "+
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
                 "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
 
         try( Connection conn = this.getConnection() ) {
@@ -1994,17 +1995,18 @@ public class AnnotationDAO extends AbstractDAO {
             setInt(cs, 15, annot.getCreatedBy());
             setInt(cs, 16, annot.getLastModifiedBy());
             cs.setString(17, annot.getXrefSource());
-            //cs.setString(18, annot.getStrainTermAcc());
+            cs.setString(18, annot.getAnnotationExtension());
+            cs.setString(19, annot.getGeneProductFormId());
 
-            cs.registerOutParameter(18, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(19, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(20, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(20, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(21, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(22, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(18));
-            annot.setCreatedDate(cs.getTimestamp(19));
-            annot.setLastModifiedDate(cs.getTimestamp(20));
+            annot.setKey(cs.getInt(20));
+            annot.setCreatedDate(cs.getTimestamp(21));
+            annot.setLastModifiedDate(cs.getTimestamp(22));
         }
 
         return annot.getKey();

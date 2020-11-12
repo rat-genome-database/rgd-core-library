@@ -54,7 +54,8 @@ public class AnnotationQuery extends MappingSqlQuery {
         }catch (Exception ignored) {
         }
 
-        //annot.setStrainTermAcc(rs.getString("strain_term_acc"));
+        annot.setAnnotationExtension(rs.getString("annotation_extension"));
+        annot.setGeneProductFormId(rs.getString("gene_product_form_id"));
 
         return annot;
     }
