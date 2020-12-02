@@ -95,6 +95,18 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     *  Return all records having No std Units (CMO IDs that are being used for measurements but do not appear in the standard units table)
+     *  @return list of all phenominer Enum Tables
+     */
+    public List<phenominerNoStdUnitTable> getPhenominerNoStdUnitsTables() throws Exception {
+        String query = "select distinct cm.CLINICAL_MEASUREMENT_ONT_ID,ot.TERM, er.MEASUREMENT_UNITS from EXPERIMENT_RECORD er join CLINICAL_MEASUREMENT cm on cm.CLINICAL_MEASUREMENT_ID=er.CLINICAL_MEASUREMENT_ID\n" +
+                "JOIN ONT_TERMS ot on cm.CLINICAL_MEASUREMENT_ONT_ID=ot.TERM_ACC\n" +
+                "where er.CURATION_STATUS<>50 and cm.CLINICAL_MEASUREMENT_ONT_ID not in(select su.ONT_ID from PHENOMINER_STANDARD_UNITS su) order by cm.CLINICAL_MEASUREMENT_ONT_ID";
+        PhenominerNoStdUnitsTablesQuery pquery = new PhenominerNoStdUnitsTablesQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
+
+    /**
      *  Return all Phenominer Unit search results
      *  @return list of all phenominer Unit Tables
      */
