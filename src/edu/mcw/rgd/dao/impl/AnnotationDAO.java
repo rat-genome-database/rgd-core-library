@@ -1942,18 +1942,21 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int updateAnnotation(Annotation annot) throws Exception{
 
+        // NOTE: LOB fields (like NOTES) must come at the end of bind list, to avoid exception:
+        // ORA-24816: Expanded non LONG bind data supplied after actual LONG or LOB column
+
         String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, " +
-                "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, notes=?, " +
-                "qualifier=?, relative_to=?, last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, " +
-                "xref_source=?, annotation_extension=?, gene_product_form_id=? " +
+                "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?, " +
+                "relative_to=?, last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, " +
+                "annotation_extension=?, gene_product_form_id=?, notes=? " +
                 "WHERE full_annot_key=?";
 
         return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
                 annot.getDataSrc(), annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
-                annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(), annot.getQualifier(),
+                annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getQualifier(),
                 annot.getRelativeTo(), annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
                 annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
-                annot.getGeneProductFormId(), annot.getKey());
+                annot.getGeneProductFormId(), annot.getNotes(), annot.getKey());
     }
 
     /**
