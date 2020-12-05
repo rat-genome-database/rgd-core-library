@@ -1071,6 +1071,12 @@ public class OntologyXDAO extends AbstractDAO {
         return update(sql, cutoffDate, ontId);
     }
 
+    public List<TermDagEdge> getAllDagsForOntology(String ontId) throws Exception{
+        String sql = "Select * from ont_dag where parent_term_acc like '"+ontId+"%'";
+
+        TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(),sql);
+        return execute(q);
+    }
     /**
      * get list of all synonyms for given term
      * @param termAcc term accession id
