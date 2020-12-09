@@ -16,7 +16,7 @@ public class RGDNewsConfDAO extends AbstractDAO {
     }
 
     public List<RGDNewsConf> getAllConferences() throws Exception {
-        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='CONFERENCES'";
+        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='CONFERENCE'";
         return RGDNewsConfQuery.execute(this,query);
     }
 
