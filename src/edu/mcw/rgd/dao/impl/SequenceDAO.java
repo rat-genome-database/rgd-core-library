@@ -75,7 +75,13 @@ public class SequenceDAO extends AbstractDAO {
                 "WHERE s.rgd_id=? AND s.seq_data_md5=d.data_md5";
         return SequenceQuery.execute(this, query, rgdId);
     }
+    public List<Sequence> getObjectSequencesBySeqKey(int seqKey) throws Exception {
 
+        // retrieve all sequences for given rgd object
+        String query = "SELECT s.*,d.seq_data FROM rgd_sequences s,seq_data d "+
+                "WHERE s.seq_key=? AND s.seq_data_md5=d.data_md5";
+        return SequenceQuery.execute(this, query, seqKey);
+    }
     /**
      * return list of sequences of given type for given rgd object
      * @param rgdId object rgd id, like SSLP rgd id
