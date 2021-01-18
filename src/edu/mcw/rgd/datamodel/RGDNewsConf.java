@@ -5,6 +5,7 @@ public class RGDNewsConf {
     private String displayText;
     private String redirectLink;
     private String contentType;
+    private String strongText;
 
     public RGDNewsConf() {}
 
@@ -40,5 +41,11 @@ public class RGDNewsConf {
         this.redirectLink = redirectLink;
     }
 
+    public void setStrongText(String strongText) {
+        this.strongText = strongText;
+    }
 
+    public String getStrongText() {
+        return strongText;
+    }
 }

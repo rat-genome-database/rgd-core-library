@@ -21,7 +21,7 @@ public class RGDNewsConfQuery extends MappingSqlQuery {
         newsConf.setContentType(rs.getString("CONTENT_TYPE"));
         newsConf.setDisplayText(rs.getString("DISPLAY_TEXT"));
         newsConf.setRedirectLink(rs.getString("REDIRECT_LINK"));
-
+        newsConf.setStrongText(rs.getString("STRONG_TEXT"));
 
         return newsConf;
     }

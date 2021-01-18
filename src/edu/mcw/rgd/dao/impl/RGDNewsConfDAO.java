@@ -33,8 +33,8 @@ public class RGDNewsConfDAO extends AbstractDAO {
     public void insertIntoRGDNewsConf(RGDNewsConf newsConf) throws Exception {
         int key = this.getNextKeyFromSequence("RGD_NEWS_CONFERENCES_SEQ");
         newsConf.setNewsId(key);
-        String qeury = "insert into RGD_NEWS_CONFERENCES (news_id, display_text, redirect_link, CONTENT_TYPE) " +
-                "values (?, ?, ?, upper(?))";
+        String qeury = "insert into RGD_NEWS_CONFERENCES (news_id, display_text, redirect_link, CONTENT_TYPE, strong_text) " +
+                "values (?, ?, ?, upper(?), ?)";
         update(qeury, newsConf.getNewsId(), newsConf.getDisplayText(), newsConf.getRedirectLink(), newsConf.getContentType());
 
         return;
