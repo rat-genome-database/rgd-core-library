@@ -35,7 +35,7 @@ public class RGDNewsConfDAO extends AbstractDAO {
         newsConf.setNewsId(key);
         String qeury = "insert into RGD_NEWS_CONFERENCES (news_id, display_text, redirect_link, CONTENT_TYPE, strong_text) " +
                 "values (?, ?, ?, upper(?), ?)";
-        update(qeury, newsConf.getNewsId(), newsConf.getDisplayText(), newsConf.getRedirectLink(), newsConf.getContentType());
+        update(qeury, newsConf.getNewsId(), newsConf.getDisplayText(), newsConf.getRedirectLink(), newsConf.getContentType(), newsConf.getStrongText());
 
         return;
     }
