@@ -2,7 +2,7 @@ package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Utils;
 
-import java.util.Date;
+import java.sql.Date;
 
 
 public class RGDNewsConf {
@@ -68,7 +68,7 @@ public class RGDNewsConf {
         RGDNewsConf nc = (RGDNewsConf)  obj;
         return Utils.stringsAreEqual(displayText,nc.getDisplayText()) && Utils.stringsAreEqual(redirectLink, nc.getRedirectLink())
                 && Utils.stringsAreEqual(contentType, nc.getContentType()) && Utils.stringsAreEqual(strongText, nc.getStrongText())
-                && Utils.datesAreEqual(date, nc.getDate());
+                && date.equals(nc.getDate());
     }
 
     @Override
