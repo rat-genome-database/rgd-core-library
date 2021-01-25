@@ -2,7 +2,6 @@ package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Utils;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
@@ -56,10 +55,8 @@ public class RGDNewsConf {
         return strongText;
     }
 
-    public String getDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-        String release = formatter.format(date);
-        return release;
+    public Date getDate() {
+        return date;
     }
 
     public void setDate(Date date){
@@ -70,14 +67,12 @@ public class RGDNewsConf {
     public boolean equals(Object obj) {
         RGDNewsConf nc = (RGDNewsConf)  obj;
         return Utils.stringsAreEqual(displayText,nc.getDisplayText()) && Utils.stringsAreEqual(redirectLink, nc.getRedirectLink())
-                && Utils.stringsAreEqual(contentType, nc.getContentType()) && Utils.stringsAreEqual(strongText, nc.getStrongText())
-                && Utils.stringsAreEqual(getDate(), nc.getDate());
+                && Utils.stringsAreEqual(contentType, nc.getContentType()) && Utils.stringsAreEqual(strongText, nc.getStrongText());
     }
 
     @Override
     public int hashCode() {
         return Utils.defaultString(displayText).hashCode() ^ Utils.defaultString(redirectLink).hashCode()
-                ^ Utils.defaultString(contentType).hashCode() ^ Utils.defaultString(strongText).hashCode()
-                ^ Utils.defaultString(getDate()).hashCode();
+                ^ Utils.defaultString(contentType).hashCode() ^ Utils.defaultString(strongText).hashCode();
     }
 }
