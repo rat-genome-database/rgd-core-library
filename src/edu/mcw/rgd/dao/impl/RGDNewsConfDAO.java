@@ -11,12 +11,12 @@ public class RGDNewsConfDAO extends AbstractDAO {
     public RGDNewsConfDAO() {}
 
     public List<RGDNewsConf> getAllNews() throws Exception {
-        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='NEWS'";
+        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='NEWS' order by release_date desc";
         return RGDNewsConfQuery.execute(this,query);
     }
 
     public List<RGDNewsConf> getAllConferences() throws Exception {
-        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='CONFERENCE'";
+        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='CONFERENCE' order by release_date desc";
         return RGDNewsConfQuery.execute(this,query);
     }
 
