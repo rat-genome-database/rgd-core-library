@@ -63,12 +63,24 @@ public class RGDNewsConf {
         this.date = date;
     }
 
+    public boolean datesAreEqual(Date date) {
+        if(this.date == null && date == null)
+            return true;
+        else if (this.date == null && date != null)
+            return false;
+        else if (this.date != null && date == null)
+            return false;
+        else //if (this.date != null && date != null)
+            return this.date.equals(date);
+
+    }
+
     @Override
     public boolean equals(Object obj) {
         RGDNewsConf nc = (RGDNewsConf)  obj;
         return Utils.stringsAreEqual(displayText,nc.getDisplayText()) && Utils.stringsAreEqual(redirectLink, nc.getRedirectLink())
                 && Utils.stringsAreEqual(contentType, nc.getContentType()) && Utils.stringsAreEqual(strongText, nc.getStrongText())
-                && Utils.stringsAreEqual(date.toString(),nc.getDate().toString());
+                && this.datesAreEqual(nc.getDate());
     }
 
     @Override
