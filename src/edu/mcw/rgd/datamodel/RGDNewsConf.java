@@ -68,7 +68,7 @@ public class RGDNewsConf {
         RGDNewsConf nc = (RGDNewsConf)  obj;
         return Utils.stringsAreEqual(displayText,nc.getDisplayText()) && Utils.stringsAreEqual(redirectLink, nc.getRedirectLink())
                 && Utils.stringsAreEqual(contentType, nc.getContentType()) && Utils.stringsAreEqual(strongText, nc.getStrongText())
-                && date.equals(nc.getDate());
+                && Utils.stringsAreEqual(date.toString(),nc.getDate().toString());
     }
 
     @Override
