@@ -36,7 +36,7 @@ public class RGDNewsConfDAO extends AbstractDAO {
         String query = "insert into RGD_NEWS_CONFERENCES (news_id, display_text, redirect_link, CONTENT_TYPE, strong_text, release_date) " +
                 "values (?, ?, ?, upper(?), ?, to_date(?,'yyyy-MM-dd'))";
         update(query, newsConf.getNewsId(), newsConf.getDisplayText(), newsConf.getRedirectLink(), newsConf.getContentType(),
-                newsConf.getStrongText(), newsConf.getDate().toString());
+                newsConf.getStrongText(), newsConf.getDate());
 
         return;
     }
