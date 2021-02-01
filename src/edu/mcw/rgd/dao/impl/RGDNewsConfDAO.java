@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.RGDNewsConfQuery;
 import edu.mcw.rgd.datamodel.RGDNewsConf;
 
+import java.sql.Date;
 import java.util.List;
 
 
@@ -33,10 +34,16 @@ public class RGDNewsConfDAO extends AbstractDAO {
     public void insertIntoRGDNewsConf(RGDNewsConf newsConf) throws Exception {
         int key = this.getNextKeyFromSequence("RGD_NEWS_CONFERENCES_SEQ");
         newsConf.setNewsId(key);
+        String date;
+        Date d1 = newsConf.getDate();
+        if (d1 == null)
+            date = null;
+        else
+            date = d1.toString();
         String query = "insert into RGD_NEWS_CONFERENCES (news_id, display_text, redirect_link, CONTENT_TYPE, strong_text, release_date) " +
                 "values (?, ?, ?, upper(?), ?, to_date(?,'yyyy-MM-dd'))";
         update(query, newsConf.getNewsId(), newsConf.getDisplayText(), newsConf.getRedirectLink(), newsConf.getContentType(),
-                newsConf.getStrongText(), newsConf.getDate());
+                newsConf.getStrongText(), date);
 
         return;
     }
