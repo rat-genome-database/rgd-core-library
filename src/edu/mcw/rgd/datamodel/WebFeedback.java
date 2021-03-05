@@ -2,12 +2,12 @@ package edu.mcw.rgd.datamodel;
 
 import java.sql.Date;
 
-public class WebLikes {
+public class WebFeedback {
     private int thumbsUp;
     private int thumbsDown;
     private Date date;
 
-    public WebLikes(){}
+    public WebFeedback(){}
 
     public Date getDate() {
         return date;

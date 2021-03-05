@@ -4,13 +4,13 @@ import edu.mcw.rgd.dao.AbstractDAO;
 
 import java.sql.Date;
 
-public class WebLikesDAO extends AbstractDAO {
-    public WebLikesDAO() {}
+public class WebFeedbackDAO extends AbstractDAO {
+    public WebFeedbackDAO() {}
     public void insertLike() throws Exception {
         java.util.Date today = new java.util.Date();
         Date date = new Date(today.getTime());
 
-        String sql = "insert into website_likes (thumbs_up, date_liked) values (1, to_date(?, 'yyyy-MM-dd))";
+        String sql = "insert into website_feedback (thumbs_up, date_liked) values (1, to_date(?, 'yyyy-MM-dd))";
         String curDate = date.toString();
 
         update(sql,curDate);
@@ -21,7 +21,7 @@ public class WebLikesDAO extends AbstractDAO {
         java.util.Date today = new java.util.Date();
         Date date = new Date(today.getTime());
 
-        String sql = "insert into website_likes (thumbs_down, date_liked) values (1, to_date(?, 'yyyy-MM-dd))";
+        String sql = "insert into website_feedback (thumbs_down, date_liked) values (1, to_date(?, 'yyyy-MM-dd))";
         String curDate = date.toString();
 
         update(sql,curDate);
