@@ -6,6 +6,7 @@ public class WebFeedback {
     private int thumbsUp;
     private int thumbsDown;
     private Date date;
+    private String webPage;
 
     public WebFeedback(){}
 
@@ -31,5 +32,13 @@ public class WebFeedback {
 
     public void setThumbsDown(int thumbsDown) {
         this.thumbsDown = thumbsDown;
+    }
+
+    public String getWebPage() {
+        return webPage;
+    }
+
+    public void setWebPage(String webPage) {
+        this.webPage = webPage;
     }
 }

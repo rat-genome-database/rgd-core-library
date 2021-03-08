@@ -19,6 +19,7 @@ public class WebFeedbackQuery extends MappingSqlQuery {
         wl.setThumbsUp(rs.getInt("THUMBS_UP"));
         wl.setThumbsDown(rs.getInt("THUMBS_DOWN"));
         wl.setDate(rs.getDate("DATE_LIKED"));
+        wl.setWebPage(rs.getString("WEB_PAGE"));
         return wl;
     }
 
