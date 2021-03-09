@@ -10,7 +10,7 @@ public class WebFeedbackDAO extends AbstractDAO {
         java.util.Date today = new java.util.Date();
         Date date = new Date(today.getTime());
 
-        String sql = "insert into website_feedback (thumbs_up, date_liked, web_page) values (1, to_date(?, 'yyyy-MM-dd), ?)";
+        String sql = "insert into website_feedback (thumbs_up, date_liked, web_page) values (1, to_date(?, 'yyyy-MM-dd'), ?)";
         String curDate = date.toString();
 
         update(sql,curDate, page);
@@ -21,7 +21,7 @@ public class WebFeedbackDAO extends AbstractDAO {
         java.util.Date today = new java.util.Date();
         Date date = new Date(today.getTime());
 
-        String sql = "insert into website_feedback (thumbs_down, date_liked, web_page) values (1, to_date(?, 'yyyy-MM-dd), ?)";
+        String sql = "insert into website_feedback (thumbs_down, date_liked, web_page) values (1, to_date(?, 'yyyy-MM-dd'), ?)";
         String curDate = date.toString();
 
         update(sql,curDate, page);
