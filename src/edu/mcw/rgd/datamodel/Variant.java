@@ -3,6 +3,7 @@ package edu.mcw.rgd.datamodel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Holds data from a row of VARIANT table, RATCNDEV|RATCNPROD schema
@@ -42,6 +43,7 @@ public class Variant implements Serializable {
     int sampleId;
     public List<ConservationScore> conservationScore = new ArrayList<ConservationScore>();
     String genicStatus = "";
+    String rsId;
 
     public Variant() {
     }
@@ -52,7 +54,7 @@ public class Variant implements Serializable {
                    String zygosityRefAllele, int zygosityNumberAllele, String zygosityInPseudo,
                    String spliceSitePrediction, String regionName, int sampleId,
                    List<ConservationScore> conservationScore, String genicStatus, int variantFrequency,
-                   String hgvsName, int rgdId, String variantType, String paddingBase ) {
+                   String hgvsName, int rgdId, String variantType, String paddingBase, String rsId ) {
         this.id = id;
         this.chromosome = chromosome;
         this.startPos = startPos;
@@ -78,6 +80,7 @@ public class Variant implements Serializable {
         this.rgdId = rgdId;
         this.variantType = variantType;
         this.paddingBase = paddingBase;
+        this.rsId=rsId;
     }
 
     /**
@@ -96,7 +99,7 @@ public class Variant implements Serializable {
                 aVar.getZygosityStatus(), aVar.getZygosityPercentRead(), aVar.getZygosityPossibleError(),
                 aVar.getZygosityRefAllele(), aVar.getZygosityNumberAllele(), aVar.getZygosityInPseudo(),
                 aVar.getSpliceSitePrediction(), aVar.getRegionName(), aVar.getSampleId(),
-                b, aVar.getGenicStatus(), aVar.getVariantFrequency(), aVar.getHgvsName(), aVar.getRgdId(), aVar.getVariantType(), aVar.getPaddingBase());
+                b, aVar.getGenicStatus(), aVar.getVariantFrequency(), aVar.getHgvsName(), aVar.getRgdId(), aVar.getVariantType(), aVar.getPaddingBase(), aVar.rsId);
     }
 
     public List<ConservationScore> getConservationScore() {
@@ -105,6 +108,14 @@ public class Variant implements Serializable {
 
     public void setConservationScore(List<ConservationScore> conservationScore) {
         this.conservationScore = conservationScore;
+    }
+
+    public String getRsId() {
+        return rsId;
+    }
+
+    public void setRsId(String rsId) {
+        this.rsId = rsId;
     }
 
     public long getId() {
@@ -302,4 +313,24 @@ public class Variant implements Serializable {
     public void setPaddingBase(String paddingBase) {
         this.paddingBase = paddingBase;
     }
+    @Override
+    public boolean equals(Object obj){
+            Variant v= (Variant) obj;
+            return (Objects.equals(chromosome, v.getChromosome())) &&
+                    ( startPos==v.startPos ) &&
+                    (endPos==v.getEndPos()) &&
+                    (Objects.equals(referenceNucleotide, v.getReferenceNucleotide())) &&
+                    (depth==v.getDepth()) &&
+                    (qualityScore==v.getQualityScore()) &&
+                   /* (zygosityPercentRead==v.getZygosityPercentRead())&&
+                    (zygosityNumberAllele==v.getZygosityNumberAllele())&&
+                    (Objects.equals(zygosityRefAllele, v.getZygosityRefAllele()))&&
+                    (variantFrequency==v.getVariantFrequency()) &&*/
+                    (Objects.equals(hgvsName, v.getHgvsName())) &&
+                    (Objects.equals(variantType, v.getVariantType())) &&
+                    (Objects.equals(paddingBase, v.getPaddingBase()));
+
+
+    }
+
 }
