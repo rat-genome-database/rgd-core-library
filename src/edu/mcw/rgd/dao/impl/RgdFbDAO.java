@@ -36,11 +36,12 @@ public class RgdFbDAO extends AbstractDAO {
         return FBPersonQuery.execute(this,getDataSource(),query);
     }
 
-    public void insertMessage(String subject, String message, int type, int personId) throws Exception {
+    public int insertMessage(String subject, String message, int type, int personId) throws Exception {
         String query = "insert into FB_QUESTION (MESSAGE_ID, SUBJECT, MESSAGE, MESSAGE_DATE, TYPE_ID, PERSON_ID) " +
                 "values(?, ?, ?, CURRENT_DATE, ?, ?)";
         int messageId = this.getNextKeyFromSequence("FB_QUESTION_SEQ");
         update(query, messageId, subject, message, type, personId);
+        return messageId;
     }
 
     public void updatePerson(FBPerson person) throws Exception {
