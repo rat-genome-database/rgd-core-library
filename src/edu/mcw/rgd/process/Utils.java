@@ -152,9 +152,8 @@ public class Utils {
      * @param date date object, or null for today's date
      * @param daysToAdd number of days to add; could be negative
      * @return return date object incremented by given amount of days
-     * @throws ParseException
      */
-    static public Date addDaysToDate( Date date, int daysToAdd ) throws ParseException {
+    static public Date addDaysToDate( Date date, int daysToAdd ) {
         int hoursToAdd = 24*daysToAdd;
         return addHoursToDate(date, hoursToAdd);
     }
@@ -163,17 +162,33 @@ public class Utils {
      * given a date, add some hours to the date
      * note: you can pass 'null' for todays date!
      * @param date date object, or null for today's date
-     * @param hoursToAdd number of days to add; could be negative
-     * @return return date object incremented by given amount of days
-     * @throws ParseException
+     * @param hoursToAdd number of hours to add; if negative hours are subtracted from the date
+     * @return return date object incremented by given amount of hours
      */
-    static public Date addHoursToDate( Date date, int hoursToAdd ) throws ParseException {
+    static public Date addHoursToDate( Date date, int hoursToAdd ) {
 
         java.util.Date syncDate = date==null ? new Date() : date;
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(syncDate);
         calendar.add(Calendar.HOUR, hoursToAdd);
+        return calendar.getTime();
+    }
+
+    /**
+     * given a date, add some minutes to the date
+     * note: you can pass 'null' for todays date!
+     * @param date date object, or null for today's date
+     * @param minutesToAdd number of minutes to add; if negative minutes are subtracted from the date
+     * @return return date object incremented by given amount of minutes
+     */
+    static public Date addMinutesToDate( Date date, int minutesToAdd ) {
+
+        java.util.Date syncDate = date==null ? new Date() : date;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(syncDate);
+        calendar.add(Calendar.MINUTE, minutesToAdd);
         return calendar.getTime();
     }
 
