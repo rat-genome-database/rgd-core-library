@@ -33,10 +33,19 @@ public class VariantObject {
     private Integer fullRefAAPos;
     private String tripletError;
     private String frameShift;
+    private VariantSampleDetail vsd;
 
     //===========================
 
     private BigDecimal conScore;
+
+    public VariantSampleDetail getVsd() {
+        return vsd;
+    }
+
+    public void setVsd(VariantSampleDetail vsd) {
+        this.vsd = vsd;
+    }
 
     public long getId() {
         return id;

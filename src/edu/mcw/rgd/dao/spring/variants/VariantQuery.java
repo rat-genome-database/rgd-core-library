@@ -1,6 +1,8 @@
 package edu.mcw.rgd.dao.spring.variants;
 
+import edu.mcw.rgd.datamodel.variants.SampleManager;
 import edu.mcw.rgd.datamodel.variants.VariantObject;
+import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
@@ -43,6 +45,25 @@ public class VariantQuery  extends MappingSqlQuery {
         obj.setFullRefAASeqKey(rs.getInt("full_ref_aa_seq_key"));
         obj.setTripletError(rs.getString("triplet_error"));
         obj.setFrameShift(rs.getString("frameshift"));
+        VariantSampleDetail vsd=new VariantSampleDetail();
+        vsd.setId(rs.getInt("rgd_id"));
+        vsd.setSource(rs.getString("source"));
+        vsd.setSampleId(rs.getInt("sample_id"));
+        vsd.setDepth(rs.getInt("total_depth"));
+        vsd.setVariantFrequency(rs.getInt("var_freq"));
+        vsd.setZygosityStatus(rs.getString("zygosity_status"));
+        vsd.setZygosityPercentRead(rs.getInt("zygosity_percent_read"));
+        vsd.setZygosityPossibleError(rs.getString("zygosity_poss_error"));
+        vsd.setZygosityRefAllele(rs.getString("zygosity_ref_allele"));
+        vsd.setZygosityNumberAllele(rs.getInt("zygosity_num_allele"));
+        vsd.setZygosityInPseudo(rs.getString("zygosity_in_pseudo"));
+        vsd.setQualityScore(rs.getInt("quality_score"));
+        try {
+            vsd.setAnalysisName(SampleManager.getInstance().getSampleName(rs.getInt("sample_id")).getAnalysisName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        obj.setVsd(vsd);
         return obj;
     }
 }
