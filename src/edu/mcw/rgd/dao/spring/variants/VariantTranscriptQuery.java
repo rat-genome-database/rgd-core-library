@@ -30,7 +30,7 @@ public class VariantTranscriptQuery extends MappingSqlQuery<VariantTranscript> {
         t.setFullRefAASeqKey(rs.getInt("full_ref_aa_seq_key"));
         t.setTripletError(rs.getString("triplet_error"));
         t.setFrameShift(rs.getString("frameshift"));
-
+        t.setPolyphenStatus(rs.getString("PREDICTION"));
         return t;
 
     }
