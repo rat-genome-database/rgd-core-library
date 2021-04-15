@@ -24,11 +24,8 @@ public class GeneOntologyEnrichmentProcess{
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
+    public BigDecimal calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
-        NumberFormat formatter = new DecimalFormat("0.0E0");
-        formatter.setRoundingMode(RoundingMode.HALF_UP);
-        formatter.setMinimumFractionDigits(2);
         MathContext mc = new MathContext(3);
 
         try {
@@ -36,9 +33,9 @@ public class GeneOntologyEnrichmentProcess{
                     new HypergeometricDistribution(refGenes, refAnnotGenes, inputGenes);
 
             BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes), mc);
-            String p = formatter.format(pvalue);
+            //String p = formatter.format(pvalue);
 
-            return p;
+            return pvalue;
         }catch(Exception e) {
 
         }
