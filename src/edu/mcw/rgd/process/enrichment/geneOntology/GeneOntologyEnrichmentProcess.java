@@ -15,27 +15,48 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class GeneOntologyEnrichmentProcess{
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public BigDecimal calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
+    public int calculateOddsRatio(int inputGenes,int refGenes,int inputAnnotGenes, int refAnnotGenes) throws Exception{
+        int a = inputAnnotGenes;
+        int c = refAnnotGenes - a;
+        int b = inputGenes - a;
+        int d = refGenes - refAnnotGenes;
+
+        int oddsRatio = (a*d)/(b*c);
+
+        return oddsRatio;
+    }
+    public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
         MathContext mc = new MathContext(3);
-
+        NumberFormat formatter = new DecimalFormat("0.0E0");
+        formatter.setRoundingMode(RoundingMode.HALF_UP);
+        formatter.setMinimumFractionDigits(2);
         try {
             HypergeometricDistribution hg =
                     new HypergeometricDistribution(refGenes, refAnnotGenes, inputGenes);
 
-            BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes), mc);
-            //String p = formatter.format(pvalue);
+            BigDecimal pvalue = new BigDecimal(0);
+            IntStream range = IntStream.rangeClosed(inputAnnotGenes, inputGenes);
+            List<BigDecimal> probabilities = Collections.synchronizedList(new ArrayList<>());
+            range.parallel().forEach(x -> {
+                probabilities.add(new BigDecimal(hg.probability(x), mc));
+            });
 
-            return pvalue;
+            for(BigDecimal probability:probabilities) {
+                pvalue = pvalue.add(probability);
+            }
+            //pvalue = new BigDecimal(hg.probability(inputAnnotGenes),mc);
+
+            String p = formatter.format(pvalue);
+
+            return p;
         }catch(Exception e) {
 
         }
