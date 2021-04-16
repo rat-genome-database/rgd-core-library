@@ -22,13 +22,13 @@ public class GeneOntologyEnrichmentProcess{
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public int calculateOddsRatio(int inputGenes,int refGenes,int inputAnnotGenes, int refAnnotGenes) throws Exception{
-        int a = inputAnnotGenes;
-        int c = refAnnotGenes - a;
-        int b = inputGenes - a;
-        int d = refGenes - refAnnotGenes;
+    public float calculateOddsRatio(int inputGenes,int refGenes,int inputAnnotGenes, int refAnnotGenes) throws Exception{
+        float a = inputAnnotGenes;
+        float c = refAnnotGenes - a;
+        float b = inputGenes - a;
+        float d = refGenes - refAnnotGenes;
 
-        int oddsRatio = (a*d)/(b*c);
+        float oddsRatio = (a*d)/(b*c);
 
         return oddsRatio;
     }
