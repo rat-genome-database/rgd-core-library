@@ -15,27 +15,45 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class GeneOntologyEnrichmentProcess{
 
     protected final Log logger = LogFactory.getLog(getClass());
 
+    public float calculateOddsRatio(int inputGenes,int refGenes,int inputAnnotGenes, int refAnnotGenes) throws Exception{
+        float a = inputAnnotGenes;
+        float c = refAnnotGenes - a;
+        float b = inputGenes - a;
+        float d = refGenes - refAnnotGenes;
+
+        float oddsRatio = (a*d)/(b*c);
+
+        return oddsRatio;
+    }
     public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
+        MathContext mc = new MathContext(3);
         NumberFormat formatter = new DecimalFormat("0.0E0");
         formatter.setRoundingMode(RoundingMode.HALF_UP);
         formatter.setMinimumFractionDigits(2);
-        MathContext mc = new MathContext(3);
-
         try {
             HypergeometricDistribution hg =
                     new HypergeometricDistribution(refGenes, refAnnotGenes, inputGenes);
 
-            BigDecimal pvalue = new BigDecimal(hg.probability(inputAnnotGenes), mc);
+            BigDecimal pvalue = new BigDecimal(0);
+            IntStream range = IntStream.rangeClosed(inputAnnotGenes, inputGenes);
+            List<BigDecimal> probabilities = Collections.synchronizedList(new ArrayList<>());
+            range.parallel().forEach(x -> {
+                probabilities.add(new BigDecimal(hg.probability(x), mc));
+            });
+
+            for(BigDecimal probability:probabilities) {
+                pvalue = pvalue.add(probability);
+            }
+            //pvalue = new BigDecimal(hg.probability(inputAnnotGenes),mc);
+
             String p = formatter.format(pvalue);
 
             return p;
