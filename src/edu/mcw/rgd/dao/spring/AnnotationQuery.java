@@ -56,6 +56,7 @@ public class AnnotationQuery extends MappingSqlQuery {
 
         annot.setAnnotationExtension(rs.getString("annotation_extension"));
         annot.setGeneProductFormId(rs.getString("gene_product_form_id"));
+        annot.setOriginalCreatedDate(rs.getTimestamp("original_created_date"));
 
         return annot;
     }

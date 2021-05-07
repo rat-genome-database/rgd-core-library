@@ -8,7 +8,6 @@ import java.util.Date;
 /**
  * @author jdepons
  * @since Mar 20, 2009
- * <p>
  * Bean class for an ontology annotation
  */
 public class Annotation implements Cloneable, Dumpable {
@@ -35,6 +34,7 @@ public class Annotation implements Cloneable, Dumpable {
     private int speciesTypeKey; // optional: if 0, it is undefined
     private String annotationExtension;
     private String geneProductFormId;
+    private Date originalCreatedDate;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -225,6 +225,14 @@ public class Annotation implements Cloneable, Dumpable {
         this.geneProductFormId = geneProductFormId;
     }
 
+    public Date getOriginalCreatedDate() {
+        return originalCreatedDate;
+    }
+
+    public void setOriginalCreatedDate(Date originalCreatedDate) {
+        this.originalCreatedDate = originalCreatedDate;
+    }
+
     public String dump(String delimiter) {
 
         return new Dumper(delimiter, true, true)
@@ -251,6 +259,7 @@ public class Annotation implements Cloneable, Dumpable {
             .put("SPECIES_TYPE_KEY", speciesTypeKey)
             .put("ANNOT_EXT", annotationExtension)
             .put("PRODUCT_ID", geneProductFormId)
+            .put("ORIG_CREATED_DATE", originalCreatedDate)
             .dump();
     }
 }

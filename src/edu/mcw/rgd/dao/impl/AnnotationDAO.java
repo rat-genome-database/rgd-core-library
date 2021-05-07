@@ -1948,7 +1948,7 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, " +
                 "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?, " +
                 "relative_to=?, last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, " +
-                "annotation_extension=?, gene_product_form_id=?, notes=? " +
+                "annotation_extension=?, gene_product_form_id=?, notes=?, original_created_date=? " +
                 "WHERE full_annot_key=?";
 
         return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
@@ -1956,7 +1956,7 @@ public class AnnotationDAO extends AbstractDAO {
                 annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getQualifier(),
                 annot.getRelativeTo(), annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
                 annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
-                annot.getGeneProductFormId(), annot.getNotes(), annot.getKey());
+                annot.getGeneProductFormId(), annot.getNotes(), annot.getOriginalCreatedDate(), annot.getKey());
     }
 
     /**
@@ -1975,8 +1975,8 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
                 " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
                 " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
-                " xref_source, annotation_extension, gene_product_form_id, full_annot_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
+                " xref_source, annotation_extension, gene_product_form_id, original_created_date, full_annot_key) "+
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
                 "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
 
         try( Connection conn = this.getConnection() ) {
@@ -2000,16 +2000,17 @@ public class AnnotationDAO extends AbstractDAO {
             cs.setString(17, annot.getXrefSource());
             cs.setString(18, annot.getAnnotationExtension());
             cs.setString(19, annot.getGeneProductFormId());
+            setTimestamp(cs, 20, annot.getOriginalCreatedDate());
 
-            cs.registerOutParameter(20, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(21, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(22, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(21, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(22, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(23, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(20));
-            annot.setCreatedDate(cs.getTimestamp(21));
-            annot.setLastModifiedDate(cs.getTimestamp(22));
+            annot.setKey(cs.getInt(21));
+            annot.setCreatedDate(cs.getTimestamp(22));
+            annot.setLastModifiedDate(cs.getTimestamp(23));
         }
 
         return annot.getKey();
