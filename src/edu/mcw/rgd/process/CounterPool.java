@@ -52,7 +52,7 @@ public class CounterPool {
         return buf.toString();
     }
 
-    /// dump all counters in alphabetic order
+    /// dump all counters in alphabetic order; counts are formatted with thousand separator
     public String dumpAlphabetically() {
 
         TreeSet<String> sortedCounterNames = new TreeSet<>(_map.keySet());
@@ -61,7 +61,7 @@ public class CounterPool {
         for( String counterName: sortedCounterNames ) {
             buf.append(counterName)
                     .append(" : ")
-                    .append(_map.get(counterName))
+                    .append(Utils.formatThousands(_map.get(counterName)))
                     .append("\n");
         }
         buf.append("=========\n");
