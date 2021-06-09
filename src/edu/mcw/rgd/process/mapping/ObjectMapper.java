@@ -353,7 +353,7 @@ public class ObjectMapper {
             }
 
             if (lst.size()==0) {
-                log.add("<span style='color:red'>Could not find rgd object for symbol " + symbol + " and species " + SpeciesType.getTaxonomicName(speciesTypeKey) + "</span>");
+                log.add("<span style='color:red'>Could not find rgd object for symbol <b>" + symbol + "</b> and species " + SpeciesType.getTaxonomicName(speciesTypeKey) + "</span>");
                 logUnformatted.add("Could not find rgd object for symbol " + symbol + " and species " + SpeciesType.getTaxonomicName(speciesTypeKey));
                 this.mapped.add(symbol);
             }
