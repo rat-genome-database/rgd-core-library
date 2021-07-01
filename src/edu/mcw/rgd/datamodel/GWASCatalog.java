@@ -2,6 +2,7 @@ package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Utils;
 
+import javax.rmi.CORBA.Util;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.sql.Date;
@@ -14,7 +15,7 @@ public class GWASCatalog {
     private String replicateSample;
     private String region;
     private String chr;
-    private Integer pos;
+    private String pos;
     private String reportedGenes;
     private String mappedGene;
     private String snpGeneId;
@@ -32,7 +33,7 @@ public class GWASCatalog {
 
     public GWASCatalog(){};
 
-    public GWASCatalog(GWASCatalog gc, String chrom, Integer position, String riskAllele, String snp){
+    public GWASCatalog(GWASCatalog gc, String chrom, String position, String riskAllele, String snp){
         pmid = gc.getPmid();
         diseaseTrait = gc.getDiseaseTrait();
         initialSample = gc.getInitialSample();
@@ -104,11 +105,11 @@ public class GWASCatalog {
         this.chr = chr;
     }
 
-    public Integer getPos() {
+    public String getPos() {
         return pos;
     }
 
-    public void setPos(Integer pos) {
+    public void setPos(String pos) {
         this.pos = pos;
     }
 
@@ -247,7 +248,7 @@ public class GWASCatalog {
         GWASCatalog gc = (GWASCatalog) obj;
         return Utils.stringsAreEqual(pmid,gc.getPmid()) && Utils.stringsAreEqual(diseaseTrait, gc.getDiseaseTrait()) && Utils.stringsAreEqual(initialSample,gc.getInitialSample()) &&
                 Utils.stringsAreEqual(replicateSample,gc.getReplicateSample()) && Utils.stringsAreEqual(region, gc.getRegion()) && Utils.stringsAreEqual(chr, gc.getChr()) &&
-                pos.equals(gc.getPos()) && Utils.stringsAreEqual(reportedGenes, gc.getReportedGenes()) && Utils.stringsAreEqual(mappedGene,gc.getMappedGene()) &&
+                Utils.stringsAreEqual(pos,gc.getPos()) && Utils.stringsAreEqual(reportedGenes, gc.getReportedGenes()) && Utils.stringsAreEqual(mappedGene,gc.getMappedGene()) &&
                 Utils.stringsAreEqual(strongSnpRiskallele, gc.getStrongSnpRiskallele()) && Utils.stringsAreEqual(snps,gc.getSnps()) && Utils.stringsAreEqual(curSnpId,gc.getCurSnpId()) &&
                 Utils.stringsAreEqual(context,gc.getContext()) && Utils.stringsAreEqual(riskAlleleFreq,gc.getRiskAlleleFreq()) && Utils.stringsAreEqual(pVal,gc.getpValStr()) &&
                 pValMlog.equals(gc.getpValMlog()) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
@@ -257,7 +258,7 @@ public class GWASCatalog {
     @Override
     public int hashCode() {
         return Utils.defaultString(pmid).hashCode() ^ Utils.defaultString(diseaseTrait).hashCode() ^ Utils.defaultString(initialSample).hashCode() ^ Utils.defaultString(replicateSample).hashCode()
-                ^ Utils.defaultString(region).hashCode() ^ Utils.defaultString(chr).hashCode() ^ pos.hashCode() ^ Utils.defaultString(reportedGenes).hashCode() ^
+                ^ Utils.defaultString(region).hashCode() ^ Utils.defaultString(chr).hashCode() ^ Utils.defaultString(pos).hashCode() ^ Utils.defaultString(reportedGenes).hashCode() ^
                 Utils.defaultString(mappedGene).hashCode() ^ Utils.defaultString(strongSnpRiskallele).hashCode() ^ Utils.defaultString(snps).hashCode() ^ Utils.defaultString(curSnpId).hashCode()
                 ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ pValMlog.hashCode()
                 ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode();

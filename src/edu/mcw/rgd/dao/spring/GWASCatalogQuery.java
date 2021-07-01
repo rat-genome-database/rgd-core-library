@@ -25,7 +25,7 @@ public class GWASCatalogQuery extends MappingSqlQuery {
         gc.setReplicateSample(rs.getString("REPLICATE_SAMPLE_SIZE"));
         gc.setRegion(rs.getString("REGION"));
         gc.setChr(rs.getString("CHROMOSOME"));
-        gc.setPos(Integer.getInteger(rs.getString("POS") ) );
+        gc.setPos(String.valueOf(rs.getInt("POS")));
         gc.setReportedGenes(rs.getString("REPORT_GENES"));
         gc.setMappedGene(rs.getString("MAPPED_GENES"));
         gc.setStrongSnpRiskallele(rs.getString("SNP_RISK_ALLELE"));
