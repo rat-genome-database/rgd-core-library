@@ -42,6 +42,7 @@ public class GWASCatalog {
         chr = chrom;
         pos = position;
         reportedGenes = gc.getReportedGenes();
+        mappedGene = gc.getMappedGene();
         strongSnpRiskallele = riskAllele;
         snps = snp;
         curSnpId = gc.getCurSnpId();
