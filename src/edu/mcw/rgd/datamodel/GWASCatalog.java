@@ -25,7 +25,7 @@ public class GWASCatalog {
     private String context;
     private String riskAlleleFreq;
     private String pVal;
-    private BigDecimal pValMlog;
+    private Double pValMlog;
     private String snpPassQc;
     private String mapTrait;
     private String studyAcc;
@@ -191,16 +191,11 @@ public class GWASCatalog {
         this.pVal = pVal;
     }
 
-    public BigDecimal getpValMlog() {
+    public Double getpValMlog() {
         return pValMlog;
     }
 
-    public void setpValMlog(String pValMlog){
-        BigDecimal b = new BigDecimal(pValMlog, MathContext.DECIMAL64);
-        this.pValMlog = b;
-    }
-
-    public void setpValMlog(BigDecimal pValMlog) {
+    public void setpValMlog(Double pValMlog) {
         this.pValMlog = pValMlog;
     }
 

@@ -38,7 +38,7 @@ public class GWASCatalogDAO extends AbstractDAO {
             gc.setGwasId(gwasId);
 
             su.update(gc.getGwasId(),gc.getPmid(),gc.getDiseaseTrait(),gc.getInitialSample(), gc.getReplicateSample(),gc.getRegion(),gc.getChr(),gc.getPos(),
-            gc.getReportedGenes(),gc.getMappedGene(),gc.getStrongSnpRiskallele(),gc.getSnps(),gc.getCurSnpId(),gc.getContext(),gc.getRiskAlleleFreq(),gc.getpValStr(),gc.getpValMlog().doubleValue(),
+            gc.getReportedGenes(),gc.getMappedGene(),gc.getStrongSnpRiskallele(),gc.getSnps(),gc.getCurSnpId(),gc.getContext(),gc.getRiskAlleleFreq(),gc.getpValStr(),gc.getpValMlog(),
             gc.getSnpPassQc(),gc.getMapTrait(),gc.getEfoId(),gc.getStudyAcc());
         }
         return executeBatch(su);

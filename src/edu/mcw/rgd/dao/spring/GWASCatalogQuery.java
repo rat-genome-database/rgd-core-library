@@ -34,7 +34,7 @@ public class GWASCatalogQuery extends MappingSqlQuery {
         gc.setContext(rs.getString("CONTEXT"));
         gc.setRiskAlleleFreq(rs.getString("RISK_ALLELE_FREQ"));
         gc.setpVal(rs.getString("P_VALUE"));
-        gc.setpValMlog(rs.getString("P_VALUE_MLOG"));
+        gc.setpValMlog(rs.getDouble("P_VALUE_MLOG"));
         gc.setSnpPassQc(rs.getString("SNP_PASSING_QC"));
         gc.setMapTrait(rs.getString("MAPPED_TRAIT"));
         gc.setEfoId(rs.getString("EFO_IDS"));
