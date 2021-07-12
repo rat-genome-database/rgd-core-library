@@ -36,13 +36,9 @@ public class GenomicElementQuery extends MappingSqlQuery {
         obj.setSoAccId(rs.getString("so_acc_id"));
         obj.setNotes(rs.getString("notes"));
 
-        try {
-            obj.setGenomicAlteration(rs.getString("genomic_alteration"));
-            obj.setSpeciesTypeKey(rs.getInt("species_type_key"));
-            obj.setObjectStatus(rs.getString("object_status"));
-            obj.setObjectKey(rs.getInt("object_key"));
-        }catch (Exception ignored) {
-
-        }
+        try { obj.setGenomicAlteration(rs.getString("genomic_alteration")); }catch (Exception ignored) { }
+        try { obj.setSpeciesTypeKey(rs.getInt("species_type_key")); }catch (Exception ignored) { }
+        try { obj.setObjectStatus(rs.getString("object_status")); }catch (Exception ignored) { }
+        try { obj.setObjectKey(rs.getInt("object_key")); }catch (Exception ignored) { }
     }
 }
