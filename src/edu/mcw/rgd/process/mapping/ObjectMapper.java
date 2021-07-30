@@ -126,11 +126,11 @@ public class ObjectMapper {
         for (String symbol: symbols) {
 
             //strip off trailing dot values
-            Pattern p = Pattern.compile("(.*)(\\.\\d+)");
-            Matcher m = p.matcher(symbol);
-            if (m.matches()) {
-                symbol=(m.group(1));
-            }
+//            Pattern p = Pattern.compile("(.*)(\\.\\d+)");
+//            Matcher m = p.matcher(symbol);
+//            if (m.matches()) {
+//                symbol=(m.group(1));
+//            }
 
             //check for numeric values
             try {
@@ -220,8 +220,8 @@ public class ObjectMapper {
             }
 
             //check if an ontology term
-            p = Pattern.compile("\\w+\\:\\d\\d\\d\\d\\d\\d\\d");
-            m = p.matcher(symbol);
+            Pattern p = Pattern.compile("\\w+\\:\\d\\d\\d\\d\\d\\d\\d");
+            Matcher m = p.matcher(symbol);
             if (m.matches()) {
                 List<Gene> genes = gdao.getActiveAnnotatedGenes(symbol.toUpperCase(),speciesTypeKey);
 
