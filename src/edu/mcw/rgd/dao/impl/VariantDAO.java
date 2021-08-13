@@ -592,16 +592,17 @@ public class VariantDAO extends JdbcBaseDAO {
         return totalRowsAffected;
     }
 
- 	/**
- 	* @param sampleId
- 	* @param chr
- 	* @param start
- 	* @param stop
- 	* @return
- 	*/
  	public List<Variant> getVariants(int sampleId, String chr, long start, long stop) {
 
-        String sql = "SELECT * FROM "+getVariantTable(sampleId)+" WHERE sample_id=? AND start_pos >= ? AND start_pos <= ? AND chromosome=?";
+ 	    // obsolete: old variant table structure
+        //String sql = "SELECT * FROM "+getVariantTable(sampleId)+" WHERE sample_id=? AND start_pos >= ? AND start_pos <= ? AND chromosome=?";
+
+        String sql ="SELECT v.rgd_id VARIANT_ID,m.chromosome,d.sample_id,m.start_pos,m.end_pos,d.var_freq,d.total_depth,d.quality_score,v.ref_nuc,v.var_nuc"
+            +",d.zygosity_status,d.zygosity_in_pseudo,d.zygosity_num_allele,d.zygosity_percent_read,d.zygosity_poss_error,d.zygosity_ref_allele,m.genic_status"
+            +",null HGVS_NAME,v.rgd_id,v.variant_type,m.padding_base "
+            +"FROM variant v, variant_sample_detail d, variant_map_data m "
+            +"WHERE d.rgd_id=m.rgd_id AND v.rgd_id=m.rgd_id AND sample_id=? AND start_pos BETWEEN ? AND  ? AND chromosome=?";
+
 
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
