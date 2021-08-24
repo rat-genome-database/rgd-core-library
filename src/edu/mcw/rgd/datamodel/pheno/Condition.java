@@ -95,7 +95,7 @@ public class Condition {
     }
 
     public String getValue() {
-        return (valueMin == null || valueMax == null || valueMin.equals(valueMax)) ? valueMin : valueMin + "~" + valueMax;
+        return (valueMin == null || valueMax == null || valueMin.equals(valueMax)) ? valueMin : valueMin + "-" + valueMax;
     }
 
     public void setValue(String value) {
