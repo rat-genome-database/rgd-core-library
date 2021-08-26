@@ -2,10 +2,9 @@ package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Utils;
 
-import javax.rmi.CORBA.Util;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.sql.Date;
+
 
 public class GWASCatalog {
     private int gwasId;
@@ -30,6 +29,7 @@ public class GWASCatalog {
     private String mapTrait;
     private String studyAcc;
     private String efoId;
+    private String orBeta;
 
     public GWASCatalog(){};
 
@@ -54,6 +54,7 @@ public class GWASCatalog {
         mapTrait = gc.getMapTrait();
         efoId = gc.getEfoId();
         studyAcc = gc.getStudyAcc();
+        orBeta = gc.orBeta;
     }
 
     public String print(){return pmid+"|"+diseaseTrait+"|"+initialSample+"|"+replicateSample+"|"+region+"|"+chr+"|"+pos+"|"+reportedGenes+"|"+strongSnpRiskallele+"|"+snps+"|"+curSnpId+"|"+context+"|"+riskAlleleFreq+"|"+pVal+"|"+pValMlog+"|"+snpPassQc+"|"+mapTrait+"|"+efoId+"|"+studyAcc;}
@@ -239,6 +240,14 @@ public class GWASCatalog {
         this.efoId = efoId;
     }
 
+    public void setOrBeta(String orBeta){
+        this.orBeta = orBeta;
+    }
+
+    public String getOrBeta(){
+        return orBeta;
+    }
+
     @Override
     public boolean equals(Object obj) {
         GWASCatalog gc = (GWASCatalog) obj;
@@ -248,7 +257,7 @@ public class GWASCatalog {
                 Utils.stringsAreEqual(strongSnpRiskallele, gc.getStrongSnpRiskallele()) && Utils.stringsAreEqual(snps,gc.getSnps()) && Utils.stringsAreEqual(curSnpId,gc.getCurSnpId()) &&
                 Utils.stringsAreEqual(context,gc.getContext()) && Utils.stringsAreEqual(riskAlleleFreq,gc.getRiskAlleleFreq()) && Utils.stringsAreEqual(pVal,gc.getpValStr()) &&
                 pValMlog.equals(gc.getpValMlog()) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
-                Utils.stringsAreEqual(efoId, gc.getEfoId()) && Utils.stringsAreEqual(studyAcc,gc.getStudyAcc());
+                Utils.stringsAreEqual(efoId, gc.getEfoId()) && Utils.stringsAreEqual(studyAcc,gc.getStudyAcc()) && Utils.stringsAreEqual(orBeta,gc.getOrBeta());
     }
 
     @Override
@@ -257,6 +266,6 @@ public class GWASCatalog {
                 ^ Utils.defaultString(region).hashCode() ^ Utils.defaultString(chr).hashCode() ^ Utils.defaultString(pos).hashCode() ^ Utils.defaultString(reportedGenes).hashCode() ^
                 Utils.defaultString(mappedGene).hashCode() ^ Utils.defaultString(strongSnpRiskallele).hashCode() ^ Utils.defaultString(snps).hashCode() ^ Utils.defaultString(curSnpId).hashCode()
                 ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ pValMlog.hashCode()
-                ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode();
+                ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode() ^ Utils.defaultString(orBeta).hashCode();
     }
 }

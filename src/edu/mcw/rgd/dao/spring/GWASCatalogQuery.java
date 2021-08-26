@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.datamodel.Eva;
 import edu.mcw.rgd.datamodel.GWASCatalog;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
@@ -39,6 +38,7 @@ public class GWASCatalogQuery extends MappingSqlQuery {
         gc.setMapTrait(rs.getString("MAPPED_TRAIT"));
         gc.setEfoId(rs.getString("EFO_IDS"));
         gc.setStudyAcc(rs.getString("STUDY_ACC"));
+        gc.setOrBeta(rs.getString("OR_OR_BETA"));
         return gc;
     }
     public static List<GWASCatalog> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
