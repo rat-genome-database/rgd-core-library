@@ -673,6 +673,11 @@ public class VariantDAO extends JdbcBaseDAO {
         return getCount(sql);
     }
 
+    public int getCountofDamagingVariantsForSample2(int sampleId, String mapKey) throws Exception {
+        String sql = "select count(DISTINCT(p.VARIANT_RGD_ID)) as count from POLYPHEN p inner join variant_sample_detail v on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID ="+sampleId+" and s.MAP_KEY="+mapKey;
+        return getCount(sql);
+    }
+
     /**
      * get the list of damaging or possibly damaging variants associated with the sample
      * @param sampleId
