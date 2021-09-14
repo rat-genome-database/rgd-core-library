@@ -700,7 +700,10 @@ public class VariantDAO extends JdbcBaseDAO {
     }
 
     public List<DamagingVariant> getDamagingVariantsForSampleByAssembly2(int sampleId, int mapKey) throws Exception {
-        String sql = "select DISTINCT(va.RGD_ID),va.*,p.gene_symbol,vmd.* from variant va,variant_map_data vmd,POLYPHEN p inner join variant_sample_detail v on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID ="+sampleId+" and s.MAP_KEY="+ mapKey +" where vmd.rgd_id=va.rgd_id ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
+        String sql = "select DISTINCT(va.RGD_ID) as VAR_RGD_ID,va.*,p.gene_symbol,vmd.* from variant va,variant_map_data vmd,POLYPHEN p " +
+                "inner join variant_sample_detail v on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
+                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID ="+sampleId+" and s.MAP_KEY="+ mapKey +" where vmd.rgd_id=va.rgd_id " +
+                "ORDER BY vmd.CHROMOSOME,vmd.START_POS,vmd.END_POS,va.REF_NUC,va.VAR_NUC";
         AbstractDAO dao = new AbstractDAO();
         return DamagingVariantQuery.execute(dao,DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql,sampleId,mapKey);
     }

@@ -17,7 +17,7 @@ public class DamagingVariantQuery extends MappingSqlQuery {
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
         DamagingVariant dv = new DamagingVariant();
 
-        dv.setRgdId(rs.getInt("RGD_ID"));
+        dv.setRgdId(rs.getInt("VAR_RGD_ID"));
         dv.setRefNuc(rs.getString("REF_NUC"));
         dv.setVariantType(rs.getString("VARIANT_TYPE"));
         dv.setVarNuc(rs.getString("VAR_NUC"));
