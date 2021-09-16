@@ -702,7 +702,7 @@ public class VariantDAO extends JdbcBaseDAO {
     public List<DamagingVariant> getDamagingVariantsForSampleByAssembly2(int sampleId, int mapKey) throws Exception {
         String sql = "select DISTINCT(va.RGD_ID) as VAR_RGD_ID,va.REF_NUC,va.VARIANT_TYPE,va.VAR_NUC,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.START_POS,vmd.END_POS,vmd.GENIC_STATUS," +
                 " v.SAMPLE_ID,v.TOTAL_DEPTH,v.VAR_FREQ,v.ZYGOSITY_STATUS,v.ZYGOSITY_IN_PSEUDO,v.ZYGOSITY_NUM_ALLELE,v.ZYGOSITY_PERCENT_READ," +
-                " v.ZYGOSITY_POSS_ERROR,v.ZYGOSITY_REF_ALLELE,p.gene_symbol" +
+                " v.ZYGOSITY_POSS_ERROR,v.ZYGOSITY_REF_ALLELE,v.QUALITY_SCORE,p.gene_symbol" +
                 " from variant va" +
                 " inner join POLYPHEN p on p.PREDICTION LIKE '%damaging'" +
                 " inner join variant_sample_detail v on p.VARIANT_RGD_ID=v.RGD_ID and v.total_depth > 8" +
