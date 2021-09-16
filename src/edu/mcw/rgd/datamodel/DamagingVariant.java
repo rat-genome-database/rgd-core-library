@@ -16,6 +16,17 @@ public class DamagingVariant {
     private int endPos;
     private String genicStatus;
     private int mapKey;
+    private int sampleId;
+    private int variantFrequency;
+    private int depth;
+    private int qualityScore;
+    private String zygosityStatus;
+    private String zygosityInPseudo;
+    private int zygosityNumberAllele;
+    private int zygosityPercentRead;
+    private String zygosityPossibleError;
+    private String zygosityRefAllele;
+
 
     public DamagingVariant() {}
 
@@ -129,5 +140,85 @@ public class DamagingVariant {
 
     public void setMapKey(int mapKey) {
         this.mapKey = mapKey;
+    }
+
+    public int getSampleId() {
+        return sampleId;
+    }
+
+    public void setSampleId(int sampleId) {
+        this.sampleId = sampleId;
+    }
+
+    public int getVariantFrequency() {
+        return variantFrequency;
+    }
+
+    public void setVariantFrequency(int variantFrequency) {
+        this.variantFrequency = variantFrequency;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public int getQualityScore() {
+        return qualityScore;
+    }
+
+    public void setQualityScore(int qualityScore) {
+        this.qualityScore = qualityScore;
+    }
+
+    public String getZygosityStatus() {
+        return zygosityStatus;
+    }
+
+    public void setZygosityStatus(String zygosityStatus) {
+        this.zygosityStatus = zygosityStatus;
+    }
+
+    public String getZygosityInPseudo() {
+        return zygosityInPseudo;
+    }
+
+    public void setZygosityInPseudo(String zygosityInPseudo) {
+        this.zygosityInPseudo = zygosityInPseudo;
+    }
+
+    public int getZygosityNumberAllele() {
+        return zygosityNumberAllele;
+    }
+
+    public void setZygosityNumberAllele(int zygosityNumberAllele) {
+        this.zygosityNumberAllele = zygosityNumberAllele;
+    }
+
+    public int getZygosityPercentRead() {
+        return zygosityPercentRead;
+    }
+
+    public void setZygosityPercentRead(int zygosityPercentRead) {
+        this.zygosityPercentRead = zygosityPercentRead;
+    }
+
+    public String getZygosityPossibleError() {
+        return zygosityPossibleError;
+    }
+
+    public void setZygosityPossibleError(String zygosityPossibleError) {
+        this.zygosityPossibleError = zygosityPossibleError;
+    }
+
+    public String getZygosityRefAllele() {
+        return zygosityRefAllele;
+    }
+
+    public void setZygosityRefAllele(String zygosityRefAllele) {
+        this.zygosityRefAllele = zygosityRefAllele;
     }
 }
