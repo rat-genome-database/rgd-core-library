@@ -1,8 +1,5 @@
 package edu.mcw.rgd.dao.impl;
 
-import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.dao.DataSourceFactory;
-import edu.mcw.rgd.dao.spring.DamagingVariantQuery;
 import edu.mcw.rgd.dao.spring.VariantMapper;
 import edu.mcw.rgd.datamodel.*;
 import org.springframework.jdbc.core.SqlParameter;
@@ -37,7 +34,7 @@ public class VariantDAO extends JdbcBaseDAO {
         if( sampleId>=6000 && sampleId<=6999 ) {
             return "variant_transcript_dog";
         }
-       
+
         return "variant_transcript";
     }
     public String getPolyphenTable(int sampleId) {
@@ -45,7 +42,7 @@ public class VariantDAO extends JdbcBaseDAO {
         if( sampleId>=6000 && sampleId<=6999 ) {
             return "polyphen_dog";
         }
-     
+
         return "polyphen";
     }
     /**
@@ -292,10 +289,10 @@ public class VariantDAO extends JdbcBaseDAO {
             if (vsb.hasDBSNP() || vsb.getNovelDBSNP()) {
                 sql += " left outer JOIN sample s ON (v.sample_id=s.sample_id AND s.MAP_KEY=" + vsb.getMapKey() + ") " +
 
-                    " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
-                    "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
-                    "    AND v.VAR_NUC = dbs.ALLELE  " +
-                    "    AND dbs.MAP_KEY = s.MAP_KEY AND dbs.source=s.dbsnp_source) \n ";
+                        " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
+                        "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
+                        "    AND v.VAR_NUC = dbs.ALLELE  " +
+                        "    AND dbs.MAP_KEY = s.MAP_KEY AND dbs.source=s.dbsnp_source) \n ";
             }
 
             sqlFrom += ",dbs.* , dbs.snp_name as MCW_DBS_SNP_NAME";
@@ -347,7 +344,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
 
         if (vsb.isShowDifferences()) {
-        sql += "and (v.chromosome, v.start_pos, v.var_nuc) in (";
+            sql += "and (v.chromosome, v.start_pos, v.var_nuc) in (";
             sql += "select chromosome, start_pos, var_nuc from (select v.chromosome, v.start_pos,v.var_nuc, count(*) from " + sub;
             sql += " group by v.chromosome,v.start_pos,v.var_nuc having count(*) < " + vsb.sampleIds.size() + "))";
         }
@@ -358,7 +355,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql = sqlFrom + " from " +  sql;
 
         logger.debug("Running Search SQL getVariantResults() : \n" + sql + "\n");
-       
+
         List<VariantResult> vrList = new ArrayList<VariantResult>();
         try( Connection conn = this.getDataSource().getConnection()) {
 
@@ -487,17 +484,17 @@ public class VariantDAO extends JdbcBaseDAO {
 
         String tableName = getVariantTable(sampleId);
         String sqlUpdate = "UPDATE "+tableName+" SET\n" +
-            " chromosome=?, end_pos=?, ref_nuc=?, sample_id=?, start_pos=?,\n" +
-            " total_depth=?, var_freq=?, quality_score=?, rgd_id=?, hgvs_name=?,\n" +
-            " variant_type=?, var_nuc=?, zygosity_status=?, genic_status=?, zygosity_percent_read=?,\n" +
-            " zygosity_num_allele=?, zygosity_poss_error=?, zygosity_ref_allele=?, zygosity_in_pseudo=?, padding_base=?\n" +
-            "WHERE variant_id=?";
+                " chromosome=?, end_pos=?, ref_nuc=?, sample_id=?, start_pos=?,\n" +
+                " total_depth=?, var_freq=?, quality_score=?, rgd_id=?, hgvs_name=?,\n" +
+                " variant_type=?, var_nuc=?, zygosity_status=?, genic_status=?, zygosity_percent_read=?,\n" +
+                " zygosity_num_allele=?, zygosity_poss_error=?, zygosity_ref_allele=?, zygosity_in_pseudo=?, padding_base=?\n" +
+                "WHERE variant_id=?";
         String sqlInsert = "INSERT INTO "+tableName+" (\n" +
-            " chromosome, end_pos, ref_nuc, sample_id, start_pos,\n" +
-            " total_depth, var_freq, quality_score, rgd_id, hgvs_name,\n" +
-            " variant_type, var_nuc, zygosity_status, genic_status, zygosity_percent_read,\n" +
-            " zygosity_num_allele, zygosity_poss_error, zygosity_ref_allele, zygosity_in_pseudo, padding_base, variant_id)\n" +
-            "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, VARIANT_SEQ.NEXTVAL)";
+                " chromosome, end_pos, ref_nuc, sample_id, start_pos,\n" +
+                " total_depth, var_freq, quality_score, rgd_id, hgvs_name,\n" +
+                " variant_type, var_nuc, zygosity_status, genic_status, zygosity_percent_read,\n" +
+                " zygosity_num_allele, zygosity_poss_error, zygosity_ref_allele, zygosity_in_pseudo, padding_base, variant_id)\n" +
+                "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, VARIANT_SEQ.NEXTVAL)";
 
         int countInserted = 0;
         try(Connection conn = this.getDataSource().getConnection() ) {
@@ -557,33 +554,33 @@ public class VariantDAO extends JdbcBaseDAO {
         String tableName = getVariantTable(sampleId);
 
         BatchSqlUpdate bsu = new BatchSqlUpdate(this.getDataSource(),
-            "INSERT INTO "+tableName+" (\n" +
-            " VARIANT_ID, CHROMOSOME, END_POS, REF_NUC, SAMPLE_ID,\n" +
-            " START_POS, TOTAL_DEPTH, VAR_FREQ, QUALITY_SCORE, RGD_ID,\n" +
-            " HGVS_NAME, VARIANT_TYPE, VAR_NUC, ZYGOSITY_STATUS, GENIC_STATUS,\n" +
-            " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
-            " PADDING_BASE)\n" +
-            "VALUES (\n" +
-            "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
-            "  ?,?,?,?,?,\n" +
-            "  ?,?,?,?,?,\n" +
-            "  ?,?,?,?,?,\n" +
-            "  ?)",
-            new int[]{Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER,
-                Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-                Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                Types.VARCHAR
-            }, 10000);
+                "INSERT INTO "+tableName+" (\n" +
+                        " VARIANT_ID, CHROMOSOME, END_POS, REF_NUC, SAMPLE_ID,\n" +
+                        " START_POS, TOTAL_DEPTH, VAR_FREQ, QUALITY_SCORE, RGD_ID,\n" +
+                        " HGVS_NAME, VARIANT_TYPE, VAR_NUC, ZYGOSITY_STATUS, GENIC_STATUS,\n" +
+                        " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
+                        " PADDING_BASE)\n" +
+                        "VALUES (\n" +
+                        "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
+                        "  ?,?,?,?,?,\n" +
+                        "  ?,?,?,?,?,\n" +
+                        "  ?,?,?,?,?,\n" +
+                        "  ?)",
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER,
+                        Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
+                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                        Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                        Types.VARCHAR
+                }, 10000);
         bsu.compile();
 
         for( Variant v: variantList ) {
             bsu.update(v.getChromosome(), v.getEndPos(), v.getReferenceNucleotide(), v.getSampleId(),
-                v.getStartPos(), v.getDepth(), v.getVariantFrequency(), v.getQualityScore(), v.getRgdId(),
-                v.getHgvsName(), v.getVariantType(), v.getVariantNucleotide(), v.getZygosityStatus(), v.getGenicStatus(),
-                v.getZygosityPercentRead(), v.getZygosityNumberAllele(), v.getZygosityPossibleError(),
-                v.getZygosityRefAllele(), v.getZygosityInPseudo(), v.getPaddingBase()
-                );
+                    v.getStartPos(), v.getDepth(), v.getVariantFrequency(), v.getQualityScore(), v.getRgdId(),
+                    v.getHgvsName(), v.getVariantType(), v.getVariantNucleotide(), v.getZygosityStatus(), v.getGenicStatus(),
+                    v.getZygosityPercentRead(), v.getZygosityNumberAllele(), v.getZygosityPossibleError(),
+                    v.getZygosityRefAllele(), v.getZygosityInPseudo(), v.getPaddingBase()
+            );
         }
         bsu.flush();
 
@@ -595,16 +592,16 @@ public class VariantDAO extends JdbcBaseDAO {
         return totalRowsAffected;
     }
 
- 	public List<Variant> getVariants(int sampleId, String chr, long start, long stop) {
+    public List<Variant> getVariants(int sampleId, String chr, long start, long stop) {
 
- 	    // obsolete: old variant table structure
+        // obsolete: old variant table structure
         //String sql = "SELECT * FROM "+getVariantTable(sampleId)+" WHERE sample_id=? AND start_pos >= ? AND start_pos <= ? AND chromosome=?";
 
         String sql ="SELECT v.rgd_id VARIANT_ID,m.chromosome,d.sample_id,m.start_pos,m.end_pos,d.var_freq,d.total_depth,d.quality_score,v.ref_nuc,v.var_nuc"
-            +",d.zygosity_status,d.zygosity_in_pseudo,d.zygosity_num_allele,d.zygosity_percent_read,d.zygosity_poss_error,d.zygosity_ref_allele,m.genic_status"
-            +",null HGVS_NAME,v.rgd_id,v.variant_type,m.padding_base "
-            +"FROM variant v, variant_sample_detail d, variant_map_data m "
-            +"WHERE d.rgd_id=m.rgd_id AND v.rgd_id=m.rgd_id AND sample_id=? AND start_pos BETWEEN ? AND  ? AND chromosome=?";
+                +",d.zygosity_status,d.zygosity_in_pseudo,d.zygosity_num_allele,d.zygosity_percent_read,d.zygosity_poss_error,d.zygosity_ref_allele,m.genic_status"
+                +",null HGVS_NAME,v.rgd_id,v.variant_type,m.padding_base "
+                +"FROM variant v, variant_sample_detail d, variant_map_data m "
+                +"WHERE d.rgd_id=m.rgd_id AND v.rgd_id=m.rgd_id AND sample_id=? AND start_pos BETWEEN ? AND  ? AND chromosome=?";
 
 
         VariantMapper q = new VariantMapper(getDataSource(), sql);
@@ -622,11 +619,19 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql = "select * from VARIANT where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n"+
-        " (select VARIANT_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
+        String sql1 = "select * from VARIANT where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n"+
+                " (select VARIANT_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
                 "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
                 "AND PREDICTION LIKE '%damaging') and SAMPLE_ID IN (SELECT UNIQUE(SAMPLE_ID) "+
-        "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
+                "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
+        String sql = "select * from VARIANT v" +
+                " left outer join VARIANT_MAP_DATA   vmd on vmd.rgd_id=v.rgd_id " +
+                " left outer join variant_sample_data vsd on vsd.rgd_id=v.rgd_id " +
+                "where v.rgd_ID in (select distinct(variant_rgd_ID) from POLYPHEN where VARIANT_RGD_ID in "+
+                " (select VARIANT_RGD_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
+                "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
+                "AND PREDICTION LIKE '%damaging') and vsd.SAMPLE_ID IN (SELECT UNIQUE(SAMPLE_ID) "+
+                "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -656,10 +661,17 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
+        String sql1 = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
                 " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey;
 
+
+        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+                "from POLYPHEN p inner join VARIANT v "+
+                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging'  " +
+                " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id and vsd.total_depth > 8 "+
+                " inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey;
         return getCount(sql);
     }
     /**
@@ -669,15 +681,13 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public int getCountofDamagingVariantsForSample(int sampleId, String mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
-                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
-                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
+        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+                "from POLYPHEN p inner join VARIANT v \n"+
+                " on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging'  " +
+                " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8"+
+                "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
 
-        return getCount(sql);
-    }
-
-    public int getCountofDamagingVariantsForSample2(int sampleId, String mapKey) throws Exception {
-        String sql = "select count(DISTINCT(p.VARIANT_RGD_ID)) as count from POLYPHEN p inner join variant_sample_detail v on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID ="+sampleId+" and s.MAP_KEY="+mapKey;
         return getCount(sql);
     }
 
@@ -689,29 +699,22 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId, int mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v\n" +
+        String sql1 = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v\n" +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =?\n" +
                 "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 \n" +
                 "ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
+        String sql = "select /*+ PARALLEL*/ distinct(v.RGD_ID),v.*, vmd.*, vsd.*,p.GENE_SYMBOL from VARIANT v\n" +
+                " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id and vsd.total_depth > 8 "+
+                "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =? \n" +
+                "inner join POLYPHEN p on v.RGD_ID = p.VARIANT_RGD_ID and p.PREDICTION LIKE '%damaging'  \n" +
+                "ORDER BY vmd.CHROMOSOME,vmd.START_POS,vmd.END_POS,v.REF_NUC,v.VAR_NUC";
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(sampleId,mapKey);
     }
 
-    public List<DamagingVariant> getDamagingVariantsForSampleByAssembly2(int sampleId, int mapKey) throws Exception {
-        String sql = "select DISTINCT(va.RGD_ID) as VAR_RGD_ID,va.REF_NUC,va.VARIANT_TYPE,va.VAR_NUC,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.START_POS,vmd.END_POS,vmd.GENIC_STATUS," +
-                " v.SAMPLE_ID,v.TOTAL_DEPTH,v.VAR_FREQ,v.ZYGOSITY_STATUS,v.ZYGOSITY_IN_PSEUDO,v.ZYGOSITY_NUM_ALLELE,v.ZYGOSITY_PERCENT_READ," +
-                " v.ZYGOSITY_POSS_ERROR,v.ZYGOSITY_REF_ALLELE,v.QUALITY_SCORE,p.gene_symbol" +
-                " from variant va" +
-                " inner join POLYPHEN p on p.PREDICTION LIKE '%damaging'" +
-                " inner join variant_sample_detail v on p.VARIANT_RGD_ID=v.RGD_ID and v.total_depth > 8" +
-                " inner join SAMPLE s on v.SAMPLE_ID=s.SAMPLE_ID and s.SAMPLE_ID="+sampleId+" and s.MAP_KEY="+ mapKey +
-                " inner join variant_map_data vmd on vmd.RGD_ID=va.RGD_ID " +
-                "ORDER BY vmd.CHROMOSOME,vmd.START_POS,vmd.END_POS,va.REF_NUC,va.VAR_NUC";
-        AbstractDAO dao = new AbstractDAO();
-        return DamagingVariantQuery.execute(dao,DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql,sampleId,mapKey);
-    }
 
     /**
      * get the list of damaging or possibly damaging variants associated with the strain
@@ -727,7 +730,7 @@ public class VariantDAO extends JdbcBaseDAO {
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
-       return q.execute(rgdId,mapKey);
+        return q.execute(rgdId,mapKey);
     }
 
 
@@ -741,15 +744,15 @@ public class VariantDAO extends JdbcBaseDAO {
         List batchArgs = new ArrayList(variantList.size());
         for( Variant v: variantList ) {
             batchArgs.add(new Object[]{
-                v.getDepth(),
-                v.getVariantNucleotide(),
-                v.getZygosityStatus(),
-                v.getZygosityPercentRead(),
-                v.getZygosityInPseudo(),
-                v.getZygosityNumberAllele(),
-                v.getZygosityPossibleError(),
-                v.getZygosityRefAllele(),
-                v.getId()});
+                    v.getDepth(),
+                    v.getVariantNucleotide(),
+                    v.getZygosityStatus(),
+                    v.getZygosityPercentRead(),
+                    v.getZygosityInPseudo(),
+                    v.getZygosityNumberAllele(),
+                    v.getZygosityPossibleError(),
+                    v.getZygosityRefAllele(),
+                    v.getId()});
         }
         String sql = "UPDATE variant SET total_depth=?, "+
                 "var_nuc=?, "+
@@ -796,7 +799,7 @@ public class VariantDAO extends JdbcBaseDAO {
         return res;
     }
     public List<Variant> getVariantsBySampleId(int sampleId,String chr, String tableName) throws Exception {
-      //  String sql="select * from variant_dog where sample_id=?";
+        //  String sql="select * from variant_dog where sample_id=?";
         String sql="select * from "+tableName+" where sample_id=? and chromosome=?";
         VariantMapper mapper= new VariantMapper(this.getDataSource(), sql);
         mapper.declareParameter(new SqlParameter(Types.INTEGER));
