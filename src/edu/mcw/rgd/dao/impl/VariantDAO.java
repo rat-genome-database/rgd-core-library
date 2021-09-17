@@ -619,11 +619,6 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql1 = "select * from VARIANT where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n"+
-                " (select VARIANT_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
-                "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
-                "AND PREDICTION LIKE '%damaging') and SAMPLE_ID IN (SELECT UNIQUE(SAMPLE_ID) "+
-                "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
         String sql = "select * from VARIANT v" +
                 " left outer join VARIANT_MAP_DATA   vmd on vmd.rgd_id=v.rgd_id " +
                 " left outer join variant_sample_data vsd on vsd.rgd_id=v.rgd_id " +
@@ -661,10 +656,6 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql1 = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_ID)) as count from POLYPHEN p inner join VARIANT v \n"+
-                " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
-                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and STRAIN_RGD_ID =" + rgdId +" and MAP_KEY ="+mapKey;
-
 
         String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
                 "from POLYPHEN p inner join VARIANT v "+
@@ -699,10 +690,6 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId, int mapKey) throws Exception {
-        String sql1 = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v\n" +
-                "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =?\n" +
-                "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 \n" +
-                "ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
         String sql = "select /*+ PARALLEL*/ distinct(v.RGD_ID),v.*, vmd.*, vsd.*,p.GENE_SYMBOL from VARIANT v\n" +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
                 " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id and vsd.total_depth > 8 "+
