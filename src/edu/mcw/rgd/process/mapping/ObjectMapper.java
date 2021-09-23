@@ -123,7 +123,7 @@ public class ObjectMapper {
             numericIdType="";
         }
 
-        for (String symbol: symbols) {
+        nextSymbol:      for (String symbol: symbols) {
 
             //strip off trailing dot values
 //            Pattern p = Pattern.compile("(.*)(\\.\\d+)");
@@ -134,7 +134,7 @@ public class ObjectMapper {
 
             //check for numeric values
             try {
-                if (numericIdType.equals("rgd")) {
+                if (numericIdType.equals("rgd") ) {
                     RgdId rid = rdao.getRgdId(Integer.parseInt(symbol));
 
                     if (rid.getSpeciesTypeKey() != speciesTypeKey) {
@@ -213,6 +213,21 @@ public class ObjectMapper {
 
 
                     continue;
+                }else if(numericIdType.equals("")) {
+                    try {
+                        RgdId rid = rdao.getRgdId(Integer.parseInt(symbol));
+
+                        if (rid.getSpeciesTypeKey() != speciesTypeKey) {
+                            throw new Exception();
+                        }
+
+                        Gene g = gdao.getGene(rid.getRgdId());
+
+                        if (g != null) {
+                            this.addToMap(g);
+                            continue;
+                        }
+                    } catch (Exception e) { e.printStackTrace();}
                 }
 
             }catch (Exception ignored) {
