@@ -26,15 +26,14 @@ public class GeneOntologyEnrichmentProcess{
         float a = inputAnnotGenes;
         float c = refAnnotGenes - a;
         float b = inputGenes - a;
-        float d = refGenes - refAnnotGenes;
-
+        float d = refGenes - refAnnotGenes - b;
         float oddsRatio = (a*d)/(b*c);
 
         return oddsRatio;
     }
     public String calculatePValue(int inputGenes, int refGenes, int inputAnnotGenes, int refAnnotGenes) throws Exception{
 
-        MathContext mc = new MathContext(3);
+        //MathContext mc = new MathContext(3);
         NumberFormat formatter = new DecimalFormat("0.0E0");
         formatter.setRoundingMode(RoundingMode.HALF_UP);
         formatter.setMinimumFractionDigits(2);
@@ -46,7 +45,7 @@ public class GeneOntologyEnrichmentProcess{
             IntStream range = IntStream.rangeClosed(inputAnnotGenes, inputGenes);
             List<BigDecimal> probabilities = Collections.synchronizedList(new ArrayList<>());
             range.parallel().forEach(x -> {
-                probabilities.add(new BigDecimal(hg.probability(x), mc));
+                probabilities.add(new BigDecimal(hg.probability(x), MathContext.UNLIMITED));
             });
 
             for(BigDecimal probability:probabilities) {
