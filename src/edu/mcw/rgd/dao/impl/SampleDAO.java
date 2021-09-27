@@ -45,7 +45,21 @@ public class SampleDAO extends JdbcBaseDAO {
                 " ORDER BY analysis_name";
         return runSamplesQuery(query, mapKey);
     }
+    public List<Sample> getLimitedSamplesByPopulation(int mapKey, String population, int limit) {
+        String query = "SELECT * FROM sample "+
+                "WHERE patient_id IN(SELECT patient_id FROM patient WHERE map_key=?) "+
+                " and (analysis_name != 'CDR' and analysis_name != 'CDS') " +
+                " and analysis_name like '"+ population+"%'" +
+                " and ROWNUM < ? "+
+                " ORDER BY analysis_name "
+               ;
+        SampleQuery q = new SampleQuery(this.getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        return q.execute(mapKey,limit);
 
+    }
     public Sample getSampleBySampleId(int sampleId) {
 
         String query = "SELECT * FROM sample WHERE sample_id=?";
@@ -114,6 +128,16 @@ public class SampleDAO extends JdbcBaseDAO {
         q.compile();
         List<Sample> samples = q.execute(strainRgdId, patientId);
        return samples.isEmpty() ? null : samples.get(0);
+    }
+    public Sample getSampleByStrainRgdIdNMapKey(int strainRgdId, int mapKey) {
+        String sql = "SELECT * FROM sample WHERE strain_rgd_id=? and patient_id in (" +
+                "select patient_id from patient where mapKey=?)";
+        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        List<Sample> samples = q.execute(strainRgdId, mapKey);
+        return samples.isEmpty() ? null : samples.get(0);
     }
 
     public List<Sample> getSamplesByStrainRgdId(int strainRgdId) {
