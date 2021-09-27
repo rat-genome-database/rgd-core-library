@@ -129,6 +129,16 @@ public class SampleDAO extends JdbcBaseDAO {
         List<Sample> samples = q.execute(strainRgdId, patientId);
        return samples.isEmpty() ? null : samples.get(0);
     }
+    public Sample getSampleByStrainRgdIdNMapKey(int strainRgdId, int mapKey) {
+        String sql = "SELECT * FROM sample WHERE strain_rgd_id=? and patient_id in (" +
+                "select patient_id from patient where mapKey=?)";
+        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        List<Sample> samples = q.execute(strainRgdId, mapKey);
+        return samples.isEmpty() ? null : samples.get(0);
+    }
 
     public List<Sample> getSamplesByStrainRgdId(int strainRgdId) {
         String sql = "SELECT * FROM sample WHERE strain_rgd_id=?";
