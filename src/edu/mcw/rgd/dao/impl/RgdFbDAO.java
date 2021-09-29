@@ -44,6 +44,17 @@ public class RgdFbDAO extends AbstractDAO {
         return messageId;
     }
 
+    /**
+    * Used for the Send Message Form, not Contact Us Form
+    * */
+    public int insertMessageForm(String subject, String message, int type) throws Exception {
+        String query = "insert into FB_QUESTION (MESSAGE_ID, SUBJECT, MESSAGE, MESSAGE_DATE, TYPE_ID, PERSON_ID) " +
+                "values(?, ?, ?, CURRENT_DATE, ?)";
+        int messageId = this.getNextKeyFromSequence("FB_QUESTION_SEQ");
+        update(query, messageId, subject, message, type);
+        return messageId;
+    }
+
     public void updatePerson(FBPerson person) throws Exception {
         String query = "update FB_PERSON set FIRSTNAME=?,LASTNAME=?,EMAIL_ADDRESS=?,PHONE_NUMBER=?,INSTITUTE=?, ADDRESS=?," +
                 "CITY=?,STATE=?,ZIP_CODE=?,COUNTRY=? where PERSON_ID=?";
