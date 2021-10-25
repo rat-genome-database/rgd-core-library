@@ -618,10 +618,10 @@ public class VariantDAO extends JdbcBaseDAO {
      * @return variants associated with gene in an assembly
      * @throws Exception when unexpected error occurs
      */
-    public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql = "select * from VARIANT v" +
+    public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId, String mapKey) throws Exception {
+        String sql = "SELECT * from VARIANT v" +
                 " left outer join VARIANT_MAP_DATA   vmd on vmd.rgd_id=v.rgd_id " +
-                " left outer join variant_sample_data vsd on vsd.rgd_id=v.rgd_id " +
+                " left outer join variant_sample_detail vsd on vsd.rgd_id=v.rgd_id " +
                 "where v.rgd_ID in (select distinct(variant_rgd_ID) from POLYPHEN where VARIANT_RGD_ID in "+
                 " (select VARIANT_RGD_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
                 "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
@@ -635,11 +635,14 @@ public class VariantDAO extends JdbcBaseDAO {
 
     public List<String> getGeneAssemblyOfDamagingVariants(int rgdId) throws Exception {
 
-        String sql = "select UNIQUE(s.MAP_KEY) from VARIANT v,SAMPLE s, MAPS m where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n" +
-                "(select VARIANT_ID from VARIANT_TRANSCRIPT \n" +
-                "where TRANSCRIPT_RGD_ID IN (select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID = " + rgdId + "))" +
-                "AND PREDICTION LIKE '%damaging') and v.SAMPLE_ID = s.SAMPLE_ID and s.MAP_KEY = m.MAP_KEY";
+        //String sql = "select UNIQUE(s.MAP_KEY) from VARIANT v,SAMPLE s, MAPS m where VARIANT_ID in (select distinct(VARIANT_ID) from POLYPHEN where VARIANT_ID in \n" +
+        //        "(select VARIANT_ID from VARIANT_TRANSCRIPT \n" +
+        //        "where TRANSCRIPT_RGD_ID IN (select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID = " + rgdId + "))" +
+        //        "AND PREDICTION LIKE '%damaging') and v.SAMPLE_ID = s.SAMPLE_ID and s.MAP_KEY = m.MAP_KEY";
 
+        String sql = "SELECT DISTINCT(map_key) FROM polyphen p,variant_transcript v,transcripts t \n"+
+            "WHERE prediction like '%damaging' AND v.variant_rgd_id=p.variant_rgd_id AND v.transcript_rgd_id=t.transcript_rgd_id \n"+
+            "AND gene_rgd_id="+rgdId;
         return getList(sql);
     }
 
