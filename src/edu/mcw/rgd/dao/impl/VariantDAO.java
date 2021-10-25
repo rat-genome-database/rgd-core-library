@@ -618,10 +618,10 @@ public class VariantDAO extends JdbcBaseDAO {
      * @return variants associated with gene in an assembly
      * @throws Exception when unexpected error occurs
      */
-    public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId,String mapKey) throws Exception {
-        String sql = "select * from VARIANT v" +
+    public List<Variant> getDamagingVariantsForGeneByAssembly(int rgdId, String mapKey) throws Exception {
+        String sql = "SELECT * from VARIANT v" +
                 " left outer join VARIANT_MAP_DATA   vmd on vmd.rgd_id=v.rgd_id " +
-                " left outer join variant_sample_data vsd on vsd.rgd_id=v.rgd_id " +
+                " left outer join variant_sample_detail vsd on vsd.rgd_id=v.rgd_id " +
                 "where v.rgd_ID in (select distinct(variant_rgd_ID) from POLYPHEN where VARIANT_RGD_ID in "+
                 " (select VARIANT_RGD_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
                 "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
