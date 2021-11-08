@@ -1,93 +1,109 @@
 package edu.mcw.rgd.datamodel;
 
 /**
- * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: 1/29/13
- * Time: 1:26 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SyntenicRegion {
 
-    private int mapKey1;
-    private int mapKey2;
-    private String chromosome1;
-    private String chromosome2;
-    private int startPos1;
-    private int startPos2;
-    private int stopPos1;
-    private int stopPos2;
-    private int orientation;
+    private int backboneMapKey;
+    private String backboneChromosome;
+    private int backboneStart;
+    private int backboneStop;
 
-    public int getMapKey1() {
-        return mapKey1;
+    private int mapKey;
+    private String chromosome;
+    private int start;
+    private int stop;
+    private String orientation; // '+' or '-'
+    private int chainLevel;
+    private String chainType;
+
+    public int getBackboneMapKey() {
+        return backboneMapKey;
     }
 
-    public void setMapKey1(int mapKey1) {
-        this.mapKey1 = mapKey1;
+    public void setBackboneMapKey(int backboneMapKey) {
+        this.backboneMapKey = backboneMapKey;
     }
 
-    public int getMapKey2() {
-        return mapKey2;
+    public String getBackboneChromosome() {
+        return backboneChromosome;
     }
 
-    public void setMapKey2(int mapKey2) {
-        this.mapKey2 = mapKey2;
+    public void setBackboneChromosome(String backboneChromosome) {
+        this.backboneChromosome = backboneChromosome;
     }
 
-    public String getChromosome1() {
-        return chromosome1;
+    public int getBackboneStart() {
+        return backboneStart;
     }
 
-    public void setChromosome1(String chromosome1) {
-        this.chromosome1 = chromosome1;
+    public void setBackboneStart(int backboneStart) {
+        this.backboneStart = backboneStart;
     }
 
-    public String getChromosome2() {
-        return chromosome2;
+    public int getBackboneStop() {
+        return backboneStop;
     }
 
-    public void setChromosome2(String chromosome2) {
-        this.chromosome2 = chromosome2;
+    public void setBackboneStop(int backboneStop) {
+        this.backboneStop = backboneStop;
     }
 
-    public int getStartPos1() {
-        return startPos1;
+    public int getMapKey() {
+        return mapKey;
     }
 
-    public void setStartPos1(int startPos1) {
-        this.startPos1 = startPos1;
+    public void setMapKey(int mapKey) {
+        this.mapKey = mapKey;
     }
 
-    public int getStartPos2() {
-        return startPos2;
+    public String getChromosome() {
+        return chromosome;
     }
 
-    public void setStartPos2(int startPos2) {
-        this.startPos2 = startPos2;
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
     }
 
-    public int getStopPos1() {
-        return stopPos1;
+    public int getStart() {
+        return start;
     }
 
-    public void setStopPos1(int stopPos1) {
-        this.stopPos1 = stopPos1;
+    public void setStart(int start) {
+        this.start = start;
     }
 
-    public int getStopPos2() {
-        return stopPos2;
+    public int getStop() {
+        return stop;
     }
 
-    public void setStopPos2(int stopPos2) {
-        this.stopPos2 = stopPos2;
+    public void setStop(int stop) {
+        this.stop = stop;
     }
 
-    public int getOrientation() {
+    public String getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(int orientation) {
+    public void setOrientation(String orientation) {
         this.orientation = orientation;
+    }
+
+    public int getChainLevel() {
+        return chainLevel;
+    }
+
+    public void setChainLevel(int chainLevel) {
+        this.chainLevel = chainLevel;
+    }
+
+    public String getChainType() {
+        return chainType;
+    }
+
+    public void setChainType(String chainType) {
+        this.chainType = chainType;
     }
 }
