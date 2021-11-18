@@ -38,6 +38,15 @@ public class SyntenyDAO extends AbstractDAO {
     }
 
 
+    public List<SyntenicRegion> getSizedBlocks(int backboneMapKey, String chromosome, int start, int stop, int backboneBlockMinSize, int mapKey) throws Exception {
+        String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND pos_len1>=?" +
+                "ORDER BY chromosome1, start_pos1";
+        SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
+        return execute(q, backboneMapKey, mapKey, stop, start, chromosome, backboneBlockMinSize);
+    }
+
+
     public List<SyntenicRegion> getGaps(int backboneMapKey, String chromosome, int start, int stop, int mapKey) throws Exception {
         String query = "SELECT * FROM synteny_ucsc_gaps WHERE map_key1=? AND map_key2=? " +
                 " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? " +
