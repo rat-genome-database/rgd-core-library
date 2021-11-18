@@ -23,7 +23,7 @@ public class SyntenyDAO extends AbstractDAO {
 
     public List<SyntenicRegion> getBlocks(int backboneMapKey, String chromosome, int start, int stop, int mapKey, int chainLevel) throws Exception {
         String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
-                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level=?" +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level=? " +
                 "ORDER BY chromosome1, start_pos1";
         SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
         return execute(q, backboneMapKey, mapKey, stop, start, chromosome, chainLevel);
@@ -31,7 +31,7 @@ public class SyntenyDAO extends AbstractDAO {
 
     public List<SyntenicRegion> getBlocks(int backboneMapKey, String chromosome, int start, int stop, int mapKey, int minChainLevel, int maxChainLevel) throws Exception {
         String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
-                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level BETWEEN ? and ?" +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level BETWEEN ? and ? " +
                 "ORDER BY chromosome1, start_pos1";
         SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
         return execute(q, backboneMapKey, mapKey, stop, start, chromosome, minChainLevel, maxChainLevel);
@@ -40,10 +40,26 @@ public class SyntenyDAO extends AbstractDAO {
 
     public List<SyntenicRegion> getSizedBlocks(int backboneMapKey, String chromosome, int start, int stop, int backboneBlockMinSize, int mapKey) throws Exception {
         String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
-                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND pos_len1>=?" +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND pos_len1>=? " +
                 "ORDER BY chromosome1, start_pos1";
         SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
         return execute(q, backboneMapKey, mapKey, stop, start, chromosome, backboneBlockMinSize);
+    }
+
+    public List<SyntenicRegion> getSizedBlocks(int backboneMapKey, String chromosome, int start, int stop, int backboneBlockMinSize, int mapKey, int chainLevel) throws Exception {
+        String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level=? AND pos_len1>=? " +
+                "ORDER BY chromosome1, start_pos1";
+        SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
+        return execute(q, backboneMapKey, mapKey, stop, start, chromosome, chainLevel, backboneBlockMinSize);
+    }
+
+    public List<SyntenicRegion> getSizedBlocks(int backboneMapKey, String chromosome, int start, int stop, int backboneBlockMinSize, int mapKey, int minChainLevel, int maxChainLevel) throws Exception {
+        String query = "SELECT * FROM synteny_ucsc WHERE map_key1=? AND map_key2=? " +
+                " AND start_pos1<? AND stop_pos1 > ? AND chromosome1=? AND chain_level BETWEEN ? and ? AND pos_len1>=? " +
+                "ORDER BY chromosome1, start_pos1";
+        SyntenyQuery q = new SyntenyQuery(this.getDataSource(), query);
+        return execute(q, backboneMapKey, mapKey, stop, start, chromosome, minChainLevel, maxChainLevel, backboneBlockMinSize);
     }
 
 
