@@ -8,7 +8,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -71,7 +72,7 @@ public class FileDownloader {
     private boolean doNotUseHttpClient = false;
 
     // local log4j logger
-    private Logger log = Logger.getLogger(FileDownloader.class);
+    private Logger log = LogManager.getLogger(FileDownloader.class);
 
     public String buildLocalFileName() {
 
