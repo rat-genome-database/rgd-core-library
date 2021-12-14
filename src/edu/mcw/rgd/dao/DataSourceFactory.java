@@ -116,7 +116,14 @@ public class DataSourceFactory {
     public DataSource getDssDataSource() throws Exception{
         return getDataSource("Dss");
     }
-
+    /**
+     * Returns a DataSource object for rgd_fb database
+     * @return DataSource object
+     * @throws Exception
+     */
+    public DataSource getRgdFbDataSource() throws Exception{
+        return getDataSource("rgd_fb");
+    }
 
     // /**
      // * Returns a textMining DataSource object

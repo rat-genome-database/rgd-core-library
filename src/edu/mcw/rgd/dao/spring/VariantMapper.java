@@ -24,7 +24,7 @@ public class VariantMapper extends MappingSqlQuery {
 
     static public Variant mapRow(ResultSet rs) throws SQLException {
         Variant v = new Variant();
-        v.setId(rs.getLong("VARIANT_ID"));
+        v.setId(rs.getLong("RGD_ID"));
         v.setChromosome(rs.getString("CHROMOSOME"));
         v.setSampleId(rs.getInt("SAMPLE_ID"));
         v.setStartPos(rs.getLong("START_POS"));
@@ -41,7 +41,7 @@ public class VariantMapper extends MappingSqlQuery {
         v.setZygosityPossibleError(rs.getString("ZYGOSITY_POSS_ERROR"));
         v.setZygosityRefAllele(rs.getString("ZYGOSITY_REF_ALLELE"));
         v.setGenicStatus(rs.getString("GENIC_STATUS"));
-        v.setHgvsName(rs.getString("HGVS_NAME"));
+   //     v.setHgvsName(rs.getString("HGVS_NAME"));
         v.setRgdId(rs.getInt("RGD_ID"));
         v.setVariantType(rs.getString("VARIANT_TYPE"));
         v.setPaddingBase(rs.getString("PADDING_BASE"));

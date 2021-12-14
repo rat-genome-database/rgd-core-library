@@ -37,9 +37,11 @@ public class FastaParser {
             case 38: chrDir=dir+"hs38"; break;
             case 18: chrDir=dir+"mm37"; break;
             case 35: chrDir=dir+"mm38"; break;
+            case 239: chrDir=dir+"mm39"; break;
             case 60: chrDir=dir+"rn3.4"; break;
             case 70: chrDir=dir+"rn5"; break;
             case 360: chrDir=dir+"rn6"; break;
+            case 372: chrDir=dir+"rn7.2"; break;
             case 511: chrDir=dir+"panPan2"; break;
             case 631: chrDir=dir+"canFam3"; break;
             case 910: chrDir=dir+"susScr3"; break;

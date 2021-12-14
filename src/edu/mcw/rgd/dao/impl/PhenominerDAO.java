@@ -62,6 +62,107 @@ public class PhenominerDAO extends AbstractDAO {
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q);
     }
+    /**
+     *  Return all Phenominer Units
+     *  @return list of all phenominerUnits
+     */
+    public List<PhenominerUnit> getPhenominerUnits(String query) throws Exception {
+        //String query = "";
+        PhenominerUnitQuery pquery = new PhenominerUnitQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
+
+    /**
+     *  Return all Phenominer Units
+     *  @return list of all phenominer Unit Tables
+     */
+    public List<PhenominerUnitTable> getPhenominerUnitTables() throws Exception {
+        String query = "select distinct su.ONT_ID, su.STANDARD_UNIT, tus.UNIT_FROM, tus.UNIT_TO, tus.TERM_SPECIFIC_SCALE, tus.ZERO_OFFSET from PHENOMINER_STANDARD_UNITS su\n" +
+                "join PHENOMINER_TERM_UNIT_SCALES tus on su.ONT_ID=tus.ONT_ID order by su.ONT_ID";
+        PhenominerUnitTablesQuery pquery = new PhenominerUnitTablesQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
+
+    /**
+     *  Return all Phenominer Enums
+     *  @return list of all phenominer Enum Tables
+     */
+    public List<phenominerEnumTable> getPhenominerEnumTables() throws Exception {
+        String query = "select distinct en.TYPE, en.LABEL, en.VALUE, entp.DESCRIPTION from PHENOMINER_ENUMERABLES en \n" +
+                "join PHENOMINER_ENUM_TYPES entp on en.TYPE = entp.ID ORDER BY en.TYPE";
+        PhenominerEnumTablesQuery pquery = new PhenominerEnumTablesQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
+
+    /**
+     *  Return all records having No std Units (CMO IDs that are being used for measurements but do not appear in the standard units table)
+     *  @return list of all phenominer Enum Tables
+     */
+    public List<phenominerNoStdUnitTable> getPhenominerNoStdUnitsTables() throws Exception {
+        String query = "select distinct cm.CLINICAL_MEASUREMENT_ONT_ID,ot.TERM, er.MEASUREMENT_UNITS from EXPERIMENT_RECORD er join CLINICAL_MEASUREMENT cm on cm.CLINICAL_MEASUREMENT_ID=er.CLINICAL_MEASUREMENT_ID\n" +
+                "JOIN ONT_TERMS ot on cm.CLINICAL_MEASUREMENT_ONT_ID=ot.TERM_ACC\n" +
+                "where er.CURATION_STATUS<>50 and cm.CLINICAL_MEASUREMENT_ONT_ID not in(select su.ONT_ID from PHENOMINER_STANDARD_UNITS su) order by cm.CLINICAL_MEASUREMENT_ONT_ID";
+        PhenominerNoStdUnitsTablesQuery pquery = new PhenominerNoStdUnitsTablesQuery(this.getDataSource(), query);
+        return execute(pquery);
+    }
+
+    /**
+     *  Return all Phenominer Unit search results
+     *  @return list of all phenominer Unit Tables
+     */
+    public List<PhenominerUnitTable> getPhenominerUnitSearchResultsTables(PhenominerUnitTable pUnitTable) throws Exception{
+        String cmoIdField = pUnitTable.getOntId();
+        String stdUnitField = pUnitTable.getStdUnit();
+        String unitFromField = pUnitTable.getUnitFrom();
+        String query = "select distinct su.ONT_ID, su.STANDARD_UNIT, tus.UNIT_FROM, tus.UNIT_TO, tus.TERM_SPECIFIC_SCALE, tus.ZERO_OFFSET from PHENOMINER_STANDARD_UNITS su\n" +
+                "join PHENOMINER_TERM_UNIT_SCALES tus on su.ONT_ID=tus.ONT_ID where 1=1";
+
+        ArrayList<String> paramList = new ArrayList<String>();
+        if(!(cmoIdField == null || cmoIdField.length() == 0)) {
+            if (cmoIdField.length() == 11) {
+                query = query + " and su.ONT_ID = ?";
+                paramList.add(cmoIdField);
+            }
+        }
+        if(!(stdUnitField == null || stdUnitField.length() == 0) ){
+            query = query + " and su.STANDARD_UNIT = ?";
+            paramList.add(stdUnitField);
+        }
+        if(!(unitFromField == null || unitFromField.length() == 0)){
+            query = query + " and tus.UNIT_FROM = ?";
+            paramList.add(unitFromField);
+        }
+        query = query + " order by su.ONT_ID";
+        Object params[] = new Object[paramList.size()];
+        params = paramList.toArray();
+        PhenominerUnitTablesQuery pquery = new PhenominerUnitTablesQuery(this.getDataSource(), query);
+        return execute(pquery,params);
+    }
+    /**
+     *  Return all Phenominer Enums search results
+     *  @return list of all phenominer Enum Tables
+     */
+    public List<phenominerEnumTable> getPhenominerEnumSearchResultsTables(phenominerEnumTable pEnumTable) throws Exception{
+        int typeField = pEnumTable.getType();
+        String labelField = pEnumTable.getLabel();
+        String query = "select distinct en.TYPE, en.LABEL, en.VALUE, entp.DESCRIPTION from PHENOMINER_ENUMERABLES en \n" +
+                "join PHENOMINER_ENUM_TYPES entp on en.TYPE = entp.ID where 1=1";
+
+        ArrayList<String> paramList = new ArrayList<String>();
+        if(typeField!=0){
+            query = query + " and en.TYPE = ?";
+            paramList.add(String.valueOf(typeField));
+        }
+        if(!(labelField == null || labelField.length() == 0)){
+            query = query + " and UPPER(en.LABEL) = UPPER(?)";
+            paramList.add(labelField);
+        }
+        query = query + "ORDER BY en.TYPE" ;
+        Object params[] = new Object[paramList.size()];
+        params = paramList.toArray();
+        PhenominerEnumTablesQuery pquery = new PhenominerEnumTablesQuery(this.getDataSource(), query);
+        return execute(pquery,params);
+    }
 
     /**
      *  Return all GEO studies

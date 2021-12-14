@@ -123,18 +123,18 @@ public class ObjectMapper {
             numericIdType="";
         }
 
-        for (String symbol: symbols) {
+        nextSymbol:      for (String symbol: symbols) {
 
             //strip off trailing dot values
-            Pattern p = Pattern.compile("(.*)(\\.\\d+)");
-            Matcher m = p.matcher(symbol);
-            if (m.matches()) {
-                symbol=(m.group(1));
-            }
+//            Pattern p = Pattern.compile("(.*)(\\.\\d+)");
+//            Matcher m = p.matcher(symbol);
+//            if (m.matches()) {
+//                symbol=(m.group(1));
+//            }
 
             //check for numeric values
             try {
-                if (numericIdType.equals("rgd")) {
+                if (numericIdType.equals("rgd") ) {
                     RgdId rid = rdao.getRgdId(Integer.parseInt(symbol));
 
                     if (rid.getSpeciesTypeKey() != speciesTypeKey) {
@@ -213,6 +213,21 @@ public class ObjectMapper {
 
 
                     continue;
+                }else if(numericIdType.equals("")) {
+                    try {
+                        RgdId rid = rdao.getRgdId(Integer.parseInt(symbol));
+
+                        if (rid.getSpeciesTypeKey() != speciesTypeKey) {
+                            throw new Exception();
+                        }
+
+                        Gene g = gdao.getGene(rid.getRgdId());
+
+                        if (g != null) {
+                            this.addToMap(g);
+                            continue;
+                        }
+                    } catch (Exception e) { e.printStackTrace();}
                 }
 
             }catch (Exception ignored) {
@@ -220,8 +235,8 @@ public class ObjectMapper {
             }
 
             //check if an ontology term
-            p = Pattern.compile("\\w+\\:\\d\\d\\d\\d\\d\\d\\d");
-            m = p.matcher(symbol);
+            Pattern p = Pattern.compile("\\w+\\:\\d\\d\\d\\d\\d\\d\\d");
+            Matcher m = p.matcher(symbol);
             if (m.matches()) {
                 List<Gene> genes = gdao.getActiveAnnotatedGenes(symbol.toUpperCase(),speciesTypeKey);
 
@@ -353,7 +368,7 @@ public class ObjectMapper {
             }
 
             if (lst.size()==0) {
-                log.add("<span style='color:red'>Could not find rgd object for symbol " + symbol + " and species " + SpeciesType.getTaxonomicName(speciesTypeKey) + "</span>");
+                log.add("<span style='color:red'>Could not find rgd object for symbol <b>" + symbol + "</b> and species " + SpeciesType.getTaxonomicName(speciesTypeKey) + "</span>");
                 logUnformatted.add("Could not find rgd object for symbol " + symbol + " and species " + SpeciesType.getTaxonomicName(speciesTypeKey));
                 this.mapped.add(symbol);
             }

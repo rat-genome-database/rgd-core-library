@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * User: GKowalski
  * Date: 8/12/11
- * Time: 2:07 PM
  * Class to calculate all Zygosity's of a Variant.
  */
 public class Zygosity {
@@ -29,19 +28,13 @@ public class Zygosity {
     public static int HOMOZYGOUS_PERCENT = 100;
 
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    //protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * Returns one or more variants based on the reads of the variant passed in ,
      * setting the zygosity values on these variants.
      * <p>
      * Note: Used by legacy code of rat strain loading. New loader uses much simpler code.
-     * </p>
-     * @param scoreA
-     * @param scoreC
-     * @param scoreG
-     * @param scoreT
-     * @param gender
      * @return
      */
     @Deprecated
@@ -56,7 +49,7 @@ public class Zygosity {
         float scoreCPerc = (scoreC * 100) / totalDepth;
         float scoreGPerc = (scoreG * 100) / totalDepth;
         float scoreTPerc = (scoreT * 100) / totalDepth;
-        logger.info("Percents : " + scoreAPerc + ":" + scoreCPerc + ":" + scoreGPerc + ":" + scoreTPerc);
+        //logger.info("Percents : " + scoreAPerc + ":" + scoreCPerc + ":" + scoreGPerc + ":" + scoreTPerc);
         // pick the biggest score and nucleotide with biggest score
         String refNucl = originalVariant.getReferenceNucleotide();
         String chr = originalVariant.getChromosome();
@@ -122,7 +115,7 @@ public class Zygosity {
         float scoreCPerc = (scoreC * 100) / totalDepth;
         float scoreGPerc = (scoreG * 100) / totalDepth;
         float scoreTPerc = (scoreT * 100) / totalDepth;
-        logger.info("Percents : " + scoreAPerc + ":" + scoreCPerc + ":" + scoreGPerc + ":" + scoreTPerc);
+        //logger.info("Percents : " + scoreAPerc + ":" + scoreCPerc + ":" + scoreGPerc + ":" + scoreTPerc);
         // pick the biggest score and nucleotide with biggest score
         String chr = v.getChromosome();
 
