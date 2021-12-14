@@ -792,7 +792,7 @@ public class Utils {
     /**
      * print stack trace to the supplied log, as an error
      */
-    static public void printStackTrace(Exception e, org.apache.log4j.Logger log) {
+    static public void printStackTrace(Exception e, org.apache.logging.log4j.Logger log) {
         // print stack trace to error stream
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
