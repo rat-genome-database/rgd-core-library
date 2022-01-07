@@ -82,7 +82,7 @@ public class SampleDAO extends JdbcBaseDAO {
         }
         query += ") order by analysis_name";
 
-        System.out.println(query);
+        // System.out.println(query);
 
         SampleQuery q = new SampleQuery(this.getDataSource(), query);
         q.compile();

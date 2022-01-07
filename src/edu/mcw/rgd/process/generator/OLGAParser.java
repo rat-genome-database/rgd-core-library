@@ -31,7 +31,7 @@ public class OLGAParser {
             String[] tmpArray = oql.split("\\|");
 
             for (int i = 0; i < tmpArray.length; i++) {
-                System.out.println("TEMPARRAY: " + tmpArray[i]);
+                //System.out.println("TEMPARRAY: " + tmpArray[i]);
                 if (oKey != 1 && (tmpArray[i].substring(1).startsWith("lst")) && oKey==5) { //TEST Lines of CODE:oKey==5 added to if
                     urlParts.add(tmpArray[i]);
                 }else {
