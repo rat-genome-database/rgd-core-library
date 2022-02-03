@@ -81,6 +81,8 @@ public final class SpeciesType {
                 type.compareToIgnoreCase(info.taxonomicName)==0  ||
                 // look for species type key
                 type.compareTo(Integer.toString(speciesTypeKey))==0  ||
+                // look for taxonomic name
+                type.compareToIgnoreCase(info.shortName)==0  ||
                 // look for taxonomic id: f.e. 'taxon:10090' or 'NCBITaxon:10090'
                 (type.startsWith("taxon:") && type.equals("taxon:"+info.taxonomyId)) ||
                 (type.startsWith("NCBITaxon:") && type.equals("NCBITaxon:"+info.taxonomyId)) )
@@ -155,6 +157,16 @@ public final class SpeciesType {
     public static String getCommonName(int speciesTypeKey) {
         SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
         return info==null ? "" : info.commonName;
+    }
+
+    /**
+     * Returns the short name (one-word name) based on the species type key passed in, f.e. 'vervet'
+     * @param speciesTypeKey  species type key
+     * @return short name name
+     */
+    public static String getShortName(int speciesTypeKey) {
+        SpeciesInfo info = getInstance()._getSpeciesInfo(speciesTypeKey);
+        return info==null ? "" : info.shortName;
     }
 
     /**
@@ -290,6 +302,7 @@ public final class SpeciesType {
                 info.ncbiGenomeUrl = XDBIndex.getInstance().getXDB(61).getUrl(info.speciesTypeKey);
                 info.taxonomicName = info.genus + " " + info.species;
                 info.isSearchable = rs.getInt("is_searchable") != 0;
+                info.shortName = rs.getString("short_name");
                 _map.put(info.speciesTypeKey, info);
             }
         } catch (Exception ignore) {
@@ -307,5 +320,6 @@ public final class SpeciesType {
         public String taxonomicName;
         public String ncbiGenomeUrl;
         public boolean isSearchable;
+        public String shortName;
     }
 }
