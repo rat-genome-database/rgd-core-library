@@ -282,6 +282,7 @@ public final class SpeciesType {
         info.commonName = "All";
         info.genebankCommonName = "";
         info.taxonomicName = info.genus + " " + info.species;
+        info.shortName = "all";
         _map.put(info.speciesTypeKey, info);
 
         try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ){
