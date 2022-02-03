@@ -30,6 +30,7 @@ public class GWASCatalog {
     private String studyAcc;
     private String efoId;
     private String orBeta;
+    private int variantRgdId;
 
     public GWASCatalog(){};
 
@@ -267,5 +268,13 @@ public class GWASCatalog {
                 Utils.defaultString(mappedGene).hashCode() ^ Utils.defaultString(strongSnpRiskallele).hashCode() ^ Utils.defaultString(snps).hashCode() ^ Utils.defaultString(curSnpId).hashCode()
                 ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ pValMlog.hashCode()
                 ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode() ^ Utils.defaultString(orBeta).hashCode();
+    }
+
+    public int getVariantRgdId() {
+        return variantRgdId;
+    }
+
+    public void setVariantRgdId(int variantRgdId) {
+        this.variantRgdId = variantRgdId;
     }
 }
