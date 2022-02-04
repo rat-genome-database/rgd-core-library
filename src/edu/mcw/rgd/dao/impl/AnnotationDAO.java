@@ -209,52 +209,6 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     /* unused -- to be removed?
-
-    public List<SNVAnnotation> getSNVAnnotationList(List<String> termAccs, List<Integer> objectRgdIds, String dataSrc) throws Exception {
-        String query;
-
-        if (termAccs.size() ==0) {
-            query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId " +
-                " from full_annot fa, rgd_associations ra " +
-                 " where master_rgd_id=annotated_object_rgd_id and ra.assoc_type='variant_to_gene' ";
-        }else {
-            query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source, ra.detail_rgd_id as geneRgdId, fai.term_acc as childTerm " +
-                " from full_annot_index fai, full_annot fa, rgd_associations ra " +
-                 " where fai.full_annot_key = fa.full_annot_key and master_rgd_id=annotated_object_rgd_id and ra.assoc_type='variant_to_gene' ";
-        }
-
-        if (objectRgdIds.size()==0 && termAccs.size()==0) {
-            throw new Exception("Gene and term lists can not be 0 length");
-        }
-
-        if (objectRgdIds.size() > 0) {
-            query += " and ra.detail_rgd_id in ( ";
-            query += Utils.buildInPhrase(objectRgdIds);
-            query += ") ";
-        }
-
-        if (termAccs.size() > 0) {
-            query += " and fai.term_acc in (";
-            query += Utils.buildInPhraseQuoted(termAccs);
-            query += ")";
-        }
-
-        if (dataSrc != null) {
-            query += " and data_src='" + dataSrc + "'";
-        }
-
-        query += " and rgd_object_key=7";
-
-        query += "  order by term, object_symbol ";
-
-        SNVAnnotationQuery q = new SNVAnnotationQuery(this.getDataSource(), query);
-        q.compile();
-
-        return q.execute();
-    }
-
     public List<Annotation> getAnnotationList(List<String> termAccs, List<Integer> objectRgdIds, int objectKey) throws Exception {
         String query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
                  ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source " +
@@ -841,6 +795,22 @@ public class AnnotationDAO extends AbstractDAO {
                 "FROM full_annot a,rgd_ids r "+
                 "WHERE ref_rgd_id=? AND data_src=? AND aspect=? AND annotated_object_rgd_id=rgd_id AND r.object_status='ACTIVE'";
         return getCount(query, refRgdId, src, aspect);
+    }
+
+    /**
+     * get count of annotations given reference rgd id and species type key
+     * <br> Note: annotations to non-active rgd objects are skipped!
+     * @param refRgdId reference rgd id
+     * @param speciesTypeKey species type key
+     * @return count of annotations
+     * @throws Exception on spring framework dao failure
+     */
+    public int getCountOfAnnotationsByReference(int refRgdId, int speciesTypeKey) throws Exception {
+
+        String query = "SELECT COUNT(*) "+
+                "FROM full_annot a,rgd_ids r "+
+                "WHERE ref_rgd_id=? AND annotated_object_rgd_id=rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=?";
+        return getCount(query, refRgdId, speciesTypeKey);
     }
 
     /**

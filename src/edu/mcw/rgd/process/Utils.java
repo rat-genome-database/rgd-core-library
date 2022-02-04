@@ -827,6 +827,27 @@ public class Utils {
     }
 
     /**
+     * given file name, return BufferedReader object;
+     * if file name ends with '.gz', assumes that the file is 'gzip'-compressed;
+     * assume the file content is UTF-8 encoded
+     * @param fileName file name to open
+     * @return BufferedReader object
+     * @throws IOException
+     */
+    static public BufferedReader openReaderUtf8(String fileName) throws IOException {
+        final String encoding = "UTF-8";
+        InputStream is;
+        if( fileName.endsWith(".gz") || fileName.contains(".gz_") ) {
+            is = new GZIPInputStream(new FileInputStream(fileName));
+        } else {
+            is = new FileInputStream(fileName);
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding));
+        return reader;
+    }
+
+    /**
      * given file name, return BufferedWriter object;
      * if file name ends with '.gz', the file will be 'gzip'-compressed
      * @param fileName file name to create/overwrite
