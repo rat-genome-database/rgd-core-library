@@ -42,4 +42,14 @@ public class GWASCatalogDAO extends AbstractDAO {
         }
         return executeBatch(su);
     }
+    public int updateGWASBatch(Collection<GWASCatalog> toBeUpdated) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
+                "update GWAS_CATALOG set VARIANT_RGD_ID=? where GWAS_ID=?",
+                new int[]{Types.INTEGER, Types.INTEGER});
+        su.compile();
+        for (GWASCatalog gc : toBeUpdated){
+            su.update(gc.getVariantRgdId(),gc.getGwasId());
+        }
+        return executeBatch(su);
+    }
 }
