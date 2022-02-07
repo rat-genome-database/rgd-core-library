@@ -58,7 +58,7 @@ public class GWASCatalog {
         orBeta = gc.orBeta;
     }
 
-    public String print(){return pmid+"|"+diseaseTrait+"|"+initialSample+"|"+replicateSample+"|"+region+"|"+chr+"|"+pos+"|"+reportedGenes+"|"+strongSnpRiskallele+"|"+snps+"|"+curSnpId+"|"+context+"|"+riskAlleleFreq+"|"+pVal+"|"+pValMlog+"|"+snpPassQc+"|"+mapTrait+"|"+efoId+"|"+studyAcc;}
+    public String print(){return pmid+"|"+diseaseTrait+"|"+initialSample+"|"+replicateSample+"|"+region+"|"+chr+"|"+pos+"|"+reportedGenes+"|"+strongSnpRiskallele+"|"+snps+"|"+curSnpId+"|"+context+"|"+riskAlleleFreq+"|"+pVal+"|"+pValMlog+"|"+snpPassQc+"|"+mapTrait+"|"+efoId+"|"+studyAcc+"|"+variantRgdId;}
 
     public int getGwasId() {
         return gwasId;
