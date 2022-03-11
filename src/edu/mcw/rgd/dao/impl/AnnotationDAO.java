@@ -335,6 +335,21 @@ public class AnnotationDAO extends AbstractDAO {
         return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc);
     }
 
+    public List<Annotation> getAnnotationsWithDiseaseCategory(int annotatedObjectRGDId) throws Exception {
+
+        String query = "SELECT DISTINCT fa.full_annot_key, fa.term, fa.ANNOTATED_OBJECT_RGD_ID, fa.term_acc, fa.data_src, fai.*, ont.term  \n" +
+                "FROM full_annot fa \n" +
+                "INNER JOIN full_annot_index fai ON fai.full_annot_key=fa.full_annot_key\n" +
+                "INNER JOIN  ont_terms ont ON ont.term_acc = fai.term_acc\n" +
+                "WHERE fa.annotated_object_rgd_id=? AND fai.term_acc \n" +
+                "IN('DOID:9004985', 'DOID:9008261','DOID:0050117', 'DOID:7', 'DOID:14566', 'DOID:9007801', 'DOID:9001878', \n" +
+                "        'DOID:9008231', 'DOID:9005463', 'DOID:9000298', 'DOID:0080015', 'DOID:0050155', 'DOID:9001349', \n" +
+                "        'DOID:225', 'DOID:9001600', 'DOID:9008231')";
+
+
+        return executeAnnotationQuery(query, annotatedObjectRGDId);
+    }
+
     public int updateLastModified(int annotatedObjectRGDID, String evidence, String termAcc, int createdBy, String xrefSource) throws Exception{
         String sql = "UPDATE full_annot SET last_modified_date=SYSDATE " +
                 "WHERE annotated_object_rgd_id=? AND evidence=? AND term_acc=? AND created_by=? ";
