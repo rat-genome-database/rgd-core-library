@@ -8,15 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Jan 17, 2008
- * Time: 10:08:19 AM
- * To change this template use File | Settings | File Templates.
- */
-
-/**
- * Returns a row from the Alias table
+ *
+ * Returns a row from SYNTENY_USCS or SYNTENY_UCSC_GAPS table
  */
 public class SyntenyQuery extends MappingSqlQuery {
 
@@ -27,17 +22,19 @@ public class SyntenyQuery extends MappingSqlQuery {
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         SyntenicRegion sr = new SyntenicRegion();
-        sr.setBackboneChromosome(rs.getString("backbone_chr"));
-        sr.setBackboneMapKey(rs.getInt("backbone_map_key"));
-        sr.setBackboneStart(rs.getLong("backbone_start_pos"));
-        sr.setBackboneStop(rs.getLong("backbone_stop_pos"));
+        sr.setBackboneChromosome(rs.getString("chromosome1"));
+        sr.setBackboneMapKey(rs.getInt("map_key1"));
+        sr.setBackboneStart(rs.getInt("start_pos1"));
+        sr.setBackboneStop(rs.getInt("stop_pos1"));
 
-        sr.setChromosome(rs.getString("chr"));
-        sr.setMapKey(rs.getInt("map_key"));
-        sr.setStart(rs.getLong("start_pos"));
-        sr.setStop(rs.getLong("stop_pos"));
+        sr.setChromosome(rs.getString("chromosome2"));
+        sr.setMapKey(rs.getInt("map_key2"));
+        sr.setStart(rs.getInt("start_pos2"));
+        sr.setStop(rs.getInt("stop_pos2"));
 
+        sr.setOrientation(rs.getString("strand"));
+        sr.setChainLevel(rs.getInt("chain_level"));
+        sr.setChainType(rs.getString("chain_type"));
         return sr;
     }
-
 }
