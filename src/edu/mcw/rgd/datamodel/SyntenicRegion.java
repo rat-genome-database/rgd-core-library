@@ -1,23 +1,23 @@
 package edu.mcw.rgd.datamodel;
 
 /**
- * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: 1/29/13
- * Time: 1:26 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SyntenicRegion {
 
     private int backboneMapKey;
     private String backboneChromosome;
-    private long backboneStart;
-    private long backboneStop;
+    private int backboneStart;
+    private int backboneStop;
 
     private int mapKey;
     private String chromosome;
-    private long start;
-    private long stop;
+    private int start;
+    private int stop;
+    private String orientation; // '+' or '-'
+    private int chainLevel;
+    private String chainType;
 
     public int getBackboneMapKey() {
         return backboneMapKey;
@@ -35,19 +35,19 @@ public class SyntenicRegion {
         this.backboneChromosome = backboneChromosome;
     }
 
-    public long getBackboneStart() {
+    public int getBackboneStart() {
         return backboneStart;
     }
 
-    public void setBackboneStart(long backboneStart) {
+    public void setBackboneStart(int backboneStart) {
         this.backboneStart = backboneStart;
     }
 
-    public long getBackboneStop() {
+    public int getBackboneStop() {
         return backboneStop;
     }
 
-    public void setBackboneStop(long backboneStop) {
+    public void setBackboneStop(int backboneStop) {
         this.backboneStop = backboneStop;
     }
 
@@ -67,19 +67,43 @@ public class SyntenicRegion {
         this.chromosome = chromosome;
     }
 
-    public long getStart() {
+    public int getStart() {
         return start;
     }
 
-    public void setStart(long start) {
+    public void setStart(int start) {
         this.start = start;
     }
 
-    public long getStop() {
+    public int getStop() {
         return stop;
     }
 
-    public void setStop(long stop) {
+    public void setStop(int stop) {
         this.stop = stop;
+    }
+
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
+    }
+
+    public int getChainLevel() {
+        return chainLevel;
+    }
+
+    public void setChainLevel(int chainLevel) {
+        this.chainLevel = chainLevel;
+    }
+
+    public String getChainType() {
+        return chainType;
+    }
+
+    public void setChainType(String chainType) {
+        this.chainType = chainType;
     }
 }
