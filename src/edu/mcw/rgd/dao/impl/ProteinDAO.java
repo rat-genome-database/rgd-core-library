@@ -37,7 +37,7 @@ public class ProteinDAO extends AbstractDAO {
         String sql = "UPDATE proteins SET uniprot_id=?,protein_symbol=?,protein_name=?,src_pipeline=?,is_canonical=? "+
                 "WHERE rgd_id=?";
         update(sql, protein.getUniprotId(), protein.getSymbol(), protein.getName(),
-                protein.getSrcPipeline(), protein.getRgdId(), protein.isCanonical()?1:0);
+                protein.getSrcPipeline(), protein.isCanonical()?1:0, protein.getRgdId());
     }
 
     public Protein getProtein(int rgdId) throws Exception {
