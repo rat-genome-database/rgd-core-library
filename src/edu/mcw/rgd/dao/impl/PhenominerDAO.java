@@ -2725,16 +2725,16 @@ public class PhenominerDAO extends AbstractDAO {
                 " AND er.curation_status=40 AND ref_rgd_id="+refRgdId;
         switch (prefix){
             case "RS":
-                query += " and STRAIN_ONT_ID="+ontId;
+                query += " and STRAIN_ONT_ID='"+ontId+"'";
                 break;
             case "CMO":
-                query += " and CLINICAL_MEASUREMENT_ONT_ID="+ontId;
+                query += " and CLINICAL_MEASUREMENT_ONT_ID='"+ontId+"'";
                 break;
             case "VT":
-                query += " and TRAIT_ONT_ID="+ontId;
+                query += " and TRAIT_ONT_ID='"+ontId+"'";
                 break;
             case "MMO":
-                query += " and MEASUREMENT_METHOD_ONT_ID="+ontId;
+                query += " and MEASUREMENT_METHOD_ONT_ID='"+ontId+"'";
                 break;
         }
 
