@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Bean class for a protein.
  * <p>
- * Data is currently contained in the proteins table
+ * PROTEINS table
  */
 public class Protein implements Identifiable, Speciated, ObjectWithName, ObjectWithSymbol, Dumpable {
 
@@ -18,11 +18,12 @@ public class Protein implements Identifiable, Speciated, ObjectWithName, ObjectW
     private int speciesTypeKey;
     private String srcPipeline;
     private Date createdDate;
+    private boolean isCanonical;
 
     /**
-     * two genes are equal if either they have same rgd_id or gene key
+     * two proteins are equal if they have same rgd_id
      * @param obj Protein object to compare
-     * @return true if both genes have either the same rgd ids or gene keys
+     * @return true if both proteins have the same rgd ids
      */
     @Override
     public boolean equals(Object obj) {
@@ -31,7 +32,7 @@ public class Protein implements Identifiable, Speciated, ObjectWithName, ObjectW
     }
 
     /**
-     * hashCode() must return consistent values: if two Gene objects are equal, their hash codes must be equal
+     * hashCode() must return consistent values: if two Protein objects are equal, their hash codes must be equal
      * @return
      */
     @Override
@@ -100,20 +101,29 @@ public class Protein implements Identifiable, Speciated, ObjectWithName, ObjectW
         this.createdDate = createdDate;
     }
 
+    public boolean isCanonical() {
+        return isCanonical;
+    }
+
+    public void setCanonical(boolean canonical) {
+        isCanonical = canonical;
+    }
+
     public String toString() {
        return "RGD:" + rgdId + ", "+uniprotId+", " + symbol + ", " + name+", "+srcPipeline;
     }
 
     public String dump(String delimiter) {
 
-        return new Dumper(delimiter)
+        return new Dumper(delimiter, true, true)
             .put("RGD_ID", rgdId)
             .put("UNIPROT_ID", uniprotId)
             .put("SYMBOL", symbol)
             .put("NAME", name)
             .put("CREATED_DATE", createdDate)
             .put("SRC_PIPELINE", srcPipeline)
-                .put("SPECIES_TYPE_KEY", speciesTypeKey)
+            .put("SPECIES_TYPE_KEY", speciesTypeKey)
+            .put("IS_CANONICAL", isCanonical?1:0)
             .dump();
     }
 }
