@@ -21,10 +21,10 @@ public class ProteinDAO extends AbstractDAO {
      */
     public void insertProtein(Protein protein) throws Exception {
 
-        String sql = "INSERT INTO proteins (rgd_id,uniprot_id,protein_symbol,protein_name,created_date,src_pipeline) "+
-                "VALUES(?,?,?,?,SYSDATE,?)";
+        String sql = "INSERT INTO proteins (rgd_id,uniprot_id,protein_symbol,protein_name,created_date,src_pipeline,is_canonical) "+
+                "VALUES(?,?,?,?,SYSDATE,?,?)";
         update(sql, protein.getRgdId(), protein.getUniprotId(), protein.getSymbol(), protein.getName(),
-                protein.getSrcPipeline());
+                protein.getSrcPipeline(), protein.isCanonical()?1:0);
     }
 
     /**
@@ -34,10 +34,10 @@ public class ProteinDAO extends AbstractDAO {
      */
     public void updateProtein(Protein protein) throws Exception {
 
-        String sql = "UPDATE proteins SET uniprot_id=?,protein_symbol=?,protein_name=?,src_pipeline=? "+
+        String sql = "UPDATE proteins SET uniprot_id=?,protein_symbol=?,protein_name=?,src_pipeline=?,is_canonical=? "+
                 "WHERE rgd_id=?";
         update(sql, protein.getUniprotId(), protein.getSymbol(), protein.getName(),
-                protein.getSrcPipeline(), protein.getRgdId());
+                protein.getSrcPipeline(), protein.getRgdId(), protein.isCanonical()?1:0);
     }
 
     public Protein getProtein(int rgdId) throws Exception {

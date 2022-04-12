@@ -28,6 +28,7 @@ public class ProteinQuery extends MappingSqlQuery {
 
         try {
             obj.setSpeciesTypeKey(rs.getInt("species_type_key"));
+            obj.setCanonical(rs.getInt("is_canonical")!=0);
         }catch (Exception ignored) {
         }
         return obj;
