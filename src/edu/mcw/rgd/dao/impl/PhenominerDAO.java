@@ -2710,6 +2710,38 @@ public class PhenominerDAO extends AbstractDAO {
         return runFullRecordsQuery(query);
     }
 
+    /**
+     * get full phenominer records based on reference rgd id of a study
+     * @param refRgdId reference rgd id of a study, ontId RS, CMO, VT, or MMO id to fine tune amount of records
+     * @return list of Record objects
+     * @throws Exception
+     */
+    public List<Record> getFullRecords(int refRgdId, String ontId) throws Exception {
+
+        String prefix=ontId.split(":")[0];
+        String query = "SELECT * FROM experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "WHERE er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id " +
+                " AND er.measurement_method_id=mm.measurement_method_id" +
+                " AND er.experiment_id=e.experiment_id AND e.study_id=st.study_id" +
+                " AND er.curation_status=40 AND ref_rgd_id="+refRgdId;
+        switch (prefix){
+            case "RS":
+                query += " and STRAIN_ONT_ID='"+ontId+"'";
+                break;
+            case "CMO":
+                query += " and CLINICAL_MEASUREMENT_ONT_ID='"+ontId+"'";
+                break;
+            case "VT":
+                query += " and TRAIT_ONT_ID='"+ontId+"'";
+                break;
+            case "MMO":
+                query += " and MEASUREMENT_METHOD_ONT_ID='"+ontId+"'";
+                break;
+        }
+
+        return runFullRecordsQuery(query);
+    }
+
     List<Record> runFullRecordsQuery(String query ) throws Exception {
 
         RecordQuery rq = new RecordQuery(this.getDataSource(), query);
