@@ -1,7 +1,12 @@
 package edu.mcw.rgd.dao.impl;
 
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.VariantMapper;
+import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
+import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.datamodel.variants.VariantMapData;
+import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -800,5 +805,22 @@ public class VariantDAO extends JdbcBaseDAO {
     public String getGeneSymbolByVariantId(long id) throws Exception {
         String query = "select GENE_SYMBOL from POLYPHEN where VARIANT_ID ="+id;
         return getList(query).get(0);
+    }
+
+    public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant_sample_detail WHERE rgd_id=?";
+        VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
+    }
+
+    public VariantMapData getVariant(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantMapData> vmds = q.execute(rgdId);
+        if (vmds.isEmpty())
+            return null;
+        return vmds.get(0);
     }
 }
