@@ -67,10 +67,10 @@ public class RecordQuery extends MappingSqlQuery {
         }
         s.setNotes(rs.getString("sample_notes"));
         s.setSex(rs.getString("sex"));
+        s.setBioSampleId(rs.getString("biosample_id"));
 
-        String strainId = rs.getString("strain_ont_id");
-
-        s.setStrainAccId(rs.getString("strain_ont_id"));
+        String strainOntId = rs.getString("strain_ont_id");
+        s.setStrainAccId(strainOntId);
 
         rec.setSample(s);
 
