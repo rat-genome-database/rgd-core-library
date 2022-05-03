@@ -10,6 +10,13 @@ import java.util.List;
  */
 public class CellLineDAO extends GenomicElementDAO {
 
+    public int getActiveCellLineCount() throws Exception {
+
+        String query = "SELECT COUNT(c.rgd_id) FROM rgd_ids r,cell_lines c "+
+                "WHERE r.rgd_id=c.rgd_id AND object_status='ACTIVE'";
+        return getCount(query);
+    }
+
     public List<CellLine> getActiveCellLines() throws Exception {
 
         String query = "SELECT g.*,r.*,c.* FROM rgd_ids r,genomic_elements g,cell_lines c "+
