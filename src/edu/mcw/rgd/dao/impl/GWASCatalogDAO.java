@@ -54,7 +54,7 @@ public class GWASCatalogDAO extends AbstractDAO {
         }
         return executeBatch(su);
     }
-    
+
     public GWASCatalog getGWASCatalogByVariantRgdId(int rgdId) throws Exception{
         String sql = "select * from gwas_catalog where variant_rgd_id=?";
         GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(),sql);
@@ -63,5 +63,15 @@ public class GWASCatalogDAO extends AbstractDAO {
         if (list.isEmpty())
             return null;
         return list.get(0);
+    }
+
+    public List<GWASCatalog> getGWASListByVariantRgdId(int rgdId) throws Exception{
+        String sql = "select * from gwas_catalog where variant_rgd_id=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<GWASCatalog> list = q.execute(rgdId);
+        if (list.isEmpty())
+            return null;
+        return list;
     }
 }
