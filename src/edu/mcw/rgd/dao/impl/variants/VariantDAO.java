@@ -134,4 +134,11 @@ public class VariantDAO extends AbstractDAO {
             return null;
         return vmds.get(0);
     }
+
+    public List<VariantMapData> getVariantsByRgdId(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
+    }
 }
