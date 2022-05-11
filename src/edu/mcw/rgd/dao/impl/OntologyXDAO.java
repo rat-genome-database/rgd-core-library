@@ -1662,4 +1662,10 @@ public class OntologyXDAO extends AbstractDAO {
         TermQuery q = new TermQuery(this.getDataSource(), query);
         return execute(q, params);
     }
+    public List<Term> getParentTerm(String termAcc) throws Exception {
+        String sql="select * from ont_terms where term_acc in (\n" +
+                "select parent_term_acc from ont_dag where child_term_acc=?)";
+        TermQuery q=new TermQuery(this.getDataSource(), sql);
+        return execute(q, termAcc);
+    }
 }
