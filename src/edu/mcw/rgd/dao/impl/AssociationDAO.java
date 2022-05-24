@@ -932,5 +932,13 @@ public class AssociationDAO extends AbstractDAO {
     public List<Association> executeAssocQuery(String query, Object ... params) throws Exception {
         return AssociationQuery.execute(this, query, params);
     }
+    public List<Association> getAssociationsByObjectKey(int objectKey) throws Exception {
+        String sql="select * from rgd_associations a, rgd_ids r " +
+                "where a.master_rgd_id=r.rgd_id " +
+                "and r.object_status='ACTIVE' " +
+                "and r.object_key=?";
+
+        return executeAssocQuery(sql, objectKey);
+    }
 }
 

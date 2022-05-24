@@ -123,7 +123,7 @@ public class XdbIdDAO extends AbstractDAO {
     /**
      * get active genes with given external id
      * @param xdbKey - external db key
-     * @param accId - external id to be looked for
+     * @param accId - external acc id
      * @return list of Gene objects
      */
     public List<Gene> getActiveGenesByXdbId(int xdbKey, String accId) throws Exception {
@@ -132,6 +132,21 @@ public class XdbIdDAO extends AbstractDAO {
                     "where r.RGD_ID=g.RGD_ID AND x.RGD_ID=g.RGD_ID AND x.XDB_KEY=? AND x.ACC_ID=? AND r.OBJECT_STATUS='ACTIVE'";
 
         return GeneQuery.execute(this, sql, xdbKey, accId);
+    }
+
+    /**
+     * get active genes for given external db acc and src_pipeline
+     * @param xdbKey - external db key
+     * @param accId - external acc id
+     * @param srcPipeline - source pipeline
+     * @return list of Gene objects
+     */
+    public List<Gene> getActiveGenesByXdbId(int xdbKey, String accId, String srcPipeline) throws Exception {
+
+        String sql = "SELECT DISTINCT g.*, r.species_type_key FROM genes g, rgd_ids r, rgd_acc_xdb x " +
+                "WHERE r.rgd_id=g.rgd_id AND x.rgd_id=g.rgd_id AND x.xdb_key=? AND x.acc_id=? AND r.object_status='ACTIVE' AND x.src_pipeline=?";
+
+        return GeneQuery.execute(this, sql, xdbKey, accId, srcPipeline);
     }
 
     /**
