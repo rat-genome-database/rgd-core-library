@@ -227,7 +227,8 @@ public class ObjectMapper {
                             this.addToMap(g);
                             continue;
                         }
-                    } catch (Exception e) { e.printStackTrace();}
+                    } catch (Exception e) { //e.printStackTrace();
+                         }
                 }
 
             }catch (Exception ignored) {
