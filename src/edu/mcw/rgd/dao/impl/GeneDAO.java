@@ -733,7 +733,7 @@ public class GeneDAO extends AbstractDAO {
         String query = "SELECT COUNT(*) FROM genes g, rgd_ids r " +
         "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') " +
         " AND (g.nomen_review_date BETWEEN ? AND ? OR g.nomen_review_date IS NULL) "+
-        " AND r.rgd_id=g.rgd_id ";
+        " AND r.rgd_id=g.rgd_id AND r.object_key=1";
 
         return getCount(query, speciesKey, fromNomenclatureReview, toNomenclatureReview);
     }
@@ -744,7 +744,7 @@ public class GeneDAO extends AbstractDAO {
      * @param speciesKey species type key
      * @param fromNomenclatureReview starting date of nomenclature review
      * @param toNomenclatureReview ending date of nomenclature review
-     * @return count of active genes
+     * @return list of active genes matching
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Gene> getActiveGenes(int speciesKey, java.util.Date fromNomenclatureReview, java.util.Date toNomenclatureReview) throws Exception {
@@ -752,7 +752,7 @@ public class GeneDAO extends AbstractDAO {
         String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
             "WHERE r.object_status='ACTIVE' and r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') " +
             " AND (g.nomen_review_date BETWEEN ? AND ? OR g.nomen_review_date IS NULL) "+
-            " AND r.rgd_id=g.rgd_id ORDER BY g.gene_symbol_lc";
+            " AND r.rgd_id=g.rgd_id AND r.object_key=1 ORDER BY g.gene_symbol_lc";
 
         GeneQuery q = new GeneQuery(this.getDataSource(), query);
         q.declareParameter(new SqlParameter(Types.INTEGER));
