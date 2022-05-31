@@ -396,17 +396,13 @@ public class VariantDAO extends JdbcBaseDAO {
         return vrList;
     }
 
-
-    /**
-     *
-     * @param vsb VariantSearchBean object
-     * @return
-     * @throws Exception
-     */
     public Map<String, Map<String, Integer>> getVariantToGeneCountMap(VariantSearchBean vsb) throws Exception{
 
         String sql = "SELECT gene_symbols as gene_symbol, sample_id, count(*) as count FROM (" +
-                "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
+            "select distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
+
+        // 'parallel' hint on PROD db ultimately causes explosion of processes that kills the db; do NOT use it
+        // "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
 
         sql += vsb.getVariantTable(vsb.getMapKey()) +  " v ";
 
@@ -660,7 +656,8 @@ public class VariantDAO extends JdbcBaseDAO {
      */
     public int getCountofDamagingVariantsForStrainByAssembly(int rgdId,String mapKey) throws Exception {
 
-        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+        //String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+        String sql = "select count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
                 "from POLYPHEN p inner join VARIANT v "+
                 " on p.VARIANT_ID = v.VARIANT_ID and p.PREDICTION LIKE '%damaging'  " +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
@@ -675,7 +672,8 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public int getCountofDamagingVariantsForSample(int sampleId, String mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+        //String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+        String sql = "select count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
                 "from POLYPHEN p inner join VARIANT v \n"+
                 " on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging'  " +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
@@ -693,7 +691,8 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForSampleByAssembly(int sampleId, int mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ distinct(v.RGD_ID),v.*, vmd.*, vsd.*,p.GENE_SYMBOL from VARIANT v\n" +
+        //String sql = "select /*+ PARALLEL*/ distinct(v.RGD_ID),v.*, vmd.*, vsd.*,p.GENE_SYMBOL from VARIANT v\n" +
+        String sql = "select distinct(v.RGD_ID),v.*, vmd.*, vsd.*,p.GENE_SYMBOL from VARIANT v\n" +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
                 " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id and vsd.total_depth > 8 "+
                 "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =? \n" +
@@ -713,7 +712,8 @@ public class VariantDAO extends JdbcBaseDAO {
      * @throws Exception when unexpected error occurs
      */
     public List<Variant> getDamagingVariantsForStrainByAssembly(int rgdId,int mapKey) throws Exception {
-        String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v " +
+        //String sql = "select /*+ PARALLEL*/ distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v " +
+        String sql = "select distinct(v.VARIANT_ID),v.*,p.GENE_SYMBOL from VARIANT v " +
                 "inner join SAMPLE s on v.SAMPLE_ID = s.SAMPLE_ID and s.STRAIN_RGD_ID=? and s.MAP_KEY =?\n" +
                 "inner join POLYPHEN p on v.VARIANT_ID = p.VARIANT_ID and p.PREDICTION LIKE '%damaging' and v.total_depth > 8 " +
                 "ORDER BY CHROMOSOME,START_POS,END_POS,REF_NUC,VAR_NUC";
