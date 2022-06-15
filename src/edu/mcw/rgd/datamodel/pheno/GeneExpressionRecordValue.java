@@ -14,6 +14,7 @@ public class GeneExpressionRecordValue {
     private String expressionUnit;
     private int mapKey;
     private String expressionLevel;
+    private Double tpmValue;
 
     public boolean deleteFlag; // if true, the value should be deleted
 
@@ -87,5 +88,13 @@ public class GeneExpressionRecordValue {
 
     public void setExpressionLevel(String expressionLevel) {
         this.expressionLevel = expressionLevel;
+    }
+
+    public Double getTpmValue() {
+        return tpmValue;
+    }
+
+    public void setTpmValue(Double tpmValue) {
+        this.tpmValue = tpmValue;
     }
 }
