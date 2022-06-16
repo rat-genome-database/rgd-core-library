@@ -28,7 +28,7 @@ public class Link {
     private static String ONTOLOGY_VIEW = "/rgdweb/ontology/view.html?acc_id=";
     private static String ONTOLOGY_ANNOT = "/rgdweb/ontology/annot.html?acc_id=";
     private static String PATHWAY_DIAGRAM = "/rgdweb/pathway/pathwayRecord.html?acc_id=";
-
+    private static String VARIANT_RSID = "/rgdweb/report/rsId/main.html?id=";
     // genomic elements
     private static String GE = "/rgdweb/report/ge/main.html?id=";
 
@@ -200,7 +200,9 @@ public class Link {
     public static String ontAnnot(String ontAccId) {
         return ONTOLOGY_ANNOT + ontAccId;
     }
-
+    public static String rsId(String rsId) {
+        return VARIANT_RSID + rsId;
+    }
     /**
      * given pathway ontology accession id, like PW:0000394, returns the link to pathway diagram report page
      * @param pwAccId pathway ontology accession id, like PW:0000394
