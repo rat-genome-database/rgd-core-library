@@ -55,5 +55,8 @@ public class EvaDAO extends AbstractDAO{
 
         return executeBatch(su);
     }
-
+    public List<Eva> getEvaByRsId(String rsId, int mapKey) throws Exception{
+        String sql = "select * from EVA where rs_id=? and map_key=?";
+        return EvaQuery.execute(this,sql,rsId,mapKey);
+    }
 }
