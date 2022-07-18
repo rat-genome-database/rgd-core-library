@@ -38,12 +38,12 @@ public class EvaDAO extends AbstractDAO{
 
         return executeBatch(su);
     }
-    public int deleteEvaBatchByRsId(List<String> rsIds) throws Exception{
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM EVA WHERE RS_ID=?",
-                new int[] {Types.VARCHAR});
+    public int deleteEvaBatchByRsId(List<String> rsIds, int mapKey) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM EVA WHERE RS_ID=? and MAP_KEY=?",
+                new int[] {Types.VARCHAR,Types.INTEGER});
 
         for(String rsId : rsIds)
-            su.update(rsId);
+            su.update(rsId, mapKey);
 
         return executeBatch(su);
     }
