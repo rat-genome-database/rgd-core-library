@@ -3,10 +3,17 @@ package edu.mcw.rgd.dao.impl.variants;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.IntListQuery;
+import edu.mcw.rgd.dao.spring.VariantMapper;
+import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
+import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
+import edu.mcw.rgd.datamodel.Variant;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
+import edu.mcw.rgd.datamodel.variants.VariantMapData;
+import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import edu.mcw.rgd.datamodel.variants.VariantTranscript;
+import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.*;
 import java.util.*;
@@ -110,5 +117,45 @@ public class VariantDAO extends AbstractDAO {
        List<VariantResult> results=variantDAO.getVariantsNewTbaleStructure(vsb);
        System.out.println("RESULSTS SIZE:"+ results.size());
         System.out.println("DONE!!");
+    }
+        public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant_sample_detail WHERE rgd_id=?";
+        VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
+    }
+
+    public VariantMapData getVariant(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantMapData> vmds = q.execute(rgdId);
+        if (vmds.isEmpty())
+            return null;
+        return vmds.get(0);
+    }
+
+    public List<VariantMapData> getVariantsByRgdId(int rgdId) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
+    }
+
+    public VariantMapData getVariantByRsId(String rsId) throws Exception {
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=?";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        List<VariantMapData> vmds = q.execute(rsId);
+        if (vmds.isEmpty())
+            return  null;
+        return vmds.get(0);
+    }
+
+    public List<VariantMapData> getAllVariantByRsId(String rsId) throws Exception {
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=? order by vmd.chromosome, vmd.start_pos";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rsId);
     }
 }

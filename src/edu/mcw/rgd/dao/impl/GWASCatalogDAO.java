@@ -1,8 +1,10 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.GWASCatalogQuery;
 import edu.mcw.rgd.datamodel.GWASCatalog;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Types;
@@ -41,5 +43,32 @@ public class GWASCatalogDAO extends AbstractDAO {
             gc.getSnpPassQc(),gc.getMapTrait(),gc.getEfoId(),gc.getStudyAcc(),gc.getOrBeta());
         }
         return executeBatch(su);
+    }
+    public int updateGWASBatch(Collection<GWASCatalog> toBeUpdated) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
+                "update GWAS_CATALOG set VARIANT_RGD_ID=? where GWAS_ID=?",
+                new int[]{Types.INTEGER, Types.INTEGER});
+        su.compile();
+        for (GWASCatalog gc : toBeUpdated){
+            su.update(gc.getVariantRgdId(),gc.getGwasId());
+        }
+        return executeBatch(su);
+    }
+
+    public GWASCatalog getGWASCatalogByVariantRgdId(int rgdId) throws Exception{
+        String sql = "select * from gwas_catalog where variant_rgd_id=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<GWASCatalog> list = q.execute(rgdId);
+        if (list.isEmpty())
+            return null;
+        return list.get(0);
+    }
+
+    public List<GWASCatalog> getGWASListByVariantRgdId(int rgdId) throws Exception{
+        String sql = "select * from gwas_catalog where variant_rgd_id=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
     }
 }
