@@ -5,7 +5,6 @@ import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.describe.DescriptionGenerator;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.Socket;
@@ -807,13 +806,7 @@ public class Utils {
     static public String generateMD5(String str) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] md5 = md.digest(str.getBytes());
-        return DatatypeConverter.printHexBinary(md5);
-//        return bytesToHex(md5);
-    }
-    static public String generateMD52(String str) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] md5 = md.digest(str.getBytes());
-//        return DatatypeConverter.printHexBinary(md5);
+//        return DatatypeConverter.printHexBinary(md5); // old method removed in Java 11
         return bytesToHex(md5);
     }
 
