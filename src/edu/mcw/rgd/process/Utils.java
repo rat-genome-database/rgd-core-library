@@ -5,7 +5,6 @@ import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.describe.DescriptionGenerator;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.Socket;
@@ -807,7 +806,8 @@ public class Utils {
     static public String generateMD5(String str) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] md5 = md.digest(str.getBytes());
-        return DatatypeConverter.printHexBinary(md5);
+//        return DatatypeConverter.printHexBinary(md5); // old Java 8 method removed in Java 11
+        return bytesToHex(md5);
     }
 
     /**
@@ -861,5 +861,16 @@ public class Utils {
         } else
             writer = new BufferedWriter(new FileWriter(fileName));
         return writer;
+    }
+
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 }
