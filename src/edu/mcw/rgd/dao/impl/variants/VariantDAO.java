@@ -158,4 +158,14 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsId);
     }
+
+    public List<VariantMapData> getVariantsWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
+        String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey,chrom,start,stop);
+    }
 }
