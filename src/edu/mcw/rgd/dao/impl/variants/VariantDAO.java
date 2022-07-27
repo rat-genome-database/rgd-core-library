@@ -182,7 +182,7 @@ public class VariantDAO extends AbstractDAO {
 //        while(rs.next()){
 //            cnt =rs.getInt(1);
 //        }
-        CountQuery q = new CountQuery(this.getDataSource(), sql);
+        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         List<Integer> results = execute(q, mapKey,chrom,start,stop);
         return results.get(0);
     }
