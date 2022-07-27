@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl.variants;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.VariantMapper;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
@@ -167,5 +168,22 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(mapKey,chrom,start,stop);
+    }
+    public Integer getVariantsCountWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
+        String sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+//        Connection con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
+//        PreparedStatement ps = con.prepareStatement(sql);
+//        ps.setInt(1,mapKey);
+//        ps.setString(2,chrom);
+//        ps.setInt(3,start);
+//        ps.setInt(4,stop);
+//        ResultSet rs = ps.executeQuery();
+//        int cnt = 0;
+//        while(rs.next()){
+//            cnt =rs.getInt(1);
+//        }
+        CountQuery q = new CountQuery(this.getDataSource(), sql);
+        List<Integer> results = execute(q, mapKey,chrom,start,stop);
+        return results.get(0);
     }
 }
