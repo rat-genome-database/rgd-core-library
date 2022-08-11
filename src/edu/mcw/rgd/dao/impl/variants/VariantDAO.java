@@ -206,7 +206,7 @@ public class VariantDAO extends AbstractDAO {
             loc = "EXON";
         else
             loc="INTRON";
-        String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and and vm.map_key=? v.rgd_id in (\n" +
+        String sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and and vm.map_key=? v.rgd_id in (\n" +
                 "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
                 "(select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) ";
         Connection con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
