@@ -38,6 +38,15 @@ public class EvaDAO extends AbstractDAO{
 
         return executeBatch(su);
     }
+    public int deleteEvaBatchByRsId(List<String> rsIds, int mapKey) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM EVA WHERE RS_ID=? and MAP_KEY=?",
+                new int[] {Types.VARCHAR,Types.INTEGER});
+
+        for(String rsId : rsIds)
+            su.update(rsId, mapKey);
+
+        return executeBatch(su);
+    }
     public int insertEva(Collection<Eva> tobeInserted) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO EVA (EVA_ID, CHROMOSOME, POS, RS_ID, " +
                 "REF_NUC, VAR_NUC, SO_TERM_ACC, MAP_KEY, PADDING_BASE) values (?,?,?,?,?,?,?,?,?)",
@@ -55,5 +64,8 @@ public class EvaDAO extends AbstractDAO{
 
         return executeBatch(su);
     }
-
+    public List<Eva> getEvaByRsId(String rsId, int mapKey) throws Exception{
+        String sql = "select * from EVA where rs_id=? and map_key=?";
+        return EvaQuery.execute(this,sql,rsId,mapKey);
+    }
 }
