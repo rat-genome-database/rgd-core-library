@@ -1021,7 +1021,12 @@ public class OntologyXDAO extends AbstractDAO {
                 "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
                 ")";
         int childrenMerged = update(sqlc, termAccTo, termAccFrom, termAccFrom, termAccTo);
-        return parentsMerged + childrenMerged;
+
+        // delete potential self-referencing dags after the merge
+        String sql = "DELETE FROM ont_dag WHERE parent_term_acc=? AND child_term_acc=?";
+        int dagsDeleted = update(sql, termAccTo, termAccTo);
+
+        return parentsMerged + childrenMerged + dagsDeleted;
     }
 
     /**
@@ -1071,6 +1076,12 @@ public class OntologyXDAO extends AbstractDAO {
         return update(sql, cutoffDate, ontId);
     }
 
+    public List<TermDagEdge> getAllDagsForOntology(String ontId) throws Exception{
+        String sql = "Select * from ont_dag where parent_term_acc like '"+ontId+"%'";
+
+        TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(),sql);
+        return execute(q);
+    }
     /**
      * get list of all synonyms for given term
      * @param termAcc term accession id
