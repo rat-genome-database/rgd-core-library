@@ -1021,7 +1021,12 @@ public class OntologyXDAO extends AbstractDAO {
                 "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
                 ")";
         int childrenMerged = update(sqlc, termAccTo, termAccFrom, termAccFrom, termAccTo);
-        return parentsMerged + childrenMerged;
+
+        // delete potential self-referencing dags after the merge
+        String sql = "DELETE FROM ont_dag WHERE parent_term_acc=? AND child_term_acc=?";
+        int dagsDeleted = update(sql, termAccTo, termAccTo);
+
+        return parentsMerged + childrenMerged + dagsDeleted;
     }
 
     /**
