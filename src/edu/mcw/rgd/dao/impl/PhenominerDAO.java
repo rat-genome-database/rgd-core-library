@@ -2774,4 +2774,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
         return recList;
     }
+    public List<PhenominerUnitTable> getConversionFactorToStandardUnits(int recordId) throws Exception {
+        String sql="select * from phenominer_term_unit_scales tus where unit_from in (\n" +
+                "select measurement_units from experiment_record er where experiment_record_id=?)";
+        PhenominerUnitTablesQuery query=new PhenominerUnitTablesQuery(this.getDataSource(), sql);
+        return execute(query, recordId);
+    }
 }
