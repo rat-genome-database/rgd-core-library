@@ -53,6 +53,30 @@ public class SubmittedStrain  {
    private Gene allele;
    private Strain strain;
 
+    public Gene getGene() {
+        return gene;
+    }
+
+    public void setGene(Gene gene) {
+        this.gene = gene;
+    }
+
+    public Gene getAllele() {
+        return allele;
+    }
+
+    public void setAllele(Gene allele) {
+        this.allele = allele;
+    }
+
+    public Strain getStrain() {
+        return strain;
+    }
+
+    public void setStrain(Strain strain) {
+        this.strain = strain;
+    }
+
     public boolean isRgdGeneId() {
         return isRgdGeneId;
     }
