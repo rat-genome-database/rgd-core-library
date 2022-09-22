@@ -163,7 +163,6 @@ public class PhenominerDAO extends AbstractDAO {
         PhenominerEnumTablesQuery pquery = new PhenominerEnumTablesQuery(this.getDataSource(), query);
         return execute(pquery,params);
     }
-
     /**
      *  Return all GEO studies
      *  @return list of all studies
@@ -1312,11 +1311,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
-                "geo_sample_acc=?, biosample_id=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
+                "geo_sample_acc=?, biosample_id=?, life_stage=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
                 s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
-                s.getBioSampleId(), s.getLastModifiedBy(), s.getId());
+                s.getBioSampleId(),s.getDevelopmentalStage(),s.getLastModifiedBy(), s.getId());
     }
 
     /**
@@ -1484,12 +1483,12 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cell_line_id, geo_sample_acc, biosample_id, sample_id,last_modified_by,created_by,created_date, last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,last_modified_by,created_by,created_date, last_modified_date) "+
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
-                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getLastModifiedBy(),s.getCreatedBy());
+                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy(),s.getCreatedBy());
         return next;
     }
 
