@@ -45,8 +45,8 @@ public class RgdFbDAO extends AbstractDAO {
     }
 
     /**
-    * Used for the Send Message Form, not Contact Us Form
-    * */
+     * Used for the Send Message Form, not Contact Us Form
+     * */
     public int insertMessageForm(String subject, String message, int type) throws Exception {
         String query = "insert into FB_QUESTION (MESSAGE_ID, SUBJECT, MESSAGE, MESSAGE_DATE, TYPE_ID) " +
                 "values(?, ?, ?, CURRENT_DATE, ?)";

@@ -178,61 +178,6 @@ public class HTMLTableReportStrategy implements ReportStrategy {
         return buf.toString();
     }
 
-    /**
-     * Returns the report formatted in an html table
-     * @param report Report object, idName String
-     * @return HTML string for this report
-     * @throws Exception
-     */
-    public String format(Report report, String idName) throws Exception{
-        StringBuilder buf = new StringBuilder();
-
-        buf.append(getStyles());
-        String id = "id='"+idName+"' ";
-        buf.append("<table ").append(id).append(tableProperties).append(" />");
-        Iterator reportIt = report.iterator();
-        int count=1;
-        while (reportIt.hasNext()) {
-            String trProperties = "";
-            if (count == 1) {
-                trProperties = "class='headerRow'";
-            }else if (count % 2 == 0) {
-                trProperties = "class='evenRow'";
-            }else {
-                trProperties = "class='oddRow'";
-            }
-
-            buf.append("<tr ").append(trProperties).append(" >");
-            Record rec = (Record) reportIt.next();
-            int colCount = 0;
-            Iterator recordIt = rec.iterator();
-            while (recordIt.hasNext()) {
-                String nxt = (String) recordIt.next();
-
-                if (nxt == null || nxt.toUpperCase().equals("NULL")) {
-                    nxt = "";
-                }
-
-                // handle user supplied td properties for this column (skip header column)
-                String tdAttrs = "";
-                if( count>1 && tdProperties!=null && colCount<tdProperties.length ) {
-                    tdAttrs = tdProperties[colCount];
-                }
-
-                buf.append("<td ").append(tdAttrs).append(" >");
-                buf.append(nxt);
-                buf.append("</td>");
-
-                colCount++;
-            }
-            buf.append("</tr>");
-            count++;
-        }
-        buf.append("</table>");
-        return buf.toString();
-    }
-
-
     public void setTableProperties(String tableProperties) {
         this.tableProperties = tableProperties;
     }
