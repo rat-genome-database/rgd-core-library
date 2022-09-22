@@ -1,10 +1,8 @@
 package edu.mcw.rgd.datamodel;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Jun 25, 2010
- * Time: 1:19:00 PM
+ * @author mtutaj
+ * @since Jun 25, 2010
  */
 public class TranscriptFeature extends MapData {
 
@@ -66,7 +64,6 @@ public class TranscriptFeature extends MapData {
 
     public TranscriptFeature( MapData md ) {
         this.setAbsPosition(md.getAbsPosition());
-        this.setBandType(md.getBandType());
         this.setChromosome(md.getChromosome());
         this.setFishBand(md.getFishBand());
         this.setFOrP(md.getFOrP());
