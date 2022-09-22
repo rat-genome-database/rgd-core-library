@@ -1,5 +1,8 @@
 package edu.mcw.rgd.datamodel.models;
 
+import edu.mcw.rgd.datamodel.Gene;
+import edu.mcw.rgd.datamodel.Strain;
+
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +45,61 @@ public class SubmittedStrain  {
     private String imageUrl;
 
    private int strainRgdId;
+   private boolean isRgdGeneId;
+   private boolean isRgdStrainId;
+   private boolean isRgdAlleleId;
+
+   private Gene gene;
+   private Gene allele;
+   private Strain strain;
+
+    public Gene getGene() {
+        return gene;
+    }
+
+    public void setGene(Gene gene) {
+        this.gene = gene;
+    }
+
+    public Gene getAllele() {
+        return allele;
+    }
+
+    public void setAllele(Gene allele) {
+        this.allele = allele;
+    }
+
+    public Strain getStrain() {
+        return strain;
+    }
+
+    public void setStrain(Strain strain) {
+        this.strain = strain;
+    }
+
+    public boolean isRgdGeneId() {
+        return isRgdGeneId;
+    }
+
+    public void setRgdGeneId(boolean rgdGeneId) {
+        isRgdGeneId = rgdGeneId;
+    }
+
+    public boolean isRgdStrainId() {
+        return isRgdStrainId;
+    }
+
+    public void setRgdStrainId(boolean rgdStrainId) {
+        isRgdStrainId = rgdStrainId;
+    }
+
+    public boolean isRgdAlleleId() {
+        return isRgdAlleleId;
+    }
+
+    public void setRgdAlleleId(boolean rgdAlleleId) {
+        isRgdAlleleId = rgdAlleleId;
+    }
 
     public int getStrainRgdId() {
         return strainRgdId;
