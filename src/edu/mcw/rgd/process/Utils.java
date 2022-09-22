@@ -806,7 +806,7 @@ public class Utils {
     static public String generateMD5(String str) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] md5 = md.digest(str.getBytes());
-//        return DatatypeConverter.printHexBinary(md5); // old method removed in Java 11
+//        return DatatypeConverter.printHexBinary(md5); // old Java 8 method removed in Java 11
         return bytesToHex(md5);
     }
 
