@@ -23,32 +23,6 @@ public class MapManager {
     private java.util.Map<Integer, Map> primaryMapsForEnsembl = new ConcurrentHashMap<>(); // species_type_key => Map
 
     private java.util.Map<Integer,List<Chromosome>> chromosomeHash = new ConcurrentHashMap<>(); // contains the chromosomes
-    private static final java.util.Map<Integer, String> refSeqAccMap;
-    static{
-        java.util.Map<Integer, String> map=new HashMap<>();
-
-              map.put(360, "GCF_000001895.5");      //Rnor_6.0
-              map.put(70, "GCF_000001895.4");       //Rnor_5.0
-              map.put(15, "GCF_000002265.2");       //CELERA
-
-               map.put(35, "GCF_000001635.26");     //GRCm38
-               map.put(20, "GCF_000002165.2");      //CELERA
-
-               map.put(38, "GCF_000001405.37");     //GRCh38
-               map.put(17, "GCF_000001405.25");     //GRCh37
-               map.put(19, "GCF_000002125.1");      //HUREF
-               map.put(36, "GCF_000306695.2");      //CHM1_1
-
-               map.put(44, "GCF_000276665.1");           //Chinchilla ChiLan1.0
-               map.put(511, "GCF_000258655.2");          //Bonobo PanPan1.1
-               map.put(631, "GCF_000002285.3");          //Dog CanFam3.1
-               map.put(720, "GCF_000236235.1");          //Squirrel SpeTri2.0
-
-               map.put(911, "GCF_000003025.6");         //Sscrofa11.1
-               map.put(910, "GCF_000003025.5");         //Sscrofa10.2
-
-        refSeqAccMap=Collections.unmodifiableMap(map);
-    }
     /**
      * Returns the map manager instance.
      *
@@ -223,8 +197,4 @@ public class MapManager {
         }
         return false;
     }
-
-    public java.util.Map<Integer, String> getReqSeqAccIdMap(){
-        return refSeqAccMap;
-}
 }
