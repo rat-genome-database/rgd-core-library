@@ -3,15 +3,12 @@ package edu.mcw.rgd.datamodel;
 import edu.mcw.rgd.process.Dumper;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Apr 7, 2009
- * Time: 2:32:24 PM
+ * @author jdepons
+ * @since Apr 7, 2009
  */
 public class MapData implements Identifiable, Cloneable, Dumpable {
 
     private int key;
-    private String bandType;
     private String fOrP;
     private String chromosome;
     private String fishBand;
@@ -123,14 +120,6 @@ public class MapData implements Identifiable, Cloneable, Dumpable {
 
     public void setKey(int key) {
         this.key = key;
-    }
-
-    public String getBandType() {
-        return bandType;
-    }
-
-    public void setBandType(String bandType) {
-        this.bandType = bandType;
     }
 
     public String getFOrP() {
@@ -284,7 +273,6 @@ public class MapData implements Identifiable, Cloneable, Dumpable {
         // we are skipping null fields and zero int fields
         return new Dumper(delimiter, true, true)
             .put("MAPS_DATA_KEY", key)
-            .put("BAND_TYPE", bandType)
             .put("F_OR_P", fOrP)
             .put("CHROMOSOME", chromosome)
             .put("FISH_BAND", fishBand)

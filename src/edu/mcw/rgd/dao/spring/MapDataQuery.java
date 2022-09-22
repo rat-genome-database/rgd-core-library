@@ -9,11 +9,8 @@ import java.sql.ResultSet;
 import edu.mcw.rgd.datamodel.MapData;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: Apr 7, 2009
- * Time: 2:32:41 PM
- * To change this template use File | Settings | File Templates.
+ * @author jdepons
+ * @since Apr 7, 2009
  */
 public class MapDataQuery extends MappingSqlQuery {
 
@@ -26,7 +23,6 @@ public class MapDataQuery extends MappingSqlQuery {
         MapData md = new MapData();
 
         md.setKey(rs.getInt("maps_data_key"));
-        md.setBandType(rs.getString("band_type"));
         md.setFOrP(rs.getString("f_or_p"));
         md.setChromosome(rs.getString("chromosome"));
         md.setFishBand(rs.getString("fish_band"));
