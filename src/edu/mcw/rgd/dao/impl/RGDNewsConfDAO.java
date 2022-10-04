@@ -22,7 +22,7 @@ public class RGDNewsConfDAO extends AbstractDAO {
     }
 
     public List<RGDNewsConf> getAllVideos() throws Exception {
-        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='VIDEO'";
+        String query = "select * from RGD_NEWS_CONFERENCES where CONTENT_TYPE='VIDEO' order by release_date desc";
         return RGDNewsConfQuery.execute(this,query);
     }
 
