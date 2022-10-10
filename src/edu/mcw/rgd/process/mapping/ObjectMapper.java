@@ -99,7 +99,8 @@ public class ObjectMapper {
         Iterator it = mappedGenes.iterator();
         while (it.hasNext()) {
             Gene g = (Gene) it.next();
-            this.addToMap(g);
+            if (!g.getSymbol().contains("NEWGENE"))
+                this.addToMap(g);
         }
     }
 
