@@ -39,7 +39,11 @@ public class RecordQuery extends MappingSqlQuery {
         rec.setStudyId(rs.getInt("study_id"));
         rec.setHasIndividualRecord(rs.getBoolean("has_individual_record"));
         rec.setCurationStatus(rs.getInt("curation_status"));
-        rec.setRefRgdId(rs.getInt("ref_rgd_id"));
+        try {
+            rec.setRefRgdId(rs.getInt("ref_rgd_id"));
+        }catch (Exception e){
+            
+        }
         rec.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
 
         try {
