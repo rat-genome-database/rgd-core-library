@@ -21,6 +21,7 @@ public class Sample {
     private String developmentalStage;
     private String lastModifiedBy;
     private String createdBy;
+    private String lifeStage;
 
 
     public int getId() {
@@ -141,5 +142,13 @@ public class Sample {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getLifeStage() {
+        return lifeStage;
+    }
+
+    public void setLifeStage(String lifeStage) {
+        this.lifeStage = lifeStage;
     }
 }

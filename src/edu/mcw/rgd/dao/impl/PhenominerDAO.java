@@ -10,6 +10,7 @@ import edu.mcw.rgd.datamodel.pheno.*;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.pheno.SearchBean;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -1483,13 +1484,28 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,last_modified_by,created_by,created_date, last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,last_modified_by,created_by,created_date, last_modified_date, life_stage) "+
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP, ?)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
-                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy(),s.getCreatedBy());
+                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy(),s.getCreatedBy(), s.getLifeStage());
         return next;
+    }
+
+    /**
+     * Update samples life stage column
+     * @param samples list of samples
+     * @throws Exception
+     */
+    public void updateSampleBatch(List<Sample> samples) throws Exception{
+        String query = "update sample set life_stage=? where sample_id=?";
+        BatchSqlUpdate sql =new BatchSqlUpdate(this.getDataSource(), query, new int[]{Types.VARCHAR,Types.INTEGER}, 1000);
+        sql.compile();
+        for (Sample s : samples){
+            sql.update(s.getLifeStage(), s.getId());
+        }
+        sql.flush();
     }
 
     /**
