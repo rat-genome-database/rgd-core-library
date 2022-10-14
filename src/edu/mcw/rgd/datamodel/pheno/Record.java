@@ -32,6 +32,15 @@ public class Record {
     private List<Condition> conditions = new ArrayList<>();
     private boolean hasIndividualRecord = false;
     private String conditionDescription = "";
+    private int refRgdId;
+
+    public int getRefRgdId() {
+        return refRgdId;
+    }
+
+    public void setRefRgdId(int refRgdId) {
+        this.refRgdId = refRgdId;
+    }
 
     public String getExperimentName() {
         return experimentName;

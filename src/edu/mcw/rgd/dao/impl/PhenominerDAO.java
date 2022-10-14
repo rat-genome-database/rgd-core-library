@@ -2692,6 +2692,27 @@ public class PhenominerDAO extends AbstractDAO {
 
         return runFullRecordsQuery(query);
     }
+    public List<Record> getFullRecords() throws Exception {
+        String query = "select * from experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "where er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id  " +
+                "and er.measurement_method_id=mm.measurement_method_id  " +
+                "and er.experiment_id=e.experiment_id and e.study_id=st.study_id " +
+
+                "and er.curation_status=40 and er.species_type_key=3 ";
+
+        return runFullRecordsQuery(query);
+    }
+    public List<Record> getFullRecordsByCMO(String cmoTermAcc) throws Exception {
+        String query = "select * from experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "where er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id  " +
+                "and er.measurement_method_id=mm.measurement_method_id  " +
+                "and er.experiment_id=e.experiment_id and e.study_id=st.study_id " +
+
+                "and er.curation_status=40 and er.species_type_key=3 " +
+                "and cm.clinical_measurement_ont_id='"+cmoTermAcc+"'";
+
+        return runFullRecordsQuery(query);
+    }
 
     /**
      * get full phenominer records based on reference rgd id of a study
@@ -2773,5 +2794,11 @@ public class PhenominerDAO extends AbstractDAO {
             r.setConditionDescription(conditionSetItem);
         }
         return recList;
+    }
+    public List<PhenominerUnitTable> getConversionFactorToStandardUnits(int recordId) throws Exception {
+        String sql="select * from phenominer_term_unit_scales tus where unit_from in (\n" +
+                "select measurement_units from experiment_record er where experiment_record_id=?)";
+        PhenominerUnitTablesQuery query=new PhenominerUnitTablesQuery(this.getDataSource(), sql);
+        return execute(query, recordId);
     }
 }
