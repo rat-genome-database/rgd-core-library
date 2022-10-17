@@ -1498,7 +1498,7 @@ public class PhenominerDAO extends AbstractDAO {
      * @param samples list of samples
      * @throws Exception
      */
-    public void updateSampleBatch(List<Sample> samples) throws Exception{
+    public void updateSampleLifeStageBatch(List<Sample> samples) throws Exception{
         String query = "update sample set life_stage=? where sample_id=?";
         BatchSqlUpdate sql =new BatchSqlUpdate(this.getDataSource(), query, new int[]{Types.VARCHAR,Types.INTEGER}, 1000);
         sql.compile();
