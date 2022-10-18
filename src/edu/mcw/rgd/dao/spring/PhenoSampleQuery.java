@@ -32,7 +32,7 @@ public class PhenoSampleQuery extends MappingSqlQuery {
         s.setCellLineId(rs.getString("cell_line_id"));
         s.setGeoSampleAcc(rs.getString("geo_sample_acc"));
         s.setBioSampleId(rs.getString("biosample_id"));
-        s.setDevelopmentalStage(rs.getString("life_stage"));
+        s.setLifeStage(rs.getString("life_stage"));
         s.setLastModifiedBy(rs.getString("last_modified_by"));
         s.setCreatedBy(rs.getString("created_by"));
         return s;
