@@ -1435,6 +1435,13 @@ public class PhenominerDAO extends AbstractDAO {
         List<Sample> samples = sq.execute(id);
         return samples.get(0);
     }
+
+    public List<Sample> getSamplesByIds(List<String> ids) throws Exception {
+        String query = "select * from sample where sample_id in ("+Utils.buildInPhrase(ids)+")";
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.compile();
+        return sq.execute();
+    }
     /**
      * Return a sample based on an Geo Sample ID
      * @param id
