@@ -226,6 +226,16 @@ public class MapDAO extends AbstractDAO {
     }
 
     /**
+     * Returns maps by rank
+     * @param rgdId object rgd id
+     * @return list of MapData objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<MapData> getMapDataByRank(int rgdId) throws Exception{
+        String query = "SELECT * FROM maps_data WHERE rgd_id=? ORDER BY rank ASC";
+        return executeMapDataQuery(query, rgdId);
+    }
+    /**
      * get all positions for the objects with given rgd ids
      * @param rgdIds list of rgd id
      * @return list of MapData objects
