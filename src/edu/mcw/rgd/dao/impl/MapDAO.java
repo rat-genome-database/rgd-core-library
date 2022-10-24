@@ -232,7 +232,8 @@ public class MapDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<MapData> getMapDataByRank(int rgdId) throws Exception{
-        String query = "SELECT * FROM maps_data WHERE rgd_id=? ORDER BY rank ASC";
+        String query = " SELECT * FROM maps_data md \n" +
+                " inner join maps m on m.map_key=md.map_key WHERE md.rgd_id=? ORDER BY m.rank ASC";
         return executeMapDataQuery(query, rgdId);
     }
     /**
