@@ -4,25 +4,20 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Mar 11, 2011
- * Time: 12:37:15 PM
+ * @author mtutaj
+ * @since Mar 11, 2011
  *
- * Goal: offer a generic external-memory (file) sorting program in Java.
+ * Goal: a generic external-memory (file) sorting program in Java
  *
- * It must be :
+ * It must be:
  *  - hackable (easy to adapt)
  *  - scalable to large files
- *  - sensibly efficient.
+ *  - sensibly efficient
  *
  * This software is in the public domain.
  *
- * By (in alphabetical order)
- *   Philippe Beaudoin,  Jon Elsas,  Christan Grant, Daniel Haran, Daniel Lemire,
- *  April 2010,
- * originally posted at
- *  http://www.daniel-lemire.com/blog/archives/2010/04/01/external-memory-sorting-in-java/
+ * By Philippe Beaudoin,  Jon Elsas,  Christan Grant, Daniel Haran, Daniel Lemire, April 2010,
+ * originally posted at  http://www.daniel-lemire.com/blog/archives/2010/04/01/external-memory-sorting-in-java/
  */
 public class FileExternalSort {
     
@@ -178,7 +173,7 @@ public class FileExternalSort {
 	}
 
     /**
-     * primary utility method to merge and sort text files
+     * primary utility method to merge and sort text files; uses default String comparator
      * @param inputFiles array of names of input files
      * @param outputFile name of output file
      * @param skipDuplicates if true duplicate lines won't be written to output file; if false all lines will be written to output file
@@ -191,12 +186,24 @@ public class FileExternalSort {
                 return r1.compareTo(r2);
             }
         };
-        List<File> inFiles = new LinkedList<File>();
-        for( String inFile: inputFiles ) {
-            inFiles.addAll(sortInBatch(new File(inFile), comparator));
-        }
-        return mergeSortedFiles(inFiles, new File(outputFile), comparator, skipDuplicates);
+		return mergeAndSortFiles(inputFiles, outputFile, skipDuplicates, comparator);
     }
+
+	/**
+	 * merge and sort text files; uses custom comparator
+	 * @param inputFiles array of names of input files
+	 * @param outputFile name of output file
+	 * @param skipDuplicates if true duplicate lines won't be written to output file; if false all lines will be written to output file
+	 * @return nr of rows written to output file
+	 */
+	public static int mergeAndSortFiles(String[] inputFiles, String outputFile, boolean skipDuplicates, Comparator<String> comparator) throws IOException {
+
+		List<File> inFiles = new LinkedList<File>();
+		for( String inFile: inputFiles ) {
+			inFiles.addAll(sortInBatch(new File(inFile), comparator));
+		}
+		return mergeSortedFiles(inFiles, new File(outputFile), comparator, skipDuplicates);
+	}
 }
 
 class BinaryFileBuffer  {
