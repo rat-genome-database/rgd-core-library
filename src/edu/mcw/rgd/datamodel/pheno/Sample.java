@@ -21,6 +21,7 @@ public class Sample {
     private String lastModifiedBy;
     private String createdBy;
     private String lifeStage;
+    private String curatorNotes;
 
 
     public int getId() {
@@ -141,5 +142,13 @@ public class Sample {
 
     public void setLifeStage(String lifeStage) {
         this.lifeStage = lifeStage;
+    }
+
+    public String getCuratorNotes() {
+        return curatorNotes;
+    }
+
+    public void setCuratorNotes(String curatorNotes) {
+        this.curatorNotes = curatorNotes;
     }
 }
