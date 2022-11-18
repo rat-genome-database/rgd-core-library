@@ -192,6 +192,13 @@ public class PhenominerDAO extends AbstractDAO {
         update(query, status,gse,species+"%");
 
     }
+
+    public void updateGeoSampleStatus(String gse,String gsm,String status,String species) throws Exception{
+
+        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =? and sample_accession_id =? and sample_organism like ? ";
+        update(query, status,gse,gsm,species+"%");
+
+    }
     /**
      * get list of studies given list of study ids
      * <p>
