@@ -192,6 +192,13 @@ public class PhenominerDAO extends AbstractDAO {
         update(query, status,gse,species+"%");
 
     }
+
+    public void updateGeoSampleStatus(String gse,String gsm,String status,String species) throws Exception{
+
+        String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =? and sample_accession_id =? and sample_organism like ? ";
+        update(query, status,gse,gsm,species+"%");
+
+    }
     /**
      * get list of studies given list of study ids
      * <p>
@@ -1445,8 +1452,8 @@ public class PhenominerDAO extends AbstractDAO {
 
     public List<Sample> getSamplesByStudyId(int studyId) throws Exception {
         String query = "select s.* from sample s where s.sample_id in (" +
-                "select r.sample_id from experiment_record r where r.experiment_id in (" +
-                "select experiment_id from experiment where study_id=?) )";
+                        "select r.sample_id from experiment_record r where r.experiment_id in (" +
+                        "select experiment_id from experiment where study_id=?) )";
         PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(),query);
         sq.declareParameter(new SqlParameter(Types.INTEGER));
         sq.compile();
