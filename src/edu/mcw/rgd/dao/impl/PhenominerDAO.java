@@ -1319,11 +1319,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
-                "geo_sample_acc=?, biosample_id=?, life_stage=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
+                "geo_sample_acc=?, biosample_id=?, life_stage=?, curator_notes=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
                 s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
-                s.getBioSampleId(),s.getLifeStage(),s.getLastModifiedBy(), s.getId());
+                s.getBioSampleId(), s.getLifeStage(), s.getCuratorNotes(),s.getLastModifiedBy(), s.getId());
     }
 
     /**
