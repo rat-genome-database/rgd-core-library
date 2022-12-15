@@ -10,6 +10,7 @@ import edu.mcw.rgd.datamodel.pheno.*;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.pheno.SearchBean;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -1311,11 +1312,11 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
-                "geo_sample_acc=?, biosample_id=?, life_stage=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
+                "geo_sample_acc=?, biosample_id=?, life_stage=?, curator_notes=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
                 s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
-                s.getBioSampleId(),s.getDevelopmentalStage(),s.getLastModifiedBy(), s.getId());
+                s.getBioSampleId(), s.getLifeStage(), s.getCuratorNotes(),s.getLastModifiedBy(), s.getId());
     }
 
     /**
@@ -1434,6 +1435,33 @@ public class PhenominerDAO extends AbstractDAO {
         List<Sample> samples = sq.execute(id);
         return samples.get(0);
     }
+
+    public List<Sample> getSamplesByIds(List<String> ids) throws Exception {
+        String query = "select * from sample where sample_id in ("+Utils.buildInPhrase(ids)+")";
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.compile();
+        return sq.execute();
+    }
+
+    public List<Sample> getSamplesByStudyId(int studyId) throws Exception {
+        String query = "select s.* from sample s where s.sample_id in (" +
+                "select r.sample_id from experiment_record r where r.experiment_id in (" +
+                "select experiment_id from experiment where study_id=?) )";
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(),query);
+        sq.declareParameter(new SqlParameter(Types.INTEGER));
+        sq.compile();
+        return sq.execute(studyId);
+    }
+
+    public List<Sample> getSamplesByExperimentId(int experimentId) throws Exception {
+        String query = "select s.* from sample s where s.sample_id in (" +
+                "select r.sample_id from experiment_record r where r.experiment_id=? )";
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(),query);
+        sq.declareParameter(new SqlParameter(Types.INTEGER));
+        sq.compile();
+        return sq.execute(experimentId);
+    }
+
     /**
      * Return a sample based on an Geo Sample ID
      * @param id
@@ -1451,6 +1479,13 @@ public class PhenominerDAO extends AbstractDAO {
         if(samples.size() != 0)
             return samples.get(0);
         else return null;
+    }
+    public List<Sample> getSampleByGeoStudyId(String id) throws Exception{
+        String query = "select * from sample where biosample_id in (select SAMPLE_ACCESSION_ID from rna_seq where geo_accession_id=?)";
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+        return sq.execute(id);
     }
     /**
      * Return geo records based on an Geo  ID
@@ -1471,6 +1506,7 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
 
+
     /**
      * Insert a sample in the datastore
      * @param s Sample object
@@ -1483,13 +1519,28 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
-                "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,last_modified_by,created_by,created_date, last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,CURATOR_NOTES,last_modified_by,created_by,created_date, last_modified_date) "+
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
-                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getDevelopmentalStage(),s.getLastModifiedBy(),s.getCreatedBy());
+                s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getLifeStage(),s.getCuratorNotes(),s.getLastModifiedBy(),s.getCreatedBy());
         return next;
+    }
+
+    /**
+     * Update samples life stage column
+     * @param samples list of samples
+     * @throws Exception
+     */
+    public void updateSampleLifeStageBatch(List<Sample> samples) throws Exception{
+        String query = "update sample set life_stage=? where sample_id=?";
+        BatchSqlUpdate sql =new BatchSqlUpdate(this.getDataSource(), query, new int[]{Types.VARCHAR,Types.INTEGER}, 1000);
+        sql.compile();
+        for (Sample s : samples){
+            sql.update(s.getLifeStage(), s.getId());
+        }
+        sql.flush();
     }
 
     /**

@@ -18,9 +18,10 @@ public class Sample {
     private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
-    private String developmentalStage;
     private String lastModifiedBy;
     private String createdBy;
+    private String lifeStage;
+    private String curatorNotes;
 
 
     public int getId() {
@@ -119,14 +120,6 @@ public class Sample {
         this.bioSampleId = bioSampleId;
     }
 
-    public String getDevelopmentalStage() {
-        return developmentalStage;
-    }
-
-    public void setDevelopmentalStage(String developmentalStage) {
-        this.developmentalStage = developmentalStage;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -141,5 +134,21 @@ public class Sample {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getLifeStage() {
+        return lifeStage;
+    }
+
+    public void setLifeStage(String lifeStage) {
+        this.lifeStage = lifeStage;
+    }
+
+    public String getCuratorNotes() {
+        return curatorNotes;
+    }
+
+    public void setCuratorNotes(String curatorNotes) {
+        this.curatorNotes = curatorNotes;
     }
 }

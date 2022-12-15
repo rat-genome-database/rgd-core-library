@@ -66,6 +66,10 @@ public class RecordQuery extends MappingSqlQuery {
         if (rs.wasNull()) {
            s.setAgeDaysFromLowBound(null);
         }
+        s.setLifeStage(rs.getString("LIFE_STAGE"));
+        if (rs.wasNull()) {
+            s.setLifeStage(null);
+        }
         s.setNumberOfAnimals(rs.getInt("number_of_animals"));
         if (rs.wasNull()) {
             s.setNumberOfAnimals(null);
