@@ -34,9 +34,6 @@ public class OrthologQuery extends MappingSqlQuery {
         obj.setPercentHomology(rs.getDouble("percent_homology"));
         if( rs.wasNull() )
             obj.setPercentHomology(null);
-        obj.setRefKey(rs.getInt("ref_key"));
-        if( rs.wasNull() )
-            obj.setRefKey(null);
         obj.setCreatedBy(rs.getInt("created_by"));
         obj.setCreatedDate(rs.getTimestamp("created_date"));
         obj.setLastModifiedBy(rs.getInt("last_modified_by"));
