@@ -1,10 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.dao.spring.GeneQuery;
-import edu.mcw.rgd.dao.spring.MappedOrthologQuery;
-import edu.mcw.rgd.dao.spring.OrthologQuery;
-import edu.mcw.rgd.dao.spring.StringListQuery;
+import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.MappedOrtholog;
 import edu.mcw.rgd.datamodel.Ortholog;
@@ -359,10 +356,10 @@ public class OrthologDAO extends AbstractDAO {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
                 "INSERT INTO genetogene_rgd_id_rlt " +
                         "(genetogene_key, src_rgd_id, dest_rgd_id, group_id, xref_data_src, xref_data_set, ortholog_type_key, " +
-                        " percent_homology, ref_key, created_by, created_date, last_modified_by, last_modified_date) " +
-                        "VALUES(?,?,?,?,?,?,?, ?,?,?,?,?,?)",
+                        " percent_homology, created_by, created_date, last_modified_by, last_modified_date) " +
+                        "VALUES(?,?,?,?,?,?,?, ?,?,?,?,?)",
                 new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
-                        Types.FLOAT, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.INTEGER, Types.TIMESTAMP});
+                        Types.FLOAT, Types.INTEGER, Types.TIMESTAMP, Types.INTEGER, Types.TIMESTAMP});
 
         su.compile();
 
@@ -373,7 +370,7 @@ public class OrthologDAO extends AbstractDAO {
             su.update(
                     o.getKey(), o.getSrcRgdId(), o.getDestRgdId(), o.getGroupId(),
                     o.getXrefDataSrc(), o.getXrefDataSet(), o.getOrthologTypeKey(),
-                    o.getPercentHomology(), o.getRefKey(), o.getCreatedBy(), o.getCreatedDate(),
+                    o.getPercentHomology(), o.getCreatedBy(), o.getCreatedDate(),
                     o.getLastModifiedBy(), o.getLastModifiedDate()
             );
         }
@@ -630,5 +627,4 @@ public class OrthologDAO extends AbstractDAO {
 
         return mapping;
     }
-
 }

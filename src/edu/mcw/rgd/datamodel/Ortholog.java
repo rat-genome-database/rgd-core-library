@@ -20,7 +20,6 @@ public class Ortholog implements Cloneable, Dumpable {
     private String xrefDataSet;
     private int orthologTypeKey;
     private Double percentHomology;
-    private Integer refKey;
     private int createdBy;
     private java.util.Date createdDate;
     private int lastModifiedBy;
@@ -106,14 +105,6 @@ public class Ortholog implements Cloneable, Dumpable {
         this.percentHomology = percentHomology;
     }
 
-    public Integer getRefKey() {
-        return refKey;
-    }
-
-    public void setRefKey(Integer refKey) {
-        this.refKey = refKey;
-    }
-
     public int getCreatedBy() {
         return createdBy;
     }
@@ -163,7 +154,6 @@ public class Ortholog implements Cloneable, Dumpable {
             .put("XREF_DATA_SET", xrefDataSet)
             .put("ORTHOLOG_TYPE", orthologTypeKey)
             .put("PERCENT_HOMOLOGY", percentHomology)
-            .put("REF_KEY", refKey)
             .put("CREATED_BY", createdBy)
             .put("CREATED_DATE", createdDate)
             .put("LAST_MODIFIED_BY", lastModifiedBy)
