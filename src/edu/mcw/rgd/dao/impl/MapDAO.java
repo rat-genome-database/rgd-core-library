@@ -68,6 +68,21 @@ public class MapDAO extends AbstractDAO {
         }
     }
 
+    /**
+     * get all active maps by order rank DESC
+     * @return List of Map objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Map> getActiveMapsByRankASC() throws Exception {
+
+
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' " +
+                    "order by m.rank asc";
+            return executeMapQuery(sql);
+
+    }
+
     public int getSpeciesTypeKeyForMap(int mapKey) throws Exception{
 
         String sql = "SELECT species_type_key FROM maps m, rgd_ids ri WHERE m.rgd_id=ri.rgd_id AND m.map_key=?";
@@ -222,6 +237,18 @@ public class MapDAO extends AbstractDAO {
      */
     public List<MapData> getMapData(int rgdId) throws Exception{
         String query = "SELECT * FROM maps_data WHERE rgd_id=? ORDER BY map_key DESC";
+        return executeMapDataQuery(query, rgdId);
+    }
+
+    /**
+     * Returns maps by rank
+     * @param rgdId object rgd id
+     * @return list of MapData objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<MapData> getMapDataByRank(int rgdId) throws Exception{
+        String query = " SELECT * FROM maps_data md \n" +
+                " inner join maps m on m.map_key=md.map_key WHERE md.rgd_id=? ORDER BY m.rank ASC";
         return executeMapDataQuery(query, rgdId);
     }
 
