@@ -49,7 +49,7 @@ public class ClientInit {
         ClientInit.client = client;
     }
 
-    public synchronized void destroy() throws IOException {
+    public static synchronized void destroy() throws IOException {
         System.out.println("destroying Elasticsearch Client...");
 
         if(client!=null) {
