@@ -1,10 +1,8 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.dao.spring.StrainFilesQuery;
-import edu.mcw.rgd.dao.spring.StrainQuery;
-import edu.mcw.rgd.dao.spring.StrainStatusQuery;
-import edu.mcw.rgd.dao.spring.StringListQuery;
+import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.MappedStrain;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.datamodel.StrainFiles;
 import edu.mcw.rgd.process.Utils;
@@ -65,6 +63,15 @@ public class StrainDAO extends AbstractDAO {
                 " order by g.strain_symbol";
 
         return executeStrainQuery(query, chr, stopPos, startPos, mapKey);
+    }
+
+    public List<MappedStrain> getActiveMappedStrainPositions(String chr, long startPos, long stopPos, int mapKey) throws Exception{
+        String query = "SELECT s.*,r.species_type_key, s.strain_symbol as symbol,  md.* \n" +
+                "FROM Strains s, rgd_ids r, maps_data md \n" +
+                "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND md.rgd_id=s.rgd_id \n" +
+                "AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? \n" +
+                "ORDER BY md.start_pos";
+        return MappedStrainQuery.run(this, query, chr, stopPos, startPos, mapKey);
     }
 
     /**
