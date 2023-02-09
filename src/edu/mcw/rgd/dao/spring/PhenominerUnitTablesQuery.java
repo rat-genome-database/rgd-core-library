@@ -23,8 +23,10 @@ public class PhenominerUnitTablesQuery extends MappingSqlQuery{
         PhenominerUnitTable pUnitTable = new PhenominerUnitTable();
         //pUnitTable.setI(rs.getInt(1));
         pUnitTable.setOntId(rs.getString("ont_id"));
-        pUnitTable.setStdUnit(rs.getString("standard_unit"));
-        pUnitTable.setUnitFrom(rs.getString("unit_from"));
+        try {
+            pUnitTable.setStdUnit(rs.getString("standard_unit"));
+        } catch (Exception var5) {
+        }        pUnitTable.setUnitFrom(rs.getString("unit_from"));
         pUnitTable.setUnitTo(rs.getString("unit_to"));
         pUnitTable.setTermSpecificScale(rs.getFloat("term_specific_scale"));
         pUnitTable.setZeroOffset(rs.getInt("zero_offset"));
