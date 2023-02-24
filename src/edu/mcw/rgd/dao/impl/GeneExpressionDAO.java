@@ -28,9 +28,9 @@ public class GeneExpressionDAO extends PhenominerDAO {
         r.setId(id);
 
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-            +",last_modified_by, last_modified_date, curation_status, species_type_key) VALUES(?,?,?,?,?,?,?)";
+            +",last_modified_by, curation_status, species_type_key, last_modified_date) VALUES(?,?,?,?,?,?,SYSTIMESTAMP)";
 
-        update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(), r.getLastModifiedDate(),
+        update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
                 r.getCurationStatus(), r.getSpeciesTypeKey());
         return id;
     }
