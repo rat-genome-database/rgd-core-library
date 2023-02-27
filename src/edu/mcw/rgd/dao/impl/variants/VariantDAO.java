@@ -268,4 +268,33 @@ public class VariantDAO extends AbstractDAO {
 //        List<Integer> results = execute(q, mapKey,chrom,start,stop);
         return cnt;
     }
+
+    public List<Long> getVariantStartPositionByPositionAndMapKey(int mapKey, String chrom, int start, int stop) throws Exception{
+        String sql = "select start_pos from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+        List<Long> pos = new ArrayList<>();
+        Connection con = null;
+        try {
+            con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,mapKey);
+            ps.setString(2,chrom);
+            ps.setInt(3,start);
+            ps.setInt(4,stop);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                pos.add(rs.getLong(1));
+            }
+            ps.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                con.close();
+            }
+            catch (Exception ignored){  }
+        }
+        return pos;
+    }
 }
