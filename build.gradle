@@ -1,0 +1,98 @@
+group 'edu.mcw.rgd'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+// https://mvnrepository.com/artifact/junit/junit
+    testImplementation 'junit:junit:4.13.2'
+
+
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
+    implementation fileTree(dir: 'lib', include: '*.jar')
+
+    implementation 'co.elastic.clients:elasticsearch-java:8.6.1'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.4'
+    implementation 'org.apache.lucene:lucene-core:8.2.0'
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.87.Final'
+// https://mvnrepository.com/artifact/commons-collections/commons-collections
+    implementation 'commons-collections:commons-collections:3.2.2'
+
+    implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    implementation 'commons-lang:commons-lang:2.6'
+    implementation 'commons-logging:commons-logging:1.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+
+    implementation 'org.jsoup:jsoup:1.8.3'
+    implementation 'com.google.code.gson:gson:2.9.0'
+
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.1.9.RELEASE'
+// https://mvnrepository.com/artifact/org.springframework/spring-context
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.1.9.RELEASE'
+// https://mvnrepository.com/artifact/org.springframework/spring-web
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.1.9.RELEASE'
+// https://mvnrepository.com/artifact/org.springframework/spring-beans
+    implementation group: 'org.springframework', name: 'spring-beans', version: '5.1.9.RELEASE'
+
+// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.1.9.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
+    implementation 'org.springframework:spring-jdbc:3.1.2.RELEASE'
+
+
+    implementation 'com.google.api-client:google-api-client:1.30.2'
+    // https://mvnrepository.com/artifact/postgresql/postgresql
+
+
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+// https://mvnrepository.com/artifact/log4j/log4j
+    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+// https://mvnrepository.com/artifact/commons-net/commons-net
+    implementation group: 'commons-net', name: 'commons-net', version: '3.6'
+
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation group: 'org.json', name: 'json', version: '20201115'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
+// https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+
+// https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.3'
+
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+
+
+// https://mvnrepository.com/artifact/javax.xml.parsers/jaxp-api
+    implementation group: 'javax.xml.parsers', name: 'jaxp-api', version: '1.4.5'
+
+// https://mvnrepository.com/artifact/org.springframework.security/spring-security-core
+    implementation 'org.springframework.security:spring-security-core:5.1.13.RELEASE'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+// https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+// https://mvnrepository.com/artifact/xom/xom
+    implementation 'xom:xom:1.2.5'
+
+// https://mvnrepository.com/artifact/jaxen/jaxen
+    implementation 'jaxen:jaxen:2.0.0'
+
+}
+jar {
+    baseName "rgdcore-1.1.3"
+}
+
+test {
+    exclude '**/*'
+}
+
