@@ -4,6 +4,7 @@ import io.netty.util.internal.InternalThreadLocalMap;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.RestHighLevelClientBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,9 +28,11 @@ public class ClientInit {
     }
     private static RestHighLevelClient getInstance() throws UnknownHostException {
 
+
         if(RgdContext.isProduction() || RgdContext.isPipelines()) {
+
             Properties props = getProperties();
-            return new RestHighLevelClient(
+            return new RestHighLevelClientBuilder(
                     RestClient.builder(
                             new HttpHost((String) props.get("HOST1"), 9200, "http"),
                             new HttpHost((String) props.get("HOST2"), 9200, "http"),
@@ -37,14 +40,13 @@ public class ClientInit {
                             new HttpHost((String) props.get("HOST4"), 9200, "http"),
                             new HttpHost((String) props.get("HOST5"), 9200, "http")
 
-                    ));
-        }
-        else
-            return new RestHighLevelClient(
+                    ).build()).setApiCompatibilityMode(true).build();
+        } else
+            return new RestHighLevelClientBuilder(
                     RestClient.builder(
                             new HttpHost("travis.rgd.mcw.edu", 9200, "http")
-                    ));
-    }
+                    ).build()).setApiCompatibilityMode(true).build();
+        }
     public static void setClient(RestHighLevelClient client) {
         ClientInit.client = client;
     }
