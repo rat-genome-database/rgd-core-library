@@ -28,9 +28,7 @@ public class ClientInit {
     }
     private static RestHighLevelClient getInstance() throws UnknownHostException {
 
-
         if(RgdContext.isProduction() || RgdContext.isPipelines()) {
-
             Properties props = getProperties();
             return new RestHighLevelClientBuilder(
                     RestClient.builder(
@@ -41,12 +39,13 @@ public class ClientInit {
                             new HttpHost((String) props.get("HOST5"), 9200, "http")
 
                     ).build()).setApiCompatibilityMode(true).build();
-        } else
+        }
+        else
             return new RestHighLevelClientBuilder(
                     RestClient.builder(
                             new HttpHost("travis.rgd.mcw.edu", 9200, "http")
                     ).build()).setApiCompatibilityMode(true).build();
-        }
+    }
     public static void setClient(RestHighLevelClient client) {
         ClientInit.client = client;
     }
@@ -91,5 +90,9 @@ public class ClientInit {
         }
         return props;
     }
+    public static void main(String args[]) throws IOException {
 
+        ClientInit.init();
+        ClientInit.destroy();
+    }
 }
