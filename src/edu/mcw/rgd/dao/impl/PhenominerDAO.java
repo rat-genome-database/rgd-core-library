@@ -2787,7 +2787,21 @@ public class PhenominerDAO extends AbstractDAO {
 
         return runFullRecordsQuery(query);
     }
+    /** created by JTHOTA for indexing chinchilla records
+     *
+     * @return
+     * @throws Exception
+     */
+    public List<Record> getChincillaFullRecords() throws Exception {
+        String query = "select * from experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "where er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id  " +
+                "and er.measurement_method_id=mm.measurement_method_id  " +
+                "and er.experiment_id=e.experiment_id and e.study_id=st.study_id " +
 
+                "and er.curation_status=40 and er.species_type_key=4 ";
+
+        return runFullRecordsQuery(query);
+    }
     /**
      * get full phenominer records based on reference rgd id of a study
      * @param refRgdId reference rgd id of a study, ontId RS, CMO, VT, or MMO id to fine tune amount of records
