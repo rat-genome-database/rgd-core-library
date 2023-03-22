@@ -8,6 +8,6 @@ public class AccessLogDAO extends AbstractDAO {
         String sql = "insert into ACCESS_LOG (log_type,log_date,description) values (?,?,?)";
         java.util.Date today = new java.sql.Date(new java.util.Date().getTime());
 
-        return update(sql,type, today, description);
+        return updateFb(sql,type, today, description);
     }
 }
