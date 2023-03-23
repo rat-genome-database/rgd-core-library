@@ -235,6 +235,19 @@ public class AbstractDAO implements DAO {
         return su.update(params);
     }
 
+    public int updateFb(String sql, Object ... params) throws Exception {
+
+        SqlUpdate su = new SqlUpdate(DataSourceFactory.getInstance().getRgdFbDataSource(), sql);
+
+        // declare parameters
+        for( Object param: params ) {
+            su.declareParameter(new SqlParameter(getParamType(param)));
+        }
+        su.compile();
+
+        return su.update(params);
+    }
+
     private int getParamType(Object param) {
         int paramType;
         if( param == null ) {
