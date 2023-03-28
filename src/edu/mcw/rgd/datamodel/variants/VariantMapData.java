@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel.variants;
 
+import edu.mcw.rgd.process.Utils;
+
 public class VariantMapData  {
     long id;
     String referenceNucleotide = "";
@@ -117,5 +119,20 @@ public class VariantMapData  {
 
     public void setSpeciesTypeKey(int speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        VariantMapData v = (VariantMapData) obj;
+        return Utils.stringsAreEqual(referenceNucleotide, v.getReferenceNucleotide()) && Utils.stringsAreEqual(variantNucleotide,v.getVariantNucleotide())
+                && Utils.stringsAreEqual(chromosome,v.getChromosome()) && Utils.stringsAreEqual(rsId, v.getRsId()) && Utils.stringsAreEqual(clinvarId, v.getClinvarId())
+                && Utils.stringsAreEqual(variantType, v.getVariantType()) && speciesTypeKey == v.getSpeciesTypeKey() && Utils.stringsAreEqual(paddingBase, v.getPaddingBase())
+                && startPos == v.getStartPos() && endPos == v.getEndPos() && Utils.stringsAreEqual(genicStatus,v.getGenicStatus()) && mapKey == v.getMapKey();
+    }
+    @Override
+    public int hashCode() {
+        return Utils.defaultString(referenceNucleotide).hashCode() ^ Utils.defaultString(variantNucleotide).hashCode() ^ Utils.defaultString(rsId).hashCode()
+                ^ Utils.defaultString(clinvarId).hashCode() ^ Utils.defaultString(variantType).hashCode() ^ speciesTypeKey ^ Utils.defaultString(chromosome).hashCode()
+                ^ Utils.defaultString(paddingBase).hashCode() ^ Long.hashCode(startPos) ^ Long.hashCode(endPos) ^ Utils.defaultString(genicStatus).hashCode() ^ mapKey;
     }
 }
