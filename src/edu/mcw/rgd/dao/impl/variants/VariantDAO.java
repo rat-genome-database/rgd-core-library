@@ -218,7 +218,7 @@ public class VariantDAO extends AbstractDAO {
             loc = "EXON";
         else
             loc="INTRON";
-        String sql = "select * from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (\n" +
+        String sql = "select v.*,vm* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (\n" +
                 "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
                 "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) " +
                 "offset ? rows fetch next 1000 rows only";
@@ -235,7 +235,7 @@ public class VariantDAO extends AbstractDAO {
         String sql = "";
         int cnt = 0;
         if (locName.equals("Exon"))
-            sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and v.rgd_id in (" +
+            sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (" +
                     "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%EXON%' and variant_rgd_id in " +
                     "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
         else
@@ -270,7 +270,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public Integer getVariantsCountWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
-        String sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+        String sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r  where v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
         int cnt = 0;
         Connection con = null;
         try {
