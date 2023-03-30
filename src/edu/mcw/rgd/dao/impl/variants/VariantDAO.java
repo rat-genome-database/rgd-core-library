@@ -144,7 +144,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public VariantMapData getVariantByRsId(String rsId) throws Exception {
-        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=?";
+        String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         List<VariantMapData> vmds = q.execute(rsId);
@@ -154,7 +154,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public List<VariantMapData> getAllVariantByRsId(String rsId) throws Exception {
-        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=? order by vmd.chromosome, vmd.start_pos";
+        String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsId);
