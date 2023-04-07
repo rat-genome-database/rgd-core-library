@@ -10,4 +10,10 @@ public class AccessLogDAO extends AbstractDAO {
 
         return updateFb(sql,type, today, description);
     }
+    public int log(String type, String description, String ipAddress) throws Exception {
+        String sql = "insert into ACCESS_LOG (log_type,log_date,description,ip_address) values (?,?,?,?)";
+        java.util.Date today = new java.sql.Date(new java.util.Date().getTime());
+
+        return updateFb(sql,type, today, description, ipAddress);
+    }
 }
