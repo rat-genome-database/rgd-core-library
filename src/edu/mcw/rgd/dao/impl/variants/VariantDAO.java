@@ -2,25 +2,33 @@ package edu.mcw.rgd.dao.impl.variants;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
-import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
-import edu.mcw.rgd.dao.spring.VariantMapper;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
-import edu.mcw.rgd.datamodel.Variant;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
-import edu.mcw.rgd.datamodel.variants.VariantTranscript;
 import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
 
 public class VariantDAO extends AbstractDAO {
+
+    // overrides data source to be CarpeNovo data source for this class
+    public DataSource getDataSource() throws Exception{
+        return DataSourceFactory.getInstance().getCarpeNovoDataSource();
+    }
+
+    // overrides data source to be CarpeNovo data source for this class
+    public Connection getConnection() throws Exception{
+        return getDataSource().getConnection();
+    }
+
     public List<VariantResult> getVariantsNewTbaleStructure(VariantSearchBean vsb) throws Exception {
 
         String csTable=vsb.getConScoreTable();
@@ -113,13 +121,18 @@ public class VariantDAO extends AbstractDAO {
 
     public static void main(String[] args) throws Exception {
         VariantDAO variantDAO=new VariantDAO();
+
+        int cnt = variantDAO.getVariantsCountWithGeneLocation(372,"20", 1, Integer.MAX_VALUE);
+        System.out.println("cnt="+cnt);
+
         VariantSearchBean vsb=new VariantSearchBean(60);
         vsb.setVariantId(69050686);
        List<VariantResult> results=variantDAO.getVariantsNewTbaleStructure(vsb);
        System.out.println("RESULSTS SIZE:"+ results.size());
         System.out.println("DONE!!");
     }
-        public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
+
+    public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
         String sql = "SELECT * FROM variant_sample_detail WHERE rgd_id=?";
         VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -271,32 +284,7 @@ public class VariantDAO extends AbstractDAO {
 
     public Integer getVariantsCountWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
         String sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r  where v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
-        int cnt = 0;
-        Connection con = null;
-        try {
-        con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1,mapKey);
-        ps.setString(2,chrom);
-        ps.setInt(3,start);
-        ps.setInt(4,stop);
-        ResultSet rs = ps.executeQuery();
-
-        while(rs.next()){
-            cnt =rs.getInt(1);
-        }
-        ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                con.close();
-            }
-            catch (Exception ignored){  }
-        }
-//        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
-//        List<Integer> results = execute(q, mapKey,chrom,start,stop);
+        int cnt = getCount(sql, mapKey,chrom,start,stop);
         return cnt;
     }
 
