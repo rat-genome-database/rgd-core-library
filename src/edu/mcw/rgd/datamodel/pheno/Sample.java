@@ -22,7 +22,8 @@ public class Sample {
     private String createdBy;
     private String lifeStage;
     private String curatorNotes;
-
+    private Integer cultureDur;
+    private String cultureDurUnit;
 
     public int getId() {
         return id;
@@ -150,5 +151,21 @@ public class Sample {
 
     public void setCuratorNotes(String curatorNotes) {
         this.curatorNotes = curatorNotes;
+    }
+
+    public Integer getCultureDur() {
+        return cultureDur;
+    }
+
+    public void setCultureDur(Integer cultureDur) {
+        this.cultureDur = cultureDur;
+    }
+
+    public String getCultureDurUnit() {
+        return cultureDurUnit;
+    }
+
+    public void setCultureDurUnit(String cultureDurUnit) {
+        this.cultureDurUnit = cultureDurUnit;
     }
 }

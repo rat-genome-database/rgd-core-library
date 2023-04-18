@@ -80,6 +80,8 @@ public class RecordQuery extends MappingSqlQuery {
 
         String strainOntId = rs.getString("strain_ont_id");
         s.setStrainAccId(strainOntId);
+        s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
+        s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
 
         rec.setSample(s);
 

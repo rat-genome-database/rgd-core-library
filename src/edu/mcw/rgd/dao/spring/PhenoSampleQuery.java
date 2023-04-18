@@ -36,6 +36,8 @@ public class PhenoSampleQuery extends MappingSqlQuery {
         s.setLastModifiedBy(rs.getString("last_modified_by"));
         s.setCreatedBy(rs.getString("created_by"));
         s.setCuratorNotes(rs.getString("CURATOR_NOTES"));
+        s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
+        s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
         return s;
     }
 

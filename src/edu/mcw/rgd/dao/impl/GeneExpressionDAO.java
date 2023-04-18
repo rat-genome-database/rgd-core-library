@@ -28,9 +28,9 @@ public class GeneExpressionDAO extends PhenominerDAO {
         r.setId(id);
 
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-            +",last_modified_by, last_modified_date, curation_status, species_type_key) VALUES(?,?,?,?,?,?,?)";
+            +",last_modified_by, curation_status, species_type_key, last_modified_date) VALUES(?,?,?,?,?,?,SYSTIMESTAMP)";
 
-        update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(), r.getLastModifiedDate(),
+        update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
                 r.getCurationStatus(), r.getSpeciesTypeKey());
         return id;
     }
@@ -126,6 +126,26 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
 
         return records;
+    }
+
+    public GeneExpressionRecord getGeneExpressionRecordByExperimentIdAndSampleId(int experimentId, int sampleId) throws Exception {
+
+        // load records
+        String sql = "SELECT * FROM gene_expression_exp_record WHERE experiment_id=? and sample_id=?";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(), sql);
+        List<GeneExpressionRecord> records = execute(q, experimentId,sampleId);
+        if (records.isEmpty())
+            return null;
+        else {
+            // load record values and conditions
+    //        for( GeneExpressionRecord record: records ) {
+                records.get(0).setValues( getGeneExpressionRecordValues(records.get(0).getId()) );
+                records.get(0).setConditions( getConditions(records.get(0).getId()) );
+                records.get(0).setMeasurementMethods( getMeasurementMethods(records.get(0).getId()) );
+    //        }
+
+            return records.get(0);
+        }
     }
 
     /**
