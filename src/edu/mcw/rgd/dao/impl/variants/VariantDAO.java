@@ -2,25 +2,33 @@ package edu.mcw.rgd.dao.impl.variants;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
-import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
-import edu.mcw.rgd.dao.spring.VariantMapper;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
-import edu.mcw.rgd.datamodel.Variant;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
-import edu.mcw.rgd.datamodel.variants.VariantTranscript;
 import org.springframework.jdbc.core.SqlParameter;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
 
 public class VariantDAO extends AbstractDAO {
+
+    // overrides data source to be CarpeNovo data source for this class
+    public DataSource getDataSource() throws Exception{
+        return DataSourceFactory.getInstance().getCarpeNovoDataSource();
+    }
+
+    // overrides data source to be CarpeNovo data source for this class
+    public Connection getConnection() throws Exception{
+        return getDataSource().getConnection();
+    }
+
     public List<VariantResult> getVariantsNewTbaleStructure(VariantSearchBean vsb) throws Exception {
 
         String csTable=vsb.getConScoreTable();
@@ -113,13 +121,18 @@ public class VariantDAO extends AbstractDAO {
 
     public static void main(String[] args) throws Exception {
         VariantDAO variantDAO=new VariantDAO();
+
+        int cnt = variantDAO.getVariantsCountWithGeneLocation(372,"20", 1, Integer.MAX_VALUE);
+        System.out.println("cnt="+cnt);
+
         VariantSearchBean vsb=new VariantSearchBean(60);
         vsb.setVariantId(69050686);
        List<VariantResult> results=variantDAO.getVariantsNewTbaleStructure(vsb);
        System.out.println("RESULSTS SIZE:"+ results.size());
         System.out.println("DONE!!");
     }
-        public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
+
+    public List<VariantSampleDetail> getVariantSampleDetail(int rgdId) throws Exception{
         String sql = "SELECT * FROM variant_sample_detail WHERE rgd_id=?";
         VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -144,7 +157,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public VariantMapData getVariantByRsId(String rsId) throws Exception {
-        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=?";
+        String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         List<VariantMapData> vmds = q.execute(rsId);
@@ -154,7 +167,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public List<VariantMapData> getAllVariantByRsId(String rsId) throws Exception {
-        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rs_id=? order by vmd.chromosome, vmd.start_pos";
+        String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsId);
@@ -172,6 +185,18 @@ public class VariantDAO extends AbstractDAO {
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
         String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ? offset ? rows fetch next 1000 rows only";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey,chrom,start,stop, offset);
+    }
+
+    public List<VariantMapData> getActiveVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
+        String sql = "select v.*, vm.* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? " +
+                "and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.start_pos between ? and ? offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -200,11 +225,30 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(mapKey,chrom,start,stop, offset);
     }
 
+    public List<VariantMapData> getActiveVariantsWithTranscriptLocationNameLimited(int mapKey, String chrom, int start, int stop, String locName, int offset) throws Exception{
+        String loc = "";
+        if (locName.equals("Exon"))
+            loc = "EXON";
+        else
+            loc="INTRON";
+        String sql = "select v.*,vm* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (\n" +
+                "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
+                "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) " +
+                "offset ? rows fetch next 1000 rows only";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey,chrom,start,stop, offset);
+    }
+
     public Integer getVariantsWithTranscriptLocationNameCount(int mapKey, String chrom, int start, int stop, String locName) throws Exception{
         String sql = "";
         int cnt = 0;
         if (locName.equals("Exon"))
-            sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and v.rgd_id in (" +
+            sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (" +
                     "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%EXON%' and variant_rgd_id in " +
                     "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
         else
@@ -239,33 +283,8 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public Integer getVariantsCountWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
-        String sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
-        int cnt = 0;
-        Connection con = null;
-        try {
-        con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1,mapKey);
-        ps.setString(2,chrom);
-        ps.setInt(3,start);
-        ps.setInt(4,stop);
-        ResultSet rs = ps.executeQuery();
-
-        while(rs.next()){
-            cnt =rs.getInt(1);
-        }
-        ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                con.close();
-            }
-            catch (Exception ignored){  }
-        }
-//        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
-//        List<Integer> results = execute(q, mapKey,chrom,start,stop);
+        String sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r  where v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+        int cnt = getCount(sql, mapKey,chrom,start,stop);
         return cnt;
     }
 
