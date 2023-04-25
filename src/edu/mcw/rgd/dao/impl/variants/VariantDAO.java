@@ -173,6 +173,14 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(rsId);
     }
 
+    public List<VariantMapData> getAllVariantByRsIdAndMapKey(String rsId, int mapKey) throws Exception {
+        String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vmd.map_key=? order by vmd.chromosome, vmd.start_pos";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rsId,mapKey);
+    }
+
     public List<VariantMapData> getVariantsWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
         String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
@@ -252,7 +260,7 @@ public class VariantDAO extends AbstractDAO {
                     "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%EXON%' and variant_rgd_id in " +
                     "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
         else
-            sql = "select count(*) as CNT from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and v.rgd_id in (" +
+            sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (" +
                     "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%INTRON%' and variant_rgd_id in " +
                     "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
         Connection con = null;
