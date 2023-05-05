@@ -1489,7 +1489,7 @@ public class PhenominerDAO extends AbstractDAO {
         else return null;
     }
     public List<Sample> getSampleByGeoStudyId(String id) throws Exception{
-        String query = "select * from sample where biosample_id in (select SAMPLE_ACCESSION_ID from rna_seq where geo_accession_id=?)";
+        String query = "select * from sample where geo_sample_acc in (select SAMPLE_ACCESSION_ID from rna_seq where geo_accession_id=?)";
         PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
         sq.compile();
