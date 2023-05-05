@@ -23,6 +23,7 @@ public class GeneBinAssigneeQuery  extends MappingSqlQuery {
         geneBinAssignee.setAssignee(rs.getString("ASSIGNEE"));
         geneBinAssignee.setCompleted(rs.getInt("COMPLETED"));
         geneBinAssignee.setTotalGenes(rs.getInt("TOTAL_GENES"));
+        geneBinAssignee.setIsParent(rs.getInt("PARENT"));
         return geneBinAssignee;
     }
 

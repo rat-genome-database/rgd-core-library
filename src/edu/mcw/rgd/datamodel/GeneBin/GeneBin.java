@@ -5,6 +5,7 @@ public class GeneBin {
     private String geneSymbol;
     private String termAcc;
     private String term;
+    private String childTermAcc;
 
     @Override
     public String toString() {
@@ -14,6 +15,14 @@ public class GeneBin {
                 ", termAcc='" + termAcc + '\'' +
                 ", term='" + term + '\'' +
                 '}';
+    }
+
+    public String getChildTermAcc() {
+        return childTermAcc;
+    }
+
+    public void setChildTermAcc(String childTermAcc) {
+        this.childTermAcc = childTermAcc;
     }
 
     public int getRgdId() {

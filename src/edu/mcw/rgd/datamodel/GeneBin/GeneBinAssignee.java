@@ -4,9 +4,9 @@ public class GeneBinAssignee {
     private String termAcc;
     private String term;
     private String assignee;
-
     private int completed;
     private int totalGenes;
+    private int isParent;
 
 
     public GeneBinAssignee() {
@@ -31,6 +31,23 @@ public class GeneBinAssignee {
         this.assignee = assignee;
         this.completed = completed;
         this.totalGenes = totalGenes;
+    }
+
+    public GeneBinAssignee(String termAcc, String term, String assignee, int completed, int totalGenes, int isParent) {
+        this.termAcc = termAcc;
+        this.term = term;
+        this.assignee = assignee;
+        this.completed = completed;
+        this.totalGenes = totalGenes;
+        this.isParent = isParent;
+    }
+
+    public int getIsParent() {
+        return isParent;
+    }
+
+    public void setIsParent(int isParent) {
+        this.isParent = isParent;
     }
 
     public int getTotalGenes() {

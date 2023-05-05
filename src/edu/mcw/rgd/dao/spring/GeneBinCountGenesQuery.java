@@ -5,11 +5,16 @@ import edu.mcw.rgd.datamodel.GeneBin.GeneBin;
 import edu.mcw.rgd.datamodel.GeneBin.GeneBinCountGenes;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 public class GeneBinCountGenesQuery extends MappingSqlQuery {
+    public GeneBinCountGenesQuery(DataSource ds, String query) {
+        super(ds, query);
+    }
+
     @Override
     protected Object mapRow(ResultSet rs, int i) throws SQLException {
         GeneBinCountGenes geneBinCountGenes = new GeneBinCountGenes();
@@ -19,7 +24,7 @@ public class GeneBinCountGenesQuery extends MappingSqlQuery {
         return geneBinCountGenes;
     }
     public static List<GeneBinCountGenes> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
-        GeneBinQuery q = new GeneBinQuery(dao.getDataSource(), sql);
+        GeneBinCountGenesQuery q = new GeneBinCountGenesQuery(dao.getDataSource(), sql);
         return dao.execute(q, params);
     }
 }

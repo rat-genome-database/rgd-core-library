@@ -49,10 +49,10 @@ public class GeneBinDAO extends AbstractDAO {
      * @return an int if there was a successful insertion of the gene in the GENEBIN Table
      * @throws Exception SQLExceptions
      */
-    public int insertGeneInBin(int rgdId, String geneSymbol, String term, String termAcc) throws Exception {
+    public int insertGeneInBin(int rgdId, String geneSymbol, String term, String termAcc, String childTermAcc) throws Exception {
         if(!this.existsGene(rgdId, geneSymbol)){
-            String INSERT_GENE = "insert into GENEBIN(RGD_ID, GENE_SYMBOL, TERM, TERM_ACC) values (?,?,?,?)";
-            return update(INSERT_GENE, rgdId, geneSymbol, term, termAcc);
+            String INSERT_GENE = "insert into GENEBIN(RGD_ID, GENE_SYMBOL, TERM, TERM_ACC, CHILD_TERM_ACC) values (?,?,?,?,?)";
+            return update(INSERT_GENE, rgdId, geneSymbol, term, termAcc, childTermAcc);
         }
         return 0;
     }
@@ -65,8 +65,13 @@ public class GeneBinDAO extends AbstractDAO {
      */
     public List<GeneBin> getGenes(String termAcc) throws Exception{
         String GET_GENES = "select * from GENEBIN where TERM_ACC=?";
-
         List<GeneBin> genes =  GeneBinQuery.execute(this, GET_GENES, termAcc);
+        return genes;
+    }
+
+    public List<GeneBin> getGenesOfDecendents(String childTermAcc) throws Exception{
+        String GET_GENES = "select * from GENEBIN where CHILD_TERM_ACC=?";
+        List<GeneBin> genes =  GeneBinQuery.execute(this, GET_GENES, childTermAcc);
         return genes;
     }
 
@@ -86,6 +91,12 @@ public class GeneBinDAO extends AbstractDAO {
 
     public List<GeneBinCountGenes> getGeneCounts() throws Exception{
         String GET_GENES_COUNT = "select TERM_ACC, count(RGD_ID) as TOTAL_GENES from GENEBIN group by TERM_ACC";
+        List<GeneBinCountGenes> geneCounts = GeneBinCountGenesQuery.execute(this, GET_GENES_COUNT);
+        return  geneCounts;
+    }
+
+    public List<GeneBinCountGenes> getGeneChildCounts() throws Exception{
+        String GET_GENES_COUNT = "select CHILD_TERM_ACC as TERM_ACC, count(CHILD_TERM_ACC) as TOTAL_GENES from GENEBIN group by CHILD_TERM_ACC";
         List<GeneBinCountGenes> geneCounts = GeneBinCountGenesQuery.execute(this, GET_GENES_COUNT);
         return  geneCounts;
     }

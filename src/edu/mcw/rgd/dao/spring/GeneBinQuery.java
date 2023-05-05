@@ -24,6 +24,11 @@ public class GeneBinQuery  extends MappingSqlQuery {
         geneBin.setGeneSymbol(rs.getString("GENE_SYMBOL"));
         geneBin.setTermAcc(rs.getString("TERM_ACC"));
         geneBin.setTerm(rs.getString("TERM"));
+        try{
+            geneBin.setChildTermAcc(rs.getString("CHILD_TERM_ACC"));
+        } catch(Exception ignore) {
+
+        }
         return geneBin;
     }
 

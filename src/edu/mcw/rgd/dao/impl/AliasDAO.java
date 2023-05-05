@@ -250,6 +250,16 @@ public class AliasDAO extends AbstractDAO {
         }
     }
 
+    public Alias getAliasByValue(String aliasValue) throws Exception{
+        String query = "SELECT * FROM aliases WHERE alias_value_lc=LOWER(?)";
+        List<Alias> aliases = AliasQuery.execute(this, query, aliasValue);
+        if(aliases.isEmpty()){
+            return null;
+        }else{
+            return aliases.get(0);
+        }
+    }
+
 
 
     /**
