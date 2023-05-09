@@ -1345,7 +1345,12 @@ public class PhenominerDAO extends AbstractDAO {
                 valueMin = Double.parseDouble(c.getValueMax());
             }
         }else {
-            valueMin = Double.parseDouble(c.getValueMin());
+            try {
+                valueMin = Double.parseDouble(c.getValueMin());
+            }
+            catch (Exception e){
+                valueMin = null;
+            }
         }
 
         Double valueMax = null;
@@ -1354,7 +1359,12 @@ public class PhenominerDAO extends AbstractDAO {
                 valueMax = valueMin;
             }
         }else {
-            valueMax = Double.parseDouble(c.getValueMax());
+            try {
+                valueMax = Double.parseDouble(c.getValueMax());
+            }
+            catch (Exception e){
+                valueMax = null;
+            }
         }
 
         Integer recId = c.getExperimentRecordId()==0 ? null : c.getExperimentRecordId();
