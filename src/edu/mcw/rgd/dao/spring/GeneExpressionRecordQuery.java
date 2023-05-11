@@ -28,7 +28,6 @@ public class GeneExpressionRecordQuery extends MappingSqlQuery {
         rec.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
         rec.setCurationStatus(rs.getInt("curation_status"));
         rec.setSpeciesTypeKey(rs.getInt("species_type_key"));
-        rec.setClinicalMeasurementId(rs.getInt("CLINICAL_MEASUREMENT_ID"));
         return rec;
     }
 }
