@@ -1,5 +1,6 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import edu.mcw.rgd.process.Utils;
 import java.util.Date;
 import java.util.List;
 
@@ -107,5 +108,17 @@ public class GeneExpressionRecord {
 
     public void setClinicalMeasurementId(int clinicalMeasurementId) {
         this.clinicalMeasurementId = clinicalMeasurementId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        GeneExpressionRecord r = (GeneExpressionRecord) obj;
+        return experimentId==r.getExperimentId() && sampleId==r.getSampleId() && Utils.stringsAreEqual(lastModifiedBy,r.getLastModifiedBy()) && lastModifiedDate.equals(r.getLastModifiedDate())
+                && curationStatus==r.curationStatus && speciesTypeKey==r.getSpeciesTypeKey() && clinicalMeasurementId==r.getClinicalMeasurementId();
+    }
+
+    @Override
+    public int hashCode() {
+        return experimentId ^ sampleId ^ Utils.defaultString(lastModifiedBy).hashCode() ^ lastModifiedDate.hashCode() ^ curationStatus ^ speciesTypeKey ^ clinicalMeasurementId;
     }
 }
