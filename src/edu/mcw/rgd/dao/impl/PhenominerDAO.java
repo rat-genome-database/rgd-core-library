@@ -1405,8 +1405,8 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO clinical_measurement (clinical_measurement_notes, " +
                 " clinical_measurement_ont_id, formula, clinical_meas_average_type, " +
-                "clinical_measurement_id, clinical_meas_site_ont_id, clinical_measurement_site, class) "+
-				"VALUES(?,?,?,?,?,?,?,'edu.mcw.rgd.phenodb.ClinicalMeasurement')";
+                "clinical_measurement_id, clinical_meas_site_ont_id, clinical_measurement_site) "+
+				"VALUES(?,?,?,?,?,?,?)";
 
         update(query, cm.getNotes(), cm.getAccId(), cm.getFormula(), cm.getAverageType(),
                 next, cm.getSiteOntIds(), cm.getSite());
