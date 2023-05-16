@@ -1186,6 +1186,25 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     * Returns a CMO object
+     *
+     * @param cmoId CLINICAL MEASUREMENT ID
+     * @return CMO object or null if empty
+     * @throws Exception
+     */
+    public ClinicalMeasurement getClinicalMeasurement(int cmoId) throws Exception {
+        String query = "select * from CLINICAL_MEASUREMENT WHERE CLINICAL_MEASUREMENT_ID=?";
+        ClinicalMeasurementQuery q = new ClinicalMeasurementQuery(getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<ClinicalMeasurement> objs = q.execute(cmoId);
+        if (objs.isEmpty()){
+            return null;
+        }
+        else
+            return objs.get(0);
+    }
+
+    /**
      * delete a sample from the datastore given sample id
      * @param sampleId sample id
      * @return count of rows affected
