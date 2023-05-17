@@ -16,7 +16,7 @@ public class GeneExpressionRecord {
     private Date lastModifiedDate;
     private int curationStatus;
     private int speciesTypeKey;
-    private int clinicalMeasurementId;
+    private Integer clinicalMeasurementId;
 
     private List<GeneExpressionRecordValue> values;
     private List<Condition> conditions;
@@ -102,11 +102,11 @@ public class GeneExpressionRecord {
         this.measurementMethods = measurementMethods;
     }
 
-    public int getClinicalMeasurementId() {
+    public Integer getClinicalMeasurementId() {
         return clinicalMeasurementId;
     }
 
-    public void setClinicalMeasurementId(int clinicalMeasurementId) {
+    public void setClinicalMeasurementId(Integer clinicalMeasurementId) {
         this.clinicalMeasurementId = clinicalMeasurementId;
     }
 
