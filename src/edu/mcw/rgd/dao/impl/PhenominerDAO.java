@@ -338,6 +338,22 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     * Return a list of experiments tied to a geo study ID
+     * @param geoStudy
+     * @return
+     * @throws Exception
+     */
+    public List<Experiment> getExperiments(String geoStudy) throws Exception {
+        String query = "SELECT * from experiment where study_id in (select study_id from study where geo_series_acc=?) order by experiment_id desc";
+
+        ExperimentQuery sq = new ExperimentQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        return sq.execute(new Object[]{geoStudy});
+    }
+
+    /**
      * Return a list of experiments from a list of experiment ID's passed in
      * <p>
      *     Note: only first 1000 experiments is returned, due to Oracle limitations
