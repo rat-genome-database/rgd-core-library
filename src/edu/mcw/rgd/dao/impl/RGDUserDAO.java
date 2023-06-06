@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.RGDUserListQuery;
 import edu.mcw.rgd.dao.spring.RGDUserQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.RGDUser;
 import edu.mcw.rgd.datamodel.RGDUserList;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -132,13 +133,11 @@ public class RGDUserDAO extends AbstractDAO {
 
     public String getCurationUser(int id) throws Exception {
 
-        String query = "select username from users where user_key=" +id;
-        JdbcTemplate jt = new JdbcTemplate(getDataSource());
-        SqlRowSet row = jt.queryForRowSet(query);
-        String user = "";
-        while(row.next())
-            user = row.getString("username");
-        return user;
+        String query = "select username from users where user_key=?";
+        StringListQuery q=new StringListQuery(this.getDataSource(), query);
+        List<String> userNames=execute(q, id);
+        if(userNames.size()>0) return userNames.get(0);
+        else return null;
 
     }
 
