@@ -127,8 +127,10 @@ public class MapManager {
             // map not found: make sure maps for given species are up-to-date
             try {
                 int speciesTypeKey = new MapDAO().getSpeciesTypeKeyForMap(mapKey);
-                loadForSpecies(speciesTypeKey);
-                map = keyedHash.get(mapKey);
+                if( speciesTypeKey!=0 ) {
+                    loadForSpecies(speciesTypeKey);
+                    map = keyedHash.get(mapKey);
+                }
             } catch(Exception e) {
                 e.printStackTrace();
             }

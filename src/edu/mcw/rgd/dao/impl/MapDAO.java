@@ -75,17 +75,23 @@ public class MapDAO extends AbstractDAO {
      */
     public List<Map> getActiveMapsByRankASC() throws Exception {
 
-
-            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
-                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' " +
-                    "order by m.rank asc";
-            return executeMapQuery(sql);
-
+        String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE' " +
+                "order by m.rank asc";
+        return executeMapQuery(sql);
     }
 
+    /**
+     * get species type key given map key
+     * @param mapKey
+     * @return species type key for a valid map key; or 0 if map key is invalid
+     * @throws Exception
+     */
     public int getSpeciesTypeKeyForMap(int mapKey) throws Exception{
 
-        String sql = "SELECT species_type_key FROM maps m, rgd_ids ri WHERE m.rgd_id=ri.rgd_id AND m.map_key=?";
+        // note: we use MAX(...) grouping phrase to ensure that 1 row (or more) of data is always returned;
+        //    if 'mapKey' is invalid, then NULL result is returned, which in turn will be converted to 0
+        String sql = "SELECT MAX(species_type_key) FROM maps m, rgd_ids ri WHERE m.rgd_id=ri.rgd_id AND m.map_key=?";
         return getCount(sql, mapKey);
     }
 
