@@ -17,6 +17,25 @@ public class VariantTranscript {
     private Integer fullRefAAPos;
     private String tripletError;
     private String frameShift;
+    private String transcriptSymbol;
+    private String proteinSymbol;
+
+
+    public String getTranscriptSymbol() {
+        return transcriptSymbol;
+    }
+
+    public void setTranscriptSymbol(String transcriptSymbol) {
+        this.transcriptSymbol = transcriptSymbol;
+    }
+
+    public String getProteinSymbol() {
+        return proteinSymbol;
+    }
+
+    public void setProteinSymbol(String proteinSymbol) {
+        this.proteinSymbol = proteinSymbol;
+    }
 
     public long getId() {
         return id;
