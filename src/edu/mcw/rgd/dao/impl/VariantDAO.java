@@ -18,30 +18,17 @@ public class VariantDAO extends JdbcBaseDAO {
     public static String lastQuery = "";
 
     public String getVariantTable(int sampleId) {
-        if( sampleId<100 ) {
-            return "variant_clinvar";
-        }
-        if( sampleId>=6000 && sampleId<=6999 ) {
-            return "variant_dog";
-        }
+
         return "variant";
     }
 
     public String getVariantTranscriptTable(int sampleId) {
-        if( sampleId<100 ) {
-            return "variant_transcript_clinvar";
-        }
-        if( sampleId>=6000 && sampleId<=6999 ) {
-            return "variant_transcript_dog";
-        }
 
         return "variant_transcript";
     }
     public String getPolyphenTable(int sampleId) {
 
-        if( sampleId>=6000 && sampleId<=6999 ) {
-            return "polyphen_dog";
-        }
+
 
         return "polyphen";
     }
@@ -58,8 +45,8 @@ public class VariantDAO extends JdbcBaseDAO {
         String sql = " ";
         String sqlFrom = "select ";
 
-        sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
-        sqlFrom += "v.* ";
+        sql +=  " variant v ";
+        sqlFrom += " v.* , vmd.*, vsd.* ";
         String[] results = vsb.getTableJoinSQL(sqlFrom,false);
         sql += results[1];
         sqlFrom = results[0] + " from \n";  // We're done updating the sql From clause
@@ -86,9 +73,9 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getVariantTypeSQL();
         sql += vsb.getIsFrameshiftSQL();
 
-        sql += "    order by v.start_pos ";
+        sql += "    order by vmd.start_pos ";
         sql = sqlFrom + sql;
-
+        System.out.println("Running Search SQL getVariantResults() : \n" + sql + "\n");
         logger.debug("Running Search SQL getVariantResults() : \n" + sql + "\n");
 
         List<VariantResult> vrList = new ArrayList<VariantResult>();
@@ -107,7 +94,7 @@ public class VariantDAO extends JdbcBaseDAO {
             VariantResultBuilder vrb = null;
 
             while (rs.next()) {
-                long variantId = rs.getLong("variant_id");
+                long variantId = rs.getLong("rgd_id");
                 if (variantId != lastVariant) {
                     if (lastVariant != 0) {
                         vrList.add(vrb.getVariantResult());
@@ -180,7 +167,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getNearSpliceSiteSQL();
         sql += vsb.getIsPrematureStopSQL();
         sql += vsb.getIsReadthroughSQL();
-        sql += vsb.getDBSNPSQL();
+      //  sql += vsb.getDBSNPSQL();
         sql += vsb.getPolyphenSQL();
         sql += vsb.getConScoreSQL();
         sql += vsb.getClinicalSignificanceSQL();
@@ -192,7 +179,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getVariantTypeSQL();
         sql += vsb.getIsFrameshiftSQL();
 
-        sql += "    order by v.variant_id";
+        sql += "    order by v.rgd_id";
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
@@ -238,7 +225,7 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getVariantTypeSQL();
         sql += vsb.getIsFrameshiftSQL();
 
-        sql += "    order by v.variant_id";
+        sql += "    order by v.rgd_id";
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
@@ -265,32 +252,34 @@ public class VariantDAO extends JdbcBaseDAO {
 
         sql += vsb.getVariantTable(vsb.getMapKey()) + " v ";
 
-        sqlFrom += "v.* ";
+        sqlFrom += " v.* , vmd.*, vsd.*";
 
+        sql+="  inner join  variant_map_data vmd on vmd.rgd_id=v.rgd_id\n" +
+                "   inner join variant_sample_detail vsd on vsd.rgd_id=v.rgd_id    ";
         if (vsb.getGeneMap().size() > 0) {
-            sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=v.chromosome and gl.pos=v.start_pos) ";
+            sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=vmd.chromosome and gl.pos=vmd.start_pos) ";
         }
 
 
         if (vsb.hasOnlyTranscript()) {
-            sql += " inner join "+vsb.getVariantTranscriptTable(vsb.getMapKey())+" vt on v.variant_id=vt.variant_id ";
+            sql += " inner join "+vsb.getVariantTranscriptTable(vsb.getMapKey())+" vt on v.rgd_id=vt.variant_rgd_id ";
             sqlFrom += ",vt.* ";
             sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
 
         }
         if (vsb.hasPolyphen()) {
-            sql += " inner join "+vsb.getPolyphenTable()+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+            sql += " inner join "+vsb.getPolyphenTable()+" p on (v.rgd_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
         }
 
         if (vsb.hasDBSNP()) {
 
             if (vsb.hasDBSNP() || vsb.getNovelDBSNP()) {
-                sql += " left outer JOIN sample s ON (v.sample_id=s.sample_id AND s.MAP_KEY=" + vsb.getMapKey() + ") " +
+                sql += " left outer JOIN sample s ON (vsd.sample_id=s.sample_id AND s.MAP_KEY=" + vsb.getMapKey() + ") " +
 
-                        " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
-                        "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
+                        " left outer JOIN  db_snp dbs ON  ( vmd.START_POS = dbs.POSITION " +
+                        "    AND vmd.CHROMOSOME = dbs.CHROMOSOME  " +
                         "    AND v.VAR_NUC = dbs.ALLELE  " +
                         "    AND dbs.MAP_KEY = s.MAP_KEY AND dbs.source=s.dbsnp_source) \n ";
             }
@@ -299,10 +288,10 @@ public class VariantDAO extends JdbcBaseDAO {
         }
 
         if (vsb.hasConScore()) {
-            sql += " inner join  " + vsb.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";
+            sql += " inner join  " + vsb.getConScoreTable() + " cs on (cs.chr=vmd.chromosome and cs.position = vmd.start_pos) ";
             sqlFrom += ",cs.* ";
         }else {
-            sql += " left outer join " + vsb.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";
+            sql += " left outer join " + vsb.getConScoreTable() + " cs on (cs.chr=vmd.chromosome and cs.position = vmd.start_pos) ";
             sqlFrom += ",cs.*";
         }
 
@@ -314,7 +303,8 @@ public class VariantDAO extends JdbcBaseDAO {
             sqlFrom += ",cv.*";
         }
 
-        sql += " where 1=1  ";
+        sql += " where 1=1   " +
+                " ";
 
         sql += vsb.getPositionSQL();
         sql += vsb.getDepthSQL();
@@ -344,12 +334,12 @@ public class VariantDAO extends JdbcBaseDAO {
 
 
         if (vsb.isShowDifferences()) {
-            sql += "and (v.chromosome, v.start_pos, v.var_nuc) in (";
-            sql += "select chromosome, start_pos, var_nuc from (select v.chromosome, v.start_pos,v.var_nuc, count(*) from " + sub;
-            sql += " group by v.chromosome,v.start_pos,v.var_nuc having count(*) < " + vsb.sampleIds.size() + "))";
+            sql += "and (vmd.chromosome, vmd.start_pos, v.var_nuc) in (";
+            sql += "select chromosome, start_pos, var_nuc from (select vmd.chromosome, vmd.start_pos,v.var_nuc, count(*) from " + sub;
+            sql += " group by vmd.chromosome,vmd.start_pos,v.var_nuc having count(*) < " + vsb.sampleIds.size() + "))";
         }
 
-        sql += "    order by v.variant_id";
+        sql += "    order by v.rgd_id";
 
 
         sql = sqlFrom + " from " +  sql;
@@ -368,7 +358,7 @@ public class VariantDAO extends JdbcBaseDAO {
             boolean found= false;
             while (rs.next()) {
                 found=true;
-                long variantId = rs.getLong("variant_id");
+                long variantId = rs.getLong("rgd_id");
                 if (variantId != lastVariant) {
                     if (lastVariant != 0) {
                         vrList.add(vrb.getVariantResult());
@@ -399,18 +389,18 @@ public class VariantDAO extends JdbcBaseDAO {
     public Map<String, Map<String, Integer>> getVariantToGeneCountMap(VariantSearchBean vsb) throws Exception{
 
         String sql = "SELECT gene_symbols as gene_symbol, sample_id, count(*) as count FROM (" +
-            "select distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
+            "select distinct v.rgd_id, vsd.sample_id, gl.gene_symbols from ";
 
         // 'parallel' hint on PROD db ultimately causes explosion of processes that kills the db; do NOT use it
         // "select /*+parallel*/distinct v.variant_id, v.sample_id, gl.gene_symbols from ";
 
-        sql += vsb.getVariantTable(vsb.getMapKey()) +  " v ";
+        sql +=   "variant v, variant_map_data vmd, variant_sample_detail vsd ";
 
         if (vsb.getGeneMap().size() > 0) {
-            sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=v.chromosome and gl.pos=v.start_pos) ";
+            sql += " inner join gene_loci gl on (gl.map_key=" + vsb.getMapKey() + " and gl.chromosome=vmd.chromosome and gl.pos=vmd.start_pos) ";
         }else {
             sql += " inner join  gene_loci gl ";
-            sql += " on (v.chromosome=gl.chromosome and v.start_pos = gl.pos and gl.map_key=" + vsb.getMapKey() + " )";
+            sql += " on (vmd.chromosome=gl.chromosome and vmd.start_pos = gl.pos and gl.map_key=" + vsb.getMapKey() + " )";
         }
 
         String[] results = vsb.getTableJoinSQL("", true); // We don't need to auto generate the select statement
