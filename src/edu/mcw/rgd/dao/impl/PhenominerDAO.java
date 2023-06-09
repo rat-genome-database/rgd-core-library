@@ -1547,7 +1547,7 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<GeoRecord> getGeoRecords(String  geoId,String species) throws Exception {
-        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ?";
+        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ? order by sample_accession_id asc";
 
         GeoRecordQuery sq = new GeoRecordQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
