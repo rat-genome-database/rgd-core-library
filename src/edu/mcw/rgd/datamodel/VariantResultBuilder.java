@@ -53,7 +53,7 @@ public class VariantResultBuilder {
 
     public void mapTranscript(ResultSet rs) throws Exception {
         TranscriptResult tr = (TranscriptResult) this.getLast(vr.getTranscriptResults());
-        String id = rs.getString("VARIANT_TRANSCRIPT_ID");
+        String id = rs.getString("TRANSCRIPT_RGD_ID");
 
         if (!rs.wasNull()) {
             if (tr == null || !tr.getTranscriptId().equals(id)) {

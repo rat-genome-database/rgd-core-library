@@ -158,79 +158,37 @@ public class VariantSearchBean {
 
     public String getVariantTable() {
 
-        if( isHuman() ) {
-            return " variant_clinvar ";
-        }
-        else if( isDog() ) {
-            return " variant_dog ";
-        }
-        else if( isGenic() ) {
-            return " variant_genic ";
-        }else {
+
             return " variant ";
-        }
+
     }
     public String getVariantTable(int mapKey) {
+        return " variant ";
 
-       if(mapKey==17 && isHuman()){
-          return  " variant_human";
-       }
-        if( isHuman() && mapKey!=17 ) {
-            return " variant_clinvar ";
-        }
-        else if( isDog() ) {
-            return " variant_dog ";
-        }
-        else if( isGenic() ) {
-            return " variant_genic ";
-        }else {
-            return " variant ";
-        }
     }
 
     public String getVariantTranscriptTable(int mapKey) {
 
-        if(mapKey==17&& isHuman() ) {
-            return " variant_transcript_human ";
-        }
-        if(mapKey!=17&& isHuman() ) {
-            return " variant_transcript_clinvar ";
-        }
 
-        else if( isDog() ) {
-            return " variant_transcript_dog ";
-        }else {
             return " variant_transcript ";
-        }
+
     }
     public String getVariantTranscriptTable() {
 
-        if( isHuman() ) {
-            return " variant_transcript_clinvar ";
-        }
-        else if( isDog() ) {
-            return " variant_transcript_dog ";
-        }else {
+
             return " variant_transcript ";
-        }
+
     }
 
     public String getPolyphenTable() {
-         if( isDog() ) {
-            return " polyphen_dog ";
-        }else {
+
             return " polyphen ";
-        }
+
     }
     public String getPolyphenTable(int mapKey) {
-        if( isDog() ) {
-            return " polyphen_dog ";
-        }else {
-            if(mapKey==17 && isHuman()){
-                return " polyphen_human ";
-            }else
+
             return " polyphen ";
-        }
+
     }
 
     public String getConScoreTable() {
@@ -503,11 +461,11 @@ public class VariantSearchBean {
     public String getPsudoautosomalSQL() {
         String sql = "";
         if (this.excludePseudoautosomal) {
-            sql += " and v.zygosity_in_pseudo='N' ";
+            sql += " and vsd.zygosity_in_pseudo='N' ";
         }
 
         if (this.onlyPseudoautosomal) {
-            sql += " and v.zygosity_in_pseudo='Y' ";
+            sql += " and vsd.zygosity_in_pseudo='Y' ";
         }
         return sql;
     }
@@ -840,14 +798,14 @@ public class VariantSearchBean {
         String sql = "";
 
         if (this.hasPosition()) {
-            sql += " and ( v.chromosome='" + this.chromosome + "' ";
+            sql += " and ( vmd.chromosome='" + this.chromosome + "' ";
 
             if (this.startPosition != -1) {
-                sql += " and v.start_pos >= " + this.startPosition;
+                sql += " and vmd.start_pos >= " + this.startPosition;
             }
 
             if (this.stopPosition != -1) {
-                sql += " and v.start_pos <=" + this.stopPosition;
+                sql += " and vmd.start_pos <=" + this.stopPosition;
             }
 
             sql += ") ";
@@ -892,11 +850,11 @@ public class VariantSearchBean {
             return "";
         }
 
-        sql += " and v.sample_id=" + this.sampleIds.get(0);
+        sql += " and vsd.sample_id=" + this.sampleIds.get(0);
 
         for (int i = 0; i < this.sampleIds.size(); i++) {
             if (i == 0) continue;
-            sql += " and (v.chromosome=v" + i + ".chromosome and v.var_nuc=v" + i + ".var_nuc and v.start_pos=v" + i + ".start_pos and v" + i + ".sample_id=" + this.sampleIds.get(i) + ")";
+            sql += " and (vmd.chromosome=vmd" + i + ".chromosome and v.var_nuc=v" + i + ".var_nuc and vmd.start_pos=vmd" + i + ".start_pos and vsd" + i + ".sample_id=" + this.sampleIds.get(i) + ")";
         }
         return sql;
     }
@@ -913,13 +871,13 @@ public class VariantSearchBean {
             return getSampleSQLOverlap();
         }
 
-        sql += " and (v.sample_id=" + this.sampleIds.get(0);
+        sql += " and (vsd.sample_id=" + this.sampleIds.get(0);
 
         for (int i = 1; i < this.sampleIds.size(); i++) {
 //            if (i == 0) continue;
 //            sql += " and (v.chromosome=v" + i + ".chromosome and v.var_nuc=v" + i + ".var_nuc and v.start_pos=v" + i + ".start_pos and v" + i + ".sample_id=" + this.sampleIds.get(i) + ")";
 
-              sql += " or v.sample_id=" + this.sampleIds.get(i);
+              sql += " or vsd.sample_id=" + this.sampleIds.get(i);
 
         }
 
@@ -932,7 +890,7 @@ public class VariantSearchBean {
         if (this.minDepth == -1 && this.maxDepth == -1) {
             return "";
         } else {
-            return " and " + this.buildRange("v.total_depth", this.minDepth, this.maxDepth);
+            return " and " + this.buildRange("vsd.total_depth", this.minDepth, this.maxDepth);
         }
     }
 
@@ -941,7 +899,7 @@ public class VariantSearchBean {
         String sql = "";
 
         if (this.alleleCount.size() != 0) {
-            sql += " and " + buildOr("v.zygosity_num_allele", this.alleleCount, false);
+            sql += " and " + buildOr("vsd.zygosity_num_allele", this.alleleCount, false);
         }
 
         return sql;
@@ -952,15 +910,15 @@ public class VariantSearchBean {
         String sql = "";
 
         if (this.zygosity.size() != 0) {
-            sql += " and " + buildOr("v.zygosity_status", this.zygosity, true);
+            sql += " and " + buildOr("vsd.zygosity_status", this.zygosity, true);
         }
 
         if (this.hetDiffFromRef) {
-            sql += " and (v.zygosity_status='heterozygous' and zygosity_ref_allele='N') ";
+            sql += " and (vsd.zygosity_status='heterozygous' and zygosity_ref_allele='N') ";
         }
 
         if (this.excludePossibleError) {
-            sql += " and v.zygosity_poss_error='N' ";
+            sql += " and vsd.zygosity_poss_error='N' ";
         }
 
         return sql;
@@ -1003,7 +961,7 @@ public class VariantSearchBean {
         if (this.genicStatus.size() == 0) {
             return "";
         } else {
-            return " and " + buildOr("v.genic_status", this.genicStatus, true);
+            return " and " + buildOr("vmd.genic_status", this.genicStatus, true);
         }
     }
 
@@ -1011,7 +969,7 @@ public class VariantSearchBean {
         if (this.variantId == -1) {
             return "";
         } else {
-            return " and v.variant_id=" + this.variantId;
+            return " and v.rgd_id=" + this.variantId;
         }
     }
 
@@ -1039,7 +997,7 @@ public class VariantSearchBean {
         if (this.minQualityScore == -1 || this.maxQualityScore == -1) {
             return "";
         } else {
-            return " and " + this.buildRange("v.QUALITY_SCORE", this.minQualityScore, this.maxQualityScore);
+            return " and " + this.buildRange("vsd.QUALITY_SCORE", this.minQualityScore, this.maxQualityScore);
         }
     }
 
@@ -1047,7 +1005,7 @@ public class VariantSearchBean {
         if (this.minPercentRead == -1 || this.maxPercentRead == -1) {
             return "";
         } else {
-            return " and " + this.buildRange("v.ZYGOSITY_PERCENT_READ", this.minPercentRead, this.maxPercentRead);
+            return " and " + this.buildRange("vsd.ZYGOSITY_PERCENT_READ", this.minPercentRead, this.maxPercentRead);
         }
     }
 
@@ -1109,7 +1067,7 @@ public class VariantSearchBean {
             }
             if (symbol.equals("Intergenic")) {
                 // We assume that is Intergenic comes through , there will only be intergenic with no genes also included
-                sql += "  and ( v.GENIC_STATUS = '" + Variant.INTERGENIC + "'  ";
+                sql += "  and ( vmd.GENIC_STATUS = '" + Variant.INTERGENIC + "'  ";
             } else {
                 // Real search by Gene names here ...
                 if (count == 0) {
@@ -1156,32 +1114,33 @@ public class VariantSearchBean {
      */
     public String[] getTableJoinSQL (String sqlFrom, boolean limit) {
 
-        String vtTable = getVariantTranscriptTable(mapKey);
-        String polyTable = getPolyphenTable(mapKey);
+        String vtTable = "variant_transcript";
+        String polyTable = "polyphen";
         String sql = "";
-
+        sql+=" inner join  variant_map_data vmd on vmd.rgd_id=v.rgd_id\n" +
+                "   inner join variant_sample_detail vsd on vsd.rgd_id=v.rgd_id   ";
 
         if (limit) {
 
             if (this.hasOnlyTranscript()) {
-                sql += " inner join "+vtTable+" vt on v.variant_id=vt.variant_id ";
+                sql += " inner join "+vtTable+" vt on v.rgd_id=vt.variant_rgd_id ";
                 sqlFrom += ",vt.* ";
                 sql += " inner join transcripts t on ( vt.transcript_rgd_id = t.transcript_rgd_id ) ";
 
 
             }
              if (this.hasPolyphen()) {
-                    sql += " inner join "+polyTable+" p on (v.variant_id=p.variant_id and p.protein_status='100 PERC MATCH') ";
+                    sql += " inner join "+polyTable+" p on (v.rgd_id=p.variant_rgd_id and p.protein_status='100 PERC MATCH') ";
                     sqlFrom += ",p.* ";
                 }
 
             if (this.hasDBSNP() ) {
 
                 if (this.hasDBSNP() || this.getNovelDBSNP()) {
-                    sql += " left outer JOIN sample s ON (v.sample_id=s.sample_id AND s.MAP_KEY=" + this.mapKey + ") " +
+                    sql += " left outer JOIN sample s ON (vsd.sample_id=s.sample_id AND s.MAP_KEY=" + this.mapKey + ") " +
 
-                        " left outer JOIN  db_snp dbs ON  ( v.START_POS = dbs.POSITION " +
-                        "    AND v.CHROMOSOME = dbs.CHROMOSOME  " +
+                        " left outer JOIN  db_snp dbs ON  ( vmd.START_POS = dbs.POSITION " +
+                        "    AND vmd.CHROMOSOME = dbs.CHROMOSOME  " +
                         "    AND v.VAR_NUC = dbs.ALLELE  " +
                         "    AND dbs.SOURCE = s.DBSNP_SOURCE \n" +
                         "    AND dbs.MAP_KEY = s.MAP_KEY ) \n ";
@@ -1190,7 +1149,7 @@ public class VariantSearchBean {
             }
 
             if (this.hasConScore()) {
-                sql += " inner join  " + this.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";
+                sql += " inner join  " + this.getConScoreTable() + " cs on (cs.chr=vmd.chromosome and cs.position = vmd.start_pos) ";
                 sqlFrom += ",cs.* ";
             }
 
@@ -1202,32 +1161,32 @@ public class VariantSearchBean {
 
         } else {
 
-            sql += " left outer join "+vtTable+" vt on v.variant_id=vt.variant_id ";
+            sql += " left outer join "+vtTable+" vt on v.rgd_id=vt.variant_rgd_id ";
             sqlFrom += ",vt.* ";
 
             sql += " left outer join transcripts t on vt.transcript_rgd_id = t.transcript_rgd_id   ";
             sqlFrom += ",t.* ";
 
-            sql += " left outer join "+polyTable+" p on (vt.variant_transcript_id=p.variant_transcript_id and p.protein_status='100 PERC MATCH') ";
+            sql += " left outer join "+polyTable+" p on (vt.variant_rgd_id=p.variant_rgd_id and p.protein_status='100 PERC MATCH') ";
             sqlFrom += ",p.* ";
 
             sql += " left outer join clinvar cv on (v.rgd_id=cv.rgd_id) ";
             sqlFrom += ",cv.* ";
 
-            sql += " left outer join " + this.getConScoreTable() + " cs on (cs.chr=v.chromosome and cs.position = v.start_pos) ";
+            sql += " left outer join " + this.getConScoreTable() + " cs on (cs.chr=vmd.chromosome and cs.position = vmd.start_pos) ";
             sqlFrom += ",cs.* ";
 
-            sql += " left outer JOIN sample s ON (v.sample_id=s.sample_id AND s.MAP_KEY=" + this.mapKey + ") " +
+            sql += " left outer JOIN sample s ON (vsd.sample_id=s.sample_id AND s.MAP_KEY=" + this.mapKey + ") " +
 
-                " left outer join db_snp dbs ON (  v.START_POS  = dbs.POSITION  " +
-                "    AND v.CHROMOSOME = dbs.CHROMOSOME   " +
+                " left outer join db_snp dbs ON (  vmd.START_POS  = dbs.POSITION  " +
+                "    AND vmd.CHROMOSOME = dbs.CHROMOSOME   " +
                 "    AND v.VAR_NUC = dbs.ALLELE  " +
                 "    AND dbs.SOURCE = s.DBSNP_SOURCE \n" +
                 "    AND dbs.MAP_KEY = s.MAP_KEY ) \n ";
 
             sqlFrom += ",dbs.*  ";
         }
-        sql += " where 1=1  ";
+        sql += " where 1=1   " ;
         return new String[]{sqlFrom, sql};
     }
 
