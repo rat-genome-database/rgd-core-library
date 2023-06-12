@@ -1,14 +1,10 @@
 package edu.mcw.rgd.dao.impl;
 
-import edu.mcw.rgd.dao.spring.ConditionQuery;
-import edu.mcw.rgd.dao.spring.GeneExpressionRecordQuery;
-import edu.mcw.rgd.dao.spring.GeneExpressionRecordValueQuery;
-import edu.mcw.rgd.dao.spring.MeasurementMethodQuery;
-import edu.mcw.rgd.datamodel.pheno.Condition;
-import edu.mcw.rgd.datamodel.pheno.GeneExpressionRecord;
-import edu.mcw.rgd.datamodel.pheno.GeneExpressionRecordValue;
-import edu.mcw.rgd.datamodel.pheno.MeasurementMethod;
+import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.pheno.*;
+import org.springframework.jdbc.core.SqlParameter;
 
+import java.sql.Types;
 import java.util.Collection;
 import java.util.List;
 
@@ -153,6 +149,16 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
             return records.get(0);
         }
+    }
+
+    public Experiment getExperimentBySampleId(int sampleId) throws Exception {
+        String sql = "select * from experiment where experiment_id in (select experiment_id FROM gene_expression_exp_record WHERE sample_id=?)";
+        ExperimentQuery sq = new ExperimentQuery(this.getDataSource(), sql);
+        sq.declareParameter(new SqlParameter(Types.INTEGER));
+        sq.compile();
+
+        List<Experiment> experiments = sq.execute(sampleId);
+        return experiments.get(0);
     }
 
     /**
