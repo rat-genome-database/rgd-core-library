@@ -131,6 +131,21 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return records;
     }
 
+    public GeneExpressionRecord getGeneExpressionRecordBySampleId(int sampleId) throws Exception {
+        String sql = "SELECT * FROM gene_expression_exp_record WHERE sample_id=? and curation_status=35";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(), sql);
+        List<GeneExpressionRecord> records = execute(q, sampleId);
+        if (records.isEmpty())
+            return null;
+        else {
+            records.get(0).setValues(getGeneExpressionRecordValues(records.get(0).getId()));
+            records.get(0).setConditions(getConditions(records.get(0).getId()));
+            records.get(0).setMeasurementMethods(getMeasurementMethods(records.get(0).getId()));
+
+            return records.get(0);
+        }
+    }
+
     public GeneExpressionRecord getGeneExpressionRecordByExperimentIdAndSampleId(int experimentId, int sampleId) throws Exception {
 
         // load records
