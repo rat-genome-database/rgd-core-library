@@ -459,6 +459,11 @@ public class SearchDAO extends AbstractDAO {
                         + "FROM rgd_index ri, genomic_elements ge "
                         + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
                 break;
+            case "VARIANTS":
+                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, LOWER(v.name) as keyword_lc "
+                        + "FROM rgd_index ri, variants v "
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                break;
             default:
                 System.out.println("ERROR: findSymbol(,,): unsupported object type: " + objectType);
                 return null;
