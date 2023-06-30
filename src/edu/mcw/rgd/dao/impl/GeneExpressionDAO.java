@@ -1,14 +1,10 @@
 package edu.mcw.rgd.dao.impl;
 
-import edu.mcw.rgd.dao.spring.ConditionQuery;
-import edu.mcw.rgd.dao.spring.GeneExpressionRecordQuery;
-import edu.mcw.rgd.dao.spring.GeneExpressionRecordValueQuery;
-import edu.mcw.rgd.dao.spring.MeasurementMethodQuery;
-import edu.mcw.rgd.datamodel.pheno.Condition;
-import edu.mcw.rgd.datamodel.pheno.GeneExpressionRecord;
-import edu.mcw.rgd.datamodel.pheno.GeneExpressionRecordValue;
-import edu.mcw.rgd.datamodel.pheno.MeasurementMethod;
+import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.pheno.*;
+import org.springframework.jdbc.core.SqlParameter;
 
+import java.sql.Types;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,11 +24,18 @@ public class GeneExpressionDAO extends PhenominerDAO {
         r.setId(id);
 
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-            +",last_modified_by, curation_status, species_type_key, last_modified_date) VALUES(?,?,?,?,?,?,SYSTIMESTAMP)";
+            +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, last_modified_date) VALUES(?,?,?,?,?,?,?,SYSTIMESTAMP)";
 
         update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
-                r.getCurationStatus(), r.getSpeciesTypeKey());
+                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId());
         return id;
+    }
+
+    public void updateGeneExpressionRecord(GeneExpressionRecord r) throws Exception {
+        String sql = "update gene_expression_exp_record set experiment_id=?, sample_id=?, last_modified_by=?, curation_status=?," +
+                "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, last_modified_date = SYSTIMESTAMP where gene_expression_exp_record_id=?";
+        update(sql, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
+                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(), r.getId());
     }
 
     /**
@@ -128,6 +131,21 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return records;
     }
 
+    public GeneExpressionRecord getGeneExpressionRecordBySampleId(int sampleId) throws Exception {
+        String sql = "SELECT * FROM gene_expression_exp_record WHERE sample_id=? and curation_status=35";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(), sql);
+        List<GeneExpressionRecord> records = execute(q, sampleId);
+        if (records.isEmpty())
+            return null;
+        else {
+            records.get(0).setValues(getGeneExpressionRecordValues(records.get(0).getId()));
+            records.get(0).setConditions(getConditions(records.get(0).getId()));
+            records.get(0).setMeasurementMethods(getMeasurementMethods(records.get(0).getId()));
+
+            return records.get(0);
+        }
+    }
+
     public GeneExpressionRecord getGeneExpressionRecordByExperimentIdAndSampleId(int experimentId, int sampleId) throws Exception {
 
         // load records
@@ -146,6 +164,16 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
             return records.get(0);
         }
+    }
+
+    public Experiment getExperimentBySampleId(int sampleId) throws Exception {
+        String sql = "select * from experiment where experiment_id in (select experiment_id FROM gene_expression_exp_record WHERE sample_id=?)";
+        ExperimentQuery sq = new ExperimentQuery(this.getDataSource(), sql);
+        sq.declareParameter(new SqlParameter(Types.INTEGER));
+        sq.compile();
+
+        List<Experiment> experiments = sq.execute(sampleId);
+        return experiments.get(0);
     }
 
     /**

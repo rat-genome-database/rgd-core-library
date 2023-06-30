@@ -1,5 +1,6 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import edu.mcw.rgd.process.Utils;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class GeneExpressionRecord {
     private Date lastModifiedDate;
     private int curationStatus;
     private int speciesTypeKey;
+    private Integer clinicalMeasurementId;
 
     private List<GeneExpressionRecordValue> values;
     private List<Condition> conditions;
@@ -98,5 +100,25 @@ public class GeneExpressionRecord {
 
     public void setMeasurementMethods(List<MeasurementMethod> measurementMethods) {
         this.measurementMethods = measurementMethods;
+    }
+
+    public Integer getClinicalMeasurementId() {
+        return clinicalMeasurementId;
+    }
+
+    public void setClinicalMeasurementId(Integer clinicalMeasurementId) {
+        this.clinicalMeasurementId = clinicalMeasurementId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        GeneExpressionRecord r = (GeneExpressionRecord) obj;
+        return experimentId==r.getExperimentId() && sampleId==r.getSampleId() && Utils.stringsAreEqual(lastModifiedBy,r.getLastModifiedBy()) && lastModifiedDate.equals(r.getLastModifiedDate())
+                && curationStatus==r.curationStatus && speciesTypeKey==r.getSpeciesTypeKey() && clinicalMeasurementId==r.getClinicalMeasurementId();
+    }
+
+    @Override
+    public int hashCode() {
+        return experimentId ^ sampleId ^ Utils.defaultString(lastModifiedBy).hashCode() ^ lastModifiedDate.hashCode() ^ curationStatus ^ speciesTypeKey ^ clinicalMeasurementId;
     }
 }

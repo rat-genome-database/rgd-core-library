@@ -338,6 +338,22 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     * Return a list of experiments tied to a geo study ID
+     * @param geoStudy
+     * @return
+     * @throws Exception
+     */
+    public List<Experiment> getExperiments(String geoStudy) throws Exception {
+        String query = "SELECT * from experiment where study_id in (select study_id from study where geo_series_acc=?) order by experiment_id desc";
+
+        ExperimentQuery sq = new ExperimentQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        return sq.execute(new Object[]{geoStudy});
+    }
+
+    /**
      * Return a list of experiments from a list of experiment ID's passed in
      * <p>
      *     Note: only first 1000 experiments is returned, due to Oracle limitations
@@ -1186,6 +1202,25 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     /**
+     * Returns a CMO object
+     *
+     * @param cmoId CLINICAL MEASUREMENT ID
+     * @return CMO object or null if empty
+     * @throws Exception
+     */
+    public ClinicalMeasurement getClinicalMeasurement(int cmoId) throws Exception {
+        String query = "select * from CLINICAL_MEASUREMENT WHERE CLINICAL_MEASUREMENT_ID=?";
+        ClinicalMeasurementQuery q = new ClinicalMeasurementQuery(getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<ClinicalMeasurement> objs = q.execute(cmoId);
+        if (objs.isEmpty()){
+            return null;
+        }
+        else
+            return objs.get(0);
+    }
+
+    /**
      * delete a sample from the datastore given sample id
      * @param sampleId sample id
      * @return count of rows affected
@@ -1405,8 +1440,8 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "INSERT INTO clinical_measurement (clinical_measurement_notes, " +
                 " clinical_measurement_ont_id, formula, clinical_meas_average_type, " +
-                "clinical_measurement_id, clinical_meas_site_ont_id, clinical_measurement_site, class) "+
-				"VALUES(?,?,?,?,?,?,?,'edu.mcw.rgd.phenodb.ClinicalMeasurement')";
+                "clinical_measurement_id, clinical_meas_site_ont_id, clinical_measurement_site) "+
+				"VALUES(?,?,?,?,?,?,?)";
 
         update(query, cm.getNotes(), cm.getAccId(), cm.getFormula(), cm.getAverageType(),
                 next, cm.getSiteOntIds(), cm.getSite());
@@ -1512,7 +1547,7 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<GeoRecord> getGeoRecords(String  geoId,String species) throws Exception {
-        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ?";
+        String query = "SELECT * from rna_seq where geo_accession_id=? and sample_organism like ? order by sample_accession_id asc";
 
         GeoRecordQuery sq = new GeoRecordQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -2038,9 +2073,9 @@ public class PhenominerDAO extends AbstractDAO {
                 "st.study_id = e.study_id \n" +
                 "left join \n" +
                 "(\n" +
-                "SELECT er.experiment_id, er.measurement_error, er.last_modified_date,\n" +
+                "SELECT er.experiment_id, er.measurement_error,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
-                "er.curation_status, er.has_individual_record, er.last_modified_by,\n" +
+                "er.curation_status, er.has_individual_record,\n" +
                 "s1.*, cm.*, mm.*, ec.*\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
                 "experiment_condition ec\n" +
