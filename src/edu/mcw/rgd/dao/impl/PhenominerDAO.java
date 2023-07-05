@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.GeoRecord;
 import edu.mcw.rgd.datamodel.HistogramRecord;
@@ -12,10 +13,7 @@ import edu.mcw.rgd.process.pheno.SearchBean;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -41,6 +39,45 @@ public class PhenominerDAO extends AbstractDAO {
         if( studies.isEmpty() )
             return null;
         return studies.get(0);
+    }
+
+    public Study getStudyWithReferences(int id) throws Exception{
+        String query = "SELECT * FROM study WHERE study_id=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        Study s = studies.get(0);
+        s.setRefRgdIds(getStudyReferences(id));
+        return s;
+    }
+
+    public List<Integer> getStudyReferences(int studyId) throws Exception{
+        String sql = "select ref_rgd_id from study_references where study_id=?";
+        List<Integer> refs = new ArrayList<>();
+        Connection con = null;
+        try {
+            con = DataSourceFactory.getInstance().getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,studyId);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                refs.add(rs.getInt(1));
+            }
+            ps.close();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                con.close();
+            }
+            catch (Exception ignored){  }
+        }
+        return refs;
     }
 
     public Study getStudyByGeoId(String  id) throws Exception {
@@ -263,6 +300,11 @@ public class PhenominerDAO extends AbstractDAO {
                 study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy(),study.getCreatedBy());
 
         return studyId;
+    }
+
+    public int insertStudyReference(int studyId, int rgdId) throws Exception{
+        String sql = "insert into STUDY_REFERENCES (study_id, ref_rgd_id) values (?, ?)";
+        return update(sql, studyId, rgdId);
     }
 
     /**

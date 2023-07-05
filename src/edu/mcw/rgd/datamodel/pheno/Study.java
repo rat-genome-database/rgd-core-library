@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import java.util.List;
+
 /**
  * @author jdepons
  * @since 2/7/11
@@ -16,6 +18,7 @@ public class Study {
     private int curationStatus = -1;
     private String lastModifiedBy;
     private String createdBy;
+    private List<Integer> refRgdIds;
 
 
 
@@ -97,5 +100,13 @@ public class Study {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<Integer> getRefRgdIds() {
+        return refRgdIds;
+    }
+
+    public void setRefRgdIds(List<Integer> refRgdIds) {
+        this.refRgdIds = refRgdIds;
     }
 }
