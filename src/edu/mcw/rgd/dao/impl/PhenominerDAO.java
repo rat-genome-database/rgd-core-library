@@ -307,6 +307,11 @@ public class PhenominerDAO extends AbstractDAO {
         return update(sql, studyId, rgdId);
     }
 
+    public void deleteStudyReference(int studyId, int rgdId) throws Exception{
+        String sql = "delete from STUDY_REFERENCES where study_id=? and ref_rgd_id=?";
+        update(sql,studyId,rgdId);
+    }
+
     /**
      * Delete a study from the data store
      * @param studyId study id
