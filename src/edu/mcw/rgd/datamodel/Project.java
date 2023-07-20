@@ -15,7 +15,7 @@ public class Project {
     }
 
     public String getName() {
-        return nam.je;
+        return name;
     }
 
     public void setName(String name) {

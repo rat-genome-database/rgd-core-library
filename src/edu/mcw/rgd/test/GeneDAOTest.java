@@ -2,7 +2,9 @@ package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.impl.GeneDAO;
 import edu.mcw.rgd.dao.impl.MapDAO;
+import edu.mcw.rgd.dao.impl.ProjectDAO;
 import edu.mcw.rgd.datamodel.Gene;
+import edu.mcw.rgd.datamodel.Project;
 import edu.mcw.rgd.datamodel.Map;
 import edu.mcw.rgd.datamodel.MapData;
 import junit.framework.TestCase;
@@ -23,6 +25,8 @@ public class GeneDAOTest extends TestCase {
     }
 
     public void testAll() throws Exception {
+        ProjectDAO pro = new ProjectDAO();
+        List<Project> li=pro.getAllProjects();
 
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
