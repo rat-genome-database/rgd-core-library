@@ -313,7 +313,7 @@ public class PhenominerDAO extends AbstractDAO {
         update(sql, study.getName(), study.getSource(), study.getType(),
                 study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy(),study.getCreatedBy());
 
-        if (study.getRefRgdIds() != null && !study.getRefRgdIds().isEmpty()) {
+        if (!study.getRefRgdIds().isEmpty()) {
             for (Integer ref : study.getRefRgdIds()) {
                 insertStudyReference(studyId, ref);
             }
