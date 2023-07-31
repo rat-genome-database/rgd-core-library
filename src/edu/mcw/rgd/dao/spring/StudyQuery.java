@@ -25,7 +25,6 @@ public class StudyQuery extends MappingSqlQuery {
         study.setName(rs.getString("study_name"));
         study.setSource(rs.getString("study_source"));
         study.setType(rs.getString("study_type"));
-        study.setRefRgdId(rs.getInt("ref_rgd_id"));
         study.setDataType(rs.getString("data_type"));
         study.setGeoSeriesAcc(rs.getString("geo_series_acc"));
         study.setLastModifiedBy(rs.getString("last_modified_by"));

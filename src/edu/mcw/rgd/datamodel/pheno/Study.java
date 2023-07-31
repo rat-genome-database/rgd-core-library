@@ -12,7 +12,6 @@ public class Study {
     private String name;
     private String source;
     private String type;
-    private Integer refRgdId;
     private String dataType;
     private String geoSeriesAcc;
     private int curationStatus = -1;
@@ -63,11 +62,10 @@ public class Study {
     }
 
     public Integer getRefRgdId() {
-        return refRgdId;
-    }
-
-    public void setRefRgdId(Integer refRgdId) {
-        this.refRgdId = refRgdId;
+        if (refRgdIds.size()>0)
+            return refRgdIds.get(0);
+        else
+            return null;
     }
 
     public String getDataType() {

@@ -27,6 +27,7 @@ public class GeneDAOTest extends TestCase {
     public void testAll() throws Exception {
         ProjectDAO pro = new ProjectDAO();
         List<Project> li=pro.getAllProjects();
+        List<Project> t = pro.getProjectByRgdId(476081963);
 
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
