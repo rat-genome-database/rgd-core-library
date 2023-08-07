@@ -2892,6 +2892,20 @@ public class PhenominerDAO extends AbstractDAO {
         return runFullRecordsQuery(query);
     }
 
+    public List<Record> getFullRecordsForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
+        if(refRgdIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT * FROM experiment_record_view er, clinical_measurement cm, sample s, experiment e, study st, measurement_method mm " +
+                "WHERE er.clinical_measurement_id=cm.clinical_measurement_id and er.sample_id=s.sample_id " +
+                " AND er.measurement_method_id=mm.measurement_method_id" +
+                " AND er.experiment_id=e.experiment_id AND e.study_id=st.study_id" +
+                " AND er.curation_status=40 AND ref_rgd_id IN("+refRgdIdsStr+")";
+        return runFullRecordsQuery(query);
+    }
+
     /**
      * get full phenominer records based on reference rgd id of a study
      * @param refRgdId reference rgd id of a study

@@ -1,13 +1,15 @@
 package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.impl.GeneDAO;
-import edu.mcw.rgd.dao.impl.MapDAO;
+
+import edu.mcw.rgd.dao.impl.PhenominerDAO;
 import edu.mcw.rgd.dao.impl.ProjectDAO;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.Project;
-import edu.mcw.rgd.datamodel.Map;
-import edu.mcw.rgd.datamodel.MapData;
+
+import edu.mcw.rgd.datamodel.pheno.Record;
 import junit.framework.TestCase;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,8 @@ public class GeneDAOTest extends TestCase {
         ProjectDAO pro = new ProjectDAO();
         List<Project> li=pro.getAllProjects();
         List<Project> t = pro.getProjectByRgdId(476081963);
-
+        List<Integer> id = pro.getReferenceRgdIdsForProject(476081962);
+        List<Record> rec = new PhenominerDAO().getFullRecordsForProject(476081962);
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
         assert genes.size() > 0;

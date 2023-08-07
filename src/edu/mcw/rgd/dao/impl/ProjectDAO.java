@@ -22,6 +22,19 @@ public class ProjectDAO extends AbstractDAO{
         String query = "SELECT * FROM PROJECTS";
         return ProjectQuery.execute(this,query);
     }
+
+    public List<Integer> getReferenceRgdIdsForProject(int projectRgdId) throws Exception {
+        String query = "SELECT RGD_ID " +
+                "FROM references " +
+                "WHERE ref_key IN (" +
+                "    SELECT ref_key " +
+                "    FROM rgd_ref_rgd_id " +
+                "    WHERE rgd_id = ?" +
+                ")";
+        return IntListQuery.execute(this, query, projectRgdId);
+    }
+
+
     public List<Project> getProjectByRgdId(int id) throws Exception{
         String query = "SELECT * from PROJECTS WHERE RGD_ID=?";
         return ProjectQuery.execute(this,query,id);
