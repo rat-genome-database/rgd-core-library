@@ -581,6 +581,19 @@ public class AnnotationDAO extends AbstractDAO {
                 "ORDER BY a.object_symbol asc";
         return executeAnnotationQuery(query, refRgdId);
     }
+    public List<Annotation> getAnnotationsByReferenceForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId);
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT a.*, r.species_type_key \n" +
+                "FROM full_annot a, rgd_ids r, references ref \n" +
+                "WHERE a.ref_rgd_id IN ("+ refRgdIdsStr + ") \n" +
+                "AND a.annotated_object_rgd_id = r.rgd_id \n" +
+                "AND a.ref_rgd_id = ref.rgd_id \n" +
+                "AND r.object_status = 'ACTIVE' \n" +
+                "ORDER BY a.object_symbol ASC";
+        return executeAnnotationQuery(query);
+    }
+
 
     /**
      * get annotations given reference rgd id
@@ -613,6 +626,17 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE s.ref_rgd_id=? \n" +
                 "AND s.study_id=ex.study_id AND ex.experiment_id=er.experiment_id";
         return getCount(query, refRgdId);
+    }
+    public int getPhenoAnnotationsCountByReferenceForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
+        if(refRgdIds.isEmpty()) {
+            return 0;
+        }
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT COUNT(*) FROM study s, experiment ex, experiment_record_view er\n" +
+                "WHERE s.ref_rgd_id IN("+refRgdIdsStr+") \n" +
+                "AND s.study_id=ex.study_id AND ex.experiment_id=er.experiment_id";
+        return getCount(query);
     }
 
     /**
@@ -850,6 +874,18 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE annotated_object_rgd_id=? AND rgd_id=annotated_object_rgd_id "+
                 "ORDER BY term";
         return executeAnnotationQuery(query, rgdId);
+    }
+
+    public List<Annotation> getAnnotationsForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
+        if(refRgdIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT a.*,r.species_type_key FROM full_annot a,rgd_ids r "+
+                "WHERE annotated_object_rgd_id IN ("+refRgdIdsStr+") AND rgd_id=annotated_object_rgd_id "+
+                "ORDER BY term";
+        return executeAnnotationQuery(query);
     }
 
     /**

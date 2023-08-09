@@ -1,5 +1,6 @@
 package edu.mcw.rgd.test;
 
+import edu.mcw.rgd.dao.impl.AnnotationDAO;
 import edu.mcw.rgd.dao.impl.GeneDAO;
 
 import edu.mcw.rgd.dao.impl.PhenominerDAO;
@@ -7,6 +8,7 @@ import edu.mcw.rgd.dao.impl.ProjectDAO;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.Project;
 
+import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.pheno.Record;
 import junit.framework.TestCase;
 
@@ -31,7 +33,11 @@ public class GeneDAOTest extends TestCase {
         List<Project> li=pro.getAllProjects();
         List<Project> t = pro.getProjectByRgdId(476081963);
         List<Integer> id = pro.getReferenceRgdIdsForProject(476081962);
-        List<Record> rec = new PhenominerDAO().getFullRecordsForProject(476081962);
+        List<Record> rec = new PhenominerDAO().getFullRecordsForProject(69701);
+        List<Record> rec1 = new PhenominerDAO().getFullRecordsForProject(476081962,"RS");
+        List<Annotation> a = new AnnotationDAO().getAnnotationsByReferenceForProject(476081962);
+        List<Annotation> a1 = new AnnotationDAO().getAnnotationsForProject(476081962);
+        int c = new AnnotationDAO().getPhenoAnnotationsCountByReferenceForProject(476081962);
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
         assert genes.size() > 0;
