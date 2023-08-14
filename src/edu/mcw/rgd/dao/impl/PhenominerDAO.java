@@ -1,21 +1,20 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.GeoRecord;
 import edu.mcw.rgd.datamodel.HistogramRecord;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.pheno.*;
+import edu.mcw.rgd.datamodel.pheno.Record;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.pheno.SearchBean;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -40,7 +39,48 @@ public class PhenominerDAO extends AbstractDAO {
         List<Study> studies = execute(q, id);
         if( studies.isEmpty() )
             return null;
-        return studies.get(0);
+        Study s = studies.get(0);
+        s.setRefRgdIds(getStudyReferences(id));
+        return s;
+    }
+
+    public Study getStudyWithReferences(int id) throws Exception{
+        String query = "SELECT * FROM study WHERE study_id=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        Study s = studies.get(0);
+        s.setRefRgdIds(getStudyReferences(id));
+        return s;
+    }
+
+    public List<Integer> getStudyReferences(int studyId) throws Exception{
+        String sql = "select ref_rgd_id from study_references where study_id=?";
+        List<Integer> refs = new ArrayList<>();
+        Connection con = null;
+        try {
+            con = DataSourceFactory.getInstance().getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,studyId);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                refs.add(rs.getInt(1));
+            }
+            ps.close();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                con.close();
+            }
+            catch (Exception ignored){  }
+        }
+        return refs;
     }
 
     public Study getStudyByGeoId(String  id) throws Exception {
@@ -51,6 +91,18 @@ public class PhenominerDAO extends AbstractDAO {
         if( studies.isEmpty() )
             return null;
         return studies.get(0);
+    }
+
+    public Study getStudyByGeoIdWithReferences(String  id) throws Exception {
+        String query = "SELECT * FROM study WHERE geo_series_acc=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        Study s = studies.get(0);
+        s.setRefRgdIds(getStudyReferences(s.getId()));
+        return s;
     }
 
     /**
@@ -229,9 +281,9 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void updateStudy(Study study) throws Exception{
 
-        String query = "UPDATE study SET study_name=?, study_source=?, study_type=?, ref_rgd_id=?, "+
+        String query = "UPDATE study SET study_name=?, study_source=?, study_type=?, "+
             "data_type=?, geo_series_acc=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE study_id=?";
-        update(query, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(),
+        update(query, study.getName(), study.getSource(), study.getType(),
                 study.getDataType(), study.getGeoSeriesAcc(),study.getLastModifiedBy(), study.getId());
 
         // Update curation status for each experiment record that belongs to this study
@@ -256,13 +308,33 @@ public class PhenominerDAO extends AbstractDAO {
         int studyId = this.getNextKey("study_seq");
         study.setId(studyId);
 
-        String sql = "INSERT INTO study (study_name, study_source, study_type, ref_rgd_id, " +
-                "data_type, geo_series_acc, study_id,last_modified_by,created_by,created_date, last_modified_date) VALUES(?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+        String sql = "INSERT INTO study (study_name, study_source, study_type,  " +
+                "data_type, geo_series_acc, study_id,last_modified_by,created_by,created_date, last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
-        update(sql, study.getName(), study.getSource(), study.getType(), study.getRefRgdId(),
+        update(sql, study.getName(), study.getSource(), study.getType(),
                 study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy(),study.getCreatedBy());
 
+        if (study.getRefRgdIds() != null && !study.getRefRgdIds().isEmpty()) {
+            for (Integer ref : study.getRefRgdIds()) {
+                insertStudyReference(studyId, ref);
+            }
+        }
         return studyId;
+    }
+
+    public int insertStudyReference(int studyId, int rgdId) throws Exception{
+        String sql = "insert into STUDY_REFERENCES (study_id, ref_rgd_id) values (?, ?)";
+        return update(sql, studyId, rgdId);
+    }
+
+    public void deleteStudyReference(int studyId, int rgdId) throws Exception{
+        String sql = "delete from STUDY_REFERENCES where study_id=? and ref_rgd_id=?";
+        update(sql,studyId,rgdId);
+    }
+
+    public void deleteStudyReferences(int studyId) throws Exception{
+        String sql = "delete from STUDY_REFERENCES where study_id=?";
+        update(sql,studyId);
     }
 
     /**
@@ -277,7 +349,8 @@ public class PhenominerDAO extends AbstractDAO {
         for (Experiment e: experiments) {
             this.deleteExperiment(e.getId());
         }
-        
+        deleteStudyReferences(studyId);
+
         String sql = "delete from study where study_id=?";
         update(sql, studyId);
     }

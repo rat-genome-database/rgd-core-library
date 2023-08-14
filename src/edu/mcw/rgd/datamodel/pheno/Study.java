@@ -1,5 +1,7 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import java.util.List;
+
 /**
  * @author jdepons
  * @since 2/7/11
@@ -10,12 +12,12 @@ public class Study {
     private String name;
     private String source;
     private String type;
-    private Integer refRgdId;
     private String dataType;
     private String geoSeriesAcc;
     private int curationStatus = -1;
     private String lastModifiedBy;
     private String createdBy;
+    private List<Integer> refRgdIds;
 
 
 
@@ -60,11 +62,10 @@ public class Study {
     }
 
     public Integer getRefRgdId() {
-        return refRgdId;
-    }
-
-    public void setRefRgdId(Integer refRgdId) {
-        this.refRgdId = refRgdId;
+        if (refRgdIds.size()>0)
+            return refRgdIds.get(0);
+        else
+            return null;
     }
 
     public String getDataType() {
@@ -97,5 +98,13 @@ public class Study {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<Integer> getRefRgdIds() {
+        return refRgdIds;
+    }
+
+    public void setRefRgdIds(List<Integer> refRgdIds) {
+        this.refRgdIds = refRgdIds;
     }
 }
