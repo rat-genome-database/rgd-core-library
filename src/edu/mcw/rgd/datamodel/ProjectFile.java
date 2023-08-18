@@ -30,4 +30,14 @@ public class ProjectFile {
     private String project_file_type;
     private String download_url;
 
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    private String protocol;
+
 }

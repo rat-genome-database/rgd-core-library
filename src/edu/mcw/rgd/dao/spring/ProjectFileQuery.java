@@ -19,6 +19,7 @@ public class ProjectFileQuery extends MappingSqlQuery{
         projFile.setRgdid(rs.getInt("rgd_id"));
         projFile.setProject_file_type(rs.getString("project_file_type"));
         projFile.setDownload_url(rs.getString("download_url"));
+        projFile.setProtocol(rs.getString("protocol"));
         return projFile;
     }
     public static List<ProjectFile> execute(AbstractDAO dao, String sql, Object... params) throws  Exception {
