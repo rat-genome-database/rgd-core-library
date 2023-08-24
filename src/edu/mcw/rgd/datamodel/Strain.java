@@ -7,10 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: May 20, 2008
- * Time: 8:57:54 AM
  */
 public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
 
@@ -34,6 +32,8 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
     private String geneticStatus;
     private Integer backgroundStrainRgdId; // could be NULL
     private String modificationMethod;
+
+    private String taglessStrainSymbol;
 
     private String lastStatus; // last status, determined from analysis of statusLog
     private List<Status> statusLog; // log of all strain statuses
@@ -191,13 +191,20 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         this.backgroundStrainRgdId = backgroundStrainRgdId;
     }
 
-
     public String getModificationMethod() {
         return modificationMethod;
     }
 
     public void setModificationMethod(String modificationMethod) {
         this.modificationMethod = modificationMethod;
+    }
+
+    public String getTaglessStrainSymbol() {
+        return taglessStrainSymbol;
+    }
+
+    public void setTaglessStrainSymbol(String taglessStrainSymbol) {
+        this.taglessStrainSymbol = taglessStrainSymbol;
     }
 
     /**

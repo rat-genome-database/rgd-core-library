@@ -1,6 +1,8 @@
 package edu.mcw.rgd.test;
 
+import edu.mcw.rgd.dao.impl.RGDManagementDAO;
 import edu.mcw.rgd.dao.impl.StrainDAO;
+import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.Strain;
 import junit.framework.TestCase;
 
@@ -21,9 +23,23 @@ public class StrainDaoTest extends TestCase {
     }
 
     public void testAll() throws Exception{
-        testGetStrains();
-        
 
+        RGDManagementDAO rdao = new RGDManagementDAO();
+        RgdId id = rdao.createRgdId(RgdId.OBJECT_KEY_STRAINS, "ACTIVE", 3);
+
+        Strain s = new Strain();
+        s.setStrain("---");
+        s.setName("---");
+        s.setSymbol("---");
+        s.setRgdId(id.getRgdId());
+        stDao.insertStrain(s);
+
+        s.setTaglessStrainSymbol("---");
+        stDao.updateStrain(s);
+
+        testGetStrains();
+
+        System.out.println("OK");
     }
 
     private List<Strain> testGetStrains() throws Exception {
