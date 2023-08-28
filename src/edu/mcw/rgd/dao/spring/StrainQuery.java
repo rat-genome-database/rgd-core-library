@@ -8,10 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: jdepons
  * Date: Jan 17, 2008
- * Time: 10:08:19 AM
  */
 public class StrainQuery extends MappingSqlQuery {
 
@@ -46,6 +44,7 @@ public class StrainQuery extends MappingSqlQuery {
             st.setBackgroundStrainRgdId(null);
         }
         st.setModificationMethod(rs.getString("modification_method"));
+        st.setTaglessStrainSymbol(rs.getString("tagless_strain_symbol"));
 
         return st;
     }

@@ -6,8 +6,6 @@ import edu.mcw.rgd.datamodel.MappedStrain;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.datamodel.StrainFiles;
 import edu.mcw.rgd.process.Utils;
-import org.springframework.jdbc.object.BatchSqlUpdate;
-import org.springframework.jdbc.object.SqlUpdate;
 
 import java.util.List;
 import java.io.InputStream;
@@ -197,14 +195,14 @@ public class StrainDAO extends AbstractDAO {
                 "full_name=?, full_name_lc=LOWER(?), strain=?, strain_lc=LOWER(?), substrain=?, substrain_lc=LOWER(?), "+
                 "GENETICS=?,  INBRED_GEN=?, ORIGIN=?, COLOR=?, CHR_ALTERED=?, SOURCE=?, NOTES=?, strain_type_name_lc=LOWER(?), "+
                 "IMAGE_URL=?, RESEARCH_USE=?, genetic_status=?, background_strain_rgd_id=?, "+
-                "modification_method=? WHERE rgd_id=?";
+                "modification_method=?, tagless_strain_symbol=? WHERE rgd_id=?";
 
         update(sql, strain.getKey(), strain.getSymbol(), strain.getSymbol(), strain.getName(), strain.getName(),
                 strain.getStrain(), strain.getStrain(), strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(),
                 strain.getInbredGen(), strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
                 strain.getNotes(), strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(),
                 strain.getGeneticStatus(), strain.getBackgroundStrainRgdId(), strain.getModificationMethod(),
-                strain.getRgdId());
+                strain.getTaglessStrainSymbol(), strain.getRgdId());
     }
 
     /**
@@ -218,15 +216,15 @@ public class StrainDAO extends AbstractDAO {
         String sql = "INSERT INTO strains (strain_key, strain_symbol, strain_symbol_lc, " +
                 "FULL_NAME, FULL_NAME_LC, STRAIN, STRAIN_LC, SUBSTRAIN, SUBSTRAIN_LC, GENETICS, INBRED_GEN, " +
                 "ORIGIN, COLOR, CHR_ALTERED, SOURCE, NOTES, STRAIN_TYPE_NAME_LC, image_url, research_use, "+
-                "genetic_status, background_strain_rgd_id, modification_method, rgd_id) " +
-                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?)";
+                "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol, rgd_id) " +
+                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?)";
 
         update(sql, this.getNextKey("STRAINS","STRAIN_KEY"), strain.getSymbol(), strain.getSymbol(),
                 strain.getName(), strain.getName(), strain.getStrain(), strain.getStrain(),
                 strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(), strain.getInbredGen(),
                 strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
                 strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(), strain.getGeneticStatus(),
-                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getRgdId());
+                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(), strain.getRgdId());
     }
 
     /**
@@ -237,10 +235,8 @@ public class StrainDAO extends AbstractDAO {
     public void insertStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
         String sql = "insert into strain_files(strain_id,file_type,file_data,content_type,file_name,modified_by) values (?,?,?,?,?,?) ";
-        Connection conn = null;
-        PreparedStatement stmt;
-        conn = this.getDataSource().getConnection();
-        stmt = conn.prepareStatement(sql);
+        Connection conn = this.getDataSource().getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1,strainId);
         stmt.setString(2,type);
         stmt.setBlob(3,data);
@@ -254,17 +250,15 @@ public class StrainDAO extends AbstractDAO {
     public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
         String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ?,last_modified_date = sysdate where strain_id = ? and file_type= ? ";
-        Connection conn = null;
-        PreparedStatement stmt;
-        conn = this.getDataSource().getConnection();
-        stmt = conn.prepareStatement(sql);
+        Connection conn = this.getDataSource().getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setBlob(1,data);
         stmt.setString(2,contentType);
         stmt.setString(3,fileName);
 		stmt.setString(4,login);
         stmt.setInt(5,strainId);
         stmt.setString(6,type);
-         stmt.execute();
+        stmt.execute();
         conn.close();
     }
     public String getContentType(int rgdId,String type) throws Exception{
@@ -277,10 +271,9 @@ public class StrainDAO extends AbstractDAO {
     }
     public Blob getStrainAttachment(int rgdId, String type) throws Exception {
         String sql = "select file_data from strain_files where strain_id = ? and file_type = ?";
-        Connection conn = null;
         PreparedStatement stmt;
         ResultSet rs;
-        conn = this.getDataSource().getConnection();
+        Connection conn = this.getDataSource().getConnection();
         stmt = conn.prepareStatement(sql);
         stmt.setInt(1,rgdId);
         stmt.setString(2,type);
