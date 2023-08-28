@@ -39,4 +39,17 @@ public class ProjectDAO extends AbstractDAO{
         String query = "SELECT * from PROJECTS WHERE RGD_ID=?";
         return ProjectQuery.execute(this,query,id);
     }
+
+    public int insertProject(Project project) throws Exception {
+        String sql = "INSERT INTO projects (rgd_id, project_name, project_desc) " +
+                "VALUES (?, ?, ?)";
+        return upsertProject(project, sql);
+    }
+    public int updateProject(Project project) throws Exception {
+        String sql = "UPDATE projects SET project_name=?, project_desc=? WHERE rgd_id=?";
+        return upsertProject(project, sql);
+    }
+    private int upsertProject(Project project, String sql) throws Exception {
+        return update(sql, project.getRgdid(), project.getName(), project.getDesc());
+    }
 }
