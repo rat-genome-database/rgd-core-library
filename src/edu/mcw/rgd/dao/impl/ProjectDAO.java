@@ -40,6 +40,22 @@ public class ProjectDAO extends AbstractDAO{
         return ProjectQuery.execute(this,query,id);
     }
 
+    public Project getProjectByRgdId1(int id1) throws Exception{
+        String query = "SELECT * from PROJECTS WHERE RGD_ID=?";
+        List<Project> pro = ProjectQuery.execute(this,query, id1);
+        return pro.isEmpty() ? null : (Project)pro.get(0);
+
+    }
+
+    public Project getProject(int rgdId) throws Exception {
+        Project pro = this.getProjectByRgdId1(rgdId);
+        if (pro == null) {
+            throw new Exception("Project " + rgdId + " not found");
+        } else {
+            return pro;
+        }
+    }
+
     public int insertProject(Project project) throws Exception {
         String sql = "INSERT INTO projects (rgd_id, project_name, project_desc) " +
                 "VALUES (?, ?, ?)";
