@@ -2,10 +2,8 @@ package edu.mcw.rgd.test;
 
 import edu.mcw.rgd.dao.impl.*;
 
-import edu.mcw.rgd.datamodel.Gene;
-import edu.mcw.rgd.datamodel.Project;
+import edu.mcw.rgd.datamodel.*;
 
-import edu.mcw.rgd.datamodel.ProjectFile;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.pheno.Record;
 import junit.framework.TestCase;
@@ -27,10 +25,24 @@ public class GeneDAOTest extends TestCase {
     }
 
     public void testAll() throws Exception {
+
+        RGDManagementDAO rdao = new RGDManagementDAO();
+        RgdId id = rdao.createRgdId(RgdId.OBJECT_KEY_GENES, "ACTIVE", 3);
+
+        Gene s = new Gene();
+        s.setName("---");
+        s.setSymbol("---");
+        s.setRgdId(id.getRgdId());
+        dao.insertGene(s);
+
+        s.setTaglessAlleleSymbol("---");
+        dao.updateGene(s);
+
+
         ProjectDAO pro = new ProjectDAO();
         List<Project> li=pro.getAllProjects();
         List<Project> t = pro.getProjectByRgdId(476081963);
-        List<Integer> id = pro.getReferenceRgdIdsForProject(476081962);
+        List<Integer> id2 = pro.getReferenceRgdIdsForProject(476081962);
         List<Record> rec = new PhenominerDAO().getFullRecordsForProject(69701);
         List<Record> rec1 = new PhenominerDAO().getFullRecordsForProject(476081962,"RS");
         List<Annotation> a = new AnnotationDAO().getAnnotationsByReferenceForProject(476081962);

@@ -212,15 +212,16 @@ public class GeneDAO extends AbstractDAO {
      */
     public void updateGene(Gene gene) throws Exception{
 
-        String sql = "update GENES set GENE_KEY=?, GENE_SYMBOL=?, GENE_SYMBOL_LC=LOWER(?), "+
-                "FULL_NAME=?, GENE_DESC=?, AGR_DESC=?, MERGED_DESC=?, NOTES=?, FULL_NAME_LC=LOWER(?), "+
-                "GENE_TYPE_LC=LOWER(?), NOMEN_REVIEW_DATE=?, REFSEQ_STATUS=?, NCBI_ANNOT_STATUS=?, "+
-                "GENE_SOURCE=?, ENSEMBL_GENE_SYMBOL=?, ENSEMBL_GENE_TYPE=?, ENSEMBL_FULL_NAME=?, NOMEN_SOURCE=? where RGD_ID=?";
+        String sql = "update GENES set GENE_KEY=?, GENE_SYMBOL=?, GENE_SYMBOL_LC=LOWER(?), FULL_NAME=?, GENE_DESC=?, "+
+                "AGR_DESC=?, MERGED_DESC=?, NOTES=?, FULL_NAME_LC=LOWER(?), GENE_TYPE_LC=LOWER(?), NOMEN_REVIEW_DATE=?, "+
+                "REFSEQ_STATUS=?, NCBI_ANNOT_STATUS=?, GENE_SOURCE=?, ENSEMBL_GENE_SYMBOL=?, ENSEMBL_GENE_TYPE=?, "+
+                "ENSEMBL_FULL_NAME=?, NOMEN_SOURCE=?, TAGLESS_ALLELE_SYMBOL=? where RGD_ID=?";
 
         update(sql, gene.getKey(), gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(),
                 gene.getAgrDescription(), gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(),
                 gene.getNomenReviewDate(), gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getGeneSource(),
-                gene.getEnsemblGeneSymbol(), gene.getEnsemblGeneType(), gene.getEnsemblFullName(), gene.getNomenSource(),gene.getRgdId());
+                gene.getEnsemblGeneSymbol(), gene.getEnsemblGeneType(), gene.getEnsemblFullName(), gene.getNomenSource(),
+                gene.getTaglessAlleleSymbol(), gene.getRgdId());
     }
 
     /**
@@ -231,10 +232,10 @@ public class GeneDAO extends AbstractDAO {
      */
     public void insertGene(Gene gene) throws Exception{
 
-        String sql = "insert into GENES (GENE_KEY, GENE_SYMBOL, GENE_SYMBOL_LC, " +
-                "FULL_NAME, GENE_DESC, AGR_DESC, MERGED_DESC, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, "+
-                "REFSEQ_STATUS, NCBI_ANNOT_STATUS, RGD_ID, GENE_SOURCE, ENSEMBL_GENE_SYMBOL, ENSEMBL_GENE_TYPE, ENSEMBL_FULL_NAME,NOMEN_SOURCE) "+
-                "VALUES (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into GENES (GENE_KEY, GENE_SYMBOL, GENE_SYMBOL_LC, FULL_NAME, GENE_DESC, AGR_DESC, " +
+                "MERGED_DESC, NOTES, FULL_NAME_LC, GENE_TYPE_LC, NOMEN_REVIEW_DATE, REFSEQ_STATUS, NCBI_ANNOT_STATUS, "+
+                "RGD_ID, GENE_SOURCE, ENSEMBL_GENE_SYMBOL, ENSEMBL_GENE_TYPE, ENSEMBL_FULL_NAME, NOMEN_SOURCE, TAGLESS_ALLELE_SYMBOL) "+
+                "VALUES (?,?,LOWER(?),?,?,?,?,?,LOWER(?),LOWER(?),?,?,?,?,?,?,?,?,?,?)";
 
         int key = this.getNextKey("genes","gene_key");
         gene.setKey(key);
@@ -242,7 +243,7 @@ public class GeneDAO extends AbstractDAO {
         update(sql, key, gene.getSymbol(), gene.getSymbol(), gene.getName(), gene.getDescription(), gene.getAgrDescription(),
                 gene.getMergedDescription(), gene.getNotes(), gene.getName(), gene.getType(), gene.getNomenReviewDate(),
                 gene.getRefSeqStatus(), gene.getNcbiAnnotStatus(), gene.getRgdId(), gene.getGeneSource(), gene.getEnsemblGeneSymbol(),
-                gene.getEnsemblGeneType(), gene.getEnsemblFullName(),gene.getNomenSource());
+                gene.getEnsemblGeneType(), gene.getEnsemblFullName(), gene.getNomenSource(), gene.getTaglessAlleleSymbol());
     }
 
     /**
