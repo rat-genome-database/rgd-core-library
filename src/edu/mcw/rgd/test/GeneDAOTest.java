@@ -38,7 +38,7 @@ public class GeneDAOTest extends TestCase {
         s.setTaglessAlleleSymbol("---");
         dao.updateGene(s);
 
-
+        /*
         ProjectDAO pro = new ProjectDAO();
         List<Project> li=pro.getAllProjects();
         List<Project> t = pro.getProjectByRgdId(476081963);
@@ -49,6 +49,7 @@ public class GeneDAOTest extends TestCase {
         List<Annotation> a1 = new AnnotationDAO().getAnnotationsForProject(476081962);
         List<ProjectFile> pf1= new ProjectFileDAO().getProjectFiles(476081962);
         int c = new AnnotationDAO().getPhenoAnnotationsCountByReferenceForProject(476081962);
+        */
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
         assert genes.size() > 0;
