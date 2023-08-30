@@ -1,11 +1,13 @@
 package edu.mcw.rgd.test;
 
-import edu.mcw.rgd.dao.impl.GeneDAO;
-import edu.mcw.rgd.dao.impl.MapDAO;
-import edu.mcw.rgd.datamodel.Gene;
-import edu.mcw.rgd.datamodel.Map;
-import edu.mcw.rgd.datamodel.MapData;
+import edu.mcw.rgd.dao.impl.*;
+
+import edu.mcw.rgd.datamodel.*;
+
+import edu.mcw.rgd.datamodel.ontology.Annotation;
+import edu.mcw.rgd.datamodel.pheno.Record;
 import junit.framework.TestCase;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,29 @@ public class GeneDAOTest extends TestCase {
 
     public void testAll() throws Exception {
 
+        RGDManagementDAO rdao = new RGDManagementDAO();
+        RgdId id = rdao.createRgdId(RgdId.OBJECT_KEY_GENES, "ACTIVE", 3);
+
+        Gene s = new Gene();
+        s.setName("---");
+        s.setSymbol("---");
+        s.setRgdId(id.getRgdId());
+        dao.insertGene(s);
+
+        s.setTaglessAlleleSymbol("---");
+        dao.updateGene(s);
+
+
+        ProjectDAO pro = new ProjectDAO();
+        List<Project> li=pro.getAllProjects();
+        List<Project> t = pro.getProjectByRgdId(476081963);
+        List<Integer> id2 = pro.getReferenceRgdIdsForProject(476081962);
+        List<Record> rec = new PhenominerDAO().getFullRecordsForProject(69701);
+        List<Record> rec1 = new PhenominerDAO().getFullRecordsForProject(476081962,"RS");
+        List<Annotation> a = new AnnotationDAO().getAnnotationsByReferenceForProject(476081962);
+        List<Annotation> a1 = new AnnotationDAO().getAnnotationsForProject(476081962);
+        List<ProjectFile> pf1= new ProjectFileDAO().getProjectFiles(476081962);
+        int c = new AnnotationDAO().getPhenoAnnotationsCountByReferenceForProject(476081962);
         int rgdId = 13838876;
         List<Gene> genes = dao.getGenesForProteinDomain(rgdId);
         assert genes.size() > 0;

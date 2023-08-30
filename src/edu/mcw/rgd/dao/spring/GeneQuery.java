@@ -38,15 +38,16 @@ public class GeneQuery extends MappingSqlQuery {
         gene.setNcbiAnnotStatus(rs.getString("ncbi_annot_status"));
         gene.setAgrDescription(rs.getString("agr_desc"));
         gene.setMergedDescription(rs.getString("merged_desc"));
+        gene.setGeneSource(rs.getString("gene_source"));
+        gene.setEnsemblGeneSymbol(rs.getString("ensembl_gene_symbol"));
+        gene.setEnsemblGeneType(rs.getString("ensembl_gene_type"));
+        gene.setEnsemblFullName(rs.getString("ensembl_full_name"));
+        gene.setNomenSource(rs.getString("nomen_source"));
 
 
         try {
             gene.setSpeciesTypeKey(rs.getInt("species_type_key"));
-            gene.setGeneSource(rs.getString("gene_source"));
-            gene.setEnsemblGeneSymbol(rs.getString("ensembl_gene_symbol"));
-            gene.setEnsemblGeneType(rs.getString("ensembl_gene_type"));
-            gene.setEnsemblFullName(rs.getString("ensembl_full_name"));
-            gene.setNomenSource(rs.getString("nomen_source"));
+            gene.setTaglessAlleleSymbol(rs.getString("tagless_allele_symbol"));
         }catch (Exception ignored) {
         }
 
