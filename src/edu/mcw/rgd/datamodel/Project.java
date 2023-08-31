@@ -30,5 +30,8 @@ public class Project {
         this.desc = desc;
     }
 
+    public int getSpeciesTypeKey(){
+        return 0;
+    }
 
 }
