@@ -33,5 +33,4 @@ public class Project {
     public int getSpeciesTypeKey(){
         return 0;
     }
-
 }
