@@ -11,7 +11,7 @@ public class Project implements Identifiable, ObjectWithName {
     }
 
     public void setRgdId(int rgdid) {
-        this.rgdId = rgdId;
+        this.rgdId = rgdid;
     }
 
     public String getName() {
