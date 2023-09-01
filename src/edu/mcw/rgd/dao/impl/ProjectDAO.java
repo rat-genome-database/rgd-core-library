@@ -66,6 +66,6 @@ public class ProjectDAO extends AbstractDAO{
         return upsertProject(project, sql);
     }
     private int upsertProject(Project project, String sql) throws Exception {
-        return update(sql, project.getRgdid(), project.getName(), project.getDesc());
+        return update(sql, project.getRgdId(), project.getName(), project.getDesc());
     }
 }

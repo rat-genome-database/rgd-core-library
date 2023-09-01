@@ -14,7 +14,7 @@ public class ProjectQuery extends MappingSqlQuery {
     }
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
         Project proj = new Project();
-        proj.setRgdid(rs.getInt("rgd_id"));
+        proj.setRgdId(rs.getInt("rgd_id"));
         proj.setName(rs.getString("project_name"));
         proj.setDesc(rs.getString("project_desc"));
 

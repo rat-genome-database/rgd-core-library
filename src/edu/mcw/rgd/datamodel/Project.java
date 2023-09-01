@@ -1,17 +1,17 @@
 package edu.mcw.rgd.datamodel;
 
-public class Project {
+public class Project implements Identifiable, ObjectWithName {
 
-    private int rgdid;
+    private int rgdId;
     private String desc;
     private String name;
 
-    public int getRgdid() {
-        return rgdid;
+    public int getRgdId() {
+        return rgdId;
     }
 
-    public void setRgdid(int rgdid) {
-        this.rgdid = rgdid;
+    public void setRgdId(int rgdid) {
+        this.rgdId = rgdId;
     }
 
     public String getName() {
@@ -30,7 +30,8 @@ public class Project {
         this.desc = desc;
     }
 
+//   Returning 3 just to display the external resource
     public int getSpeciesTypeKey(){
-        return 0;
+        return 3;
     }
 }
