@@ -74,7 +74,8 @@ public class XdbId implements Identifiable, Dumpable {
     static public final int XDB_KEY_UNISTS = 16;
     static public final int XDB_KEY_VGNC = 127;
     static public final int XDB_KEY_GWAS = 142;
-
+    static public final int XDB_KEY_BIOCYC_PATHWAY = 147;
+    
     /**
      * get unique key -- uniquely identifying a row in the db table (RGD_ACC_XDB.ACC_XDB_KEY)
      * @return unique key for this xdb id
