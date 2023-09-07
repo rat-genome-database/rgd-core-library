@@ -1404,6 +1404,8 @@ public class AnnotationDAO extends AbstractDAO {
 
         logger.debug("---\n" + query + "\n-----");
 
+        System.out.println(query);
+
         return StringListQuery.execute(this, query, speciesTypeKey, objectKey);
     }
 
@@ -1422,9 +1424,34 @@ public class AnnotationDAO extends AbstractDAO {
 
         logger.debug("---\n" + query + "\n-----");
 
+        System.out.println(query);
+
         GeneQuery slq = new GeneQuery(this.getDataSource(), query);
         return slq.execute();
     }
+
+
+    public List getAnnotatedGenesLazyLoad(List accIds, int speciesTypeKey) throws Exception {
+
+        int objectKey=1;
+
+        if (accIds.size()==0) throw new Exception("Must pass a term");
+
+        String query = "select distinct object_symbol as gene_symbol, ri.species_type_key, ri.rgd_id  from full_annot fa, full_annot_index fai, rgd_ids ri where ri.rgd_id = fa.annotated_object_rgd_id \n" +
+                "and ri.object_status='ACTIVE' and ri.species_type_key=" + speciesTypeKey + " and fa.rgd_object_key=" + objectKey + " AND fai.term_acc IN(";
+
+        query += Utils.buildInPhraseQuoted(accIds);
+
+        query += ") and fa.full_annot_key=fai.full_annot_key order by object_symbol";
+
+        logger.debug("---\n" + query + "\n-----");
+
+        System.out.println(query);
+
+        GeneQueryLazyLoad slq = new GeneQueryLazyLoad(this.getDataSource(), query);
+        return slq.execute();
+    }
+
 
 
     public List getAnnotatedQTLS(List accIds, int speciesTypeKey) throws Exception {

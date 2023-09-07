@@ -4,7 +4,7 @@ import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.QTL;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.Strain;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,12 +26,10 @@ public class OLGAParser {
         ArrayList<String> urlParts = new ArrayList<String>();
 
         HashMap<String, Object> allObjects = new HashMap<String, Object>();
-
         if (!oql.equals("")) {
             String[] tmpArray = oql.split("\\|");
 
             for (int i = 0; i < tmpArray.length; i++) {
-                //System.out.println("TEMPARRAY: " + tmpArray[i]);
                 if (oKey != 1 && (tmpArray[i].substring(1).startsWith("lst")) && oKey==5) { //TEST Lines of CODE:oKey==5 added to if
                     urlParts.add(tmpArray[i]);
                 }else {
@@ -69,7 +67,8 @@ public class OLGAParser {
 
                 GeneratorCommandParser gcp = new GeneratorCommandParser(mapKey, oKey);
 
-                allGenes.addAll(gcp.parse(accId));
+                //      lalala
+              //  allGenes.addAll(gcp.parse(accId));
 
                 //List log = gcp.getObjectMapperLog();
                 or.messages.putAll(gcp.getLog());
@@ -82,18 +81,21 @@ public class OLGAParser {
                     while (it.hasNext()) {
                         Gene g = (Gene) it.next();
                         allObjects.put(g.getSymbol(), g);
+                        allGenes.add(g.getSymbol());
                     }
                 } else if (oKey == 6) {
                     //qtl
                     while (it.hasNext()) {
                         QTL q = (QTL) it.next();
                         allObjects.put(q.getSymbol(), q);
+                        allGenes.add(q.getSymbol());
                     }
                 } else if (oKey == 5) {
                     //strain
                     while (it.hasNext()) {
                         Strain s = (Strain) it.next();
                         allObjects.put(s.getSymbol(), s);
+                        allGenes.add(s.getSymbol());
                     }
 
                 }
