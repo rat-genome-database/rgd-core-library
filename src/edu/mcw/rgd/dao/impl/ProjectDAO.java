@@ -59,13 +59,13 @@ public class ProjectDAO extends AbstractDAO{
     public int insertProject(Project project) throws Exception {
         String sql = "INSERT INTO projects (rgd_id, project_name, project_desc) " +
                 "VALUES (?, ?, ?)";
-        return upsertProject(project, sql);
+        return update(sql, project.getRgdId(), project.getName(), project.getDesc());
     }
     public int updateProject(Project project) throws Exception {
         String sql = "UPDATE projects SET project_name=?, project_desc=? WHERE rgd_id=?";
-        return upsertProject(project, sql);
+        return update(sql, project.getName(), project.getDesc(),project.getRgdId());
     }
-    private int upsertProject(Project project, String sql) throws Exception {
-        return update(sql, project.getRgdId(), project.getName(), project.getDesc());
-    }
+//    private int upsertProject(Project project, String sql) throws Exception {
+//        return update(sql, project.getRgdId(), project.getName(), project.getDesc());
+//    }
 }
