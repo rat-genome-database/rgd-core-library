@@ -7,7 +7,7 @@ import edu.mcw.rgd.datamodel.PathwayObject;
 import edu.mcw.rgd.datamodel.Reference;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.ListUtils;
 
 import java.util.*;
 
