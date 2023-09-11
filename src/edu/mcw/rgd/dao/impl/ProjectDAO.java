@@ -58,7 +58,7 @@ public class ProjectDAO extends AbstractDAO{
 
     public int insertProject(Project project) throws Exception {
         String sql = "INSERT INTO projects (rgd_id, project_name, project_desc, SUBMITTER_NAME, PRINCIPAL_INVESTIGATOR) " +
-                "VALUES (?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?)";
         return update(sql, project.getRgdId(), project.getName(), project.getDesc(), project.getSub_name(),project.getPrinci_name());
     }
     public int updateProject(Project project) throws Exception {
