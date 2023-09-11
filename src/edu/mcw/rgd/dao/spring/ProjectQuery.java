@@ -17,7 +17,8 @@ public class ProjectQuery extends MappingSqlQuery {
         proj.setRgdId(rs.getInt("rgd_id"));
         proj.setName(rs.getString("project_name"));
         proj.setDesc(rs.getString("project_desc"));
-
+        proj.setSub_name(rs.getString("submitter_name"));
+        proj.setPrinci_name(rs.getString("PRINCIPAL_INVESTIGATOR"));
         return proj;
     }
 
