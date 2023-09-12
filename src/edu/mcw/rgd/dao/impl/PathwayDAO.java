@@ -2,13 +2,17 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.BioCycRecord;
 import edu.mcw.rgd.datamodel.Pathway;
 import edu.mcw.rgd.datamodel.PathwayObject;
 import edu.mcw.rgd.datamodel.Reference;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.logging.log4j.Logger;
+import org.springframework.jdbc.core.SqlParameter;
 
+import java.sql.Types;
 import java.util.*;
 
 /**
@@ -411,5 +415,67 @@ public class PathwayDAO extends AbstractDAO {
 
         deleteAltPathwayIds(acc_id);
         insertAltPathwayIds(acc_id, altPathIds);
+    }
+
+    public void insertRecord(BioCycRecord r, Logger logInserted) throws Exception {
+
+        logInserted.debug("BIOCYC "+r.dump("|"));
+
+        String sql = "INSERT INTO biocyc (gene_ratcyc_id,gene_rgd_id,gene_ncbi_id,uniprot_id,gene_ratcyc_page,"
+                + "pathway_ratcyc_id,pathway_ratcyc_name,pathway_ratcyc_page) VALUES(?,?,?,?,?,?,?,?)";
+
+        update(sql, r.getGeneRatCycId(), r.getGeneRgdId(), r.getGeneNcbiId(), r.getUniProtId(), r.getGeneRatCycPage(),
+                r.getPathwayRatCycId(), r.getPathwayRatCycName(), r.getPathwayRatCycPage());
+    }
+
+    public void deleteRecord(BioCycRecord r, Logger logDeleted) throws Exception {
+
+        logDeleted.debug("BIOCYC "+r.dump("|"));
+
+        if( r.getPathwayRatCycId()==null ) {
+            String sql = "DELETE FROM biocyc WHERE gene_ratcyc_id=? AND pathway_ratcyc_id IS NULL";
+            update(sql, r.getGeneRatCycId());
+        } else {
+            String sql = "DELETE FROM biocyc WHERE gene_ratcyc_id=? AND pathway_ratcyc_id=?";
+            update(sql, r.getGeneRatCycId(), r.getPathwayRatCycId());
+        }
+    }
+
+    public List<BioCycRecord> getAllRecords() throws Exception {
+
+        String sql = "SELECT * FROM biocyc";
+        BioCycQuery q = new BioCycQuery(getDataSource(), sql);
+        List<BioCycRecord> results = q.execute();
+        return results;
+    }
+
+    public BioCycRecord getRecord(String geneRatCycId, String pathwayRatCycId) throws Exception {
+
+        if( pathwayRatCycId==null ) {
+            String sql = "SELECT * FROM biocyc WHERE gene_ratcyc_id=? AND pathway_ratcyc_id IS NULL";
+            BioCycQuery q = new BioCycQuery(getDataSource(), sql);
+            q.declareParameter(new SqlParameter(Types.VARCHAR));
+            List<BioCycRecord> results = q.execute(geneRatCycId);
+            if( results.isEmpty() ) {
+                return null;
+            }
+            if( results.size()>1 ) {
+                throw new Exception("unexpected: multiple results for "+geneRatCycId);
+            }
+            return results.get(0);
+        }
+
+        String sql = "SELECT * FROM biocyc WHERE gene_ratcyc_id=? AND pathway_ratcyc_id=?";
+        BioCycQuery q = new BioCycQuery(getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        List<BioCycRecord> results = q.execute(geneRatCycId, pathwayRatCycId);
+        if( results.isEmpty() ) {
+            return null;
+        }
+        if( results.size()>1 ) {
+            throw new Exception("unexpected: multiple results for "+geneRatCycId+", "+pathwayRatCycId);
+        }
+        return results.get(0);
     }
 }
