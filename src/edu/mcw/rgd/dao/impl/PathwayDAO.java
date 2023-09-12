@@ -417,7 +417,7 @@ public class PathwayDAO extends AbstractDAO {
         insertAltPathwayIds(acc_id, altPathIds);
     }
 
-    public void insertRecord(BioCycRecord r, Logger logInserted) throws Exception {
+    public void insertBioCycRecord(BioCycRecord r, Logger logInserted) throws Exception {
 
         logInserted.debug("BIOCYC "+r.dump("|"));
 
@@ -428,7 +428,7 @@ public class PathwayDAO extends AbstractDAO {
                 r.getPathwayRatCycId(), r.getPathwayRatCycName(), r.getPathwayRatCycPage());
     }
 
-    public void deleteRecord(BioCycRecord r, Logger logDeleted) throws Exception {
+    public void deleteBioCycRecord(BioCycRecord r, Logger logDeleted) throws Exception {
 
         logDeleted.debug("BIOCYC "+r.dump("|"));
 
@@ -441,7 +441,7 @@ public class PathwayDAO extends AbstractDAO {
         }
     }
 
-    public List<BioCycRecord> getAllRecords() throws Exception {
+    public List<BioCycRecord> getAllBioCycRecords() throws Exception {
 
         String sql = "SELECT * FROM biocyc";
         BioCycQuery q = new BioCycQuery(getDataSource(), sql);
@@ -449,7 +449,7 @@ public class PathwayDAO extends AbstractDAO {
         return results;
     }
 
-    public BioCycRecord getRecord(String geneRatCycId, String pathwayRatCycId) throws Exception {
+    public BioCycRecord getBioCycRecord(String geneRatCycId, String pathwayRatCycId) throws Exception {
 
         if( pathwayRatCycId==null ) {
             String sql = "SELECT * FROM biocyc WHERE gene_ratcyc_id=? AND pathway_ratcyc_id IS NULL";
@@ -476,6 +476,17 @@ public class PathwayDAO extends AbstractDAO {
         if( results.size()>1 ) {
             throw new Exception("unexpected: multiple results for "+geneRatCycId+", "+pathwayRatCycId);
         }
+        return results.get(0);
+    }
+
+    public BioCycRecord getBioCycRecord(int geneRgdId, String pathwayRatCycId) throws Exception{
+        String sql = "SELECT * FROM biocyc WHERE gene_rgd_id=? AND pathway_ratcyc_id=?";
+        BioCycQuery q = new BioCycQuery(getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        List<BioCycRecord> results = q.execute(geneRgdId, pathwayRatCycId);
+        if (results.isEmpty())
+            return null;
         return results.get(0);
     }
 }
