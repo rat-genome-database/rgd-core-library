@@ -34,5 +34,14 @@ public class ProjectFileDAO extends AbstractDAO{
         String query = "DELETE FROM PROJECT_FILES WHERE FILE_KEY=?";
         return update(query, fileKey);
     }
-    
+    public ProjectFile getProjectFile(int fileKey) throws Exception {
+        String query = "SELECT * FROM PROJECT_FILES WHERE FILE_KEY=?";
+        List<ProjectFile> result = ProjectFileQuery.execute(this, query, fileKey);
+        System.out.println(result.get(0));
+        if (!result.isEmpty()) {
+            return result.get(0);
+        } else {
+            return null;
+        }
+    }
 }
