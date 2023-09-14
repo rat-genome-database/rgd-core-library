@@ -16,10 +16,12 @@ public class ProjectFileQuery extends MappingSqlQuery{
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException{
         ProjectFile projFile = new ProjectFile();
+        projFile.setFile_key(rs.getInt("file_key"));
         projFile.setRgdid(rs.getInt("rgd_id"));
         projFile.setProject_file_type(rs.getString("project_file_type"));
         projFile.setDownload_url(rs.getString("download_url"));
         projFile.setProtocol(rs.getString("protocol"));
+        projFile.setProtocol_name(rs.getString("protocol_name"));
         return projFile;
     }
     public static List<ProjectFile> execute(AbstractDAO dao, String sql, Object... params) throws  Exception {

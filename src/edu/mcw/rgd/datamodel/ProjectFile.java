@@ -30,6 +30,26 @@ public class ProjectFile {
     private String project_file_type;
     private String download_url;
 
+    public String getProtocol_name() {
+        return protocol_name;
+    }
+
+    public void setProtocol_name(String protocol_name) {
+        this.protocol_name = protocol_name;
+    }
+
+    private String protocol_name;
+
+    public int getFile_key() {
+        return file_key;
+    }
+
+    public void setFile_key(int file_key) {
+        this.file_key = file_key;
+    }
+
+    private int file_key;
+
     public String getProtocol() {
         return protocol;
     }
