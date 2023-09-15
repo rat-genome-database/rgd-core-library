@@ -8,6 +8,7 @@ import edu.mcw.rgd.datamodel.HistogramRecord;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.pheno.*;
+import edu.mcw.rgd.datamodel.pheno.Record;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.pheno.SearchBean;
 import org.springframework.jdbc.core.SqlParameter;

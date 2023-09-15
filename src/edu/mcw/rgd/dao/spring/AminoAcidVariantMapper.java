@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.AminoAcidVariant;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
