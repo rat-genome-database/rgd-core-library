@@ -29,6 +29,10 @@ public class Link {
     private static String ONTOLOGY_ANNOT = "/rgdweb/ontology/annot.html?acc_id=";
     private static String PATHWAY_DIAGRAM = "/rgdweb/pathway/pathwayRecord.html?acc_id=";
     private static String VARIANT_RSID = "/rgdweb/report/rsId/main.html?id=";
+
+    private static String PROJECT = "/rgdweb/report/project/main.html?id=";
+
+
     // genomic elements
     private static String GE = "/rgdweb/report/ge/main.html?id=";
 
@@ -123,9 +127,14 @@ public class Link {
             case RgdId.OBJECT_KEY_VARIANTS: return variant(rgdId);
             case RgdId.OBJECT_KEY_RGDVARIANT: return rgdvariant(rgdId);
             case RgdId.OBJECT_KEY_CELL_LINES: return cellLine(rgdId);
+            case RgdId.OBJECT_KEY_EXPERIMENTS:return project(rgdId);
             case 0: return it(rgdId);
             default: return rgdId+"";
         }
+    }
+
+    private static String project(int rgdId) {
+        return PROJECT+rgdId;
     }
 
     public static String gene(int rgdId) {

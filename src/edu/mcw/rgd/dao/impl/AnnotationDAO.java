@@ -581,6 +581,19 @@ public class AnnotationDAO extends AbstractDAO {
                 "ORDER BY a.object_symbol asc";
         return executeAnnotationQuery(query, refRgdId);
     }
+    public List<Annotation> getAnnotationsByReferenceForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId);
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT a.*, r.species_type_key \n" +
+                "FROM full_annot a, rgd_ids r, references ref \n" +
+                "WHERE a.ref_rgd_id IN ("+ refRgdIdsStr + ") \n" +
+                "AND a.annotated_object_rgd_id = r.rgd_id \n" +
+                "AND a.ref_rgd_id = ref.rgd_id \n" +
+                "AND r.object_status = 'ACTIVE' \n" +
+                "ORDER BY a.object_symbol ASC";
+        return executeAnnotationQuery(query);
+    }
+
 
     /**
      * get annotations given reference rgd id
@@ -613,6 +626,17 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE s.ref_rgd_id=? \n" +
                 "AND s.study_id=ex.study_id AND ex.experiment_id=er.experiment_id";
         return getCount(query, refRgdId);
+    }
+    public int getPhenoAnnotationsCountByReferenceForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
+        if(refRgdIds.isEmpty()) {
+            return 0;
+        }
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT COUNT(*) FROM study s, experiment ex, experiment_record_view er\n" +
+                "WHERE s.ref_rgd_id IN("+refRgdIdsStr+") \n" +
+                "AND s.study_id=ex.study_id AND ex.experiment_id=er.experiment_id";
+        return getCount(query);
     }
 
     /**
@@ -850,6 +874,18 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE annotated_object_rgd_id=? AND rgd_id=annotated_object_rgd_id "+
                 "ORDER BY term";
         return executeAnnotationQuery(query, rgdId);
+    }
+
+    public List<Annotation> getAnnotationsForProject(int projectRgdId) throws Exception {
+        List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
+        if(refRgdIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
+        String query = "SELECT a.*,r.species_type_key FROM full_annot a,rgd_ids r "+
+                "WHERE annotated_object_rgd_id IN ("+refRgdIdsStr+") AND rgd_id=annotated_object_rgd_id "+
+                "ORDER BY term";
+        return executeAnnotationQuery(query);
     }
 
     /**
@@ -1368,6 +1404,8 @@ public class AnnotationDAO extends AbstractDAO {
 
         logger.debug("---\n" + query + "\n-----");
 
+        System.out.println(query);
+
         return StringListQuery.execute(this, query, speciesTypeKey, objectKey);
     }
 
@@ -1386,9 +1424,34 @@ public class AnnotationDAO extends AbstractDAO {
 
         logger.debug("---\n" + query + "\n-----");
 
+        System.out.println(query);
+
         GeneQuery slq = new GeneQuery(this.getDataSource(), query);
         return slq.execute();
     }
+
+
+    public List getAnnotatedGenesLazyLoad(List accIds, int speciesTypeKey) throws Exception {
+
+        int objectKey=1;
+
+        if (accIds.size()==0) throw new Exception("Must pass a term");
+
+        String query = "select distinct object_symbol as gene_symbol, ri.species_type_key, ri.rgd_id  from full_annot fa, full_annot_index fai, rgd_ids ri where ri.rgd_id = fa.annotated_object_rgd_id \n" +
+                "and ri.object_status='ACTIVE' and ri.species_type_key=" + speciesTypeKey + " and fa.rgd_object_key=" + objectKey + " AND fai.term_acc IN(";
+
+        query += Utils.buildInPhraseQuoted(accIds);
+
+        query += ") and fa.full_annot_key=fai.full_annot_key order by object_symbol";
+
+        logger.debug("---\n" + query + "\n-----");
+
+        System.out.println(query);
+
+        GeneQueryLazyLoad slq = new GeneQueryLazyLoad(this.getDataSource(), query);
+        return slq.execute();
+    }
+
 
 
     public List getAnnotatedQTLS(List accIds, int speciesTypeKey) throws Exception {
