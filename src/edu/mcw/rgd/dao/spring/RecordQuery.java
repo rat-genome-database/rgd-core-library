@@ -25,7 +25,7 @@ public class RecordQuery extends MappingSqlQuery {
 
     protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-        Record rec = new Record();
+        edu.mcw.rgd.datamodel.pheno.Record rec = new edu.mcw.rgd.datamodel.pheno.Record();
         rec.setId(rs.getInt("experiment_record_id"));
         rec.setClinicalMeasurementId(rs.getInt("clinical_measurement_id"));
         rec.setExperimentId(rs.getInt("experiment_id"));
