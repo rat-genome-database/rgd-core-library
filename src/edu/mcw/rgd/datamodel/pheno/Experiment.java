@@ -22,6 +22,10 @@ public class Experiment {
     private String lastModifiedBy;
     private String createdBy;
 
+
+    public String getTraitOntId() {
+        return "need to implement";
+    }
     public List<String> getTraitOntIds() throws Exception{
         PhenominerDAO pdao = new PhenominerDAO();
         return pdao.getExperimentTraits(this.id);
