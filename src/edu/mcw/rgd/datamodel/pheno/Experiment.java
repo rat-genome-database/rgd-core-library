@@ -1,5 +1,10 @@
 package edu.mcw.rgd.datamodel.pheno;
 
+import edu.mcw.rgd.dao.impl.PhenominerDAO;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: jdepons
@@ -17,16 +22,10 @@ public class Experiment {
     private String lastModifiedBy;
     private String createdBy;
 
-
-    public String getTraitOntId() {
-        return traitOntId;
+    public List<String> getTraitOntIds() throws Exception{
+        PhenominerDAO pdao = new PhenominerDAO();
+        return pdao.getExperimentTraits(this.id);
     }
-
-    public void setTraitOntId(String traitOntId) {
-        this.traitOntId = traitOntId;
-    }
-
-    private String traitOntId;
 
     public int getCurationStatus() {
         return curationStatus;
