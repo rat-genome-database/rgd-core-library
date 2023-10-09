@@ -26,7 +26,7 @@ public class ProjectFileDAO extends AbstractDAO{
     }
 
     public int update(ProjectFile projectFile) throws Exception {
-        String query = "UPDATE PROJECT_FILES SET PROJECT_FILE_TYPE=?, FILE_TYPE_NAME=?, DOWNLOAD_URL=?, WHERE FILE_KEY=?";
+        String query = "UPDATE PROJECT_FILES SET PROJECT_FILE_TYPE=?, FILE_TYPE_NAME=?, DOWNLOAD_URL=? WHERE FILE_KEY=?";
         return update(query, projectFile.getProjectFileType(), projectFile.getFileTypeName() , projectFile.getDownloadUrl(), projectFile.getFileKey());
     }
 
