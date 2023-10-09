@@ -21,7 +21,7 @@ public class ProjectFileDAO extends AbstractDAO{
     }
     public int insert(ProjectFile projectFile) throws Exception {
         String query = "INSERT INTO PROJECT_FILES (FILE_KEY, RGD_ID, PROJECT_FILE_TYPE, FILE_TYPE_NAME, DOWNLOAD_URL) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?)";
         return update(query, projectFile.getFileKey(), projectFile.getRgdId(), projectFile.getProjectFileType(), projectFile.getFileTypeName() , projectFile.getDownloadUrl());
     }
 
