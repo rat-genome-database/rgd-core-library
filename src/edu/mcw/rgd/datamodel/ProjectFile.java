@@ -1,30 +1,11 @@
 package edu.mcw.rgd.datamodel;
 
 public class ProjectFile {
-
-    private int rgdid;
-    private String protocolName;
     private int fileKey;
-    private String protocol;
+    private int rgdId;
     private String projectFileType;
+    private String fileTypeName;
     private String downloadUrl;
-
-    public String getProtocolName() {
-        return protocolName;
-    }
-
-    public void setProtocolName(String protocolName) {
-        this.protocolName = protocolName;
-    }
-
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
 
     public String getProjectFileType() {
         return projectFileType;
@@ -42,12 +23,12 @@ public class ProjectFile {
         this.fileKey = fileKey;
     }
 
-    public int getRgdid() {
-        return rgdid;
+    public int getRgdId() {
+        return rgdId;
     }
 
-    public void setRgdid(int rgdid) {
-        this.rgdid = rgdid;
+    public void setRgdId(int rgdId) {
+        this.rgdId = rgdId;
     }
 
     public String getDownloadUrl() {
@@ -56,6 +37,14 @@ public class ProjectFile {
 
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
+    }
+
+    public String getFileTypeName() {
+        return fileTypeName;
+    }
+
+    public void setFileTypeName(String fileTypeName) {
+        this.fileTypeName = fileTypeName;
     }
 
 }

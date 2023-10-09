@@ -20,14 +20,14 @@ public class ProjectFileDAO extends AbstractDAO{
         return ProjectFileQuery.execute(this,query,projectID);
     }
     public int insert(ProjectFile projectFile) throws Exception {
-        String query = "INSERT INTO PROJECT_FILES (FILE_KEY, RGD_ID, PROJECT_FILE_TYPE, DOWNLOAD_URL, PROTOCOL, PROTOCOL_NAME) " +
+        String query = "INSERT INTO PROJECT_FILES (FILE_KEY, RGD_ID, PROJECT_FILE_TYPE, FILE_TYPE_NAME, DOWNLOAD_URL) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
-        return update(query, projectFile.getFileKey(), projectFile.getRgdid(), projectFile.getProjectFileType(), projectFile.getDownloadUrl(), projectFile.getProtocol(), projectFile.getProtocolName());
+        return update(query, projectFile.getFileKey(), projectFile.getRgdId(), projectFile.getProjectFileType(), projectFile.getFileTypeName() , projectFile.getDownloadUrl());
     }
 
     public int update(ProjectFile projectFile) throws Exception {
-        String query = "UPDATE PROJECT_FILES SET PROJECT_FILE_TYPE=?, DOWNLOAD_URL=?, PROTOCOL=?, PROTOCOL_NAME=? WHERE FILE_KEY=?";
-        return update(query, projectFile.getProjectFileType(), projectFile.getDownloadUrl(), projectFile.getProtocol(), projectFile.getProtocolName(), projectFile.getFileKey());
+        String query = "UPDATE PROJECT_FILES SET PROJECT_FILE_TYPE=?, FILE_TYPE_NAME=?, DOWNLOAD_URL=?, WHERE FILE_KEY=?";
+        return update(query, projectFile.getProjectFileType(), projectFile.getFileTypeName() , projectFile.getDownloadUrl(), projectFile.getFileKey());
     }
 
     public int delete(int fileKey) throws Exception {
