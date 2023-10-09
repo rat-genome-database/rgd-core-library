@@ -6,9 +6,9 @@ public class Project implements Identifiable, ObjectWithName {
     private String desc;
     private String name;
 
-    private String sub_name;
+    private String submitterName;
 
-    private String princi_name;
+    private String piName;
 
     public int getRgdId() {
         return rgdId;
@@ -39,19 +39,19 @@ public class Project implements Identifiable, ObjectWithName {
         return 3;
     }
 
-    public void setPrinci_name(String princi_name) {
-        this.princi_name = princi_name;
+    public String getSubmitterName() {
+        return submitterName;
     }
 
-    public String getPrinci_name() {
-        return princi_name;
+    public void setSubmitterName(String submitterName) {
+        this.submitterName = submitterName;
     }
 
-    public String getSub_name() {
-        return sub_name;
+    public String getPiName() {
+        return piName;
+    }
+    public void setPiName(String piName) {
+        this.piName = piName;
     }
 
-    public void setSub_name(String sub_name) {
-        this.sub_name = sub_name;
-    }
 }
