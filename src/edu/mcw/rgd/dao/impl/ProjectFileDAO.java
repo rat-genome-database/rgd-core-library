@@ -22,12 +22,12 @@ public class ProjectFileDAO extends AbstractDAO{
     public int insert(ProjectFile projectFile) throws Exception {
         String query = "INSERT INTO PROJECT_FILES (FILE_KEY, RGD_ID, PROJECT_FILE_TYPE, DOWNLOAD_URL, PROTOCOL, PROTOCOL_NAME) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
-        return update(query, projectFile.getFile_key(), projectFile.getRgdid(), projectFile.getProject_file_type(), projectFile.getDownload_url(), projectFile.getProtocol(), projectFile.getProtocol_name());
+        return update(query, projectFile.getFileKey(), projectFile.getRgdid(), projectFile.getProjectFileType(), projectFile.getDownloadUrl(), projectFile.getProtocol(), projectFile.getProtocolName());
     }
 
     public int update(ProjectFile projectFile) throws Exception {
         String query = "UPDATE PROJECT_FILES SET PROJECT_FILE_TYPE=?, DOWNLOAD_URL=?, PROTOCOL=?, PROTOCOL_NAME=? WHERE FILE_KEY=?";
-        return update(query, projectFile.getProject_file_type(), projectFile.getDownload_url(), projectFile.getProtocol(), projectFile.getProtocol_name(), projectFile.getFile_key());
+        return update(query, projectFile.getProjectFileType(), projectFile.getDownloadUrl(), projectFile.getProtocol(), projectFile.getProtocolName(), projectFile.getFileKey());
     }
 
     public int delete(int fileKey) throws Exception {
