@@ -2,7 +2,7 @@ package edu.mcw.rgd.services;
 
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
