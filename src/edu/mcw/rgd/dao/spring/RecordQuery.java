@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.pheno.*;
+import edu.mcw.rgd.datamodel.pheno.Record;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;

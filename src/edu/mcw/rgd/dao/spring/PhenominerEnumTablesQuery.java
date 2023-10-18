@@ -2,7 +2,6 @@ package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.pheno.phenominerEnumTable;
 import org.springframework.jdbc.object.MappingSqlQuery;
-
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -35,7 +35,7 @@
 
 	<!-- Compile all of our class files -->
 	<target name="compile" depends="prepare" description="Compile .java files into .class files">
-        <javac destdir="${build.dir}" target="1.8" source="1.8" debug="true"
+        <javac destdir="${build.dir}" target="17" source="17" debug="true"
                deprecation="false" optimize="false" failonerror="true">
             <src path="${src.dir}"/>
             <classpath refid="master-classpath"/>

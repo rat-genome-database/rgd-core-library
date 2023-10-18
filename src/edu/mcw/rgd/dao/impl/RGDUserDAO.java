@@ -85,7 +85,7 @@ public class RGDUserDAO extends AbstractDAO {
         //get the sequence
         String query = "select rgd_user_seq.NEXTVAL from dual";
         JdbcTemplate jt = new JdbcTemplate(getDataSource());
-        int userKey = jt.queryForInt(query);
+        int userKey = jt.queryForObject(query,Integer.class);
 
         RGDUser user = new RGDUser();
         user.setUserId(userKey);
@@ -100,7 +100,7 @@ public class RGDUserDAO extends AbstractDAO {
 
         String query = "select rgd_user_list_seq.NEXTVAL from dual";
         JdbcTemplate jt = new JdbcTemplate(getDataSource());
-        int userListKey = jt.queryForInt(query);
+        int userListKey = jt.queryForObject(query,Integer.class);
 
         String sql = "insert into RGD_USER_LIST (user_id, list_id, object_type, " +
                 "map_key, name, created_date) values (?,?,?,?,?,?)";
@@ -126,7 +126,7 @@ public class RGDUserDAO extends AbstractDAO {
 
         String query = "select user_key from users where username='" +userName+"'";
         JdbcTemplate jt = new JdbcTemplate(getDataSource());
-        int userKey = jt.queryForInt(query);
+        int userKey = jt.queryForObject(query,Integer.class);
         return userKey;
 
     }

@@ -4,7 +4,6 @@ package edu.mcw.rgd.util;
 /**
  * User: GKowalski
  * Date: 1/11/12
- * Time: 11:28 AM
  */
 public final class EqualsUtil {
 

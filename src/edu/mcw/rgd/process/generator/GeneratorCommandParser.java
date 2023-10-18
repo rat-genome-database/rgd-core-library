@@ -354,6 +354,7 @@ public class GeneratorCommandParser {
           //  }else {
           //      messages.put(command,count + " genes annotated<br><br>Please select a<br>more specific term<br>(10,000 max)");
           //  }
+
         }
 
         return allGenes;

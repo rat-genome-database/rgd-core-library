@@ -1,63 +1,50 @@
 package edu.mcw.rgd.datamodel;
 
 public class ProjectFile {
+    private int fileKey;
+    private int rgdId;
+    private String projectFileType;
+    private String fileTypeName;
+    private String downloadUrl;
 
-    public int getRgdid() {
-        return rgdid;
+    public String getProjectFileType() {
+        return projectFileType;
     }
 
-    public void setRgdid(int rgdid) {
-        this.rgdid = rgdid;
+    public void setProjectFileType(String projectFileType) {
+        this.projectFileType = projectFileType;
     }
 
-    public String getProject_file_type() {
-        return project_file_type;
+    public int getFileKey() {
+        return fileKey;
     }
 
-    public void setProject_file_type(String project_file_type) {
-        this.project_file_type = project_file_type;
+    public void setFileKey(int fileKey) {
+        this.fileKey = fileKey;
     }
 
-    public String getDownload_url() {
-        return download_url;
+    public int getRgdId() {
+        return rgdId;
     }
 
-    public void setDownload_url(String download_url) {
-        this.download_url = download_url;
+    public void setRgdId(int rgdId) {
+        this.rgdId = rgdId;
     }
 
-    private int rgdid;
-    private String project_file_type;
-    private String download_url;
-
-    public String getProtocol_name() {
-        return protocol_name;
+    public String getDownloadUrl() {
+        return downloadUrl;
     }
 
-    public void setProtocol_name(String protocol_name) {
-        this.protocol_name = protocol_name;
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
-    private String protocol_name;
-
-    public int getFile_key() {
-        return file_key;
+    public String getFileTypeName() {
+        return fileTypeName;
     }
 
-    public void setFile_key(int file_key) {
-        this.file_key = file_key;
+    public void setFileTypeName(String fileTypeName) {
+        this.fileTypeName = fileTypeName;
     }
-
-    private int file_key;
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-
-    private String protocol;
 
 }

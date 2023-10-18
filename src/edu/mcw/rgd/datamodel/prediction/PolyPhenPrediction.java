@@ -25,6 +25,7 @@ public class PolyPhenPrediction extends Prediction{
     private String pdbId;
     private int position;
 
+
     public int getPosition() {
         return position;
     }

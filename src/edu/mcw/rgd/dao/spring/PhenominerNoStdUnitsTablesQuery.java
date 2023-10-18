@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dao.spring;
 
+import edu.mcw.rgd.datamodel.pheno.phenominerEnumTable;
 import edu.mcw.rgd.datamodel.pheno.phenominerNoStdUnitTable;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
