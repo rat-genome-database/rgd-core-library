@@ -469,9 +469,10 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     public List<String> getExperimentTraits(int experimentId) throws Exception {
-
-        if (experimentId <= 0)
-            return null;
+        if (experimentId <= 0) {
+            List<String> emptyList = new ArrayList<>();
+            return emptyList;
+        }
         String query = "SELECT trait_acc_id from experiment_trait where experiment_id = " + experimentId ;
         return StringListQuery.execute(this, query);
     }
