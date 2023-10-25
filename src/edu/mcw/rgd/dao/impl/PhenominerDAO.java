@@ -488,11 +488,11 @@ public class PhenominerDAO extends AbstractDAO {
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(), ex.getTraitOntId(),ex.getLastModifiedBy(), ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
-        if (ex.getCurationStatus() != -1) {
-            query = "update experiment_record er set er.curation_status = ? " +
-                    "where er.experiment_id = ?";
-            update(query, ex.getCurationStatus(), ex.getId());
-        }
+//        if (ex.getCurationStatus() != -1) {
+//            query = "update experiment_record er set er.curation_status = ? " +
+//                    "where er.experiment_id = ?";
+//            update(query, ex.getCurationStatus(), ex.getId());
+//        }
     }
 
     public void updateExperiment(Experiment ex, List<String> traits) throws Exception{
@@ -540,9 +540,10 @@ public class PhenominerDAO extends AbstractDAO {
         int experimentId = this.getNextKey("experiment_seq");
         ex.setId(experimentId);
 
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
+//        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
+        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id, trait_ont_id,last_modified_by,created_by,created_date,last_modified_date) " +
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getTraitOntId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
         return experimentId;
     }
