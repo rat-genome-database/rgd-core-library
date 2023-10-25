@@ -576,8 +576,9 @@ public class PhenominerDAO extends AbstractDAO {
 
         String sql = "DELETE FROM experiment WHERE experiment_id=?";
         update(sql, exId);
-
-        this.deleteExperimentTraits(exId);
+        try {
+            this.deleteExperimentTraits(exId);
+        }catch (Exception e){  }
 
     }
 
