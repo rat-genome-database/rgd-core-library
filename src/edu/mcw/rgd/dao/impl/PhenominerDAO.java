@@ -500,7 +500,7 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
 
-        this.updateExperimentTraits(ex.getId(),traits);
+//        this.updateExperimentTraits(ex.getId(),traits);
 
         /* Update curation status for each experiment record that belongs to this experiment */
         if (ex.getCurationStatus() != -1) {
@@ -556,7 +556,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
-        this.updateExperimentTraits(experimentId,traits);
+//        this.updateExperimentTraits(experimentId,traits);
 
         return experimentId;
     }
@@ -576,9 +576,9 @@ public class PhenominerDAO extends AbstractDAO {
 
         String sql = "DELETE FROM experiment WHERE experiment_id=?";
         update(sql, exId);
-        try {
-            this.deleteExperimentTraits(exId);
-        }catch (Exception e){  }
+//        try {
+//            this.deleteExperimentTraits(exId);
+//        }catch (Exception e){  }
 
     }
 
