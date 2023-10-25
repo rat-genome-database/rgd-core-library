@@ -473,7 +473,6 @@ public class PhenominerDAO extends AbstractDAO {
             List<String> emptyList = new ArrayList<>();
             return emptyList;
         }
-
         String query = "SELECT trait_acc_id from experiment_trait where experiment_id = " + experimentId ;
         return StringListQuery.execute(this, query);
     }
@@ -484,16 +483,16 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public void updateExperiment(Experiment ex) throws Exception{
-        
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
+
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?, trait_ont_id=? ,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(), ex.getTraitOntId(),ex.getLastModifiedBy(), ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
-        if (ex.getCurationStatus() != -1) {
-            query = "update experiment_record er set er.curation_status = ? " +
-                    "where er.experiment_id = ?";
-            update(query, ex.getCurationStatus(), ex.getId());
-        }
+//        if (ex.getCurationStatus() != -1) {
+//            query = "update experiment_record er set er.curation_status = ? " +
+//                    "where er.experiment_id = ?";
+//            update(query, ex.getCurationStatus(), ex.getId());
+//        }
     }
 
     public void updateExperiment(Experiment ex, List<String> traits) throws Exception{
@@ -501,7 +500,7 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
 
-        this.updateExperimentTraits(ex.getId(),traits);
+//        this.updateExperimentTraits(ex.getId(),traits);
 
         /* Update curation status for each experiment record that belongs to this experiment */
         if (ex.getCurationStatus() != -1) {
@@ -541,9 +540,10 @@ public class PhenominerDAO extends AbstractDAO {
         int experimentId = this.getNextKey("experiment_seq");
         ex.setId(experimentId);
 
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
+//        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
+        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id, trait_ont_id,last_modified_by,created_by,created_date,last_modified_date) " +
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getTraitOntId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
         return experimentId;
     }
@@ -557,7 +557,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
-        this.updateExperimentTraits(experimentId,traits);
+//        this.updateExperimentTraits(experimentId,traits);
 
         return experimentId;
     }
@@ -577,8 +577,9 @@ public class PhenominerDAO extends AbstractDAO {
 
         String sql = "DELETE FROM experiment WHERE experiment_id=?";
         update(sql, exId);
-
-        this.deleteExperimentTraits(exId);
+//        try {
+//            this.deleteExperimentTraits(exId);
+//        }catch (Exception e){  }
 
     }
 

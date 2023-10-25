@@ -23,23 +23,33 @@ public class Experiment {
     private String createdBy;
 
 
-    public String getTraitOntId() throws Exception{
-        List<String> onts = this.getTraitOntIds();
+//    public String getTraitOntId() throws Exception{
+//        return traitOntId;
+//        List<String> onts = this.getTraitOntIds();
+//
+//        if (onts.size()>0) {
+//            return onts.get(0);
+//        }else {
+//            return "";
+//        }
+//    }
+public String getTraitOntId() {
+    return traitOntId;
+}
+public void setTraitOntId(String traitOntId) {
+    this.traitOntId = traitOntId;
+}
 
-        if (onts.size()>0) {
-            return onts.get(0);
-        }else {
-            return "";
-        }
-    }
-
-    public void setTraitOntId(String ontId) throws Exception{
-        ArrayList<String> onts = new ArrayList<String>();
-        onts.add(ontId);
-
-        PhenominerDAO pdao = new PhenominerDAO();
-        pdao.updateExperimentTraits(this.getId(),onts);
-    }
+    private String traitOntId;
+//    public void setTraitOntId(String ontId) throws Exception {
+//        this.traitOntId = traitOntId;
+//    }
+//        ArrayList<String> onts = new ArrayList<String>();
+//        onts.add(ontId);
+//
+//        PhenominerDAO pdao = new PhenominerDAO();
+//        pdao.updateExperimentTraits(this.getId(),onts);
+//    }
 
 
     public List<String> getTraitOntIds() throws Exception{
