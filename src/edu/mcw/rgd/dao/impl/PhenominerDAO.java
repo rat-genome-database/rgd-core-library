@@ -483,9 +483,9 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception
      */
     public void updateExperiment(Experiment ex) throws Exception{
-        
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
+
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?, trait_ont_id=? ,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(), ex.getTraitOntId(),ex.getLastModifiedBy(), ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
         if (ex.getCurationStatus() != -1) {

@@ -18,27 +18,30 @@ public class Experiment {
     private String name;
     private String notes;
     private int studyId;
+    private String traitOntId;
     private int curationStatus = -1;
     private String lastModifiedBy;
     private String createdBy;
 
 
     public String getTraitOntId() throws Exception{
-        List<String> onts = this.getTraitOntIds();
-
-        if (onts.size()>0) {
-            return onts.get(0);
-        }else {
-            return "";
-        }
+        return traitOntId;
+//        List<String> onts = this.getTraitOntIds();
+//
+//        if (onts.size()>0) {
+//            return onts.get(0);
+//        }else {
+//            return "";
+//        }
     }
 
     public void setTraitOntId(String ontId) throws Exception{
-        ArrayList<String> onts = new ArrayList<String>();
-        onts.add(ontId);
-
-        PhenominerDAO pdao = new PhenominerDAO();
-        pdao.updateExperimentTraits(this.getId(),onts);
+        this.traitOntId = traitOntId;
+//        ArrayList<String> onts = new ArrayList<String>();
+//        onts.add(ontId);
+//
+//        PhenominerDAO pdao = new PhenominerDAO();
+//        pdao.updateExperimentTraits(this.getId(),onts);
     }
 
 
