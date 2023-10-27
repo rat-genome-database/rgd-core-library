@@ -468,33 +468,15 @@ public class PhenominerDAO extends AbstractDAO {
         return sq.execute(objArray);
     }
 
-<<<<<<< HEAD
-=======
-    public List<String> getExperimentTraits(int experimentId) throws Exception {
-        if (experimentId <= 0) {
-            List<String> emptyList = new ArrayList<>();
-            return emptyList;
-        }
-        String query = "SELECT trait_acc_id from experiment_trait where experiment_id = " + experimentId ;
-        return StringListQuery.execute(this, query);
-    }
-
->>>>>>> aadc3f40bceac60213d326ecf3ceb067cb2cdf7c
     /**
      * Updates the experiment in the data store
      * @param ex
      * @throws Exception
      */
     public void updateExperiment(Experiment ex) throws Exception{
-<<<<<<< HEAD
-        
+
         String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=? last_modified_date = SYSTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
-=======
-
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?, trait_ont_id=? ,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(), ex.getTraitOntId(),ex.getLastModifiedBy(), ex.getId());
->>>>>>> aadc3f40bceac60213d326ecf3ceb067cb2cdf7c
 
         /* Update curation status for each experiment record that belongs to this experiment */
 //        if (ex.getCurationStatus() != -1) {
@@ -531,34 +513,12 @@ public class PhenominerDAO extends AbstractDAO {
         int experimentId = this.getNextKey("experiment_seq");
         ex.setId(experimentId);
 
-<<<<<<< HEAD
         String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,trait_ont_id,trait_ont_id2,trait_ont_id3,created_by,created_date,last_modified_date) " +
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getCreatedBy());
-=======
-//        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id, trait_ont_id,last_modified_by,created_by,created_date,last_modified_date) " +
-                "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getTraitOntId(),ex.getLastModifiedBy(),ex.getCreatedBy());
 
         return experimentId;
     }
-
-    public int insertExperiment(Experiment ex,ArrayList<String> traits) throws Exception{
-
-        int experimentId = this.getNextKey("experiment_seq");
-        ex.setId(experimentId);
-
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
-                "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
-
-//        this.updateExperimentTraits(experimentId,traits);
->>>>>>> aadc3f40bceac60213d326ecf3ceb067cb2cdf7c
-
-        return experimentId;
-    }
-
 
     /**
      * Deletes an experiment from the data store
@@ -574,13 +534,6 @@ public class PhenominerDAO extends AbstractDAO {
 
         String sql = "DELETE FROM experiment WHERE experiment_id=?";
         update(sql, exId);
-<<<<<<< HEAD
-=======
-//        try {
-//            this.deleteExperimentTraits(exId);
-//        }catch (Exception e){  }
->>>>>>> aadc3f40bceac60213d326ecf3ceb067cb2cdf7c
-
     }
 
     /**
