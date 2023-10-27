@@ -21,6 +21,7 @@ public class Experiment {
     private String traitOntId2;
     private String traitOntId3;
 
+<<<<<<< HEAD
     public String getTraitOntId2() {
         return traitOntId2;
     }
@@ -28,6 +29,35 @@ public class Experiment {
     public void setTraitOntId2(String traitOntId2) {
         this.traitOntId2 = traitOntId2;
     }
+=======
+//    public String getTraitOntId() throws Exception{
+//        return traitOntId;
+//        List<String> onts = this.getTraitOntIds();
+//
+//        if (onts.size()>0) {
+//            return onts.get(0);
+//        }else {
+//            return "";
+//        }
+//    }
+public String getTraitOntId() {
+    return traitOntId;
+}
+public void setTraitOntId(String traitOntId) {
+    this.traitOntId = traitOntId;
+}
+
+    private String traitOntId;
+//    public void setTraitOntId(String ontId) throws Exception {
+//        this.traitOntId = traitOntId;
+//    }
+//        ArrayList<String> onts = new ArrayList<String>();
+//        onts.add(ontId);
+//
+//        PhenominerDAO pdao = new PhenominerDAO();
+//        pdao.updateExperimentTraits(this.getId(),onts);
+//    }
+>>>>>>> aadc3f40bceac60213d326ecf3ceb067cb2cdf7c
 
     public String getTraitOntId3() {
         return traitOntId3;
