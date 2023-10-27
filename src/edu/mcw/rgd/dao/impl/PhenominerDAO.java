@@ -468,12 +468,6 @@ public class PhenominerDAO extends AbstractDAO {
         return sq.execute(objArray);
     }
 
-    public List<String> getExperimentTraits(int experimentId) throws Exception {
-
-        String query = "SELECT trait_acc_id from experiment_trait where experiment_id = " + experimentId ;
-        return StringListQuery.execute(this, query);
-    }
-
     /**
      * Updates the experiment in the data store
      * @param ex
@@ -481,8 +475,8 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void updateExperiment(Experiment ex) throws Exception{
         
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=? last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
         if (ex.getCurationStatus() != -1) {
@@ -494,8 +488,8 @@ public class PhenominerDAO extends AbstractDAO {
 
     public void updateExperiment(Experiment ex, List<String> traits) throws Exception{
 
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getId());
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
 
         this.updateExperimentTraits(ex.getId(),traits);
 
@@ -508,24 +502,6 @@ public class PhenominerDAO extends AbstractDAO {
 
     }
 
-
-    public void updateExperimentTraits(int experimentId, List<String> traits) throws Exception{
-
-        this.deleteExperimentTraits(experimentId);
-
-        for (String trait: traits) {
-            String query = "insert into experiment_trait (experiment_id, trait_acc_id) values (?, ?) ";
-            update(query, experimentId, trait);
-        }
-    }
-
-    public void deleteExperimentTraits(int experimentID) throws Exception{
-        String query = "delete from experiment_trait where experiment_id=?";
-        update(query, experimentID);
-    }
-
-
-
     /**
      * Inserts an experiment into the data store; returns experiment_id assigned automatically during insert
      * @param ex Experiment object
@@ -537,23 +513,9 @@ public class PhenominerDAO extends AbstractDAO {
         int experimentId = this.getNextKey("experiment_seq");
         ex.setId(experimentId);
 
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
+        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,trait_ont_id,trait_ont_id2,trait_ont_id3,created_by,created_date,last_modified_date) " +
                 "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
-
-        return experimentId;
-    }
-
-    public int insertExperiment(Experiment ex,ArrayList<String> traits) throws Exception{
-
-        int experimentId = this.getNextKey("experiment_seq");
-        ex.setId(experimentId);
-
-        String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,created_by,created_date,last_modified_date) " +
-                "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
-        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getCreatedBy());
-
-        this.updateExperimentTraits(experimentId,traits);
+        update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getCreatedBy());
 
         return experimentId;
     }
@@ -573,8 +535,6 @@ public class PhenominerDAO extends AbstractDAO {
 
         String sql = "DELETE FROM experiment WHERE experiment_id=?";
         update(sql, exId);
-
-        this.deleteExperimentTraits(exId);
 
     }
 
@@ -2985,9 +2945,11 @@ public class PhenominerDAO extends AbstractDAO {
             case "CMO":
                 query += " and CLINICAL_MEASUREMENT_ONT_ID='"+ontId+"'";
                 break;
-            //case "VT":
-            //    query += " and TRAIT_ONT_ID='"+ontId+"'";
-            //    break;
+            case "VT":
+                query += " and (TRAIT_ONT_ID='"+ontId+"'" ;
+                query += " or TRAIT_ONT_ID2='"+ontId+"'" ;
+                query += " or TRAIT_ONT_ID3='"+ontId+"')" ;
+                break;
             case "MMO":
                 query += " and MEASUREMENT_METHOD_ONT_ID='"+ontId+"'";
                 break;
@@ -3047,9 +3009,11 @@ public class PhenominerDAO extends AbstractDAO {
             case "CMO":
                 query += " and CLINICAL_MEASUREMENT_ONT_ID='"+ontId+"'";
                 break;
-            //case "VT":
-            //    query += " and TRAIT_ONT_ID='"+ontId+"'";
-            //    break;
+            case "VT":
+                query += " and (TRAIT_ONT_ID='"+ontId+"'" ;
+                query += " or TRAIT_ONT_ID2='"+ontId+"'" ;
+                query += " or TRAIT_ONT_ID3='"+ontId+"')" ;
+                break;
             case "MMO":
                 query += " and MEASUREMENT_METHOD_ONT_ID='"+ontId+"'";
                 break;
