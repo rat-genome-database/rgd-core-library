@@ -54,7 +54,7 @@ public class StrainDAO extends AbstractDAO {
     }
 
     public int getStrainRgdIdByTaglessStrainSymbol(String taglessSymbol) throws Exception {
-        String sql = "select * from strains where tagless_strain_symbol=?";
+        String sql = "select s.*, ri.species_type_key from strains s, rgd_ids ri where s.rgd_id = ri.rgd_id and s.tagless_strain_symbol=?";
         List<Strain> strains = executeStrainQuery(sql,taglessSymbol);
         if (strains.isEmpty())
             return 0;
