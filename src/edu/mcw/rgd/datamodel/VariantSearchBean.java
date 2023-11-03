@@ -208,7 +208,7 @@ public class VariantSearchBean {
             case 38: // hg38
                 return " CONSERVATION_SCORE_HG38 ";
             default:
-                return " CONSERVATION_SCORE_6 ";
+                return "";
         }
     }
 
