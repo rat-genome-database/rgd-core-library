@@ -35,7 +35,6 @@ public class OntologyXDAO extends AbstractDAO {
 
     /**
      * get a term given accession id;
-     * accession id is normalized if needed ('RS:1' is changed to 'RS:0000001')
      * throws Exception if there is no term with such accession id
      * @param accId accession id
      * @return Term if accession id is valid; null is never returned
@@ -44,7 +43,11 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public Term getTerm(String accId) throws Exception {
 
-        accId = Ontology.formatId(accId);
+        // commented out the code that normalizes accession ids ('RS:1' to 'RS:0000001')
+        // it causes side effects for some ontologies (CHEBI, DO)
+        // the accession normalization is no longer needed in RGD
+        // 2023-11-03 --mt
+        //accId = Ontology.formatId(accId);
 
         Term term = getTermByAccId(accId);
 
