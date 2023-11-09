@@ -953,6 +953,38 @@ public class AnnotationDAO extends AbstractDAO {
         return executeAnnotationQuery(sql, aspect, speciesTypeKey, dataSrc);
     }
 
+    public List<String> getAnnotationsByTerm(String Term) throws Exception{
+        String sql ="SELECT a.object_symbol,a.qualifier,a.term,o.term,a.evidence,a.ref_rgd_id\n" +
+                "FROM full_annot a\n" +
+                "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
+                "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
+                "WHERE\n" +
+                "  r.object_status = 'ACTIVE'\n" +
+                "  AND r.species_type_key = 3\n" +
+                "  AND r.object_key = 5\n" +
+                "  AND LOWER(a.term) LIKE ?";
+        // Convert Term to lowercase before executing the query
+        String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
+        return StringListQuery.execute(this, sql, lowerCaseTerm);
+    }
+
+    public List<String> getAnnotationsByStrainType(String Term, String StrainType) throws Exception{
+        String sql = "SELECT a.object_symbol, a.qualifier,a.term,o.term,a.evidence,a.ref_rgd_id\n" +
+                "FROM full_annot a\n" +
+                "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
+                "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
+                "JOIN strains s ON a.annotated_object_rgd_id = s.rgd_id\n" +
+                "WHERE\n" +
+                "  r.object_status = 'ACTIVE'\n" +
+                "  AND r.species_type_key = 3\n" +
+                "  AND r.object_key = 5\n" +
+                "  AND LOWER(a.term) LIKE ? AND LOWER(s.strain_type_name_lc) = ?";
+        String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
+        String lowerCaseStrainType = StrainType.toLowerCase();
+        return StringListQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
+    }
+
+
     /**
      * get annotations by annotated object rgd id , accId and speciesTypeKey
      * @param rgdId rgd id for annotated object
