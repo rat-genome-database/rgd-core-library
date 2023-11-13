@@ -953,11 +953,12 @@ public class AnnotationDAO extends AbstractDAO {
         return executeAnnotationQuery(sql, aspect, speciesTypeKey, dataSrc);
     }
 
-    public List<String> getAnnotationsByTerm(String Term) throws Exception{
-        String sql ="SELECT a.object_symbol,a.qualifier,a.term,o.term,a.evidence,a.ref_rgd_id\n" +
+    public List<RatModelWebServiceQuery.test> getAnnotationsByTerm(String Term) throws Exception{
+        String sql ="SELECT a.object_symbol as strain,a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
                 "FROM full_annot a\n" +
                 "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
                 "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
+                "JOIN strains s ON a.annotated_object_rgd_id = s.rgd_id\n" +
                 "WHERE\n" +
                 "  r.object_status = 'ACTIVE'\n" +
                 "  AND r.species_type_key = 3\n" +
@@ -965,11 +966,12 @@ public class AnnotationDAO extends AbstractDAO {
                 "  AND LOWER(a.term) LIKE ?";
         // Convert Term to lowercase before executing the query
         String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
-        return StringListQuery.execute(this, sql, lowerCaseTerm);
+        return RatModelWebServiceQuery.execute(this,sql,lowerCaseTerm);
+//        return executeAnnotationQuery(sql,lowerCaseTerm);
     }
 
-    public List<String> getAnnotationsByStrainType(String Term, String StrainType) throws Exception{
-        String sql = "SELECT a.object_symbol, a.qualifier,a.term,o.term,a.evidence,a.ref_rgd_id\n" +
+    public List<RatModelWebServiceQuery.test> getAnnotationsByStrainType(String Term, String StrainType) throws Exception{
+        String sql = "SELECT a.object_symbol as strain, a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
                 "FROM full_annot a\n" +
                 "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
                 "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
@@ -981,8 +983,56 @@ public class AnnotationDAO extends AbstractDAO {
                 "  AND LOWER(a.term) LIKE ? AND LOWER(s.strain_type_name_lc) = ?";
         String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
         String lowerCaseStrainType = StrainType.toLowerCase();
-        return StringListQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
+        return RatModelWebServiceQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
     }
+
+    /**
+     * get RatStrain models by annotated disease/phenotype search term, strain type
+     * @param Term for disease/phenotype search term
+     * @param StrainType strain type such as inbred,congenic etc
+     * @return list of RatStrain models; could be empty if there is no strain type or related search term
+     * @throws Exception on spring framework dao failure
+     */
+
+    public List<RatModelWebServiceQuery.test> getAnnotationsByTermAndStrainType(String Term, String StrainType) throws Exception {
+        String sql = "SELECT a.object_symbol as strain, a.qualifier, a.term as Disease_OR_Phenotype_Term, o.term as With_Conditions, a.evidence, a.ref_rgd_id, s.strain_type_name_lc as strain_type " +
+                "FROM full_annot a " +
+                "LEFT JOIN ont_terms o ON a.with_info = o.term_acc " +
+                "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id " +
+                "JOIN strains s ON a.annotated_object_rgd_id = s.rgd_id " +
+                "WHERE r.object_status = 'ACTIVE' " +
+                "AND r.species_type_key = 3 " +
+                "AND r.object_key = 5 " +
+                "AND LOWER(a.term) LIKE ?";
+
+        if (StrainType != null && !StrainType.isEmpty()) {
+            sql += " AND LOWER(s.strain_type_name_lc) = ?";
+        }
+
+        String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
+        if (StrainType != null && !StrainType.isEmpty()) {
+            String lowerCaseStrainType = StrainType.toLowerCase();
+            return RatModelWebServiceQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
+        } else {
+            return RatModelWebServiceQuery.execute(this, sql, lowerCaseTerm);
+        }
+    }
+
+//    public List<String> getAnnotationsByStrainType(String Term, String StrainType) throws Exception{
+//        String sql = "SELECT a.object_symbol, a.qualifier,a.term,o.term,a.evidence,a.ref_rgd_id,s.strain_type_name_lc\n" +
+//                "FROM full_annot a\n" +
+//                "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
+//                "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
+//                "JOIN strains s ON a.annotated_object_rgd_id = s.rgd_id\n" +
+//                "WHERE\n" +
+//                "  r.object_status = 'ACTIVE'\n" +
+//                "  AND r.species_type_key = 3\n" +
+//                "  AND r.object_key = 5\n" +
+//                "  AND LOWER(a.term) LIKE ? AND LOWER(s.strain_type_name_lc) = ?";
+//        String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
+//        String lowerCaseStrainType = StrainType.toLowerCase();
+//        return StringListQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
+//    }
 
 
     /**
