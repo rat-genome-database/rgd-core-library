@@ -1,6 +1,8 @@
 package edu.mcw.rgd.util;
 
 import edu.mcw.rgd.datamodel.Variant;
+import edu.mcw.rgd.datamodel.variants.VariantMapData;
+import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -257,4 +259,67 @@ public class Zygosity {
             variant.setZygosityPossibleError(FALSE);
         }
     }
+
+    public void computeZygosityStatus(int score, int depth, String gender, VariantMapData v, VariantSampleDetail vs) {
+
+        // percentage score: 0..100
+        float scorePerc = depth==0 ? 0.0f : (score * 100.0f) / depth;
+        vs.setZygosityPercentRead((int)(scorePerc+0.5f));
+
+        // first compare first two nucleotides
+        computeZygosityStatusPseudoError(scorePerc, v.getChromosome(), gender, v, vs);
+    }
+
+    private void computeZygosityStatusPseudoError(float myScore, String chr, String gender, VariantMapData v, VariantSampleDetail variant) {
+
+        if ((gender.equals("M") || gender.equals("P")) // patient must be male  or a Pooled sample
+                && ((chr.equals("X") || chr.equals("Y"))) // and chromosome is X or Y
+        ) {
+
+            PseudoAutosomalRegion pseudo = new PseudoAutosomalRegion();
+
+            // check to see if we are in the Pseudoautozomal region
+            if (pseudo.inPAR(v.getChromosome(), v.getStartPos())) {
+
+                if (myScore == HOMOZYGOUS_PERCENT) {
+                    variant.setZygosityStatus(HOMOZYGOUS);
+                } else if (myScore >= POSSIBLY_HOMOZYGOUS_PERCENT) {
+                    variant.setZygosityStatus(POSSIBLY_HOMOZYGOUS);
+                } else {
+                    variant.setZygosityStatus(HETEROZYGOUS);
+                }
+                variant.setZygosityInPseudo(TRUE);
+
+            } else {
+
+                if (myScore == HOMOZYGOUS_PERCENT) {
+                    variant.setZygosityStatus(HEMIZYGOUS);
+                } else if (myScore >= PROBABLY_HEMIZYGOUSE_PERCENT) {
+                    variant.setZygosityStatus(PROBABLY_HEMIZYGOUS);
+                } else {
+                    variant.setZygosityStatus(POSSIBLY_HEMIZYGOUS);
+                }
+                variant.setZygosityInPseudo(FALSE);
+            }
+
+        } else {
+
+            if (myScore == HOMOZYGOUS_PERCENT) {
+                variant.setZygosityStatus(HOMOZYGOUS);
+            } else if (myScore >= POSSIBLY_HOMOZYGOUS_PERCENT) {
+                variant.setZygosityStatus(POSSIBLY_HOMOZYGOUS);
+            } else {
+                variant.setZygosityStatus(HETEROZYGOUS);
+            }
+            variant.setZygosityInPseudo(FALSE);
+        }
+
+        // Check for error condition
+        if (myScore <= POSSIBLE_ERROR_PERCENT) {
+            variant.setZygosityPossibleError(TRUE);
+        } else {
+            variant.setZygosityPossibleError(FALSE);
+        }
+    }
+
 }
