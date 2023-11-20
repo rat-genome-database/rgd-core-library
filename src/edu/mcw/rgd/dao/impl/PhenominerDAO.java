@@ -956,6 +956,15 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND species_type_key=? AND x.experiment_record_id=r.experiment_record_id\n"+
                     "AND exp_cond_ont_id=?";
         }
+        else if( accId.startsWith("VT:")) {
+            query = "select DISTINCT r.experiment_record_id " +
+                    " from experiment e, experiment_record r " +
+                    " where e.experiment_id = r.experiment_id " +
+                    " and r.curation_status=? and species_type_key=? " +
+                    " and (e.trait_ont_id =? or e.trait_ont_id2=? or e.trait_ont_id3=?)";
+            return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId);
+
+        }
         else {
             // bad ontology
             return null;
