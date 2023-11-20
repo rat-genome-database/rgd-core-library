@@ -67,7 +67,23 @@ public class RatModelWebServiceQuery extends MappingSqlQuery {
             this.strain = strain;
         }
 
-        private String strain,qualifier,diseaseOrPhenotypeTerm,withConditionsTerm,evidence,refRgdId,strainType;
+        private String strain;
+
+        public int getStrainRgdId() {
+            return strainRgdId;
+        }
+
+        public void setStrainRgdId(int strainRgdId) {
+            this.strainRgdId = strainRgdId;
+        }
+
+        private int strainRgdId;
+        private String qualifier;
+        private String diseaseOrPhenotypeTerm;
+        private String withConditionsTerm;
+        private String evidence;
+        private String refRgdId;
+        private String strainType;
 
     }
     public RatModelWebServiceQuery(DataSource ds, String query) {
@@ -78,6 +94,7 @@ public class RatModelWebServiceQuery extends MappingSqlQuery {
 
         test t= new test();
         t.setStrain(rs.getString("strain"));
+        t.setStrainRgdId(rs.getInt("strain_rgd_id"));
         t.setQualifier(rs.getString("qualifier"));
         t.setDiseaseOrPhenotypeTerm(rs.getString("Disease_OR_Phenotype_Term"));
         t.setWithConditionsTerm(rs.getString("With_Conditions"));

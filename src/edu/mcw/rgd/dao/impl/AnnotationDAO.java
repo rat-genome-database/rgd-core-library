@@ -954,7 +954,7 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     public List<RatModelWebServiceQuery.test> getAnnotationsByTerm(String Term) throws Exception{
-        String sql ="SELECT a.object_symbol as strain,a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
+        String sql ="SELECT a.object_symbol as strain,a.annotated_object_rgd_id as strain_rgd_id,a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
                 "FROM full_annot a\n" +
                 "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
                 "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
@@ -971,7 +971,7 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     public List<RatModelWebServiceQuery.test> getAnnotationsByStrainType(String Term, String StrainType) throws Exception{
-        String sql = "SELECT a.object_symbol as strain, a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
+        String sql = "SELECT a.object_symbol as strain,a.annotated_object_rgd_id as strain_rgd_id,a.qualifier,a.term as Disease_OR_Phenotype_Term,o.term as With_Conditions,a.evidence,a.ref_rgd_id,s.strain_type_name_lc as strain_type\n" +
                 "FROM full_annot a\n" +
                 "LEFT JOIN ont_terms o ON a.with_info = o.term_acc\n" +
                 "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id\n" +
@@ -995,7 +995,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
 
     public List<RatModelWebServiceQuery.test> getAnnotationsByTermAndStrainType(String Term, String StrainType) throws Exception {
-        String sql = "SELECT a.object_symbol as strain, a.qualifier, a.term as Disease_OR_Phenotype_Term, o.term as With_Conditions, a.evidence, a.ref_rgd_id, s.strain_type_name_lc as strain_type " +
+        String sql = "SELECT a.object_symbol as strain,a.annotated_object_rgd_id as strain_rgd_id,a.qualifier, a.term as Disease_OR_Phenotype_Term, o.term as With_Conditions, a.evidence, a.ref_rgd_id, s.strain_type_name_lc as strain_type " +
                 "FROM full_annot a " +
                 "LEFT JOIN ont_terms o ON a.with_info = o.term_acc " +
                 "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id " +
