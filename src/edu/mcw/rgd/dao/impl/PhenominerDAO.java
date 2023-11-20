@@ -802,7 +802,7 @@ public class PhenominerDAO extends AbstractDAO {
         }
         else if( accId.startsWith("VT:") ) {
             query = "select DISTINCT r.experiment_record_id " +
-            " rom experiment e, experiment_record r " +
+            " from experiment e, experiment_record r " +
                     " where e.experiment_id = r.experiment_id " +
             " and (e.trait_ont_id=? or e.trait_ont_id2=? or e.trait_ont_id3=?) " +
             " and r.curation_status=? and species_type_key=? " +
