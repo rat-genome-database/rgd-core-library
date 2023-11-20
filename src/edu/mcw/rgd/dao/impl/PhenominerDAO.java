@@ -804,7 +804,7 @@ public class PhenominerDAO extends AbstractDAO {
             query = "select DISTINCT r.experiment_record_id " +
             " from experiment e, experiment_record r " +
                     " where e.experiment_id = r.experiment_id " +
-            " and (e.trait_ont_id=? or e.trait_ont_id2=? or e.trait_ont_id3=?) " +
+            //" and (e.trait_ont_id=? or e.trait_ont_id2=? or e.trait_ont_id3=?) " +
             " and r.curation_status=? and species_type_key=? " +
             " and (e.trait_ont_id in (SELECT ? FROM dual UNION " +
             " SELECT child_term_acc FROM ont_dag " +
