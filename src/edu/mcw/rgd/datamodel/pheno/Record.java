@@ -33,6 +33,24 @@ public class Record {
     private boolean hasIndividualRecord = false;
     private String conditionDescription = "";
     private int refRgdId;
+    private String traitId;
+    private String trait;
+
+    public String getTraitId() {
+        return traitId;
+    }
+
+    public void setTraitId(String traitId) {
+        this.traitId = traitId;
+    }
+
+    public String getTrait() {
+        return trait;
+    }
+
+    public void setTrait(String trait) {
+        this.trait = trait;
+    }
 
     public int getRefRgdId() {
         return refRgdId;
