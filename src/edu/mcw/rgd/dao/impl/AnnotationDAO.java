@@ -2112,4 +2112,36 @@ public class AnnotationDAO extends AbstractDAO {
 
     }
 
+    /**
+     * get RatStrain models by annotated disease/phenotype search term, strain type
+     * @param Term for disease/phenotype search term
+     * @param StrainType strain type such as inbred,congenic etc
+     * @return list of RatStrain models; could be empty if there is no strain type or related search term
+     * @throws Exception on spring framework dao failure
+     */
+
+    public List<RatModelWebServiceQuery.test> getAnnotationsByTermAndStrainType(String Term, String StrainType) throws Exception {
+        String sql = "SELECT a.object_symbol as strain,a.annotated_object_rgd_id as strain_rgd_id,a.qualifier, a.term as Disease_OR_Phenotype_Term, o.term as With_Conditions, a.evidence, a.ref_rgd_id, s.strain_type_name_lc as strain_type " +
+                "FROM full_annot a " +
+                "LEFT JOIN ont_terms o ON a.with_info = o.term_acc " +
+                "JOIN rgd_ids r ON a.annotated_object_rgd_id = r.rgd_id " +
+                "JOIN strains s ON a.annotated_object_rgd_id = s.rgd_id " +
+                "WHERE r.object_status = 'ACTIVE' " +
+                "AND r.species_type_key = 3 " +
+                "AND r.object_key = 5 " +
+                "AND LOWER(a.term) LIKE ?";
+
+        if (StrainType != null && !StrainType.isEmpty()) {
+            sql += " AND LOWER(s.strain_type_name_lc) = ?";
+        }
+
+        String lowerCaseTerm = "%" + Term.toLowerCase() + "%";
+        if (StrainType != null && !StrainType.isEmpty()) {
+            String lowerCaseStrainType = StrainType.toLowerCase();
+            return RatModelWebServiceQuery.execute(this, sql, lowerCaseTerm, lowerCaseStrainType);
+        } else {
+            return RatModelWebServiceQuery.execute(this, sql, lowerCaseTerm);
+        }
+    }
+
 }
