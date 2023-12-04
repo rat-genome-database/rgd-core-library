@@ -1273,6 +1273,19 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
+     * get all terms that use the synonym
+     *
+     * @param  synName name of the synonym that is used to find terms
+     * @return list of TermSynonym objects
+     * @throws Exception on spring framework dao failure
+     */
+    public List<TermSynonym> getTermSynonymBySynonymName(String synName) throws Exception{
+        String sql = "select * from ont_synonyms where synonym_name=?";
+        TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), sql);
+        return execute(q,synName);
+    }
+
+    /**
      * get ontology object given ont_id
      * @param ontId ontology id
      * @return Ontology object or null if ont_id is invalid
