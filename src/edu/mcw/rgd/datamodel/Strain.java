@@ -19,7 +19,8 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
     private String substrain;
     private String genetics;
     private String inbredGen;
-    private String origin;
+    //    private String origin;
+    private String description;
     private String color;
     private String chrAltered;
     private String source;
@@ -34,6 +35,8 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
     private String modificationMethod;
 
     private String taglessStrainSymbol;
+
+    private String origination;
 
     private String lastStatus; // last status, determined from analysis of statusLog
     private List<Status> statusLog; // log of all strain statuses
@@ -111,13 +114,13 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         this.inbredGen = inbredGen;
     }
 
-    public String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
+//    public String getOrigin() {
+//        return origin;
+//    }
+//
+//    public void setOrigin(String origin) {
+//        this.origin = origin;
+//    }
 
     public String getColor() {
         return color;
@@ -251,6 +254,22 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         }
 
         lastStatus = status.toString();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getOrigination() {
+        return origination;
+    }
+
+    public void setOrigination(String origination) {
+        this.origination = origination;
     }
 
     /**

@@ -199,7 +199,7 @@ public class StrainDAO extends AbstractDAO {
 
         update(sql, strain.getKey(), strain.getSymbol(), strain.getSymbol(), strain.getName(), strain.getName(),
                 strain.getStrain(), strain.getStrain(), strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(),
-                strain.getInbredGen(), strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
+                strain.getInbredGen(), strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
                 strain.getNotes(), strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(),
                 strain.getGeneticStatus(), strain.getBackgroundStrainRgdId(), strain.getModificationMethod(),
                 strain.getTaglessStrainSymbol(), strain.getRgdId());
@@ -222,7 +222,7 @@ public class StrainDAO extends AbstractDAO {
         update(sql, this.getNextKey("STRAINS","STRAIN_KEY"), strain.getSymbol(), strain.getSymbol(),
                 strain.getName(), strain.getName(), strain.getStrain(), strain.getStrain(),
                 strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(), strain.getInbredGen(),
-                strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
+                strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
                 strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(), strain.getGeneticStatus(),
                 strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(), strain.getRgdId());
     }

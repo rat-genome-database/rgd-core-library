@@ -28,7 +28,8 @@ public class StrainQuery extends MappingSqlQuery {
         st.setSubstrain(rs.getString("substrain"));
         st.setGenetics(rs.getString("genetics"));
         st.setInbredGen(rs.getString("inbred_gen"));
-        st.setOrigin(rs.getString("origin"));
+//        st.setOrigin(rs.getString("origin"));
+        st.setDescription(rs.getString("description"));
         st.setColor(rs.getString("color"));
         st.setChrAltered(rs.getString("chr_altered"));
         st.setSource(rs.getString("source"));
@@ -45,6 +46,7 @@ public class StrainQuery extends MappingSqlQuery {
         }
         st.setModificationMethod(rs.getString("modification_method"));
         st.setTaglessStrainSymbol(rs.getString("tagless_strain_symbol"));
+        st.setOrigination(rs.getString("origination"));
 
         return st;
     }
