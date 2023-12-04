@@ -113,8 +113,10 @@ public class RecordQuery extends MappingSqlQuery {
         cm.setSite(rs.getString("CLINICAL_MEASUREMENT_SITE"));
 
         rec.setClinicalMeasurement(cm);
-
-//        rec.setTraitId(rs.getString("trait_ont_id"));
+        try {
+            rec.setTraitId(rs.getString("trait_ont_id"));
+        }
+        catch (Exception e) {}
         return rec;
     }
 
