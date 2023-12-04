@@ -203,14 +203,14 @@ public class StrainDAO extends AbstractDAO {
                 "full_name=?, full_name_lc=LOWER(?), strain=?, strain_lc=LOWER(?), substrain=?, substrain_lc=LOWER(?), "+
                 "GENETICS=?,  INBRED_GEN=?, DESCRIPTION=?, COLOR=?, CHR_ALTERED=?, SOURCE=?, NOTES=?, strain_type_name_lc=LOWER(?), "+
                 "IMAGE_URL=?, RESEARCH_USE=?, genetic_status=?, background_strain_rgd_id=?, "+
-                "modification_method=?, tagless_strain_symbol=? WHERE rgd_id=?";
+                "modification_method=?, tagless_strain_symbol=?, origination=? WHERE rgd_id=?";
 
         update(sql, strain.getKey(), strain.getSymbol(), strain.getSymbol(), strain.getName(), strain.getName(),
                 strain.getStrain(), strain.getStrain(), strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(),
                 strain.getInbredGen(), strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
                 strain.getNotes(), strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(),
                 strain.getGeneticStatus(), strain.getBackgroundStrainRgdId(), strain.getModificationMethod(),
-                strain.getTaglessStrainSymbol(), strain.getRgdId());
+                strain.getTaglessStrainSymbol(),strain.getOrigination(),strain.getRgdId());
     }
 
     /**
@@ -224,15 +224,15 @@ public class StrainDAO extends AbstractDAO {
         String sql = "INSERT INTO strains (strain_key, strain_symbol, strain_symbol_lc, " +
                 "FULL_NAME, FULL_NAME_LC, STRAIN, STRAIN_LC, SUBSTRAIN, SUBSTRAIN_LC, GENETICS, INBRED_GEN, " +
                 "DESCRIPTION, COLOR, CHR_ALTERED, SOURCE, NOTES, STRAIN_TYPE_NAME_LC, image_url, research_use, "+
-                "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol, rgd_id) " +
-                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?)";
+                "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol, rgd_id, origination)" +
+                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?,?)";
 
         update(sql, this.getNextKey("STRAINS","STRAIN_KEY"), strain.getSymbol(), strain.getSymbol(),
                 strain.getName(), strain.getName(), strain.getStrain(), strain.getStrain(),
                 strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(), strain.getInbredGen(),
                 strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
                 strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(), strain.getGeneticStatus(),
-                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(), strain.getRgdId());
+                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(), strain.getRgdId(),strain.getOrigination());
     }
 
     /**
