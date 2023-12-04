@@ -201,7 +201,7 @@ public class StrainDAO extends AbstractDAO {
 
         String sql = "UPDATE strains SET strain_key=?, strain_symbol=?, strain_symbol_lc=LOWER(?), " +
                 "full_name=?, full_name_lc=LOWER(?), strain=?, strain_lc=LOWER(?), substrain=?, substrain_lc=LOWER(?), "+
-                "GENETICS=?,  INBRED_GEN=?, ORIGIN=?, COLOR=?, CHR_ALTERED=?, SOURCE=?, NOTES=?, strain_type_name_lc=LOWER(?), "+
+                "GENETICS=?,  INBRED_GEN=?, DESCRIPTION=?, COLOR=?, CHR_ALTERED=?, SOURCE=?, NOTES=?, strain_type_name_lc=LOWER(?), "+
                 "IMAGE_URL=?, RESEARCH_USE=?, genetic_status=?, background_strain_rgd_id=?, "+
                 "modification_method=?, tagless_strain_symbol=? WHERE rgd_id=?";
 
@@ -223,7 +223,7 @@ public class StrainDAO extends AbstractDAO {
 
         String sql = "INSERT INTO strains (strain_key, strain_symbol, strain_symbol_lc, " +
                 "FULL_NAME, FULL_NAME_LC, STRAIN, STRAIN_LC, SUBSTRAIN, SUBSTRAIN_LC, GENETICS, INBRED_GEN, " +
-                "ORIGIN, COLOR, CHR_ALTERED, SOURCE, NOTES, STRAIN_TYPE_NAME_LC, image_url, research_use, "+
+                "DESCRIPTION, COLOR, CHR_ALTERED, SOURCE, NOTES, STRAIN_TYPE_NAME_LC, image_url, research_use, "+
                 "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol, rgd_id) " +
                 "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?)";
 
