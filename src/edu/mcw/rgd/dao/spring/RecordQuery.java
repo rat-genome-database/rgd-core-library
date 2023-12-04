@@ -114,6 +114,7 @@ public class RecordQuery extends MappingSqlQuery {
 
         rec.setClinicalMeasurement(cm);
 
+        rec.setTraitId(rs.getString("trait_ont_id"));
         return rec;
     }
 

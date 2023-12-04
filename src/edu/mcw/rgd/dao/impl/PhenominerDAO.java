@@ -475,7 +475,7 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void updateExperiment(Experiment ex) throws Exception{
 
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=? last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
@@ -800,6 +800,37 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND species_type_key=? AND x.experiment_record_id=r.experiment_record_id\n"+
                     "AND exp_cond_ont_id IN(\n";
         }
+        else if( accId.startsWith("VT:") ) {
+            query = "select DISTINCT r.experiment_record_id " +
+            " from experiment e, experiment_record r " +
+                    " where e.experiment_id = r.experiment_id " +
+            " and r.curation_status=? and species_type_key=? " +
+            " and (e.trait_ont_id in (SELECT ? FROM dual UNION " +
+            " SELECT child_term_acc FROM ont_dag " +
+            " START WITH parent_term_acc=? " +
+            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " or " +
+            " e.trait_ont_id2 in (SELECT ? FROM dual UNION " +
+            " SELECT child_term_acc FROM ont_dag " +
+            " START WITH parent_term_acc=? " +
+            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " or " +
+            " e.trait_ont_id3 in (SELECT ? FROM dual UNION " +
+            " SELECT child_term_acc FROM ont_dag " +
+            " START WITH parent_term_acc=? " +
+            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " ) ";
+
+            return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId, accId, accId, accId);
+
+        }
+       /*
+        else if( accId.startsWith("VT:") ) {
+            query = "SELECT DISTINCT r.experiment_record_id FROM experiement c,experiment_record r "+
+                    "WHERE r.curation_status=? AND r.species_type_key=? AND e.experiment_id=r.experiment_id AND e.ont_trait_id IN( ";
+        }
+
+        */
         else {
             // bad ontology
             return null;
@@ -854,6 +885,12 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public List<Integer> getRecordIdsForTermAndDescendantsCached(String termId, String sex, int speciesTypeKey) throws Exception {
 
+        boolean vt = false;
+        if (termId.equals("VT:0000001")) {
+            vt=true;
+        }
+
+
         // validate sex parameter
         String sexParam = null;
         if( termId.startsWith("RS") && sex!=null ) {
@@ -873,6 +910,12 @@ public class PhenominerDAO extends AbstractDAO {
             sql += " AND sex=?";
             recordIdsStr = getStringResult(sql, termId, speciesTypeKey, sexParam);
         }
+
+        if (vt) {
+            System.out.println(sql);
+            System.out.println(termId + " - " + sex + " - " + speciesTypeKey);
+        }
+
         if( recordIdsStr==null ) {
             return null;
         }
@@ -912,6 +955,15 @@ public class PhenominerDAO extends AbstractDAO {
             query = "SELECT DISTINCT r.experiment_record_id FROM experiment_condition x,experiment_record r\n"+
                     "WHERE r.curation_status=? AND species_type_key=? AND x.experiment_record_id=r.experiment_record_id\n"+
                     "AND exp_cond_ont_id=?";
+        }
+        else if( accId.startsWith("VT:")) {
+            query = "select DISTINCT r.experiment_record_id " +
+                    " from experiment e, experiment_record r " +
+                    " where e.experiment_id = r.experiment_id " +
+                    " and r.curation_status=? and species_type_key=? " +
+                    " and (e.trait_ont_id =? or e.trait_ont_id2=? or e.trait_ont_id3=?)";
+            return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId);
+
         }
         else {
             // bad ontology
@@ -2923,7 +2975,6 @@ public class PhenominerDAO extends AbstractDAO {
         return runFullRecordsQuery(query);
     }
     public List<Record> getFullRecordsForProject(int projectRgdId, String ontId) throws Exception {
-
         String prefix=ontId.split(":")[0];
         List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId );
         if(refRgdIds.isEmpty()) {
