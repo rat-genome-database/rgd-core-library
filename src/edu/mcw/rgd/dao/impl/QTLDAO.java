@@ -199,4 +199,9 @@ public class QTLDAO extends AbstractDAO {
     public List<QTL> executeQtlQuery(String query, Object ... params) throws Exception {
         return QTLQuery.execute(this, query, params);
     }
+
+    public List<QTL> getActiveGWASQtls() throws Exception{
+        String sql = "select q.*, r.SPECIES_TYPE_KEY from QTLs q, RGD_IDS r WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id and qtl_symbol like 'GWAS%'";
+        return executeQtlQuery(sql);
+    }
 }
