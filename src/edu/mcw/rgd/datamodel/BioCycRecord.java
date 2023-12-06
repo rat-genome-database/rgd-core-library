@@ -99,13 +99,12 @@ public class BioCycRecord implements Dumpable {
     public boolean equals(Object o) {
         BioCycRecord r = (BioCycRecord) o;
         return Utils.stringsAreEqual(geneRatCycId, r.geneRatCycId) &&
-                Utils.stringsAreEqual(pathwayRatCycId, r.pathwayRatCycId)
-                && Utils.stringsAreEqual(pathwayRatCycImage,  r.pathwayRatCycImage);
+                Utils.stringsAreEqual(pathwayRatCycId, r.pathwayRatCycId);
     }
 
     @Override
     public int hashCode() {
-        return Utils.defaultString(geneRatCycId).hashCode() ^ Utils.defaultString(pathwayRatCycId).hashCode() ^ Utils.defaultString(pathwayRatCycImage).hashCode();
+        return Utils.defaultString(geneRatCycId).hashCode() ^ Utils.defaultString(pathwayRatCycId).hashCode();
     }
 
     public String getPathwayRatCycImage() {
