@@ -29,6 +29,8 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
     private String sourceUrl;
     private String mostSignificantCmoTerm;
     private Integer speciesTypeKey;
+    private String peakRsId;
+    private String riskAllele;
 
     public Integer getKey() {
         return key;
@@ -180,5 +182,21 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
 
     public void setSpeciesTypeKey(Integer speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
+    }
+
+    public String getPeakRsId() {
+        return peakRsId;
+    }
+
+    public void setPeakRsId(String peakRsId) {
+        this.peakRsId = peakRsId;
+    }
+
+    public String getRiskAllele() {
+        return riskAllele;
+    }
+
+    public void setRiskAllele(String riskAllele) {
+        this.riskAllele = riskAllele;
     }
 }
