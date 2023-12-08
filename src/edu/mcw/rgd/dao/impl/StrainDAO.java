@@ -154,7 +154,7 @@ public class StrainDAO extends AbstractDAO {
         String query = "SELECT s.*,r.species_type_key FROM strains s, rgd_ids r WHERE r.rgd_id=s.rgd_id AND s.strain_key=?";
         List<Strain> strains = executeStrainQuery(query, strainKey);
         return strains.size()==0 ? null : strains.get(0);
-   }
+    }
 
     /**
      * get strain by strain symbol
@@ -195,14 +195,14 @@ public class StrainDAO extends AbstractDAO {
                 "full_name=?, full_name_lc=LOWER(?), strain=?, strain_lc=LOWER(?), substrain=?, substrain_lc=LOWER(?), "+
                 "GENETICS=?,  INBRED_GEN=?, ORIGIN=?, COLOR=?, CHR_ALTERED=?, SOURCE=?, NOTES=?, strain_type_name_lc=LOWER(?), "+
                 "IMAGE_URL=?, RESEARCH_USE=?, genetic_status=?, background_strain_rgd_id=?, "+
-                "modification_method=?, tagless_strain_symbol=? WHERE rgd_id=?";
+                "modification_method=?, tagless_strain_symbol=?, origination=?, description=? WHERE rgd_id=?";
 
         update(sql, strain.getKey(), strain.getSymbol(), strain.getSymbol(), strain.getName(), strain.getName(),
                 strain.getStrain(), strain.getStrain(), strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(),
-                strain.getInbredGen(), strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
+                strain.getInbredGen(), strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(),
                 strain.getNotes(), strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(),
                 strain.getGeneticStatus(), strain.getBackgroundStrainRgdId(), strain.getModificationMethod(),
-                strain.getTaglessStrainSymbol(), strain.getRgdId());
+                strain.getTaglessStrainSymbol(),strain.getOrigination(),strain.getDescription() ,strain.getRgdId());
     }
 
     /**
@@ -216,15 +216,15 @@ public class StrainDAO extends AbstractDAO {
         String sql = "INSERT INTO strains (strain_key, strain_symbol, strain_symbol_lc, " +
                 "FULL_NAME, FULL_NAME_LC, STRAIN, STRAIN_LC, SUBSTRAIN, SUBSTRAIN_LC, GENETICS, INBRED_GEN, " +
                 "ORIGIN, COLOR, CHR_ALTERED, SOURCE, NOTES, STRAIN_TYPE_NAME_LC, image_url, research_use, "+
-                "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol, rgd_id) " +
-                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?)";
+                "genetic_status, background_strain_rgd_id, modification_method, tagless_strain_symbol,origination,description, rgd_id) " +
+                "VALUES (?,?,LOWER(?), ?,LOWER(?),?,LOWER(?),?,LOWER(?),?,?, ?,?,?,?,?,LOWER(?),?,?, ?,?,?,?,?,?,?)";
 
         update(sql, this.getNextKey("STRAINS","STRAIN_KEY"), strain.getSymbol(), strain.getSymbol(),
                 strain.getName(), strain.getName(), strain.getStrain(), strain.getStrain(),
                 strain.getSubstrain(), strain.getSubstrain(), strain.getGenetics(), strain.getInbredGen(),
-                strain.getDescription(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
+                strain.getOrigin(), strain.getColor(), strain.getChrAltered(), strain.getSource(), strain.getNotes(),
                 strain.getStrainTypeName(), strain.getImageUrl(), strain.getResearchUse(), strain.getGeneticStatus(),
-                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(), strain.getRgdId());
+                strain.getBackgroundStrainRgdId(), strain.getModificationMethod(), strain.getTaglessStrainSymbol(),strain.getOrigination(),strain.getDescription() ,strain.getRgdId());
     }
 
     /**
@@ -255,7 +255,7 @@ public class StrainDAO extends AbstractDAO {
         stmt.setBlob(1,data);
         stmt.setString(2,contentType);
         stmt.setString(3,fileName);
-		stmt.setString(4,login);
+        stmt.setString(4,login);
         stmt.setInt(5,strainId);
         stmt.setString(6,type);
         stmt.execute();
