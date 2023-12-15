@@ -35,6 +35,48 @@ public class Record {
     private int refRgdId;
     private String traitId;
     private String trait;
+    private String trait2Id;
+    private String trait2;
+    private String trait3Id;
+    private String trait3;
+
+    public boolean isHasIndividualRecord() {
+        return hasIndividualRecord;
+    }
+
+
+
+    public String getTrait2() {
+        return trait2;
+    }
+
+    public void setTrait2(String trait2) {
+        this.trait2 = trait2;
+    }
+
+    public String getTrait2Id() {
+        return trait2Id;
+    }
+
+    public void setTrait2Id(String trait2Id) {
+        this.trait2Id = trait2Id;
+    }
+
+    public String getTrait3Id() {
+        return trait3Id;
+    }
+
+    public String getTrait3() {
+        return trait3;
+    }
+
+    public void setTrait3(String trait3) {
+        this.trait3 = trait3;
+    }
+
+    public void setTrait3Id(String trait3Id) {
+        this.trait3Id = trait3Id;
+    }
 
     public String getTraitId() {
         return traitId;
