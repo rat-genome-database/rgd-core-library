@@ -36,10 +36,10 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "SELECT * FROM study WHERE study_id=?";
 
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
-        List<Study> studies = execute(q, id);
+        List studies = execute(q, id);
         if( studies.isEmpty() )
             return null;
-        Study s = studies.get(0);
+        Study s = (Study) studies.get(0);
         s.setRefRgdIds(getStudyReferences(id));
         return s;
     }
@@ -514,7 +514,7 @@ public class PhenominerDAO extends AbstractDAO {
         ex.setId(experimentId);
 
         String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,trait_ont_id,trait_ont_id2,trait_ont_id3,created_by,created_date,last_modified_date) " +
-                "values (?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
+                "values (?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getCreatedBy());
 
         return experimentId;
@@ -574,6 +574,13 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public int getRecordCountForTerm(String accId) throws Exception {
 
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordCountForTerm");
+        }
+
+
         // determine kind of term
         String query;
         if( accId.startsWith("RS:") || accId.startsWith("CS:") ) {
@@ -592,9 +599,17 @@ public class PhenominerDAO extends AbstractDAO {
             query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r "+
                     "WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id AND r.curation_status=?";
         }
+        else if( accId.startsWith("VT:") ) {
+            query = " SELECT COUNT(1) FROM experiment_record r, experiment e WHERE r.experiment_id=e.experiment_id and " +
+                    " e.trait_ont_id=? AND curation_status=?";
+        }
         else {
             // bad ontology
             return -1;
+        }
+
+        if (debug) {
+            System.out.println(query);
         }
 
         return getCount(query, accId, CURATION_STATUS);
@@ -607,6 +622,13 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public int getRecordCountForTerm(String accId, int speciesTypeKey) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordCountForTerm(String accId, int speciesTypeKey)");
+        }
+
 
         // determine kind of term
         String query;
@@ -626,12 +648,19 @@ public class PhenominerDAO extends AbstractDAO {
             query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r "+
                     "WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id";
         }
+        else if( accId.startsWith("VT:") ) {
+            query = " SELECT COUNT(1) FROM experiment_record r, experiment e WHERE r.experiment_id=e.experiment_id and " +
+                    " e.trait_ont_id=? ";
+        }
         else {
             // bad ontology
             return -1;
         }
         query += " AND r.curation_status=? AND r.species_type_key=?";
 
+        if (debug) {
+            System.out.println(query);
+        }
         return getCount(query, accId, CURATION_STATUS, speciesTypeKey);
     }
 
@@ -670,6 +699,12 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public int getRecordCountForTermAndDescendants(String accId) throws Exception {
 
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordCountForTermAndDescendants(String accId))");
+        }
+
         // determine kind of term
         String query;
         if( accId.startsWith("RS:") || accId.startsWith("CS:") ) {
@@ -699,6 +734,9 @@ public class PhenominerDAO extends AbstractDAO {
         "START WITH parent_term_acc=?\n" +
         "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
 
+        if (debug) {
+            System.out.println(query);
+        }
         return getCount(query, CURATION_STATUS, accId, accId);
     }
 
@@ -709,6 +747,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public int getRecordCountForTermAndDescendants(String accId, int speciesTypeKey) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordCountForTermAndDescendants(String accId, int speciesTypeKey)");
+        }
 
         // determine kind of term
         String query;
@@ -729,6 +773,7 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND r.species_type_key=? AND x.experiment_record_id=r.experiment_record_id AND exp_cond_ont_id IN(\n";
         }
         else {
+            System.out.println("bad ontology");
             // bad ontology
             return -1;
         }
@@ -739,6 +784,9 @@ public class PhenominerDAO extends AbstractDAO {
                         "START WITH parent_term_acc=?\n" +
                         "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
 
+        if (debug) {
+            System.out.println(query);
+        }
         return getCount(query, CURATION_STATUS, speciesTypeKey, accId, accId);
     }
 
@@ -781,6 +829,12 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public List<Integer> getRecordIdsForTermAndDescendants(String accId, int speciesTypeKey) throws Exception {
 
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordIdsForTermAndDescendants(String accId, int speciesTypeKey)");
+        }
+
         // determine kind of term
         String query;
         if( accId.startsWith("RS:") || accId.startsWith("CS:") ) {
@@ -821,6 +875,9 @@ public class PhenominerDAO extends AbstractDAO {
             " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
             " ) ";
 
+            if (debug) {
+                System.out.println(query);
+            }
             return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId, accId, accId, accId);
 
         }
@@ -842,6 +899,9 @@ public class PhenominerDAO extends AbstractDAO {
             "START WITH parent_term_acc=?\n" +
             "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
 
+        if (debug) {
+            System.out.println(query);
+        }
         return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId);
     }
 
@@ -852,6 +912,11 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getRecordIdsForTermAndDescendants(String termId, String sex, int speciesTypeKey) throws Exception {
+        boolean debug = false;
+        if (termId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordIdsForTermAndDescendants(String termId, String sex, int speciesTypeKey)");
+        }
 
         if( !(termId.startsWith("RS:") || termId.startsWith("CS:")) ) {
             // ignore sex param for ontology other than 'RS'
@@ -884,6 +949,11 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getRecordIdsForTermAndDescendantsCached(String termId, String sex, int speciesTypeKey) throws Exception {
+        boolean debug = false;
+        if (termId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordIdsForTermAndDescendantsCached(String termId, String sex, int speciesTypeKey)");
+        }
 
         boolean vt = false;
         if (termId.equals("VT:0000001")) {
@@ -911,11 +981,6 @@ public class PhenominerDAO extends AbstractDAO {
             recordIdsStr = getStringResult(sql, termId, speciesTypeKey, sexParam);
         }
 
-        if (vt) {
-            System.out.println(sql);
-            System.out.println(termId + " - " + sex + " - " + speciesTypeKey);
-        }
-
         if( recordIdsStr==null ) {
             return null;
         }
@@ -936,6 +1001,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getRecordIdsForTermOnly(String accId, int speciesTypeKey) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordIdsForTermOnly(String accId, int speciesTypeKey)");
+        }
 
         // determine kind of term
         String query;
@@ -962,6 +1033,10 @@ public class PhenominerDAO extends AbstractDAO {
                     " where e.experiment_id = r.experiment_id " +
                     " and r.curation_status=? and species_type_key=? " +
                     " and (e.trait_ont_id =? or e.trait_ont_id2=? or e.trait_ont_id3=?)";
+
+            if (debug) {
+                System.out.println(query);
+            }
             return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId);
 
         }
@@ -980,6 +1055,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getRecordIdsForTermOnly(String termId, String sex, int speciesTypeKey) throws Exception {
+
+        boolean debug = false;
+        if (termId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getRecordIdsForTermOnly(String termId, String sex, int speciesTypeKey)");
+        }
 
         if( !(termId.startsWith("RS:") || termId.startsWith("CS:")) ) {
             // ignore sex param for ontology other than 'RS'
@@ -1002,10 +1083,20 @@ public class PhenominerDAO extends AbstractDAO {
 
 
     public Map<String, Integer> getRecordCountForTermAndDescendantsByListOfAccdIds(List<String> accIds) throws Exception {
+
+
         Map<String, Integer> recordCountMap= new HashMap<>();
 
         // determine kind of term
         for(String accId: accIds) {
+
+            boolean debug = false;
+            if (accId.equals("VT:0002458")) {
+                debug=true;
+                System.out.println("getRecordCountForTermAndDescendantsByListOfAccdIds(List<String> accIds)");
+            }
+
+
             String query;
             if (accId.startsWith("RS:") || accId.startsWith("CS:")) {
                 query = "SELECT COUNT(1) FROM sample s,experiment_record r\n" +
@@ -1021,7 +1112,7 @@ public class PhenominerDAO extends AbstractDAO {
                         "WHERE r.curation_status=? AND x.experiment_record_id=r.experiment_record_id\n" +
                         "AND exp_cond_ont_id IN(\n";
             } else {
-                // bad ontology
+                System.out.println("bad ontology");
                 return null;
             }
 
@@ -1029,6 +1120,10 @@ public class PhenominerDAO extends AbstractDAO {
                      "SELECT child_term_acc FROM ont_dag\n" +
                      "START WITH parent_term_acc =?\n" +
                      "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+
+            if (debug) {
+                System.out.println(query);
+            }
 
             int count = getCount(query, CURATION_STATUS, accId, accId);
             recordCountMap.put(accId, count);
@@ -1043,6 +1138,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getAnnotationsForTerm(String accId) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getAnnotationsForTerm(String accId)");
+        }
 
         // determine kind of term
         String query;
@@ -1063,8 +1164,11 @@ public class PhenominerDAO extends AbstractDAO {
                     "WHERE r.curation_status=? AND x.exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id";
         }
         else {
-            // bad ontology
+            System.out.println("bad ontology");
             return null;
+        }
+        if (debug) {
+            System.out.println(query);
         }
 
         return IntListQuery.execute(this, query, CURATION_STATUS, accId);
@@ -1077,6 +1181,11 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<String> getStrainAnnotationsForTerm(String accId) throws Exception {
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getStrainAnnotationsForTerm(String accId)");
+        }
 
         // determine kind of term
         String query;
@@ -1105,8 +1214,12 @@ public class PhenominerDAO extends AbstractDAO {
                     "  WHERE exp_cond_ont_id=? AND x.experiment_record_id=r.experiment_record_id)";
         }
         else {
-            // bad ontology
+            System.out.println("bad ontology");
             return null;
+        }
+
+        if (debug) {
+            System.out.println(query);
         }
 
         return StringListQuery.execute(this, query, CURATION_STATUS, accId);
@@ -1119,6 +1232,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Integer> getAnnotationsForTermAndDescendants(String accId) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getAnnotationsForTermAndDescendants(String accId) ");
+        }
 
         // determine kind of term
         String query;
@@ -1140,7 +1259,7 @@ public class PhenominerDAO extends AbstractDAO {
                         "AND exp_cond_ont_id IN(\n";
         }
         else {
-            // bad ontology
+            System.out.println("bad ontology");
             return null;
         }
 
@@ -1149,6 +1268,10 @@ public class PhenominerDAO extends AbstractDAO {
         "SELECT child_term_acc FROM ont_dag\n" +
         "START WITH parent_term_acc=?\n" +
         "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+
+        if (debug) {
+            System.out.println(query);
+        }
 
         return IntListQuery.execute(this, query, CURATION_STATUS, accId, accId);
     }
@@ -1160,6 +1283,12 @@ public class PhenominerDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<String> getStrainAnnotationsForTermAndDescendants(String accId) throws Exception {
+
+        boolean debug = false;
+        if (accId.equals("VT:0002458")) {
+            debug=true;
+            System.out.println("getStrainAnnotationsForTermAndDescendants(String accId)");
+        }
 
         // determine kind of term
         String query;
@@ -1188,7 +1317,7 @@ public class PhenominerDAO extends AbstractDAO {
                     "  WHERE x.experiment_record_id=r.experiment_record_id AND exp_cond_ont_id IN(\n";
         }
         else {
-            // bad ontology
+            System.out.println("bad ontology");
             return null;
         }
 
@@ -1198,6 +1327,9 @@ public class PhenominerDAO extends AbstractDAO {
         "START WITH parent_term_acc=?\n" +
         "CONNECT BY PRIOR child_term_acc=parent_term_acc))";
 
+        if (debug) {
+            System.out.println(query);
+        }
         return StringListQuery.execute(this, query, CURATION_STATUS, accId, accId);
     }
 
@@ -2757,6 +2889,7 @@ public class PhenominerDAO extends AbstractDAO {
 
     public OverlapReport getRecordCountOverlap(List<String> term1AccIds, List<String> term2AccIds, String column, int studyId) throws Exception {
 
+        System.out.println("in getRecordCountOverlap(List<String> term1AccIds, List<String> term2AccIds, String column, int studyId)");
         String query = "SELECT distinct fai.term_acc as term1, fai2.term_acc as term2, fai." + column + " as rid, fai.study_id, fai.study_name ";
 
         if (!column.equals("study_id")) {
@@ -2821,7 +2954,7 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     public List getTermIdsAndChildrenWithRecords(String term1AccId, String term2AccId, int studyId) throws Exception {
-
+        System.out.println("getTermIdsAndChildrenWithRecords(String term1AccId, String term2AccId, int studyId)");
         String query = "SELECT distinct fai.primary_term_acc as term1, fai2.primary_term_acc as term2";
 
         query += " from full_record_index fai, full_record_index fai2 WHERE fai.experiment_record_id = fai2.experiment_record_id ";
