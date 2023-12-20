@@ -117,6 +117,14 @@ public class RecordQuery extends MappingSqlQuery {
             rec.setTraitId(rs.getString("trait_ont_id"));
         }
         catch (Exception e) {}
+        try {
+            rec.setTrait2Id(rs.getString("trait_ont_id2"));
+        }
+        catch (Exception e) {}
+        try {
+            rec.setTrait3Id(rs.getString("trait_ont_id3"));
+        }
+        catch (Exception e) {}
         return rec;
     }
 
