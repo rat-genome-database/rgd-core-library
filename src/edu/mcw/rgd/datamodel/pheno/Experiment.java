@@ -1,10 +1,5 @@
 package edu.mcw.rgd.datamodel.pheno;
 
-import edu.mcw.rgd.dao.impl.PhenominerDAO;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: jdepons
@@ -22,39 +17,32 @@ public class Experiment {
     private String lastModifiedBy;
     private String createdBy;
 
-
-//    public String getTraitOntId() throws Exception{
-//        return traitOntId;
-//        List<String> onts = this.getTraitOntIds();
-//
-//        if (onts.size()>0) {
-//            return onts.get(0);
-//        }else {
-//            return "";
-//        }
-//    }
-public String getTraitOntId() {
-    return traitOntId;
-}
-public void setTraitOntId(String traitOntId) {
-    this.traitOntId = traitOntId;
-}
-
     private String traitOntId;
-//    public void setTraitOntId(String ontId) throws Exception {
-//        this.traitOntId = traitOntId;
-//    }
-//        ArrayList<String> onts = new ArrayList<String>();
-//        onts.add(ontId);
-//
-//        PhenominerDAO pdao = new PhenominerDAO();
-//        pdao.updateExperimentTraits(this.getId(),onts);
-//    }
+    private String traitOntId2;
+    private String traitOntId3;
 
+    public String getTraitOntId() {
+        return traitOntId;
+    }
 
-    public List<String> getTraitOntIds() throws Exception{
-        PhenominerDAO pdao = new PhenominerDAO();
-        return pdao.getExperimentTraits(this.id);
+    public void setTraitOntId(String traitOntId) {
+        this.traitOntId = traitOntId;
+    }
+
+    public String getTraitOntId2() {
+        return traitOntId2;
+    }
+
+    public void setTraitOntId2(String traitOntId2) {
+        this.traitOntId2 = traitOntId2;
+    }
+
+    public String getTraitOntId3() {
+        return traitOntId3;
+    }
+
+    public void setTraitOntId3(String traitOntId3) {
+        this.traitOntId3 = traitOntId3;
     }
 
     public int getCurationStatus() {
