@@ -31,6 +31,8 @@ public class GeneticModel   {
    private List<Reference> references;
     private String lastStatus;
 
+    private String origination;
+
     public String getLastStatus() {
         return lastStatus;
     }
@@ -173,6 +175,15 @@ public class GeneticModel   {
 
     public void setAliases(List<String> aliases) {
         this.aliases = aliases;
+    }
+
+
+    public String getOrigination() {
+        return origination;
+    }
+
+    public void setOrigination(String origination) {
+        this.origination = origination;
     }
 
     public static Comparator<GeneticModel> GeneSymbolComparator
