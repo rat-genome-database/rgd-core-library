@@ -28,6 +28,7 @@ public class GeneticModelQuery extends MappingSqlQuery {
         strain.setAlleleRgdId(rs.getInt("allele_rgd_id"));
         strain.setStrainRgdId(rs.getInt("strain_rgd_id"));
         strain.setSource(rs.getString("source"));
+        strain.setOrigination(rs.getString("origination"));
         strain.setBackgroundStrainRgdId(rs.getInt("background_strain_rgd_id"));
         strain.setMethod(rs.getString("modification_method"));
         try {
