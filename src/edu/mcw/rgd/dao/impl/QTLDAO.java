@@ -128,13 +128,13 @@ public class QTLDAO extends AbstractDAO {
                 "PEAK_OFFSET=?, CHROMOSOME=?, LOD=?, P_VALUE=?, VARIANCE=?,  NOTES=?, " +
                 "FLANK_1_RGD_ID=?, FLANK_2_RGD_ID=?, PEAK_RGD_ID=?, INHERITANCE_TYPE=?, " +
                 "LOD_IMAGE=?, LINKAGE_IMAGE=?, SOURCE_URL=?, MOST_SIGNIFICANT_CMO_TERM=?," +
-                " PEAK_RS_ID=?, RISK_ALLELE=? where RGD_ID=?";
+                " PEAK_RS_ID=? where RGD_ID=?";
 
         update(sql, qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
             qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(),
             qtl.getNotes(), qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(),
             qtl.getLodImage(), qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(),
-                qtl.getPeakRsId(), qtl.getRiskAllele(), qtl.getRgdId());
+                qtl.getPeakRsId(), qtl.getRgdId());
     }
 
     /**
@@ -148,13 +148,13 @@ public class QTLDAO extends AbstractDAO {
         String sql = "INSERT INTO qtls (qtl_key, qtl_symbol, qtl_name, qtl_symbol_lc, qtl_name_lc, " +
                 "peak_offset, chromosome, lod, p_value, variance, notes, " +
                 "FLANK_1_RGD_ID, FLANK_2_RGD_ID, PEAK_RGD_ID, INHERITANCE_TYPE, LOD_IMAGE, " +
-                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID, RISK_ALLELE) "+
-                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?)";
+                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID) "+
+                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?)";
 
         update(sql, this.getNextKey("QTLS","QTL_KEY"), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
                 qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
                 qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
-                qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(),qtl.getPeakRsId(), qtl.getRiskAllele());
+                qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(),qtl.getPeakRsId());
     }
 
     /**
