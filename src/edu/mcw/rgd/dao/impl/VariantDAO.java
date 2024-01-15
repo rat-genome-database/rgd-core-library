@@ -673,6 +673,27 @@ public class VariantDAO extends JdbcBaseDAO {
         return getCount(sql);
     }
 
+    public boolean hasDamagingVariants(int sampleId, String mapKey) throws Exception {
+        //String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
+        String sql = "select count(*) as count " +
+                "from POLYPHEN p inner join VARIANT v \n"+
+                " on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging'  " +
+                " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8"+
+                "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey + " and rownum < 2";
+
+        int count = getCount(sql);
+
+        if (count > 0) {
+            return true;
+        }else {
+            return false;
+        }
+
+        //return getCount(sql);
+    }
+
+
     /**
      * get the list of damaging or possibly damaging variants associated with the sample
      * @param sampleId
