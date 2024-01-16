@@ -115,6 +115,15 @@ public class PhenominerDAO extends AbstractDAO {
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q);
     }
+
+    public List<Study> getStudiesNew(int rowCount) throws Exception {
+        String query = "SELECT * FROM study ORDER BY study_id desc FETCH First ? ROWS ONLY";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        return execute(q,rowCount);
+    }
+
+
     /**
      *  Return all Phenominer Units
      *  @return list of all phenominerUnits
