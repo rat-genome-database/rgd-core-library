@@ -115,13 +115,13 @@ public class PhenominerDAO extends AbstractDAO {
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q);
     }
-
-    public List<Study> getStudiesNew(int rowCount) throws Exception {
-        String query = "SELECT * FROM study ORDER BY study_id desc FETCH First ? ROWS ONLY";
-
+    public List<Study> getStudiesByPageNum(int pageNumber, int pageSize) throws Exception {
+        int offset = (pageNumber - 1) * pageSize;
+        String query = "SELECT * FROM study ORDER BY study_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
-        return execute(q,rowCount);
+        return execute(q, offset, pageSize);
     }
+
 
 
     /**
