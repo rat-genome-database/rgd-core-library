@@ -30,6 +30,7 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
     private String mostSignificantCmoTerm;
     private Integer speciesTypeKey;
     private String peakRsId;
+    private Double pValueMlog;
 
     public Integer getKey() {
         return key;
@@ -191,4 +192,11 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
         this.peakRsId = peakRsId;
     }
 
+    public Double getpValueMlog() {
+        return pValueMlog;
+    }
+
+    public void setpValueMlog(Double pValueMlog) {
+        this.pValueMlog = pValueMlog;
+    }
 }

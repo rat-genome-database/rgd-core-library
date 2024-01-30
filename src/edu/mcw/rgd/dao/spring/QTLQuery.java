@@ -52,6 +52,7 @@ public class QTLQuery extends MappingSqlQuery {
         qtl.setMostSignificantCmoTerm(rs.getString("most_significant_cmo_term"));
         qtl.setSpeciesTypeKey(rs.getInt("species_type_key"));
         qtl.setPeakRsId(rs.getString("PEAK_RS_ID"));
+        qtl.setpValueMlog(rs.getDouble("P_VAL_MLOG"));
         return qtl;
     }
 
