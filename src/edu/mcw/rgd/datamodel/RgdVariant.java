@@ -18,6 +18,15 @@ public class RgdVariant implements Identifiable, Speciated, ObjectWithName {
     private String varNuc;
     private String notes;
     private int speciesTypeKey;
+    private String soAccId;
+
+    public String getSoAccId() {
+        return soAccId;
+    }
+
+    public void setSoAccId(String soAccId) {
+        this.soAccId = soAccId;
+    }
 
     public int getRgdId() {
         return rgdId;

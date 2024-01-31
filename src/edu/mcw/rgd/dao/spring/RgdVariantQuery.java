@@ -34,6 +34,9 @@ public class RgdVariantQuery extends MappingSqlQuery {
         variant.setVarNuc(rs.getString("var_nuc"));
         variant.setNotes(rs.getString("notes"));
         variant.setSpeciesTypeKey(rs.getInt("species_type_key"));
+        try {
+            variant.setSoAccId(rs.getString("so_acc_id"));
+        }catch (Exception e){}
         return variant;
     }
 

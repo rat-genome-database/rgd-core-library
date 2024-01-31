@@ -106,4 +106,6 @@ public class RgdVariantDAO extends AbstractDAO {
         String query = "select v.*, ri.species_type_key from rgd_strains_rgd rsr, variants v, rgd_ids ri where rsr.strain_key=? and rsr.rgd_id=v.rgd_id and v.rgd_id = ri.rgd_id";
         return executeVariantsQuery(query, strainKey);
     }
+
+
 }
