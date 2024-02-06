@@ -9,6 +9,7 @@ import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.*;
 import java.util.*;
@@ -2144,6 +2145,28 @@ public class AnnotationDAO extends AbstractDAO {
         }
 
         return annot.getKey();
+    }
+
+    public int insertAnnotationsBatch(Collection<Annotation> annots) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
+                " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
+                        " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
+                        " xref_source, annotation_extension, gene_product_form_id, original_created_date, full_annot_key) "+
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)",
+                new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+                        Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.INTEGER});
+        su.compile();
+        for (Annotation annot : annots){
+            int fullAnnotKey = this.getNextKeyFromSequence("full_annot_seq");
+            annot.setKey(fullAnnotKey);
+
+            su.update(annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(), annot.getDataSrc(), annot.getObjectSymbol(),
+                    annot.getRefRgdId(), annot.getEvidence(), annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
+                    annot.getQualifier(), annot.getRelativeTo(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
+                    annot.getXrefSource(), annot.getAnnotationExtension(), annot.getGeneProductFormId(), annot.getOriginalCreatedDate(), annot.getKey());
+        }
+        return executeBatch(su);
     }
 
     /**

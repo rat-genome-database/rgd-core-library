@@ -7,9 +7,12 @@ import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.MappedQTL;
 import edu.mcw.rgd.datamodel.QTL;
 
+import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 
 import edu.mcw.rgd.datamodel.RgdId;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 /**
  * @author jdepons
@@ -155,6 +158,25 @@ public class QTLDAO extends AbstractDAO {
                 qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
                 qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
                 qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(),qtl.getPeakRsId(), qtl.getpValueMlog());
+    }
+
+    public int insertQTLBatch(Collection<QTL> qtls) throws Exception{
+
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"INSERT INTO qtls (qtl_key, qtl_symbol, qtl_name, qtl_symbol_lc, qtl_name_lc, " +
+                "peak_offset, chromosome, lod, p_value, variance, notes, FLANK_1_RGD_ID, FLANK_2_RGD_ID, PEAK_RGD_ID, INHERITANCE_TYPE, LOD_IMAGE, " +
+                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID, P_VAL_MLOG) "+
+                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?)",
+                new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER,
+                        Types.DOUBLE, Types.DOUBLE, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.DOUBLE});
+        su.compile();
+        for (QTL qtl : qtls) {
+            su.update(this.getNextKey("QTLS", "QTL_KEY"), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
+                    qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
+                    qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
+                    qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(), qtl.getPeakRsId(), qtl.getpValueMlog());
+        }
+        return executeBatch(su);
     }
 
     /**
