@@ -153,8 +153,9 @@ public class QTLDAO extends AbstractDAO {
                 "FLANK_1_RGD_ID, FLANK_2_RGD_ID, PEAK_RGD_ID, INHERITANCE_TYPE, LOD_IMAGE, " +
                 "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID, P_VAL_MLOG) "+
                 "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?)";
-
-        update(sql, this.getNextKey("QTLS","QTL_KEY"), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
+        int qtlKey = this.getNextKeyFromSequence("QTL_KEY_SEQ");
+        qtl.setKey(qtlKey);
+        update(sql, qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
                 qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
                 qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
                 qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(),qtl.getPeakRsId(), qtl.getpValueMlog());
