@@ -171,7 +171,9 @@ public class QTLDAO extends AbstractDAO {
                         Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.DOUBLE});
         su.compile();
         for (QTL qtl : qtls) {
-            su.update(this.getNextKey("QTLS", "QTL_KEY"), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
+            int qtlKey = this.getNextKeyFromSequence("QTL_KEY_SEQ");
+            qtl.setKey(qtlKey);
+            su.update(qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
                     qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
                     qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
                     qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(), qtl.getPeakRsId(), qtl.getpValueMlog());
