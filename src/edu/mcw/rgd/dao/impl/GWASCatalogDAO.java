@@ -89,4 +89,14 @@ public class GWASCatalogDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsId);
     }
+
+    public GWASCatalog getGwasCatalogByQTLRgdId(int qtlRgdId) throws Exception{
+        String sql = "select * from gwas_catalog where qtl_rgd_id=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<GWASCatalog> list = q.execute(qtlRgdId);
+        if (list.size() != 1)
+            return null;
+        return list.get(0);
+    }
 }
