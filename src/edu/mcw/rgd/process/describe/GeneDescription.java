@@ -1,5 +1,7 @@
 package edu.mcw.rgd.process.describe;
 
+import edu.mcw.rgd.dao.impl.GeneDAO;
+
 import java.util.*;
 import java.io.*;
 
@@ -17,19 +19,21 @@ public class GeneDescription {
     public static final int GC_CHEBI = 6;
     public static final int GC_COUNT = 7;
 
-    // Stores annotated term's attributes if it belongs to given Ontology
+	String geneType = "";
+
+	// Stores annotated term's attributes if it belongs to given Ontology
     private List<AnnotationAttributes> [] geneContents = (List<AnnotationAttributes>[]) new ArrayList[GC_COUNT];
 
     public String description = null;// Stores the Gene Description as a String Object
 
 	//Constructor initializes instance variables and ArrayLists
-	public GeneDescription(String id, String name)
-	{
+	public GeneDescription(String id, String name) throws Exception {
 		setGeneId(id);
 		setGeneName(name);
         for( int i=0; i<GC_COUNT; i++ ) {
 		    geneContents[i] = new ArrayList<AnnotationAttributes>(3);
         }
+		geneType=new GeneDAO().getGene(Integer.parseInt(gene_id)).getType();
 		description = "";
 	}
 
@@ -95,6 +99,11 @@ public class GeneDescription {
 	*********************************************************************************************************************************/
 	public String createDescriptionMolecularFunction()
 	{
+		if(!(geneType.isEmpty())) {
+			if (!(geneType).equals("proten-coding")) {
+				return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a " + geneType + " that exhibits ", 0);
+			}
+		}
         return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a protein that exhibits ", 0);
 	}
 
@@ -242,11 +251,10 @@ public class GeneDescription {
 	* of the element is removed										*
 	*********************************************************************************************************/
 
-	public void createDescription()
-	{
+	public void createDescription(){
 		//output.format("%n%n%s%s%s%s%s%n", "Description for gene: \"", getGeneId(), "-", getGeneName(), "\" is:");
         StringBuilder buf = new StringBuilder(description);
-        buf.append(createDescriptionMolecularFunction());
+		buf.append(createDescriptionMolecularFunction());
 		buf.append(createDescriptionBiologicalProcess());
 		buf.append(createDescriptionPathway());
 		buf.append(createDescriptionPhenotype());
@@ -255,6 +263,25 @@ public class GeneDescription {
         buf.append(createDescriptionChebi());
         description = buf.toString();
 	}
+
+//	public String createDescriptionMolecularFunctionForNonProteinGeneType(String geneType)
+//	{
+//		return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a "+geneType+" that exhibits ", 0);
+//	}
+//
+//	public void createDescriptionForNonProteinGeneTypes(String geneType)
+//	{
+//		//output.format("%n%n%s%s%s%s%s%n", "Description for gene: \"", getGeneId(), "-", getGeneName(), "\" is:");
+//		StringBuilder buf = new StringBuilder(description);
+//		buf.append(createDescriptionMolecularFunctionForNonProteinGeneType(geneType));
+//		buf.append(createDescriptionBiologicalProcess());
+//		buf.append(createDescriptionPathway());
+//		buf.append(createDescriptionPhenotype());
+//		buf.append(createDescriptionDisease());
+//		buf.append(createDescriptionCellularComponent());
+//		buf.append(createDescriptionChebi());
+//		description = buf.toString();
+//	}
 
 	//returns size for ArrayList geneContents
 	public int getGeneContentSize(int gc)
@@ -276,8 +303,7 @@ public class GeneDescription {
 	}
 
 	// Constructor with no arguments
-	public GeneDescription()
-	{
+	public GeneDescription() throws Exception {
         for( int i=0; i<GC_COUNT; i++ ) {
 		    geneContents[i] = new ArrayList<AnnotationAttributes>(3);
         }
