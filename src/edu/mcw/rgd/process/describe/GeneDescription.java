@@ -100,7 +100,7 @@ public class GeneDescription {
 	public String createDescriptionMolecularFunction()
 	{
 		if(!(geneType.isEmpty())) {
-			if (!(geneType).equals("proten-coding")) {
+			if (!(geneType).equals("protein-coding")) {
 				return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES an " + geneType + " that exhibits ", 0);
 			}
 		}
