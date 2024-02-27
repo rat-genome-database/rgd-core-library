@@ -101,7 +101,7 @@ public class GeneDescription {
 	{
 		if(!(geneType.isEmpty())) {
 			if (!(geneType).equals("proten-coding")) {
-				return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a " + geneType + " that exhibits ", 0);
+				return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES an " + geneType + " that exhibits ", 0);
 			}
 		}
         return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a protein that exhibits ", 0);
@@ -263,25 +263,6 @@ public class GeneDescription {
         buf.append(createDescriptionChebi());
         description = buf.toString();
 	}
-
-//	public String createDescriptionMolecularFunctionForNonProteinGeneType(String geneType)
-//	{
-//		return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a "+geneType+" that exhibits ", 0);
-//	}
-//
-//	public void createDescriptionForNonProteinGeneTypes(String geneType)
-//	{
-//		//output.format("%n%n%s%s%s%s%s%n", "Description for gene: \"", getGeneId(), "-", getGeneName(), "\" is:");
-//		StringBuilder buf = new StringBuilder(description);
-//		buf.append(createDescriptionMolecularFunctionForNonProteinGeneType(geneType));
-//		buf.append(createDescriptionBiologicalProcess());
-//		buf.append(createDescriptionPathway());
-//		buf.append(createDescriptionPhenotype());
-//		buf.append(createDescriptionDisease());
-//		buf.append(createDescriptionCellularComponent());
-//		buf.append(createDescriptionChebi());
-//		description = buf.toString();
-//	}
 
 	//returns size for ArrayList geneContents
 	public int getGeneContentSize(int gc)
