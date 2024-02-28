@@ -355,6 +355,17 @@ public class StrainDAO extends AbstractDAO {
         return status.key;
     }
 
+    /**    returns list of active HRDP Strains
+     */
+    public List<Strain> getActiveHrdpStrains() throws Exception {
+        String sql= """
+                select s.*, r.SPECIES_TYPE_KEY from strains s, RGD_IDS r, variant_sample_group vsg
+                where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID
+                and vsg.strain_rgd_id=s.rgd_id and lower(vsg.group_name)=lower('HRDP')
+                """;
+        return executeStrainQuery(sql);
+    }
+
     /**
      * StrainDAOException should be thrown by StrainDAO methods to differentiate between ours and the framework's exceptions
      */
