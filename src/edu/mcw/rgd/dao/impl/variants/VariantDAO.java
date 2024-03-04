@@ -5,6 +5,7 @@ import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
+import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
@@ -323,5 +324,14 @@ public class VariantDAO extends AbstractDAO {
             catch (Exception ignored){  }
         }
         return pos;
+    }
+
+    public int insertSample(Sample sample) throws Exception{
+        String sql = "INSERT INTO SAMPLE (SAMPLE_ID, ANALYSIS_NAME, ANALYSIS_TIME, DESCRIPTION, PATIENT_ID, SEQUENCER, GENDER, GRANT_NUMBER," +
+                " SEQUENCED_BY, WHERE_BRED, SECONDARY_ANALYSIS_SOFTWARE, MAP_KEY, DBSNP_SOURCE, STRAIN_RGD_ID, REF_RGD_ID)" +
+                " VALUES (?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?,?,?,?,?)";
+        return update(sql,sample.getId(),sample.getAnalysisName(),sample.getDescription(),sample.getPatientId(),sample.getSequencer(),sample.getGender(),
+                sample.getGrantNumber(), sample.getSequencedBy(),sample.getWhereBred(), sample.getSecondaryAnalysisSoftware(), sample.getMapKey(),
+                sample.getDbSnpSource(),sample.getStrainRgdId(),sample.getRefRgdId());
     }
 }

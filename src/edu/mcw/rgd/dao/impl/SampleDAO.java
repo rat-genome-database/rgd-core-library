@@ -148,4 +148,16 @@ public class SampleDAO extends JdbcBaseDAO {
         List<Sample> samples = q.execute(strainRgdId);
         return samples;
     }
+
+    public Sample getSampleByAnalysisNameAndMapKey(String analysisName, int mapKey) throws Exception{
+        String sql = "select * from sample where analysis_name like ? and map_key=?";
+        SampleQuery q = new SampleQuery(this.getDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        List<Sample> samples = q.execute(analysisName, mapKey);
+        if (samples == null || samples.isEmpty())
+            return null;
+        return samples.get(0);
+    }
 }
