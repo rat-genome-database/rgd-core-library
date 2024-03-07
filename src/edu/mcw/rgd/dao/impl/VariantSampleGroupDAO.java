@@ -20,4 +20,11 @@ public class VariantSampleGroupDAO extends AbstractDAO {
         return il.execute();
     }
 
+    public List<Integer> getVariantSamples(String groupName,String subGroup) throws Exception{
+        String sql = "select * from variant_sample_group where lower(group_name)=lower('" + groupName + "') and lower(sub_group_name)=lower('"+subGroup+"')";
+        IntListQuery il = new IntListQuery(this.getDataSource(),sql);
+        return il.execute();
+    }
+
+
 }

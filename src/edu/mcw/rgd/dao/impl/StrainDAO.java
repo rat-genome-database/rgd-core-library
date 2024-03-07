@@ -355,15 +355,29 @@ public class StrainDAO extends AbstractDAO {
         return status.key;
     }
 
-    /**    returns list of active HRDP Strains
+    /**
+     * returns list of active Strains by groupName
+     * @param groupName group name such as HRDP,HS Founder etc
+     * @return returns list of strains by the group name
+     * @throws Exception
      */
-    public List<Strain> getActiveHrdpStrains() throws Exception {
-        String sql= """
-                select s.*, r.SPECIES_TYPE_KEY from strains s, RGD_IDS r, variant_sample_group vsg
-                where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID
-                and vsg.strain_rgd_id=s.rgd_id and lower(vsg.group_name)=lower('HRDP')
-                """;
-        return executeStrainQuery(sql);
+    public List<Strain>getStrainsByGroupName(String groupName) throws Exception{
+        List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName);
+        List<Strain>strains = getStrains(strainIds);
+        return strains;
+    }
+
+    /**
+     * returns list of active Strains by groupName and subGroupName
+     * @param groupName group name such as HRDP,HS Founder etc
+     * @param subGroupName sub group name such as Divergent Classic Inbred Strains etc
+     * @return returns list of strains by the group name and sub group name
+     * @throws Exception
+     */
+    public List<Strain>getStrainsByGroupNameAndSubGroupName(String groupName, String subGroupName) throws Exception{
+        List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName,subGroupName);
+        List<Strain>strains = getStrains(strainIds);
+        return strains;
     }
 
     /**

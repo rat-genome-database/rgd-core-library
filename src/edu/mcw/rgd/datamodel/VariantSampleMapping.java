@@ -13,6 +13,7 @@ public class VariantSampleMapping {
 
     private int strainRgdId;
     private String groupName;
+    private String subGroupName;
 
     public int getStrainRgdId() {
         return strainRgdId;
@@ -28,5 +29,13 @@ public class VariantSampleMapping {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getSubGroupName() {
+        return subGroupName;
+    }
+
+    public void setSubGroupName(String subGroupName) {
+        this.subGroupName = subGroupName;
     }
 }
