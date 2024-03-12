@@ -297,6 +297,19 @@ public class MapDAO extends AbstractDAO {
     }
 
     /**
+     * get positions
+     * @param rsId object rsId
+     * @param mapKey map key
+     * @return list of MapData objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<MapData> getMapData(String rsId, int mapKey) throws Exception{
+
+        String query = "SELECT * FROM maps_data WHERE notes=? AND map_key=?";
+        return executeMapDataQuery(query, rsId, mapKey);
+    }
+
+    /**
      * get map position given map data key
      * @param mapDataKey map data key
      * @return MapData object when key is valid
