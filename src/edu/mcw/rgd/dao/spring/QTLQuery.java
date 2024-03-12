@@ -42,17 +42,18 @@ public class QTLQuery extends MappingSqlQuery {
         qtl.setFlank1RgdId(rs.getInt("flank_1_rgd_id"));
         if (rs.wasNull()) qtl.setFlank1RgdId(null);
         qtl.setFlank2RgdId(rs.getInt("flank_2_rgd_id"));
-        //if (rs.wasNull()) qtl.setFlank2RgdId(null);
-        //qtl.setPeakRgdId(rs.getInt("peak_rgd_id"));
+        if (rs.wasNull()) qtl.setFlank2RgdId(null);
+        qtl.setPeakRgdId(rs.getInt("peak_rgd_id"));
         if (rs.wasNull()) qtl.setPeakRgdId(null);
         qtl.setInheritanceType(rs.getString("inheritance_type"));
         qtl.setLodImage(rs.getString("lod_image"));
-       // qtl.setLinkageImage(rs.getString("linkage_image"));
+        qtl.setLinkageImage(rs.getString("linkage_image"));
         qtl.setSourceUrl(rs.getString("source_url"));
         qtl.setMostSignificantCmoTerm(rs.getString("most_significant_cmo_term"));
         qtl.setSpeciesTypeKey(rs.getInt("species_type_key"));
         qtl.setPeakRsId(rs.getString("PEAK_RS_ID"));
         qtl.setpValueMlog(rs.getDouble("P_VAL_MLOG"));
+        if (rs.wasNull()) qtl.setpValueMlog(null);
         return qtl;
     }
 
