@@ -2769,7 +2769,6 @@ public class PhenominerDAO extends AbstractDAO {
 
     public OverlapReport getRecordCountOverlap(List<String> term1AccIds, List<String> term2AccIds, String column, int studyId) throws Exception {
 
-        System.out.println("in getRecordCountOverlap(List<String> term1AccIds, List<String> term2AccIds, String column, int studyId)");
         String query = "SELECT distinct fai.term_acc as term1, fai2.term_acc as term2, fai." + column + " as rid, fai.study_id, fai.study_name ";
 
         if (!column.equals("study_id")) {
@@ -2834,7 +2833,6 @@ public class PhenominerDAO extends AbstractDAO {
     }
 
     public List getTermIdsAndChildrenWithRecords(String term1AccId, String term2AccId, int studyId) throws Exception {
-        System.out.println("getTermIdsAndChildrenWithRecords(String term1AccId, String term2AccId, int studyId)");
         String query = "SELECT distinct fai.primary_term_acc as term1, fai2.primary_term_acc as term2";
 
         query += " from full_record_index fai, full_record_index fai2 WHERE fai.experiment_record_id = fai2.experiment_record_id ";
@@ -2847,26 +2845,26 @@ public class PhenominerDAO extends AbstractDAO {
 
         HashMap hm = new HashMap();
 
-        Connection conn = this.getConnection();
-        Statement st = conn.createStatement();
+        try( Connection conn = this.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query);) {
 
-        ResultSet rs = st.executeQuery(query);
-
-        while (rs.next()) {
-            hm.put(rs.getString(1), null);
-            hm.put(rs.getString(2), null);
-        }
+            while (rs.next()) {
+                hm.put(rs.getString(1), null);
+                hm.put(rs.getString(2), null);
+            }
+        }catch (Exception e){e.printStackTrace();}
 
         ArrayList al = new ArrayList();
         Iterator it = hm.keySet().iterator();
         while (it.hasNext()) {
             String termAccId=(String) it.next();
             String[] termParts = termAccId.split(":");
-            al.add(termParts[0] + ":" + Integer.parseInt(termParts[1]));
+            // al.add(termParts[0] + ":" + Integer.parseInt(termParts[1]));
+            al.add(termAccId);
         }
 
         return al;
-
     }
 
 
