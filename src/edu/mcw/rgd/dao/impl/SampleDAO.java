@@ -1,5 +1,6 @@
 package edu.mcw.rgd.dao.impl;
 
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.SampleQuery;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.process.Utils;
@@ -159,5 +160,17 @@ public class SampleDAO extends JdbcBaseDAO {
         if (samples == null || samples.isEmpty())
             return null;
         return samples.get(0);
+    }
+
+    public List<Sample> getSamplesByStrainRgdIdAndMapKey(int strainRgdId,int mapKey) throws Exception{
+        String sql = "SELECT * FROM sample WHERE strain_rgd_id IN ? AND map_key=?";
+//        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
+        SampleQuery q = new SampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.compile();
+        List<Sample> samples = q.execute(strainRgdId,mapKey);
+        return samples.isEmpty() ? null : samples;
     }
 }
