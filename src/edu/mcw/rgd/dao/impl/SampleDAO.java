@@ -164,8 +164,8 @@ public class SampleDAO extends JdbcBaseDAO {
 
     public List<Sample> getSamplesByStrainRgdIdAndMapKey(int strainRgdId,int mapKey) throws Exception{
         String sql = "SELECT * FROM sample WHERE strain_rgd_id IN ? AND map_key=?";
-//        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
-        SampleQuery q = new SampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
+//        SampleQuery q = new SampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
 
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
