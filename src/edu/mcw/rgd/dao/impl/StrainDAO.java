@@ -355,6 +355,15 @@ public class StrainDAO extends AbstractDAO {
         return status.key;
     }
 
+    /**Returns strains by the strain symbol sorted in ascending order
+     * */
+    public List<Strain> getStrainsBySymbolAscSorted(List<Integer> rgdIdsList) throws Exception {
+        String query = "SELECT s.*,r.species_type_key FROM strains s, rgd_ids r "+
+                "where r.RGD_ID=s.RGD_ID "+
+                "and r.RGD_ID in ("+Utils.buildInPhrase(rgdIdsList)+")"+"order by strain_symbol asc";
+        return executeStrainQuery(query);
+    }
+
     /**
      * returns list of active Strains by groupName
      * @param groupName group name such as HRDP,HS Founder etc
@@ -363,7 +372,7 @@ public class StrainDAO extends AbstractDAO {
      */
     public List<Strain>getStrainsByGroupName(String groupName) throws Exception{
         List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName);
-        List<Strain>strains = getStrains(strainIds);
+        List<Strain>strains = getStrainsBySymbolAscSorted(strainIds);
         return strains;
     }
 
@@ -376,7 +385,7 @@ public class StrainDAO extends AbstractDAO {
      */
     public List<Strain>getStrainsByGroupNameAndSubGroupName(String groupName, String subGroupName) throws Exception{
         List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName,subGroupName);
-        List<Strain>strains = getStrains(strainIds);
+        List<Strain>strains = getStrainsBySymbolAscSorted(strainIds);
         return strains;
     }
 
