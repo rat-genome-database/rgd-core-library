@@ -140,6 +140,17 @@ public class QTLDAO extends AbstractDAO {
                 qtl.getPeakRsId(), qtl.getpValueMlog(), qtl.getRgdId());
     }
 
+    public void updateQTLNameBatch(Collection<QTL> qtls) throws Exception {
+        BatchSqlUpdate sql = new BatchSqlUpdate(this.getDataSource(),
+                "update QTLS set QTL_NAME=? where RGD_ID=?",
+                new int[]{Types.VARCHAR,Types.INTEGER});
+        sql.compile();
+        for (QTL q : qtls){
+            sql.update(q.getName(), q.getRgdId());
+        }
+        sql.flush();
+    }
+
     /**
      * insert a qtl into the data store
      * note: qtl_key is generated automatically; rgd_id must be specified
