@@ -335,4 +335,9 @@ public class VariantDAO extends AbstractDAO {
                 sample.getDbSnpSource(),sample.getStrainRgdId(),sample.getRefRgdId());
     }
 
+    public int insertSampleDetail(VariantSampleDetail vs) throws Exception{
+        String sql = "INSERT INTO variant_sample_detail (RGD_ID,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ) VALUES (?,?,?,?)";
+        return update(sql,vs.getId(),vs.getSampleId(),vs.getDepth(),vs.getVariantFrequency());
+    }
+
 }
