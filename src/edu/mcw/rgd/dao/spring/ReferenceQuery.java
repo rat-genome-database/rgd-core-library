@@ -44,7 +44,7 @@ public class ReferenceQuery extends MappingSqlQuery {
         ref.setUrlWebReference(rs.getString("url_web_reference"));        
         ref.setSpeciesTypeKey(rs.getInt("species_type_key"));
         ref.setDoi(rs.getString("doi"));
-
+        ref.setLastModifiedDate(rs.getString("last_modified_date"));
         return ref;
     }
 
