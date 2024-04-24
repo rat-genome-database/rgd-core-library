@@ -2217,4 +2217,15 @@ public class AnnotationDAO extends AbstractDAO {
 
     }
 
+    public List<StringMapQuery.MapPair> getChildOntIds(String ontId) throws Exception{
+        String sql = """
+             select distinct fa.term_acc,fa.annotated_object_rgd_id from full_annot fa,full_annot_index fai,strains s where fa.full_annot_key=fai.full_annot_key
+             and fa.rgd_object_key=5 
+             and s.rgd_id = fa.annotated_object_rgd_id
+             and fai.term_acc in (select parent_term_acc from ont_dag where child_term_acc = ?)
+             and s.strain_type_name_lc in ('inbred','recombinant_inbred')
+             """;
+        return StringMapQuery.execute(this,sql, ontId);
+    }
+
 }
