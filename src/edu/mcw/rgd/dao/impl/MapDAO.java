@@ -48,6 +48,28 @@ public class MapDAO extends AbstractDAO {
         }
     }
 
+    public  AssemblyStats getAssemblyStats(int  mapKey) throws Exception {
+        String sql="select * from assembly_stats where map_key=?";
+        AssemblyStatsQuery query= new AssemblyStatsQuery(this.getDataSource(), sql);
+        List<AssemblyStats> stats=execute(query, mapKey);
+        return stats!=null && stats.size()>0?stats.get(0):null;
+    }
+    public void insertAssemblyStats(AssemblyStats stats) throws Exception {
+        String sql="insert into assembly_stats(MAP_KEY, TOTAL_SEQUENCE_LENGTH, TOTAL_UNGAPPED_LENGTH, " +
+                "GAPS_BETWEEN_SCAFFOLDS, NUMBER_OF_SCAFFOLDS, SCAFFOLDN50, SCAFFOLDL50, NUMBER_OF_CONTIGS, " +
+                "CONTIGN50, CONTIGL50, TOTAL_NUMBER_OF_CHROMOSOME) " +
+                "values(?,?,?,?,?,?,?,?,?,?,?)";
+        update(sql, stats.getMapKey(), stats.getTotalSequenceLength(), stats.getTotalUngappedLength(),
+                stats.getGapsBetweenScaffolds(), stats.getNumberOfScaffolds(),stats.getScaffoldN50(), stats.getScaffoldL50(),stats.getNumberOfContigs(),
+                stats.getContigN50(), stats.getContigL50(),stats.getTotalNumberOfChromosome());
+
+    }
+
+    public int deleteAssemblyStats(int mapKey) throws Exception{
+
+        String sql = "DELETE FROM assembly_stats WHERE map_key=?";
+        return update(sql, mapKey);
+    }
     /**
      * get all active maps for given species and assembly source
      * @param speciesTypeKey species type key
