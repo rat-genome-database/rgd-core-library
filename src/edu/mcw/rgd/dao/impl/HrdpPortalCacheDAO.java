@@ -29,7 +29,7 @@ public class HrdpPortalCacheDAO extends AbstractDAO {
 
     public List<HrdpPortalCache> getHrdpStrainsByGroupName(String groupName) throws Exception{
         String sql = """
-                Select * from HRDP_PORTAL_CACHE where group_name=?
+                Select * from HRDP_PORTAL_CACHE where group_name=? order by strain_symbol
                 """;
         return HrdpPortalCacheQuery.execute(this,sql,groupName);
     }
