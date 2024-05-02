@@ -212,13 +212,38 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public List<VariantMapData> getVariantExtWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
-        String sql = "select * from variant_ext v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?";
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY\s
+                FROM variant v, variant_map_data vm, RGD_IDS r\s
+                where v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?\s
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
+                FROM variant_ext v, variant_map_data vmd, RGD_IDS r\s
+                where v.rgd_id=vmd.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vmd.map_key=? and vmd.chromosome=? and vmd.start_pos between ? and ?\s
+                )
+                 order by chromosome, start_pos""";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(mapKey,chrom,start,stop);
+    }
+
+    public List<VariantMapData> getAllActiveVariantsByRsId(String rsID) throws Exception {
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY\s
+                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'\s
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
+                FROM variant_ext v, variant_map_data vmd, RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                )""";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getDataSource(),sql );
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rsID,rsID);
     }
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
