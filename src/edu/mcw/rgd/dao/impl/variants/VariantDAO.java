@@ -228,7 +228,11 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
-        return q.execute(mapKey,chrom,start,stop);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey,chrom,start,stop, mapKey,chrom,start,stop);
     }
 
     public List<VariantMapData> getAllActiveVariantsByRsId(String rsID) throws Exception {
