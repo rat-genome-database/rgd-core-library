@@ -244,7 +244,7 @@ public class VariantDAO extends AbstractDAO {
                 SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
                 FROM variant_ext v, variant_map_data vmd, RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
                 )""";
-        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getDataSource(),sql );
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql );
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsID,rsID);
