@@ -101,7 +101,7 @@ public class GeneDescription {
 	public String createDescriptionMolecularFunction()
 	{
 		if(Utils.stringsAreEqual(geneType,"pseudo")){
-			return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a " + geneType + " that exhibits ", 0);
+			return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES a " + geneType +"gene" +" that exhibits ", 0);
 		}
 		if(!Utils.stringsAreEqual(geneType,"protein-coding")&&!Utils.stringsAreEqual(geneType,"pseudo")){
 			return createDescription(GC_MOLECULAR_FUNCTION, "ENCODES an " + geneType + " that exhibits ", 0);
