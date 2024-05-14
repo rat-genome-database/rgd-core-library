@@ -161,10 +161,10 @@ public class VariantDAO extends AbstractDAO {
     public List<VariantMapData> getAllVariantsByRgdId(int rgdId) throws Exception{
         String sql = """
                 select * from (
-                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY\s
-                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'\s
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY
+                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
                 UNION ALL
-                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY
                 FROM variant_ext v, variant_map_data vmd,  RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
                 )""";
         VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
