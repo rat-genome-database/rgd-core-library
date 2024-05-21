@@ -494,4 +494,16 @@ public class VariantDAO extends AbstractDAO {
         }
         return totalRowsAffected;
     }
+
+    public void insertVariantRgdIds(List<VariantMapData> vmds) throws Exception{
+        BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER});
+        sql.compile();
+        for (VariantMapData vmd : vmds){
+            long rgdId = vmd.getId();
+            sql.update(rgdId);
+        }
+        sql.flush();
+        return;
+    }
 }
