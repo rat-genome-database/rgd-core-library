@@ -475,7 +475,7 @@ public class ReportDAO extends AbstractDAO {
                         int x = (int) Math.ceil(w);
                         double y = x - w;
                         int z = (int) Math.round(Math.pow(10, y));
-                        String convertedPVal = z + "E-" + x;
+                        String convertedPVal = z + "e-" + x;
                         r.append(convertedPVal);
                     }
                     catch (Exception e){
@@ -581,7 +581,7 @@ public class ReportDAO extends AbstractDAO {
                             int x = (int) Math.ceil(w);
                             double y = x - w;
                             int z = (int) Math.round(Math.pow(10, y));
-                            String convertedPVal = z + "E-" + x;
+                            String convertedPVal = z + "e-" + x;
                             r.append(convertedPVal);
                         }
                         catch (Exception e){
