@@ -466,8 +466,9 @@ public class ReportDAO extends AbstractDAO {
                 r.append(rs.getString("lod"));
 
                 String pVal = rs.getString("p_value");
-                String pValMlog =rs.getString("P_VAL_MLOG");
+                String pValMlog = rs.getString("P_VAL_MLOG");
                 Formatter formatter = new Formatter();
+                float pValf = Float.parseFloat(pVal);
                 if (!Utils.isStringEmpty(pValMlog)) {
                     try {
                         double w = Double.parseDouble(pValMlog);
@@ -478,13 +479,13 @@ public class ReportDAO extends AbstractDAO {
                         r.append(convertedPVal);
                     }
                     catch (Exception e){
-                        formatter.format("%6.1e", pVal);
+                        formatter.format("%6e", pValf);
                         r.append(formatter + "");
                     }
                 }
                 else {
                     if (!Utils.isStringEmpty(pVal)) {
-                        formatter.format("%6.1e", pVal);
+                        formatter.format("%6e", pValf);
                         r.append(formatter + "");
                     }
                     else
@@ -577,6 +578,7 @@ public class ReportDAO extends AbstractDAO {
                     String pVal = rs.getString("p_value");
                     String pValMlog = rs.getString("P_VAL_MLOG");
                     Formatter formatter = new Formatter();
+                    float pValf = Float.parseFloat(pVal);
                     if (!Utils.isStringEmpty(pValMlog)) {
                         try {
                             double w = Double.parseDouble(pValMlog);
@@ -587,13 +589,13 @@ public class ReportDAO extends AbstractDAO {
                             r.append(convertedPVal);
                         }
                         catch (Exception e){
-                            formatter.format("%6.1e", pVal);
+                            formatter.format("%6e", pValf);
                             r.append(formatter + "");
                         }
                     }
                     else {
                         if (!Utils.isStringEmpty(pVal)) {
-                            formatter.format("%6.1e", pVal);
+                            formatter.format("%6e", pValf);
                             r.append(formatter + "");
                         }
                         else
