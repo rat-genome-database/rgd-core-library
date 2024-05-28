@@ -479,17 +479,13 @@ public class ReportDAO extends AbstractDAO {
                         r.append(convertedPVal);
                     }
                     catch (Exception e){
-                        formatter.format("%6e", pValf);
+                        formatter.format("%1.0e", pValf);
                         r.append(formatter + "");
                     }
                 }
                 else {
-                    if (!Utils.isStringEmpty(pVal)) {
-                        formatter.format("%6e", pValf);
+                        formatter.format("%1.0e", pValf);
                         r.append(formatter + "");
-                    }
-                    else
-                        r.append(pVal);
                 }
 
 
@@ -589,17 +585,13 @@ public class ReportDAO extends AbstractDAO {
                             r.append(convertedPVal);
                         }
                         catch (Exception e){
-                            formatter.format("%6e", pValf);
+                            formatter.format("%1.0e", pValf);
                             r.append(formatter + "");
                         }
                     }
                     else {
-                        if (!Utils.isStringEmpty(pVal)) {
-                            formatter.format("%6e", pValf);
-                            r.append(formatter + "");
-                        }
-                        else
-                            r.append(pVal);
+                        formatter.format("%1.0e", pValf);
+                        r.append(formatter + "");
                     }
 
                     r.append(rs.getString("trait_name"));
