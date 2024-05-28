@@ -477,7 +477,7 @@ public class ReportDAO extends AbstractDAO {
                         r.append(convertedPVal);
                     }
                     catch (Exception e){
-                        r.append(String.format("%6.3e",pVal));
+                        r.append(pVal);
                     }
                 }
                 else {
@@ -569,7 +569,29 @@ public class ReportDAO extends AbstractDAO {
                     r.append(rs.getString("qtl_symbol"));
                     r.append(rs.getString("qtl_name"));
                     r.append(rs.getString("lod"));
-                    r.append(rs.getString("p_value"));
+
+                    String pVal = rs.getString("p_value");
+                    String pValMlog =rs.getString("P_VAL_MLOG");
+                    if (!Utils.isStringEmpty(pValMlog)) {
+                        try {
+                            double w = Double.parseDouble(pValMlog);
+                            int x = (int) Math.ceil(w);
+                            double y = x - w;
+                            int z = (int) Math.round(Math.pow(10, y));
+                            String convertedPVal = z + "E-" + x;
+                            r.append(convertedPVal);
+                        }
+                        catch (Exception e){
+                            r.append(pVal);
+                        }
+                    }
+                    else {
+                        if (!Utils.isStringEmpty(pVal))
+                            r.append(String.format("%6.3e",pVal));
+                        else
+                            r.append(pVal);
+                    }
+
                     r.append(rs.getString("trait_name"));
                     r.append(rs.getString("sub_trait_name"));
 
