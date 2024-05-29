@@ -468,11 +468,12 @@ public class ReportDAO extends AbstractDAO {
                 String pVal = rs.getString("p_value");
                 String pValMlog = rs.getString("P_VAL_MLOG");
                 Formatter formatter = new Formatter();
-                Double pValf;
+                Double pValf = null;
                 try {
-                     pValf = Double.parseDouble(pVal);
-                }
-                catch (Exception e){
+                    if (pVal.length()>=10) {
+                        pValf = Double.parseDouble(pVal);
+                    }
+                } catch (Exception e) {
                     pValf = null;
                 }
                 if (!Utils.isStringEmpty(pValMlog)) {
@@ -588,11 +589,13 @@ public class ReportDAO extends AbstractDAO {
                     String pVal = rs.getString("p_value");
                     String pValMlog = rs.getString("P_VAL_MLOG");
                     Formatter formatter = new Formatter();
-                    Double pValf;
+                    Double pValf = null;
+                    // if longer than 10 then make double
                     try {
-                        pValf = Double.parseDouble(pVal);
-                    }
-                    catch (Exception e){
+                        if (pVal.length()>=10) {
+                                pValf = Double.parseDouble(pVal);
+                        }
+                    } catch (Exception e) {
                         pValf = null;
                     }
                     if (!Utils.isStringEmpty(pValMlog)) {
