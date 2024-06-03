@@ -24,7 +24,7 @@ public class HrdpPortalCacheDAO extends AbstractDAO {
                 has_child_pheno_count=?,has_parent_sample_count=?,has_child_sample_count=?,has_phenominer=?,has_variant_visualizer=?,available_strain_id=?,available_strain_symbol=?
                 Where strain_id=? and group_name=?
                 """;
-        return update(sql,hrdp.getStrainSymbol(),hrdp.getParentOntId(),hrdp.getChildOntIds(),hrdp.getParentSampleIds(),hrdp.getChildSampleIds(),hrdp.getHasParentPhenoCount(),hrdp.getHasChildPhenoCount(),hrdp.getHasParentSampleCount(),hrdp.getHasChildSampleCount(),hrdp.getHasPhenominer(),hrdp.getHasVariantVisualizer(),hrdp.getStrainId(),hrdp.getGroupName(),hrdp.getAvailableStrainId(),hrdp.getAvailableStrainSymbol());
+        return update(sql,hrdp.getStrainSymbol(),hrdp.getParentOntId(),hrdp.getChildOntIds(),hrdp.getParentSampleIds(),hrdp.getChildSampleIds(),hrdp.getHasParentPhenoCount(),hrdp.getHasChildPhenoCount(),hrdp.getHasParentSampleCount(),hrdp.getHasChildSampleCount(),hrdp.getHasPhenominer(),hrdp.getHasVariantVisualizer(),hrdp.getAvailableStrainId(),hrdp.getAvailableStrainSymbol(),hrdp.getStrainId(),hrdp.getGroupName());
     }
 
     public List<HrdpPortalCache> getHrdpStrainsByGroupName(String groupName) throws Exception{
