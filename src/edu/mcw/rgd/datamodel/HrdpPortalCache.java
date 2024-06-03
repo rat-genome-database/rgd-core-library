@@ -15,6 +15,8 @@ public class HrdpPortalCache {
     private int hasChildSampleCount;
     private int hasPhenominer;
     private int hasVariantVisualizer;
+    private int availableStrainId;
+    private String availableStrainSymbol;
 
     public int getStrainId() {
         return strainId;
@@ -118,5 +120,21 @@ public class HrdpPortalCache {
 
     public void setHasVariantVisualizer(int hasVariantVisualizer) {
         this.hasVariantVisualizer = hasVariantVisualizer;
+    }
+
+    public int getAvailableStrainId() {
+        return availableStrainId;
+    }
+
+    public void setAvailableStrainId(int availableStrainId) {
+        this.availableStrainId = availableStrainId;
+    }
+
+    public String getAvailableStrainSymbol() {
+        return availableStrainSymbol;
+    }
+
+    public void setAvailableStrainSymbol(String availableStrainSymbol) {
+        this.availableStrainSymbol = availableStrainSymbol;
     }
 }
