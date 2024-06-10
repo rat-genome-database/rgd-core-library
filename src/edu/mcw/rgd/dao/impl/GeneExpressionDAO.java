@@ -278,7 +278,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = "select value_count FROM gene_expression_value_counts ge where ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
                 " and ge.expression_level=? and ge.term_acc = ?";
 
-       return getStringResult(query,rgdId,unit,level,termAcc);
+       return getStringResultAdditive(query,rgdId,unit,level,termAcc);
     }
     /**
      * For given  id, get all gene expression record
