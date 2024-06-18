@@ -291,8 +291,22 @@ public class GeneExpressionDAO extends PhenominerDAO {
                 " CONNECT BY PRIOR child_term_acc=parent_term_acc )" +
                 " AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?)";
         GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(),sql);
-        return execute(q,termAcc, rgdId, unit)
-;    }
+        return execute(q,termAcc, rgdId, unit);
+    }
+
+    public int getGeneExpressionSamplesCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String sql = """
+                select count(*) from sample where sample_id in (
+                        select distinct(sample_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
+                                                select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id\s
+                                                join sample s on s.sample_id = gr.sample_id\s
+                                                join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                                                CONNECT BY PRIOR child_term_acc=parent_term_acc )\s
+                                                AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ?
+                        )
+                )""";
+        return getCount(sql,termAcc,rgdId,unit);
+    }
 
     /**
      * Returns count values for given gene
