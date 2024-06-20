@@ -1356,6 +1356,20 @@ public class PhenominerDAO extends AbstractDAO {
         return sq.execute(objArray);
     }
 
+    public List<Record> getRecordsForGeneExpressionExpRecord(int expId) throws Exception{
+        String query = """
+                SELECT st.study_id, st.study_name, st.ref_rgd_id, er.*, s.*, e.experiment_name, e.experiment_notes
+                                FROM study st, experiment e, gene_expression_exp_record er, sample s
+                                WHERE er.experiment_id=? AND er.sample_id=s.sample_id
+                                AND e.experiment_id = er.experiment_id
+                                AND st.study_id=e.study_id
+                                ORDER BY er.gene_expression_exp_record_id DESC""";
+
+        GeneExpressionFullRecordQuery q = new GeneExpressionFullRecordQuery(this.getDataSource(),query);
+
+        return execute(q,expId);
+    }
+
     /**
      * Returns a CMO object
      *
