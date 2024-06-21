@@ -302,9 +302,9 @@ public class GeneExpressionDAO extends PhenominerDAO {
                                 select distinct(experiment_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
                                         select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
                                         join sample s on s.sample_id = gr.sample_id
-                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc='UBERON:0005409'
+                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc= ?
                                         CONNECT BY PRIOR child_term_acc=parent_term_acc )
-                                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=3001 and ge.expression_unit ='TPM'
+                                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id = ? and ge.expression_unit = ?
                                 )
                         ) AND er.sample_id=s.sample_id
                         AND e.experiment_id = er.experiment_id
