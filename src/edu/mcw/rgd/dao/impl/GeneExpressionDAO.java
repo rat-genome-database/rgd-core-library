@@ -296,15 +296,20 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
     public int getGeneExpressionSamplesCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
         String sql = """
-                select count(*) from sample where sample_id in (
-                        select distinct(sample_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
-                                                select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id\s
-                                                join sample s on s.sample_id = gr.sample_id\s
-                                                join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
-                                                CONNECT BY PRIOR child_term_acc=parent_term_acc )\s
-                                                AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ?
-                        )
-                )""";
+                SELECT count(*)
+                        FROM study st, experiment e, gene_expression_exp_record er, sample s
+                        WHERE er.experiment_id in (
+                                select distinct(experiment_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
+                                        select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                                        join sample s on s.sample_id = gr.sample_id
+                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc='UBERON:0005409'
+                                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=3001 and ge.expression_unit ='TPM'
+                                )
+                        ) AND er.sample_id=s.sample_id
+                        AND e.experiment_id = er.experiment_id
+                        AND st.study_id=e.study_id
+                        ORDER BY er.gene_expression_exp_record_id DESC""";
         return getCount(sql,termAcc,rgdId,unit);
     }
 
