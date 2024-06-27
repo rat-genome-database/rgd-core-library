@@ -110,7 +110,7 @@ public class ReportFactory {
         Report report = new Report();
 
         if (sb.getTerm().endsWith("]")) {
-            report = gdao.getOverlappingQTLReport(sb);
+            report = gdao.getOverlappingQTLReport2(sb);
         }else {
             Map<Integer, RankedIndexItem> rankedList = dao.getRankedRGDIds(sb, "QTLS");
 
