@@ -2111,7 +2111,7 @@ public class AnnotationDAO extends AbstractDAO {
                 new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                         Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                         Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE});
+                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.INTEGER});
 
         for (Annotation a : annots){
             su.update(a.getTerm(), a.getAnnotatedObjectRgdId(), a.getRgdObjectKey(), a.getDataSrc(), a.getObjectSymbol(),
