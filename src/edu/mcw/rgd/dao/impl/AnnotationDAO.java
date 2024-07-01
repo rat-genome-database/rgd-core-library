@@ -2110,7 +2110,7 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE full_annot_key=?",
                 new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                         Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
+                        Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                         Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.INTEGER});
 
         for (Annotation a : annots){
