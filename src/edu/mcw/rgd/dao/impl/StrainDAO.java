@@ -389,6 +389,13 @@ public class StrainDAO extends AbstractDAO {
         return strains;
     }
 
+    public Strain getStrainBySymbolNew(String strSymbol) throws Exception {
+        String query = "SELECT s.*, r.species_type_key FROM strains s, rgd_ids r WHERE r.rgd_id=s.rgd_id " +
+                       "AND s.strain_symbol_lc=?";
+        List<Strain> strains = executeStrainQuery(query, strSymbol.toLowerCase());
+        return strains.size()==0 ? null : strains.get(0);
+    }
+
     /**
      * StrainDAOException should be thrown by StrainDAO methods to differentiate between ours and the framework's exceptions
      */
