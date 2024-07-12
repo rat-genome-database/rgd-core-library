@@ -52,6 +52,7 @@ public class GeneExpressionFullRecordQuery extends MappingSqlQuery {
         s.setNotes(rs.getString("sample_notes"));
         s.setSex(rs.getString("sex"));
         s.setBioSampleId(rs.getString("biosample_id"));
+        s.setTissueAccId(rs.getString("TISSUE_ONT_ID"));
 
         String strainOntId = rs.getString("strain_ont_id");
         s.setStrainAccId(strainOntId);
