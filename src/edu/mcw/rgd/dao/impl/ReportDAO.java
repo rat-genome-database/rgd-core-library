@@ -557,7 +557,7 @@ public class ReportDAO extends AbstractDAO {
                 "LEFT JOIN full_annot a1 ON a1.annotated_object_rgd_id=q.rgd_id AND a1.aspect='V'\n" +
                 "LEFT JOIN full_annot a2 ON a2.annotated_object_rgd_id=q.rgd_id AND a2.aspect='L'\n" +
                 "LEFT JOIN notes n1 ON n1.rgd_id=q.rgd_id AND n1.notes_type_name_lc='qtl_trait'\n" +
-                "LEFT JOIN notes n2 ON n2.rgd_id=q.rgd_id AND n2.notes_type_name_lc='qtl_subtrait'";
+                "LEFT JOIN notes n2 ON n2.rgd_id=q.rgd_id AND n2.notes_type_name_lc='qtl_subtrait' order by q.rgd_id";
 
             logger.debug("REPORT DAO::getOverlappingQTLReport");
             logger.debug(query);
