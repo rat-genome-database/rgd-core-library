@@ -396,6 +396,14 @@ public class StrainDAO extends AbstractDAO {
         return strains.size()==0 ? null : strains.get(0);
     }
 
+    /*returns inbred,recomibinant strains*/
+    public List<Strain> getSubStrainsByType(String strainSymbol) throws Exception {
+
+        String query = "select s.*, ri.SPECIES_TYPE_KEY from STRAINS s, RGD_IDS ri\n" +
+                "where strain_symbol_lc like '" + strainSymbol.toLowerCase() + "/%' and s.rgd_id = ri.rgd_id and ri.object_status='ACTIVE' and s.strain_type_name_lc in ('inbred','recombinant_inbred')";
+        return executeStrainQuery(query);
+    }
+
     /**
      * StrainDAOException should be thrown by StrainDAO methods to differentiate between ours and the framework's exceptions
      */
