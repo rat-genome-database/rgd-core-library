@@ -541,7 +541,7 @@ public class ReportDAO extends AbstractDAO {
             mapKey = MapManager.getInstance().getReferenceAssembly(sb.getSpeciesType()).getKey();
             sb.setMap(mapKey);
         }
-        HashMap<Integer,qtlReport> qtlMap = new HashMap<>();
+        LinkedHashMap<Integer,qtlReport> qtlMap = new LinkedHashMap<>();
         try {
 
             conn = this.getConnection();
@@ -1262,7 +1262,7 @@ public class ReportDAO extends AbstractDAO {
 
     }
 
-    public void createQtlReport(HashMap<Integer, qtlReport> qtlMap, Report report) throws Exception{
+    public void createQtlReport(LinkedHashMap<Integer, qtlReport> qtlMap, Report report) throws Exception{
         int count = 1000;
         for (Integer id : qtlMap.keySet()){
             qtlReport qr = qtlMap.get(id);
