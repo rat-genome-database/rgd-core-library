@@ -18,6 +18,8 @@ public class HrdpPortalCache {
     private int availableStrainId;
     private String availableStrainSymbol;
 
+    private String availableStrainDetails;
+
     public int getStrainId() {
         return strainId;
     }
@@ -136,5 +138,13 @@ public class HrdpPortalCache {
 
     public void setAvailableStrainSymbol(String availableStrainSymbol) {
         this.availableStrainSymbol = availableStrainSymbol;
+    }
+
+    public String getAvailableStrainDetails() {
+        return availableStrainDetails;
+    }
+
+    public void setAvailableStrainDetails(String availableStrainDetails) {
+        this.availableStrainDetails = availableStrainDetails;
     }
 }

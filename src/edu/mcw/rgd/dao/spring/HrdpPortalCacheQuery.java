@@ -33,6 +33,7 @@ public class HrdpPortalCacheQuery extends MappingSqlQuery {
         hrdp.setHasVariantVisualizer(rs.getInt("HAS_VARIANT_VISUALIZER"));
         hrdp.setAvailableStrainId(rs.getInt("AVAILABLE_STRAIN_ID"));
         hrdp.setAvailableStrainSymbol(rs.getString("AVAILABLE_STRAIN_SYMBOL"));
+        hrdp.setAvailableStrainDetails(rs.getString("AVAILABLE_STRAIN_DETAILS"));
         return hrdp;
     }
 
