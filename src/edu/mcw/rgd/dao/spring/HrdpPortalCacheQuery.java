@@ -31,9 +31,8 @@ public class HrdpPortalCacheQuery extends MappingSqlQuery {
         hrdp.setHasChildSampleCount(rs.getInt("HAS_CHILD_SAMPLE_COUNT"));
         hrdp.setHasPhenominer(rs.getInt("HAS_PHENOMINER"));
         hrdp.setHasVariantVisualizer(rs.getInt("HAS_VARIANT_VISUALIZER"));
-        hrdp.setAvailableStrainId(rs.getInt("AVAILABLE_STRAIN_ID"));
+        hrdp.setAvailableStrainId(rs.getString("AVAILABLE_STRAIN_ID"));
         hrdp.setAvailableStrainSymbol(rs.getString("AVAILABLE_STRAIN_SYMBOL"));
-        hrdp.setAvailableStrainDetails(rs.getString("AVAILABLE_STRAIN_DETAILS"));
         return hrdp;
     }
 
