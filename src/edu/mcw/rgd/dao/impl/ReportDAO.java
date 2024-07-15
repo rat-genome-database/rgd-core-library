@@ -464,7 +464,46 @@ public class ReportDAO extends AbstractDAO {
                 r.append(rs.getString("qtl_symbol"));
                 r.append(rs.getString("qtl_name"));
                 r.append(rs.getString("lod"));
-                r.append(rs.getString("p_value"));
+
+                String pVal = rs.getString("p_value");
+                String pValMlog = rs.getString("P_VAL_MLOG");
+                Formatter formatter = new Formatter();
+                Double pValf = null;
+                try {
+                    if (pVal.length()>=10) {
+                        pValf = Double.parseDouble(pVal);
+                    }
+                } catch (Exception e) {
+                    pValf = null;
+                }
+                if (!Utils.isStringEmpty(pValMlog)) {
+                    try {
+                        double w = Double.parseDouble(pValMlog);
+                        int x = (int) Math.ceil(w);
+                        double y = x - w;
+                        int z = (int) Math.round(Math.pow(10, y));
+                        String convertedPVal = z + "e-" + x;
+                        r.append(convertedPVal);
+                    }
+                    catch (Exception e){
+                        if (pValf != null) {
+                            formatter.format("%1.0e", pValf);
+                            r.append(formatter + "");
+                        }
+                        else
+                            r.append(pVal);
+                    }
+                }
+                else {
+                    if (pValf != null) {
+                        formatter.format("%1.0e", pValf);
+                        r.append(formatter + "");
+                    }
+                    else
+                        r.append(pVal);
+                }
+
+
                 r.append(traitName);
                 r.append(subtraitName);
 
@@ -489,7 +528,7 @@ public class ReportDAO extends AbstractDAO {
 
     }
 
-    public Report getOverlappingQTLReport(SearchBean sb) throws Exception {
+    public Report getOverlappingQTLReport2(SearchBean sb) throws Exception {
         Report report = new Report();
         Connection conn = null;
 
@@ -502,7 +541,7 @@ public class ReportDAO extends AbstractDAO {
             mapKey = MapManager.getInstance().getReferenceAssembly(sb.getSpeciesType()).getKey();
             sb.setMap(mapKey);
         }
-
+        HashMap<Integer,qtlReport> qtlMap = new HashMap<>();
         try {
 
             conn = this.getConnection();
@@ -537,6 +576,147 @@ public class ReportDAO extends AbstractDAO {
 
                 ResultSet rs = ps.executeQuery();
 
+                while(rs.next()){
+                    int thisRgdId = rs.getInt("rgd_id");
+                    if (qtlMap.get(thisRgdId)==null) {
+                        qtlReport qr = new qtlReport();
+                        qr.rgdId = thisRgdId;
+                        qr.symbol = rs.getString("qtl_symbol");
+                        qr.name = rs.getString("qtl_name");
+                        qr.lod = rs.getString("lod");
+                        String pVal = rs.getString("p_value");
+                        String pValMlog = rs.getString("P_VAL_MLOG");
+                        Formatter formatter = new Formatter();
+                        Double pValf = null;
+                        // if longer than 10 then make double
+                        try {
+                            if (pVal.length()>=10) {
+                                    pValf = Double.parseDouble(pVal);
+                            }
+                        } catch (Exception e) {
+                            pValf = null;
+                        }
+                        String myPval = "";
+                        if (!Utils.isStringEmpty(pValMlog)) {
+                            try {
+                                double w = Double.parseDouble(pValMlog);
+                                int x = (int) Math.ceil(w);
+                                double y = x - w;
+                                int z = (int) Math.round(Math.pow(10, y));
+                                String convertedPVal = z + "e-" + x;
+                                myPval = convertedPVal;
+                            }
+                            catch (Exception e){
+                                if (pValf != null) {
+                                    formatter.format("%1.0e", pValf);
+                                    myPval = formatter + "";
+                                }
+                                else
+                                    myPval = pVal;
+                            }
+                        }
+                        else {
+                            if (pValf != null) {
+                                formatter.format("%1.0e", pValf);
+                                myPval = formatter + "";
+                            }
+                            else
+                                myPval = pVal;
+                        }
+                        if (!Utils.isStringEmpty(myPval)) {
+                            myPval = myPval.replace(".E", "e");
+                            qr.pVal = myPval;
+                        }
+                        String t = rs.getString("trait_name");
+                        String st = rs.getString("sub_trait_name");
+                        if (!Utils.isStringEmpty(t))
+                            qr.trait = t;
+                        if (!Utils.isStringEmpty(st))
+                            qr.subTrait = st;
+                        handleMapPosition(rs,sb,qr);
+                        qr.species = SpeciesType.getCommonName(rs.getInt("species_type_key"));
+                        qtlMap.put(qr.rgdId, qr);
+
+                    }
+                    else{
+                        qtlReport qr = qtlMap.get(thisRgdId);
+                        String t = rs.getString("trait_name");
+                        String st = rs.getString("sub_trait_name");
+                        if (Utils.isStringEmpty(qr.trait) && !Utils.isStringEmpty(t))
+                            qr.trait = t;
+                        else if (!Utils.isStringEmpty(t))
+                            qr.trait = ", "+t;
+                        if (Utils.isStringEmpty(qr.subTrait) && !Utils.isStringEmpty(st))
+                            qr.subTrait = st;
+                        else if (!Utils.isStringEmpty(st))
+                            qr.subTrait = ", "+st;
+
+                    }
+                }
+
+                createQtlReport(qtlMap,report);
+
+            }
+
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return report;
+
+    }
+
+    public Report getOverlappingQTLReport(SearchBean sb) throws Exception {
+        Report report = new Report();
+        Connection conn = null;
+
+        int rgdId = getSearchedObjectRgdId(sb);
+        if( rgdId==0 )
+            return report;
+
+        int mapKey = sb.getMap();
+        if (mapKey == -1 && sb.getSpeciesType()!=SpeciesType.ALL) {
+            mapKey = MapManager.getInstance().getReferenceAssembly(sb.getSpeciesType()).getKey();
+            sb.setMap(mapKey);
+        }
+        HashMap<Integer,qtlReport> qtlMap = new HashMap<>();
+        try {
+
+            conn = this.getConnection();
+
+            // qtl trait and subtrait: VT and CMO annotations if available
+            //  if not, notes of type 'qtl_trait' and 'qtl_subtrait'
+            String query = "SELECT q.*, r.*, md.* \n" +
+                    ",NVL2(a1.term_acc, a1.term||' ('||a1.term_acc||')', n1.notes) trait_name \n" +
+                    ",NVL2(a2.term_acc, a2.term||' ('||a2.term_acc||')', n2.notes) sub_trait_name \n" +
+                    "FROM qtls q \n" +
+                    "JOIN RGD_IDS r ON r.OBJECT_STATUS='ACTIVE' AND r.RGD_ID=q.RGD_ID\n" +
+                    "JOIN maps_data md ON md.rgd_id=q.rgd_id AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=?\n" +
+                    "LEFT JOIN full_annot a1 ON a1.annotated_object_rgd_id=q.rgd_id AND a1.aspect='V'\n" +
+                    "LEFT JOIN full_annot a2 ON a2.annotated_object_rgd_id=q.rgd_id AND a2.aspect='L'\n" +
+                    "LEFT JOIN notes n1 ON n1.rgd_id=q.rgd_id AND n1.notes_type_name_lc='qtl_trait'\n" +
+                    "LEFT JOIN notes n2 ON n2.rgd_id=q.rgd_id AND n2.notes_type_name_lc='qtl_subtrait'";
+
+            logger.debug("REPORT DAO::getOverlappingQTLReport");
+            logger.debug(query);
+
+            for( String[] row: getOverlappingRegions(rgdId, mapKey) ) {
+
+                String chr = row[0];
+                int startPos = Integer.parseInt(row[1]);
+                int stopPos = Integer.parseInt(row[2]);
+
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.setString(1, chr);
+                ps.setInt(2, stopPos);
+                ps.setInt(3, startPos);
+                ps.setInt(4, mapKey);
+
+                ResultSet rs = ps.executeQuery();
+
                 int count=1000;
                 while (rs.next()) {
                     Record r = new Record();
@@ -546,7 +726,53 @@ public class ReportDAO extends AbstractDAO {
                     r.append(rs.getString("qtl_symbol"));
                     r.append(rs.getString("qtl_name"));
                     r.append(rs.getString("lod"));
-                    r.append(rs.getString("p_value"));
+
+                    String pVal = rs.getString("p_value");
+                    String pValMlog = rs.getString("P_VAL_MLOG");
+                    Formatter formatter = new Formatter();
+                    Double pValf = null;
+                    // if longer than 10 then make double
+                    try {
+                        if (pVal.length()>=10) {
+                                pValf = Double.parseDouble(pVal);
+                        }
+                    } catch (Exception e) {
+                        pValf = null;
+                    }
+                    String myPval = "";
+                    if (!Utils.isStringEmpty(pValMlog)) {
+                        try {
+                            double w = Double.parseDouble(pValMlog);
+                            int x = (int) Math.ceil(w);
+                            double y = x - w;
+                            int z = (int) Math.round(Math.pow(10, y));
+                            String convertedPVal = z + "e-" + x;
+                            myPval = convertedPVal;
+                        }
+                        catch (Exception e){
+                            if (pValf != null) {
+                                formatter.format("%1.0e", pValf);
+                                myPval = formatter + "";
+                            }
+                            else
+                                myPval = pVal;
+                        }
+                    }
+                    else {
+                        if (pValf != null) {
+                            formatter.format("%1.0e", pValf);
+                            myPval = formatter + "";
+                        }
+                        else
+                            myPval = pVal;
+                    }
+                    if (!Utils.isStringEmpty(myPval)) {
+                        myPval = myPval.replace(".E", "e");
+                        r.append(myPval);
+                    }
+                    else
+                        r.append("");
+
                     r.append(rs.getString("trait_name"));
                     r.append(rs.getString("sub_trait_name"));
 
@@ -571,7 +797,6 @@ public class ReportDAO extends AbstractDAO {
         return report;
 
     }
-
 
     public Report getActiveReferenceReport(Map rgdIds, SearchBean sb) throws Exception {
         Report report = new Report();
@@ -905,6 +1130,29 @@ public class ReportDAO extends AbstractDAO {
         }
     }
 
+    private void handleMapPosition(ResultSet rs, SearchBean sb, qtlReport r) throws Exception {
+
+        r.chr = rs.getString("chromosome");
+
+        String mapUnit = null;
+        if( sb.getSpeciesType()!=0 ) {
+            edu.mcw.rgd.datamodel.Map m = MapManager.getInstance().getMap(sb.getMap());
+            if( m!=null )
+                mapUnit = m.getUnit();
+        }
+        r.mapUnit = mapUnit;
+        if( mapUnit==null || mapUnit.equals("bp")) {
+            r.start = rs.getString("start_pos");
+            r.stop = rs.getString("stop_pos");
+        } else if (mapUnit.equals("band")) {
+            r.band = rs.getString("fish_band");
+//            r.append("");
+        } else {
+            r.absPos = rs.getString("abs_position");
+//            r.append("");
+        }
+    }
+
     public Report getActiveVariantReport(Map rgdIds, SearchBean sb) throws Exception {
         Report report = new Report();
 
@@ -1012,5 +1260,64 @@ public class ReportDAO extends AbstractDAO {
         }
         return report;
 
+    }
+
+    public void createQtlReport(HashMap<Integer, qtlReport> qtlMap, Report report) throws Exception{
+        int count = 1000;
+        for (Integer id : qtlMap.keySet()){
+            qtlReport qr = qtlMap.get(id);
+            Record r = new Record();
+            r.append(count + "");
+            r.append(qr.rgdId+"");
+            r.append(qr.symbol);
+            r.append(qr.name);
+            r.append(qr.lod);
+            r.append(qr.pVal);
+            if (qr.trait != null && qr.trait.startsWith(",")){
+                qr.trait = qr.trait.substring(2);
+            }
+            r.append(qr.trait);
+            if (qr.subTrait != null && qr.subTrait.startsWith(",")){
+                qr.subTrait = qr.subTrait.substring(2);
+            }
+            r.append(qr.subTrait);
+            r.append(qr.chr);
+            String mapUnit = qr.mapUnit;
+            if( mapUnit==null || mapUnit.equals("bp")) {
+                r.append(qr.start);
+                r.append(qr.stop);
+            } else if (mapUnit.equals("band")) {
+                r.append(qr.band);
+                r.append("");
+            } else {
+                r.append(qr.absPos);
+                r.append("");
+            }
+            r.append(qr.species);
+            r.append("n/a");
+            r.append("region");
+            r.append("qtl");
+
+            report.append(r);
+        }
+    }
+    public class qtlReport{
+        int rgdId;
+        String symbol;
+        String name;
+        String lod;
+        String pVal;
+        String trait = "";
+        String subTrait = "";
+        String chr;
+        String start;
+        String stop;
+        String band;
+        String absPos;
+        String species;
+        String annots;
+        String match;
+        String type;
+        String mapUnit;
     }
 }

@@ -40,6 +40,7 @@ public class GWASCatalogQuery extends MappingSqlQuery {
         gc.setStudyAcc(rs.getString("STUDY_ACC"));
         gc.setOrBeta(rs.getString("OR_OR_BETA"));
         gc.setVariantRgdId(rs.getInt("VARIANT_RGD_ID"));
+        gc.setQtlRgdId(rs.getInt("QTL_RGD_ID"));
         return gc;
     }
     public static List<GWASCatalog> execute(AbstractDAO dao, String sql, Object... params) throws Exception {

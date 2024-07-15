@@ -182,6 +182,24 @@ public class AbstractDAO implements DAO {
     }
 
     /**
+     * execute sql query and return a single string from the results being added
+     * f.e. as in a query SELECT object_status FROM rgd_ids WHERE rgd_id=2004
+     * @param sqlQuery sql query returning an integer
+     * @return string value, result of the query; return null if there are no results, or the value is null
+     * @throws Exception
+     */
+    public String getStringResultAdditive(String sqlQuery, Object... params) throws Exception {
+        List<String> results = StringListQuery.execute(this, sqlQuery, params);
+        if (results.isEmpty())
+            return null;
+        int totalCnt = 0;
+        for (String r : results){
+            totalCnt += Integer.parseInt(r);
+        }
+        return Integer.toString(totalCnt);
+    }
+
+    /**
      * return count of rows in given table
      * @param tableName table name
      * @return count of rows in the table

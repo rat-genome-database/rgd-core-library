@@ -29,6 +29,8 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
     private String sourceUrl;
     private String mostSignificantCmoTerm;
     private Integer speciesTypeKey;
+    private String peakRsId;
+    private Double pValueMlog;
 
     public Integer getKey() {
         return key;
@@ -180,5 +182,21 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
 
     public void setSpeciesTypeKey(Integer speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
+    }
+
+    public String getPeakRsId() {
+        return peakRsId;
+    }
+
+    public void setPeakRsId(String peakRsId) {
+        this.peakRsId = peakRsId;
+    }
+
+    public Double getpValueMlog() {
+        return pValueMlog;
+    }
+
+    public void setpValueMlog(Double pValueMlog) {
+        this.pValueMlog = pValueMlog;
     }
 }

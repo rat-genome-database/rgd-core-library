@@ -7,9 +7,12 @@ import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.MappedQTL;
 import edu.mcw.rgd.datamodel.QTL;
 
+import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 
 import edu.mcw.rgd.datamodel.RgdId;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 /**
  * @author jdepons
@@ -127,12 +130,25 @@ public class QTLDAO extends AbstractDAO {
         String sql = "UPDATE qtls SET qtl_key=?, qtl_symbol=?, qtl_name=?, qtl_symbol_lc=LOWER(?), qtl_name_lc=LOWER(?), " +
                 "PEAK_OFFSET=?, CHROMOSOME=?, LOD=?, P_VALUE=?, VARIANCE=?,  NOTES=?, " +
                 "FLANK_1_RGD_ID=?, FLANK_2_RGD_ID=?, PEAK_RGD_ID=?, INHERITANCE_TYPE=?, " +
-                "LOD_IMAGE=?, LINKAGE_IMAGE=?, SOURCE_URL=?, MOST_SIGNIFICANT_CMO_TERM=? where RGD_ID=?";
+                "LOD_IMAGE=?, LINKAGE_IMAGE=?, SOURCE_URL=?, MOST_SIGNIFICANT_CMO_TERM=?," +
+                " PEAK_RS_ID=?, P_VAL_MLOG=? where RGD_ID=?";
 
         update(sql, qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
-            qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
-            qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(),
-            qtl.getLodImage(), qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId());
+            qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(),
+            qtl.getNotes(), qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(),
+            qtl.getLodImage(), qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(),
+                qtl.getPeakRsId(), qtl.getpValueMlog(), qtl.getRgdId());
+    }
+
+    public void updateQTLNameBatch(Collection<QTL> qtls) throws Exception {
+        BatchSqlUpdate sql = new BatchSqlUpdate(this.getDataSource(),
+                "update QTLS set QTL_NAME=? where RGD_ID=?",
+                new int[]{Types.VARCHAR,Types.INTEGER});
+        sql.compile();
+        for (QTL q : qtls){
+            sql.update(q.getName(), q.getRgdId());
+        }
+        sql.flush();
     }
 
     /**
@@ -146,13 +162,35 @@ public class QTLDAO extends AbstractDAO {
         String sql = "INSERT INTO qtls (qtl_key, qtl_symbol, qtl_name, qtl_symbol_lc, qtl_name_lc, " +
                 "peak_offset, chromosome, lod, p_value, variance, notes, " +
                 "FLANK_1_RGD_ID, FLANK_2_RGD_ID, PEAK_RGD_ID, INHERITANCE_TYPE, LOD_IMAGE, " +
-                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID) "+
-                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?)";
-
-        update(sql, this.getNextKey("QTLS","QTL_KEY"), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
+                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID, P_VAL_MLOG) "+
+                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?)";
+        int qtlKey = this.getNextKeyFromSequence("QTL_KEY_SEQ");
+        qtl.setKey(qtlKey);
+        update(sql, qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
                 qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
                 qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
-                qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId());
+                qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(),qtl.getPeakRsId(), qtl.getpValueMlog());
+    }
+
+    public int insertQTLBatch(Collection<QTL> qtls) throws Exception{
+
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"INSERT INTO qtls (qtl_key, qtl_symbol, qtl_name, qtl_symbol_lc, qtl_name_lc, " +
+                "peak_offset, chromosome, lod, p_value, variance, notes, FLANK_1_RGD_ID, FLANK_2_RGD_ID, PEAK_RGD_ID, INHERITANCE_TYPE, LOD_IMAGE, " +
+                "LINKAGE_IMAGE, SOURCE_URL, MOST_SIGNIFICANT_CMO_TERM, RGD_ID, PEAK_RS_ID, P_VAL_MLOG) "+
+                "VALUES (?,?,?,LOWER(?),LOWER(?), ?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?)",
+                new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER,
+                        Types.DOUBLE, Types.DOUBLE, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.DOUBLE});
+        su.compile();
+        for (QTL qtl : qtls) {
+            int qtlKey = this.getNextKeyFromSequence("QTL_KEY_SEQ");
+            qtl.setKey(qtlKey);
+            su.update(qtl.getKey(), qtl.getSymbol(), qtl.getName(), qtl.getSymbol(), qtl.getName(),
+                    qtl.getPeakOffset(), qtl.getChromosome(), qtl.getLod(), qtl.getPValue(), qtl.getVariance(), qtl.getNotes(),
+                    qtl.getFlank1RgdId(), qtl.getFlank2RgdId(), qtl.getPeakRgdId(), qtl.getInheritanceType(), qtl.getLodImage(),
+                    qtl.getLinkageImage(), qtl.getSourceUrl(), qtl.getMostSignificantCmoTerm(), qtl.getRgdId(), qtl.getPeakRsId(), qtl.getpValueMlog());
+        }
+        return executeBatch(su);
     }
 
     /**
@@ -198,5 +236,10 @@ public class QTLDAO extends AbstractDAO {
     /// QTL query implementation helper
     public List<QTL> executeQtlQuery(String query, Object ... params) throws Exception {
         return QTLQuery.execute(this, query, params);
+    }
+
+    public List<QTL> getActiveGWASQtls() throws Exception{
+        String sql = "select q.*, r.SPECIES_TYPE_KEY from QTLs q, RGD_IDS r WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id and qtl_symbol like 'GWAS%'";
+        return executeQtlQuery(sql);
     }
 }

@@ -12,6 +12,7 @@ import edu.mcw.rgd.datamodel.VariantSearchBean;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.*;
 import java.util.*;
@@ -157,6 +158,39 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(rgdId);
     }
 
+    public VariantMapData getVariantByRgdId(int rgdId) throws Exception {
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY
+                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY
+                FROM variant_ext v, variant_map_data vmd,  RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                )""";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantMapData> vmds = q.execute(rgdId, rgdId);
+        if (vmds.isEmpty())
+            return null;
+        return vmds.get(0);
+    }
+
+    public List<VariantMapData> getAllVariantsByRgdId(int rgdId) throws Exception{
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY
+                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY
+                FROM variant_ext v, variant_map_data vmd,  RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rgd_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                )""";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId,rgdId);
+    }
+
     public VariantMapData getVariantByRsId(String rsId) throws Exception {
         String sql = "SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
@@ -172,6 +206,24 @@ public class VariantDAO extends AbstractDAO {
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsId);
+    }
+
+    public List<VariantMapData> getAllVariantExtByRsId(String rsId) throws Exception {
+        String sql = "SELECT v.*,vmd.* FROM variant_ext v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' order by vmd.chromosome, vmd.start_pos";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rsId);
+    }
+
+    public List<VariantMapData> getAllVariantUnionByRsId(String rsId) throws Exception {
+        String sql = """
+                SELECT v.*,vmd.* FROM variant v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                UNION ALL
+                SELECT v.*,vmd.* FROM variant_ext v, variant_map_data vmd, RGD_IDS r  where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'""";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rsId,rsId);
     }
 
     public List<VariantMapData> getAllVariantByRsIdAndMapKey(String rsId, int mapKey) throws Exception {
@@ -190,6 +242,45 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(mapKey,chrom,start,stop);
+    }
+
+    public List<VariantMapData> getVariantExtWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY\s
+                FROM variant v, variant_map_data vm, RGD_IDS r\s
+                where v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?\s
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
+                FROM variant_ext v, variant_map_data vmd, RGD_IDS r\s
+                where v.rgd_id=vmd.rgd_id and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vmd.map_key=? and vmd.chromosome=? and vmd.start_pos between ? and ?\s
+                )
+                 order by chromosome, start_pos""";
+        VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey,chrom,start,stop, mapKey,chrom,start,stop);
+    }
+
+    public List<VariantMapData> getAllActiveVariantsByRsId(String rsID) throws Exception {
+        String sql = """
+                select * from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY\s
+                FROM variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'\s
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY\s
+                FROM variant_ext v, variant_map_data vmd, RGD_IDS r where v.rgd_id=vmd.rgd_id and v.rs_id=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE'
+                )""";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql );
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rsID,rsID);
     }
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
@@ -333,5 +424,85 @@ public class VariantDAO extends AbstractDAO {
         return update(sql,sample.getId(),sample.getAnalysisName(),sample.getDescription(),sample.getPatientId(),sample.getSequencer(),sample.getGender(),
                 sample.getGrantNumber(), sample.getSequencedBy(),sample.getWhereBred(), sample.getSecondaryAnalysisSoftware(), sample.getMapKey(),
                 sample.getDbSnpSource(),sample.getStrainRgdId(),sample.getRefRgdId());
+    }
+
+    public int insertSampleDetail(VariantSampleDetail vs) throws Exception{
+        String sql = "INSERT INTO variant_sample_detail (RGD_ID,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ) VALUES (?,?,?,?)";
+        return update(sql,vs.getId(),vs.getSampleId(),vs.getDepth(),vs.getVariantFrequency());
+    }
+    public void insertVariantExt(List<VariantMapData> mapsData)  throws Exception{
+        BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO variant_ext (" +
+                        " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
+                        "VALUES (?,?,?,?,?,?,?)",
+                new int[]{Types.INTEGER,Types.VARCHAR,Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,Types.INTEGER});
+        sql1.compile();
+        for( VariantMapData v: mapsData) {
+            long id = v.getId();
+            sql1.update(id, v.getReferenceNucleotide(), v.getVariantType(), v.getVariantNucleotide(), v.getRsId(), v.getClinvarId(), v.getSpeciesTypeKey());
+
+        }
+        sql1.flush();
+    }
+
+    public void insertVariants(List<VariantMapData> mapsData)  throws Exception{
+        BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO variant (" +
+                        " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
+                        "VALUES (?,?,?,?,?,?,?)",
+                new int[]{Types.INTEGER,Types.VARCHAR,Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,Types.INTEGER});
+        sql1.compile();
+        for( VariantMapData v: mapsData) {
+            long id = v.getId();
+            sql1.update(id, v.getReferenceNucleotide(), v.getVariantType(), v.getVariantNucleotide(), v.getRsId(), v.getClinvarId(), v.getSpeciesTypeKey());
+
+        }
+        sql1.flush();
+    }
+
+    public void insertVariantMapData(List<VariantMapData> mapsData)  throws Exception{
+        BatchSqlUpdate sql2 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO variant_map_data (" +
+                        " RGD_ID,CHROMOSOME,START_POS,END_POS,PADDING_BASE,GENIC_STATUS,MAP_KEY)" +
+                        "VALUES (?,?,?,?,?,?,?)",
+                new int[]{Types.INTEGER,Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,Types.VARCHAR, Types.INTEGER});
+        sql2.compile();
+        for( VariantMapData v: mapsData) {
+            long id = v.getId();
+            sql2.update(id, v.getChromosome(), v.getStartPos(), v.getEndPos(), v.getPaddingBase(), v.getGenicStatus(), v.getMapKey());
+        }
+        sql2.flush();
+    }
+    public int insertVariantSample(List<VariantSampleDetail> sampleData) throws Exception {
+        BatchSqlUpdate bsu= new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO variant_sample_detail (" +
+                        " RGD_ID,SOURCE,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ,ZYGOSITY_STATUS,ZYGOSITY_PERCENT_READ," +
+                        "ZYGOSITY_POSS_ERROR,ZYGOSITY_REF_ALLELE,ZYGOSITY_NUM_ALLELE,ZYGOSITY_IN_PSEUDO,QUALITY_SCORE)" +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                new int[]{Types.INTEGER,Types.VARCHAR,Types.INTEGER, Types.INTEGER, Types.INTEGER,Types.VARCHAR, Types.INTEGER,
+                        Types.VARCHAR,Types.VARCHAR, Types.INTEGER,Types.VARCHAR, Types.INTEGER});
+        bsu.compile();
+        for(VariantSampleDetail v: sampleData ) {
+            bsu.update(v.getId(), v.getSource(), v.getSampleId(),v.getDepth(),v.getVariantFrequency(),v.getZygosityStatus(),v.getZygosityPercentRead(),
+                    v.getZygosityPossibleError(),v.getZygosityRefAllele(),v.getZygosityNumberAllele(),v.getZygosityInPseudo(),v.getQualityScore());
+        }
+        bsu.flush();
+        // compute nr of rows affected
+        int totalRowsAffected = 0;
+        for( int rowsAffected: bsu.getRowsAffected() ) {
+            totalRowsAffected += rowsAffected;
+        }
+        return totalRowsAffected;
+    }
+
+    public int insertVariantRgdIds(List<VariantMapData> vmds) throws Exception{
+        BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER},5000);
+        sql.compile();
+        for (VariantMapData vmd : vmds){
+            long rgdId = vmd.getId();
+            sql.update(rgdId);
+        }
+        return executeBatch(sql);
     }
 }

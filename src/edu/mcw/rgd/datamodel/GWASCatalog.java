@@ -31,7 +31,7 @@ public class GWASCatalog {
     private String efoId;
     private String orBeta;
     private int variantRgdId;
-
+    private Integer qtlRgdId;
     public GWASCatalog(){};
 
     public GWASCatalog(GWASCatalog gc, String chrom, String position, String riskAllele, String snp){
@@ -276,5 +276,13 @@ public class GWASCatalog {
 
     public void setVariantRgdId(int variantRgdId) {
         this.variantRgdId = variantRgdId;
+    }
+
+    public Integer getQtlRgdId() {
+        return qtlRgdId;
+    }
+
+    public void setQtlRgdId(Integer qtlRgdId) {
+        this.qtlRgdId = qtlRgdId;
     }
 }
