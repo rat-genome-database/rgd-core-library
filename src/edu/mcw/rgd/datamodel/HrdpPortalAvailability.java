@@ -3,7 +3,9 @@ package edu.mcw.rgd.datamodel;
 public class HrdpPortalAvailability {
 
     private int primaryStrainId;
-    private int availableStrainId;
+    private String availableStrainId;
+
+    private String subGroupName;
 
     public int getPrimaryStrainId() {
         return primaryStrainId;
@@ -13,11 +15,19 @@ public class HrdpPortalAvailability {
         this.primaryStrainId = primaryStrainId;
     }
 
-    public int getAvailableStrainId() {
+    public String getAvailableStrainId() {
         return availableStrainId;
     }
 
-    public void setAvailableStrainId(int availableStrainId) {
+    public void setAvailableStrainId(String availableStrainId) {
         this.availableStrainId = availableStrainId;
+    }
+
+    public String getSubGroupName() {
+        return subGroupName;
+    }
+
+    public void setSubGroupName(String subGroupName) {
+        this.subGroupName = subGroupName;
     }
 }
