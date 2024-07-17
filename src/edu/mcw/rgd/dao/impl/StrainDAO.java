@@ -395,7 +395,13 @@ public class StrainDAO extends AbstractDAO {
         List<Strain> strains = executeStrainQuery(query, strSymbol.toLowerCase());
         return strains.size()==0 ? null : strains.get(0);
     }
-
+    public int getStrainRgdIdByTaglessStrainSymbolNew(String taglessSymbol) throws Exception {
+        String sql = "select s.*, ri.species_type_key from strains s, rgd_ids ri where s.rgd_id = ri.rgd_id and lower(s.tagless_strain_symbol)=?";
+        List<Strain> strains = executeStrainQuery(sql,taglessSymbol.toLowerCase());
+        if (strains.isEmpty())
+            return 0;
+        return strains.get(0).getRgdId();
+    }
     /*returns inbred,recomibinant strains*/
     public List<Strain> getSubStrainsByType(String strainSymbol) throws Exception {
 
