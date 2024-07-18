@@ -51,11 +51,15 @@ public class GeneExpressionFullRecordQuery extends MappingSqlQuery {
         }
         s.setNotes(rs.getString("sample_notes"));
         s.setSex(rs.getString("sex"));
-        s.setBioSampleId(rs.getString("biosample_id"));
+        s.setBioSampleId(rs.getString("BIOSAMPLE_ID"));
         s.setTissueAccId(rs.getString("TISSUE_ONT_ID"));
+        if (rs.wasNull())
+            s.setTissueAccId(null);
 
-        String strainOntId = rs.getString("strain_ont_id");
-        s.setStrainAccId(strainOntId);
+        s.setStrainAccId(rs.getString("strain_ont_id"));
+        if (rs.wasNull()){
+            s.setStrainAccId(null);
+        }
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
 
