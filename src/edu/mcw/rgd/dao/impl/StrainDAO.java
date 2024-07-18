@@ -354,6 +354,55 @@ public class StrainDAO extends AbstractDAO {
                 status.cryorecovery==null ? null : status.cryorecovery ? "Y" : "N");
         return status.key;
     }
+    /**Returns strains by the strain symbol sorted in ascending order
+     * */
+    public List<Strain> getStrainsBySymbolAscSorted(List<Integer> rgdIdsList) throws Exception {
+        String query = "SELECT s.*,r.species_type_key FROM strains s, rgd_ids r "+
+                "where r.RGD_ID=s.RGD_ID "+
+                "and r.RGD_ID in ("+Utils.buildInPhrase(rgdIdsList)+")"+"order by strain_symbol asc";
+        return executeStrainQuery(query);
+    }
+
+    /**
+     * returns list of active Strains by groupName
+     * @param groupName group name such as HRDP,HS Founder etc
+     * @return returns list of strains by the group name
+     * @throws Exception
+     */
+    public List<Strain>getStrainsByGroupName(String groupName) throws Exception{
+        List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName);
+        List<Strain>strains = getStrainsBySymbolAscSorted(strainIds);
+        return strains;
+    }
+
+    /**
+     * returns list of active Strains by groupName and subGroupName
+     * @param groupName group name such as HRDP,HS Founder etc
+     * @param subGroupName sub group name such as Divergent Classic Inbred Strains etc
+     * @return returns list of strains by the group name and sub group name
+     * @throws Exception
+     */
+    public List<Strain>getStrainsByGroupNameAndSubGroupName(String groupName, String subGroupName) throws Exception{
+        List<Integer>strainIds = new VariantSampleGroupDAO().getVariantSamples(groupName,subGroupName);
+        List<Strain>strains = getStrainsBySymbolAscSorted(strainIds);
+        return strains;
+    }
+
+    public Strain getStrainBySymbolNew(String strSymbol) throws Exception {
+        String query = "SELECT s.*, r.species_type_key FROM strains s, rgd_ids r WHERE r.rgd_id=s.rgd_id " +
+                "AND s.strain_symbol_lc=?";
+        List<Strain> strains = executeStrainQuery(query, strSymbol.toLowerCase());
+        return strains.size()==0 ? null : strains.get(0);
+    }
+    //    returns strain rgdId based on the taglessSymbol
+//    @param taglessSymbol can be given in any string format. It converts to lower case by default
+    public int getStrainRgdIdByTaglessStrainSymbolNew(String taglessSymbol) throws Exception {
+        String sql = "select s.*, ri.species_type_key from strains s, rgd_ids ri where s.rgd_id = ri.rgd_id and lower(s.tagless_strain_symbol)=?";
+        List<Strain> strains = executeStrainQuery(sql,taglessSymbol.toLowerCase());
+        if (strains.isEmpty())
+            return 0;
+        return strains.get(0).getRgdId();
+    }
 
     /**
      * StrainDAOException should be thrown by StrainDAO methods to differentiate between ours and the framework's exceptions
