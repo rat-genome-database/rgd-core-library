@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.pheno.*;
 import org.springframework.jdbc.core.SqlParameter;
 
@@ -338,5 +339,26 @@ public class GeneExpressionDAO extends PhenominerDAO {
         if( record.isEmpty() )
             return null;
         return record.get(0);
+    }
+
+    public List<GeneExpression> getGeneExpressionObjectsByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String query = """
+                select * FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                        join sample s on s.sample_id = gr.sample_id
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
+        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
+        return execute(q,termAcc,rgdId,unit);
+    }
+
+    public int getGeneExpressionCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String query = """
+                select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                        join sample s on s.sample_id = gr.sample_id
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
+        return getCount(query, termAcc, rgdId, unit);
     }
 }
