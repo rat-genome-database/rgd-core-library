@@ -68,6 +68,7 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
         ge.setSample(s);
 
+        ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
 
         return ge;
     }

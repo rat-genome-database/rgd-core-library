@@ -8,6 +8,7 @@ public class GeneExpression {
     private GeneExpressionRecord geneExpressionRecord;
     private GeneExpressionRecordValue geneExpressionRecordValue;
     private Sample sample;
+    private Integer refRgdId;
 
     public GeneExpressionRecord getGeneExpressionRecord() {
         return geneExpressionRecord;
@@ -31,5 +32,13 @@ public class GeneExpression {
 
     public void setSample(Sample sample) {
         this.sample = sample;
+    }
+
+    public Integer getRefRgdId() {
+        return refRgdId;
+    }
+
+    public void setRefRgdId(Integer refRgdId) {
+        this.refRgdId = refRgdId;
     }
 }
