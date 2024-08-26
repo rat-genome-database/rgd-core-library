@@ -115,13 +115,15 @@ public class PhenominerDAO extends AbstractDAO {
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q);
     }
-
     public List<Study> getStudiesByPageNum(int pageNumber, int pageSize) throws Exception {
         int offset = (pageNumber - 1) * pageSize;
         String query = "SELECT * FROM study ORDER BY study_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         StudyQuery q = new StudyQuery(this.getDataSource(), query);
         return execute(q, offset, pageSize);
     }
+
+
+
     /**
      *  Return all Phenominer Units
      *  @return list of all phenominerUnits
@@ -1352,6 +1354,20 @@ public class PhenominerDAO extends AbstractDAO {
         sq.compile();
 
         return sq.execute(objArray);
+    }
+
+    public List<Record> getRecordsForGeneExpressionExpRecord(int expId) throws Exception{
+        String query = """
+                SELECT st.study_id, st.study_name, st.ref_rgd_id, er.*, s.*, e.experiment_name, e.experiment_notes
+                                FROM study st, experiment e, gene_expression_exp_record er, sample s
+                                WHERE er.experiment_id=? AND er.sample_id=s.sample_id
+                                AND e.experiment_id = er.experiment_id
+                                AND st.study_id=e.study_id
+                                ORDER BY er.gene_expression_exp_record_id DESC""";
+
+        GeneExpressionFullRecordQuery q = new GeneExpressionFullRecordQuery(this.getDataSource(),query);
+
+        return execute(q,expId);
     }
 
     /**
@@ -2783,7 +2799,6 @@ public class PhenominerDAO extends AbstractDAO {
             query += " and fai.study_id = " + studyId;
         }
 
-
         RecordCountOverlapQuery gcq = new RecordCountOverlapQuery(this.getDataSource(), query);
         gcq.compile();
 
@@ -2845,26 +2860,27 @@ public class PhenominerDAO extends AbstractDAO {
 
         HashMap hm = new HashMap();
 
-        try( Connection conn = this.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(query);) {
+       try( Connection conn = this.getConnection();
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(query);) {
 
-            while (rs.next()) {
-                hm.put(rs.getString(1), null);
-                hm.put(rs.getString(2), null);
-            }
-        }catch (Exception e){e.printStackTrace();}
+           while (rs.next()) {
+               hm.put(rs.getString(1), null);
+               hm.put(rs.getString(2), null);
+           }
+       }catch (Exception e){e.printStackTrace();}
 
         ArrayList al = new ArrayList();
         Iterator it = hm.keySet().iterator();
         while (it.hasNext()) {
             String termAccId=(String) it.next();
             String[] termParts = termAccId.split(":");
-            // al.add(termParts[0] + ":" + Integer.parseInt(termParts[1]));
+           // al.add(termParts[0] + ":" + Integer.parseInt(termParts[1]));
             al.add(termAccId);
         }
 
         return al;
+
     }
 
 

@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.pheno.*;
 import org.springframework.jdbc.core.SqlParameter;
 
@@ -268,6 +269,50 @@ public class GeneExpressionDAO extends PhenominerDAO {
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
         return execute(q, termAcc,rgdId,unit,level);
     }
+    /**
+     * Returns a list of values for given gene expression experiment record
+     * @return list of GeneExpressionRecordValue objects; could be empty
+     * @throws Exception
+     */
+    public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneByTermRgdIdUnit(int rgdId,String unit,String termAcc) throws Exception {
+        String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
+                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
+                " CONNECT BY PRIOR child_term_acc=parent_term_acc ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
+                " order by ge.gene_expression_exp_record_id";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, termAcc,rgdId,unit);
+    }
+
+    public List<GeneExpressionRecord> getGeneExpressionRecordsByRecordValues(int rgdId, String unit, String termAcc) throws Exception{
+        String sql ="select * from gene_expression_exp_record where gene_expression_exp_record_id in (" +
+                " select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
+                " join sample s on s.sample_id = gr.sample_id" +
+                " join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
+                " CONNECT BY PRIOR child_term_acc=parent_term_acc )" +
+                " AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?)";
+        GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(),sql);
+        return execute(q,termAcc, rgdId, unit);
+    }
+
+    public int getGeneExpressionSamplesCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String sql = """
+                SELECT count(*)
+                        FROM study st, experiment e, gene_expression_exp_record er, sample s
+                        WHERE er.experiment_id in (
+                                select distinct(experiment_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
+                                        select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                                        join sample s on s.sample_id = gr.sample_id
+                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc= ?
+                                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id = ? and ge.expression_unit = ?
+                                )
+                        ) AND er.sample_id=s.sample_id
+                        AND e.experiment_id = er.experiment_id
+                        AND st.study_id=e.study_id
+                        ORDER BY er.gene_expression_exp_record_id DESC""";
+        return getCount(sql,termAcc,rgdId,unit);
+    }
 
     /**
      * Returns count values for given gene
@@ -278,7 +323,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = "select value_count FROM gene_expression_value_counts ge where ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
                 " and ge.expression_level=? and ge.term_acc = ?";
 
-       return getStringResult(query,rgdId,unit,level,termAcc);
+       return getStringResultAdditive(query,rgdId,unit,level,termAcc);
     }
     /**
      * For given  id, get all gene expression record
@@ -294,5 +339,26 @@ public class GeneExpressionDAO extends PhenominerDAO {
         if( record.isEmpty() )
             return null;
         return record.get(0);
+    }
+
+    public List<GeneExpression> getGeneExpressionObjectsByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String query = """
+                select ge.*,gr.*,s.*, st.ref_rgd_id from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t\s
+                        where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
+                        t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ? and gr.experiment_id=e.experiment_id and e.study_id=st.study_id""";
+        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
+        return execute(q,termAcc,rgdId,unit);
+    }
+
+    public int getGeneExpressionCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
+        String query = """
+                select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                        join sample s on s.sample_id = gr.sample_id
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
+        return getCount(query, termAcc, rgdId, unit);
     }
 }

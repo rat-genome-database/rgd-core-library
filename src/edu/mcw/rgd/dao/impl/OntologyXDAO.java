@@ -657,6 +657,14 @@ public class OntologyXDAO extends AbstractDAO {
         String sql = "SELECT term_acc FROM ont_slims WHERE ont_id = ? and source = ? order by rank";
         return StringListQuery.execute(this, sql, ontId,source);
     }
+
+    public List<String> getAllSlimTermsOrdered(String ontId, String source) throws Exception{
+        String sql = """
+                select term_acc from ont_terms where term_acc in (
+                SELECT term_acc FROM ont_slims WHERE ont_id = ? and source = ?
+                ) order by term""";
+        return StringListQuery.execute(this, sql, ontId,source);
+    }
     /**
      * get count of descendants for given term (including the most remote descendants)
      * @param termAcc term accession id
