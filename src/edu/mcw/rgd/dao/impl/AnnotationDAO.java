@@ -376,6 +376,15 @@ public class AnnotationDAO extends AbstractDAO {
         return update(sql, fullAnnotKey);
     }
 
+    public int updateLastModifiedBatch(Collection<Annotation> annots) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"UPDATE full_annot SET last_modified_date=SYSDATE WHERE full_annot_key=?",
+                new int[] {Types.INTEGER});
+        for (Annotation a : annots){
+            su.update(a.getKey());
+        }
+        return executeBatch(su);
+    }
+
     /**
      * update last modified date to SYSDATE for annotation given full annot key
      * @param fullAnnotKey FULL_ANNOT_KEY
@@ -448,6 +457,14 @@ public class AnnotationDAO extends AbstractDAO {
             deleted += update(sql);
         }
         return deleted;
+    }
+
+    public int deleteAnnotationsBatch(Collection<Annotation> annotations) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM full_annot WHERE full_annot_key=?", new int[] {Types.INTEGER});
+        for (Annotation a : annotations){
+            su.update(a.getKey());
+        }
+        return executeBatch(su);
     }
 
     /**
