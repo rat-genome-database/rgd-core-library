@@ -28,6 +28,7 @@ public class Reference implements Identifiable, Speciated {
     private String urlWebReference;
     private int speciesTypeKey;
     private String doi;
+    private String lastModifiedDate;
 
     public String getDoi() {
         return doi;
@@ -179,5 +180,13 @@ public class Reference implements Identifiable, Speciated {
 
     public void setSpeciesTypeKey(int speciesTypeKey) {
         this.speciesTypeKey = speciesTypeKey;
+    }
+
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }
