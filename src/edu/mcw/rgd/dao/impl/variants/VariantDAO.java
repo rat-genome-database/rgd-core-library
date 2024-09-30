@@ -3,6 +3,7 @@ package edu.mcw.rgd.dao.impl.variants;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.IntListQuery;
+import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
 import edu.mcw.rgd.datamodel.Sample;
@@ -281,6 +282,23 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         return q.execute(rsID,rsID);
+    }
+
+    public List<IntStringMapQuery.MapPair> getDistinctPosByRsIdAndMapKey(String rsID, int mapKey) throws Exception {
+        String sql = """
+                select distinct start_pos, chromosome  from (
+                SELECT v.*,vm.CHROMOSOME,vm.PADDING_BASE,vm.END_POS,vm.START_POS,vm.GENIC_STATUS,vm.MAP_KEY
+                FROM variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and v.rs_id=? and vm.map_key=?
+                UNION ALL
+                SELECT v.*,vmd.CHROMOSOME,vmd.PADDING_BASE,vmd.END_POS,vmd.START_POS,vmd.GENIC_STATUS,vmd.MAP_KEY
+                FROM variant_ext v, variant_map_data vmd where v.rgd_id=vmd.rgd_id and v.rs_id=? and vmd.map_key=?
+                )""";
+        IntStringMapQuery q = new IntStringMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rsID,mapKey,rsID,mapKey);
     }
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
