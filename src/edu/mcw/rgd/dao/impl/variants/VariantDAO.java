@@ -505,4 +505,12 @@ public class VariantDAO extends AbstractDAO {
         }
         return executeBatch(sql);
     }
+    public int deleteSampleDetailByRgdIdAndSampleId(List<Integer> rgdIds, int sampleId) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"delete FROM variant_sample_detail WHERE rgd_id=? and sample_id=?",
+                new int[] {Types.INTEGER, Types.INTEGER});
+        for (int id : rgdIds){
+            su.update(id, sampleId);
+        }
+        return executeBatch(su);
+    }
 }
