@@ -1,9 +1,11 @@
 package edu.mcw.rgd.dao.impl;
 
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.pheno.*;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Types;
 import java.util.Collection;
@@ -360,5 +362,26 @@ public class GeneExpressionDAO extends PhenominerDAO {
                         CONNECT BY PRIOR child_term_acc=parent_term_acc )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
         return getCount(query, termAcc, rgdId, unit);
+    }
+
+    public int insertGeneExpressionValueCountBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
+                "insert into gene_expression_value_counts (VALUE_COUNT, EXPRESSED_OBJECT_RGD_ID, TERM_ACC, EXPRESSION_UNIT, EXPRESSION_LEVEL, LAST_MODIFIED_DATE) values (?,?,?,?,?,SYSDATE)",
+                new int[]{Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
+        for (GeneExpressionValueCount vc : valueCounts){
+            su.update(vc.getValueCnt(),vc.getExpressedRgdId(),vc.getTermAcc(),vc.getUnit(),vc.getLevel());
+        }
+        return executeBatch(su);
+    }
+
+    public int UpdateGeneExpressionValueCountBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
+                "UPDATE gene_expression_value_counts set VALUE_COUNT=?, LAST_MODIFIED_DATE=SYSDATE "+
+                        "where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=? ",
+                new int[]{Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
+        for (GeneExpressionValueCount vc : valueCounts){
+            su.update(vc.getValueCnt(),vc.getExpressedRgdId(),vc.getTermAcc(),vc.getUnit(),vc.getLevel());
+        }
+        return executeBatch(su);
     }
 }
