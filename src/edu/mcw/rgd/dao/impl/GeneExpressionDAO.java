@@ -364,6 +364,16 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return getCount(query, termAcc, rgdId, unit);
     }
 
+    public int getGeneExprRecordValuesCountForGeneBySlim(String termAcc, int rgdId, String unit, String level) throws Exception{
+        String query = """
+                select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                        join sample s on s.sample_id = gr.sample_id
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
+                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=? and and ge.expression_level=?""";
+        return getCount(query, termAcc, rgdId, unit, level);
+    }
+
     public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdAndTerm(int rgdId, String termAcc) throws Exception{
         String sql = "SELECT * FROM GENE_EXPRESSION_VALUE_COUNTS where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=?";
         GeneExpressionValueCountsQuery q = new GeneExpressionValueCountsQuery(DataSourceFactory.getInstance().getDataSource(), sql);
