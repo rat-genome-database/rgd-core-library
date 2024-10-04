@@ -364,6 +364,33 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return getCount(query, termAcc, rgdId, unit);
     }
 
+    public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdAndTerm(int rgdId, String termAcc) throws Exception{
+        String sql = "SELECT * FROM GENE_EXPRESSION_VALUE_COUNTS where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=?";
+        GeneExpressionValueCountsQuery q = new GeneExpressionValueCountsQuery(DataSourceFactory.getInstance().getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rgdId,termAcc);
+    }
+
+    public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdTermUnitAndLevel(int rgdId, String termAcc, String unit, String level) throws Exception{
+        String sql = "SELECT * FROM GENE_EXPRESSION_VALUE_COUNTS where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=?";
+        GeneExpressionValueCountsQuery q = new GeneExpressionValueCountsQuery(DataSourceFactory.getInstance().getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rgdId,termAcc,unit,level);
+    }
+
+    public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdTermAndUnit(int rgdId, String termAcc, String unit) throws Exception{
+        String sql = "SELECT * FROM GENE_EXPRESSION_VALUE_COUNTS where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=?";
+        GeneExpressionValueCountsQuery q = new GeneExpressionValueCountsQuery(DataSourceFactory.getInstance().getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        return q.execute(rgdId,termAcc,unit);
+    }
+
     public int insertGeneExpressionValueCountBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
                 "insert into gene_expression_value_counts (VALUE_COUNT, EXPRESSED_OBJECT_RGD_ID, TERM_ACC, EXPRESSION_UNIT, EXPRESSION_LEVEL, LAST_MODIFIED_DATE) values (?,?,?,?,?,SYSDATE)",
