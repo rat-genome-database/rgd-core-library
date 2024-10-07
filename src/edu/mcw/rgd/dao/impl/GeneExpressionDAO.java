@@ -421,4 +421,14 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
         return executeBatch(su);
     }
+    public int UpdateGeneExpressionValueLastModifiedBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
+                "UPDATE gene_expression_value_counts set LAST_MODIFIED_DATE=SYSDATE "+
+                        "where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=? ",
+                new int[]{Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
+        for (GeneExpressionValueCount vc : valueCounts){
+            su.update(vc.getExpressedRgdId(),vc.getTermAcc(),vc.getUnit(),vc.getLevel());
+        }
+        return executeBatch(su);
+    }
 }
