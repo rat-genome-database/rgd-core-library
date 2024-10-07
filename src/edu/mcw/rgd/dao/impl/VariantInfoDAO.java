@@ -42,16 +42,17 @@ public class VariantInfoDAO extends GenomicElementDAO {
         int r = insertElement(obj);
 
         // insert a row into CLINVAR table
-        String sql =
-            "INSERT INTO clinvar(clinical_significance,date_last_evaluated,review_status,method_type,"+
-                    "nucleotide_change,trait_name,age_of_onset,prevalence,molecular_consequence,"+
-                    "submitter,rgd_id) "+
-            "VALUES(?,?,?,?, ?,?,?,?,?, ?,?)";
+        String sql = """
+            INSERT INTO clinvar (clinical_significance, date_last_evaluated, review_status, method_type,
+              nucleotide_change, trait_name, age_of_onset, prevalence, molecular_consequence,
+              submitter, ref_nuc, var_nuc, rgd_id)
+            VALUES(?,?,?,?, ?,?,?,?, ?,?,?,?,?)
+            """;
 
         return r + update(sql,
             obj.getClinicalSignificance(), obj.getDateLastEvaluated(), obj.getReviewStatus(), obj.getMethodType(),
             obj.getNucleotideChange(), obj.getTraitName(), obj.getAgeOfOnset(), obj.getPrevalence(),
-            obj.getMolecularConsequence(), obj.getSubmitter(), obj.getRgdId()
+            obj.getMolecularConsequence(), obj.getSubmitter(), obj.getRefNuc(), obj.getVarNuc(), obj.getRgdId()
         );
     }
 
@@ -67,17 +68,18 @@ public class VariantInfoDAO extends GenomicElementDAO {
         int r = updateElement(obj);
 
         // update a row in VARIANT table
-        String sql =
-            "UPDATE clinvar "+
-            "SET clinical_significance=?, date_last_evaluated=?, review_status=?, method_type=?, "+
-            "    nucleotide_change=?, trait_name=?, age_of_onset=?, prevalence=?, molecular_consequence=?, "+
-            "    submitter=? "+
-            "WHERE rgd_id=?";
+        String sql = """
+            UPDATE clinvar
+            SET clinical_significance=?, date_last_evaluated=?, review_status=?, method_type=?,
+                nucleotide_change=?, trait_name=?, age_of_onset=?, prevalence=?, molecular_consequence=?,
+                submitter=?, ref_nuc=?, var_nuc=?
+            WHERE rgd_id=?
+            """;
 
         return r + update(sql,
             obj.getClinicalSignificance(), obj.getDateLastEvaluated(), obj.getReviewStatus(), obj.getMethodType(),
             obj.getNucleotideChange(), obj.getTraitName(), obj.getAgeOfOnset(), obj.getPrevalence(),
-            obj.getMolecularConsequence(), obj.getSubmitter(), obj.getRgdId()
+            obj.getMolecularConsequence(), obj.getSubmitter(), obj.getRefNuc(), obj.getVarNuc(), obj.getRgdId()
         );
     }
 

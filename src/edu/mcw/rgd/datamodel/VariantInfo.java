@@ -24,6 +24,8 @@ public class VariantInfo extends GenomicElement {
     private String prevalence;
     private String molecularConsequence;
     private String submitter;
+    private String refNuc;
+    private String varNuc;
 
     public String getClinicalSignificance() {
         return clinicalSignificance;
@@ -105,6 +107,22 @@ public class VariantInfo extends GenomicElement {
         this.submitter = submitter;
     }
 
+    public String getRefNuc() {
+        return refNuc;
+    }
+
+    public void setRefNuc(String refNuc) {
+        this.refNuc = refNuc;
+    }
+
+    public String getVarNuc() {
+        return varNuc;
+    }
+
+    public void setVarNuc(String varNuc) {
+        this.varNuc = varNuc;
+    }
+
     protected void populateDumper(Dumper dumper) {
         super.populateDumper(dumper);
         dumper
@@ -113,6 +131,8 @@ public class VariantInfo extends GenomicElement {
             .put("REVIEW_STATUS", getReviewStatus())
             .put("METHOD_TYPE", getMethodType())
             .put("NUCL_CHANGE", getNucleotideChange())
+            .put("REF_NUC", getRefNuc())
+            .put("VAR_NUC", getVarNuc())
             .put("TRAIT", getTraitName())
             .put("SUBMITTER", getSubmitter())
             .put("AGE_OF_ONSET", getAgeOfOnset())

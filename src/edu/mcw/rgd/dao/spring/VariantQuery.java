@@ -44,5 +44,7 @@ public class VariantQuery extends GenomicElementQuery {
         obj.setPrevalence(rs.getString("prevalence"));
         obj.setMolecularConsequence(rs.getString("molecular_consequence"));
         obj.setSubmitter(rs.getString("submitter"));
+        obj.setRefNuc(rs.getString("ref_nuc"));
+        obj.setVarNuc(rs.getString("var_nuc"));
     }
 }
