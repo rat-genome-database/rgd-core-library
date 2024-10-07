@@ -382,14 +382,17 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return q.execute(rgdId,termAcc);
     }
 
-    public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdTermUnitAndLevel(int rgdId, String termAcc, String unit, String level) throws Exception{
+    public GeneExpressionValueCount getValueCountsByGeneRgdIdTermUnitAndLevel(int rgdId, String termAcc, String unit, String level) throws Exception{
         String sql = "SELECT * FROM GENE_EXPRESSION_VALUE_COUNTS where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=?";
         GeneExpressionValueCountsQuery q = new GeneExpressionValueCountsQuery(DataSourceFactory.getInstance().getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
-        return q.execute(rgdId,termAcc,unit,level);
+        List<GeneExpressionValueCount> list = q.execute(rgdId,termAcc,unit,level);
+        if (list.isEmpty())
+            return null;
+        return list.get(0);
     }
 
     public List<GeneExpressionValueCount> getValueCountsByGeneRgdIdTermAndUnit(int rgdId, String termAcc, String unit) throws Exception{
