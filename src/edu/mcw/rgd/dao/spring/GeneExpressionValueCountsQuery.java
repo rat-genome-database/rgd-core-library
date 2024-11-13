@@ -2,7 +2,6 @@ package edu.mcw.rgd.dao.spring;
 
 
 import edu.mcw.rgd.dao.AbstractDAO;
-import edu.mcw.rgd.datamodel.GWASCatalog;
 import edu.mcw.rgd.datamodel.pheno.GeneExpressionValueCount;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
