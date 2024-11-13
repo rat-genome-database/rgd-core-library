@@ -85,6 +85,13 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return execute(q, geneExpressionRecordId);
     }
 
+    public List<GeneExpressionRecordValue> getGeneExpressionRecordValuesByRecordIdAndExpressedObjId(int geneExpressionRecordId, int objRgdId, String unit) throws Exception {
+        String query = "SELECT * FROM gene_expression_values WHERE gene_expression_exp_record_id=? and EXPRESSED_OBJECT_RGD_ID=? and EXPRESSION_UNIT=?";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, geneExpressionRecordId, objRgdId, unit);
+    }
+
     /**
      * Returns a list of conditions based on a gene expression record id
      * @param geneExpressionRecordId gene expression experiment record id

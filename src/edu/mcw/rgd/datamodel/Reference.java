@@ -30,7 +30,6 @@ public class Reference implements Identifiable, Speciated {
     private String doi;
     private String lastModifiedDate;
 
-    private String lastModifiedDate;
 
     public String getDoi() {
         return doi;
