@@ -28,6 +28,7 @@ public class Reference implements Identifiable, Speciated {
     private String urlWebReference;
     private int speciesTypeKey;
     private String doi;
+    private String lastModifiedDate;
 
     private String lastModifiedDate;
 

@@ -19,8 +19,7 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
     private String substrain;
     private String genetics;
     private String inbredGen;
-//    private String origin;
-    private String description;
+    private String origin;
     private String color;
     private String chrAltered;
     private String source;
@@ -37,6 +36,8 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
     private String taglessStrainSymbol;
 
     private String origination;
+
+    private String description;
 
     private String lastStatus; // last status, determined from analysis of statusLog
     private List<Status> statusLog; // log of all strain statuses
@@ -114,13 +115,13 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         this.inbredGen = inbredGen;
     }
 
-//    public String getOrigin() {
-//        return origin;
-//    }
-//
-//    public void setOrigin(String origin) {
-//        this.origin = origin;
-//    }
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
 
     public String getColor() {
         return color;
@@ -210,20 +211,20 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         this.taglessStrainSymbol = taglessStrainSymbol;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getOrigination() {
         return origination;
     }
 
     public void setOrigination(String origination) {
         this.origination = origination;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
@@ -294,10 +295,10 @@ public class Strain implements Identifiable, ObjectWithName, ObjectWithSymbol {
         public boolean equals(Object obj) {
             Status s = (Status)obj;
             return strainRgdId==s.strainRgdId &&
-                   getBoolValue(liveAnimals)==getBoolValue(s.liveAnimals) &&
-                   getBoolValue(cryopreservedEmbryo)==getBoolValue(s.cryopreservedEmbryo) &&
-                   getBoolValue(cryopreservedSperm)==getBoolValue(s.cryopreservedSperm) &&
-                   getBoolValue(cryorecovery)==getBoolValue(s.cryorecovery);
+                    getBoolValue(liveAnimals)==getBoolValue(s.liveAnimals) &&
+                    getBoolValue(cryopreservedEmbryo)==getBoolValue(s.cryopreservedEmbryo) &&
+                    getBoolValue(cryopreservedSperm)==getBoolValue(s.cryopreservedSperm) &&
+                    getBoolValue(cryorecovery)==getBoolValue(s.cryorecovery);
         }
 
         int getBoolValue(Boolean b) {

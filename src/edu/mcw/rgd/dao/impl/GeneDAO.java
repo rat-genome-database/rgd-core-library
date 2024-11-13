@@ -322,7 +322,7 @@ public class GeneDAO extends AbstractDAO {
                 " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? \n"+
                 "ORDER BY md.start_pos";
 
-        return MappedGeneQuery.run(this, query, chr, stopPos, startPos, mapKey);
+        return MappedGeneQuery.run(this, query, chr, stopPos+1, startPos-1, mapKey);
     }
 
     public List<MappedGene> getActiveMappedGenes(int mapKey, List<String> geneSymbols) throws Exception {

@@ -409,7 +409,7 @@ public class ReportDAO extends AbstractDAO {
                     "LEFT JOIN full_annot a1 ON a1.annotated_object_rgd_id=g.rgd_id AND a1.aspect='V'\n" +
                     "LEFT JOIN full_annot a2 ON a2.annotated_object_rgd_id=g.rgd_id AND a2.aspect='L'\n" +
                     "LEFT JOIN notes n1 ON n1.rgd_id=g.rgd_id AND n1.notes_type_name_lc='qtl_trait'\n" +
-                    "LEFT JOIN notes n2 ON n2.rgd_id=g.rgd_id AND n2.notes_type_name_lc='qtl_subtrait'\n order by q.rgd_id";
+                    "LEFT JOIN notes n2 ON n2.rgd_id=g.rgd_id AND n2.notes_type_name_lc='qtl_subtrait'\n";
 
             if( !rgdIds.isEmpty() )
                 query += " WHERE g.rgd_id IN (" + Utils.buildInPhrase(rgdIds.keySet()) + ") \n";
@@ -541,7 +541,7 @@ public class ReportDAO extends AbstractDAO {
             mapKey = MapManager.getInstance().getReferenceAssembly(sb.getSpeciesType()).getKey();
             sb.setMap(mapKey);
         }
-        LinkedHashMap<Integer,qtlReport> qtlMap = new LinkedHashMap<>();
+        HashMap<Integer,qtlReport> qtlMap = new HashMap<>();
         try {
 
             conn = this.getConnection();
@@ -557,7 +557,7 @@ public class ReportDAO extends AbstractDAO {
                 "LEFT JOIN full_annot a1 ON a1.annotated_object_rgd_id=q.rgd_id AND a1.aspect='V'\n" +
                 "LEFT JOIN full_annot a2 ON a2.annotated_object_rgd_id=q.rgd_id AND a2.aspect='L'\n" +
                 "LEFT JOIN notes n1 ON n1.rgd_id=q.rgd_id AND n1.notes_type_name_lc='qtl_trait'\n" +
-                "LEFT JOIN notes n2 ON n2.rgd_id=q.rgd_id AND n2.notes_type_name_lc='qtl_subtrait' order by q.rgd_id";
+                "LEFT JOIN notes n2 ON n2.rgd_id=q.rgd_id AND n2.notes_type_name_lc='qtl_subtrait'";
 
             logger.debug("REPORT DAO::getOverlappingQTLReport");
             logger.debug(query);
@@ -1262,7 +1262,7 @@ public class ReportDAO extends AbstractDAO {
 
     }
 
-    public void createQtlReport(LinkedHashMap<Integer, qtlReport> qtlMap, Report report) throws Exception{
+    public void createQtlReport(HashMap<Integer, qtlReport> qtlMap, Report report) throws Exception{
         int count = 1000;
         for (Integer id : qtlMap.keySet()){
             qtlReport qr = qtlMap.get(id);
