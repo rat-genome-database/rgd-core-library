@@ -20,6 +20,7 @@ public class CellLine extends GenomicElement {
     private String srcPipeline;
     private String caution;
     private String groups;
+    private String citationId;
 
     @Override
     public boolean equals(Object o) {
@@ -135,6 +136,14 @@ public class CellLine extends GenomicElement {
         this.groups = groups;
     }
 
+    public String getCitationId() {
+        return citationId;
+    }
+
+    public void setCitationId(String citationId) {
+        this.citationId = citationId;
+    }
+
     public String dump(String delimiter) {
 
         Dumper dumper = new Dumper(delimiter);
@@ -145,6 +154,7 @@ public class CellLine extends GenomicElement {
 
     protected void populateDumper(Dumper dumper) {
         dumper
+            .put("CITATION_ID", citationId)
             .put("ORIGIN", origin)
             .put("RESEARCH_USE", researchUse)
             .put("AVAILABILITY", availability)

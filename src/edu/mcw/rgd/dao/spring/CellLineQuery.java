@@ -32,11 +32,12 @@ public class CellLineQuery extends GenomicElementQuery {
        obj.setOrigin(rs.getString("origin"));
        obj.setPhenotype(rs.getString("phenotype"));
        obj.setResearchUse(rs.getString("research_use"));
+       obj.setSrcPipeline(rs.getString("src_pipeline"));
+       obj.setCaution(rs.getString("caution"));
+       obj.setGroups(rs.getString("groups"));
 
        try {
-           obj.setSrcPipeline(rs.getString("src_pipeline"));
-           obj.setCaution(rs.getString("caution"));
-           obj.setGroups(rs.getString("groups"));
+           obj.setCitationId(rs.getString("citation_id"));
        } catch( Exception ignore ) {}
 
        return obj;

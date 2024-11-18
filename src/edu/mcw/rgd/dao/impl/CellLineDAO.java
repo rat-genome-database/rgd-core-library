@@ -82,12 +82,16 @@ public class CellLineDAO extends GenomicElementDAO {
         int r = insertElement(obj);
 
         // insert a row into CELL_LINE table
-        String sql =
-            "INSERT INTO cell_lines(availability,characteristics,gender, germline_competent,origin,phenotype,research_use,src_pipeline,caution,groups,rgd_id) "+
-            "VALUES(?,?,?,?, ?,?,?,?,?,?,?)";
+        String sql = """
+            INSERT INTO cell_lines( availability, characteristics, gender, germline_competent,
+                origin, phenotype, research_use, src_pipeline,
+                caution, groups, citation_id, rgd_id )
+            VALUES(?,?,?,?, ?,?,?,?, ?,?,?,?)
+            """;
 
         return r + update(sql, obj.getAvailability(), obj.getCharacteristics(), obj.getGender(), obj.getGermlineCompetent(),
-                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(), obj.getCaution(), obj.getGroups(), obj.getRgdId()
+                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(),
+                obj.getCaution(), obj.getGroups(), obj.getCitationId(), obj.getRgdId()
         );
     }
 
@@ -103,14 +107,17 @@ public class CellLineDAO extends GenomicElementDAO {
         int r = updateElement(obj);
 
         // update a row in CELL_LINE table
-        String sql =
-            "UPDATE cell_lines  SET availability=?, characteristics=?, gender=?, germline_competent=?,"+
-            "  origin=?, phenotype=?, research_use=?, src_pipeline=?, caution=?, groups=? "+
-            "WHERE rgd_id=?";
+        String sql = """
+            UPDATE cell_lines  SET availability=?, characteristics=?, gender=?, germline_competent=?,
+              origin=?, phenotype=?, research_use=?, src_pipeline=?,
+              caution=?, groups=?, citation_id=?
+            WHERE rgd_id=?
+            """;
 
         return r + update(sql,
                 obj.getAvailability(), obj.getCharacteristics(), obj.getGender(), obj.getGermlineCompetent(),
-                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(), obj.getCaution(), obj.getGroups(), obj.getRgdId()
+                obj.getOrigin(), obj.getPhenotype(), obj.getResearchUse(), obj.getSrcPipeline(),
+                obj.getCaution(), obj.getGroups(), obj.getCitationId(), obj.getRgdId()
         );
     }
 
