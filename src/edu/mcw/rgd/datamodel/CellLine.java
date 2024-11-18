@@ -38,7 +38,8 @@ public class CellLine extends GenomicElement {
             && Utils.stringsAreEqual(this.germlineCompetent, that.germlineCompetent)
             && Utils.stringsAreEqual(this.srcPipeline, that.srcPipeline)
             && Utils.stringsAreEqual(this.caution, that.caution)
-            && Utils.stringsAreEqual(this.groups, that.groups);
+            && Utils.stringsAreEqual(this.groups, that.groups)
+            && Utils.stringsAreEqual(this.citationId, that.citationId);
     }
 
     @Override
@@ -53,7 +54,8 @@ public class CellLine extends GenomicElement {
             ^ Utils.defaultString(germlineCompetent).hashCode()
             ^ Utils.defaultString(srcPipeline).hashCode()
             ^ Utils.defaultString(caution).hashCode()
-            ^ Utils.defaultString(groups).hashCode();
+            ^ Utils.defaultString(groups).hashCode()
+            ^ Utils.defaultString(citationId).hashCode();
     }
 
     public String getOrigin() {
