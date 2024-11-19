@@ -20,6 +20,7 @@ public class CellLine extends GenomicElement {
     private String srcPipeline;
     private String caution;
     private String groups;
+    private String citationId;
 
     @Override
     public boolean equals(Object o) {
@@ -37,7 +38,8 @@ public class CellLine extends GenomicElement {
             && Utils.stringsAreEqual(this.germlineCompetent, that.germlineCompetent)
             && Utils.stringsAreEqual(this.srcPipeline, that.srcPipeline)
             && Utils.stringsAreEqual(this.caution, that.caution)
-            && Utils.stringsAreEqual(this.groups, that.groups);
+            && Utils.stringsAreEqual(this.groups, that.groups)
+            && Utils.stringsAreEqual(this.citationId, that.citationId);
     }
 
     @Override
@@ -52,7 +54,8 @@ public class CellLine extends GenomicElement {
             ^ Utils.defaultString(germlineCompetent).hashCode()
             ^ Utils.defaultString(srcPipeline).hashCode()
             ^ Utils.defaultString(caution).hashCode()
-            ^ Utils.defaultString(groups).hashCode();
+            ^ Utils.defaultString(groups).hashCode()
+            ^ Utils.defaultString(citationId).hashCode();
     }
 
     public String getOrigin() {
@@ -135,6 +138,14 @@ public class CellLine extends GenomicElement {
         this.groups = groups;
     }
 
+    public String getCitationId() {
+        return citationId;
+    }
+
+    public void setCitationId(String citationId) {
+        this.citationId = citationId;
+    }
+
     public String dump(String delimiter) {
 
         Dumper dumper = new Dumper(delimiter);
@@ -145,6 +156,7 @@ public class CellLine extends GenomicElement {
 
     protected void populateDumper(Dumper dumper) {
         dumper
+            .put("CITATION_ID", citationId)
             .put("ORIGIN", origin)
             .put("RESEARCH_USE", researchUse)
             .put("AVAILABILITY", availability)
