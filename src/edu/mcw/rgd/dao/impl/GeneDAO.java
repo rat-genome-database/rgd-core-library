@@ -491,6 +491,15 @@ public class GeneDAO extends AbstractDAO {
         return GeneQuery.execute(this, query, speciesKey, symbol);
     }
 
+    public List<Gene> getActiveGenesByEnsemblSymbol(int speciesKey, String symbol) throws Exception {
+
+        String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
+                "WHERE r.object_status='ACTIVE' AND r.species_type_key=? "+
+                "AND NVL(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.ensembl_gene_symbol=?";
+
+        return GeneQuery.execute(this, query, speciesKey, symbol);
+    }
+
     /**
      * get list of active genes of given type for given species
      * @param geneType gene type
