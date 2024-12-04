@@ -5,12 +5,14 @@ import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
+import edu.mcw.rgd.dao.spring.variants.VariantSSIdQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
+import edu.mcw.rgd.datamodel.variants.VariantSSId;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
@@ -18,6 +20,7 @@ import org.springframework.jdbc.object.BatchSqlUpdate;
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 
 
 public class VariantDAO extends AbstractDAO {
@@ -530,5 +533,22 @@ public class VariantDAO extends AbstractDAO {
             su.update(id, sampleId);
         }
         return executeBatch(su);
+    }
+
+    public int insertVariantSSIdsBatch(List<VariantSSId> ssIds) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO VARIANT_SS_IDS (VARIANT_RGD_ID, SS_ID, STRAIN_RGD_ID) VALUES (?,?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER});
+        for (VariantSSId v : ssIds){
+            su.update(v.getVariantRgdId(), v.getSSId(), v.getStrainRgdId());
+        }
+        return executeBatch(su);
+    }
+
+    public List<VariantSSId> getVariantSSIdsByRgdId(int rgdId) throws Exception{
+        String sql = "SELECT * FROM VARIANT_SS_IDS WHERE VARIANT_RGD_ID=?";
+        VariantSSIdQuery q = new VariantSSIdQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
     }
 }
