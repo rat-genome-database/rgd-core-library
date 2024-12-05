@@ -535,7 +535,7 @@ public class VariantDAO extends AbstractDAO {
         return executeBatch(su);
     }
 
-    public int insertVariantSSIdsBatch(List<VariantSSId> ssIds) throws Exception{
+    public int insertVariantSSIdsBatch(Collection<VariantSSId> ssIds) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO VARIANT_SS_IDS (VARIANT_RGD_ID, SS_ID, STRAIN_RGD_ID) VALUES (?,?,?)",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER});
@@ -550,5 +550,16 @@ public class VariantDAO extends AbstractDAO {
         VariantSSIdQuery q = new VariantSSIdQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(rgdId);
+    }
+
+    public VariantSSId getVariantSSIdsByRgdIdSSId(int rgdId, String ssId) throws Exception{
+        String sql = "SELECT * FROM VARIANT_SS_IDS WHERE VARIANT_RGD_ID=? AND SS_ID=?";
+        VariantSSIdQuery q = new VariantSSIdQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        List<VariantSSId> ids = q.execute(rgdId, ssId);
+        if (ids.isEmpty())
+            return null;
+        return ids.get(0);
     }
 }
