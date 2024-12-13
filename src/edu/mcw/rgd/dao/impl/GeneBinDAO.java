@@ -84,7 +84,6 @@ public class GeneBinDAO extends AbstractDAO {
 
     public List<GeneBin> getGenesByRgdId(int rgdId) throws Exception{
         String GET_GENES = "select * from GENEBIN where RGD_ID=?";
-
         List<GeneBin> genes =  GeneBinQuery.execute(this, GET_GENES, rgdId);
         return genes;
     }
@@ -101,6 +100,10 @@ public class GeneBinDAO extends AbstractDAO {
         return  geneCounts;
     }
 
+    public void deleteAllGeneBins() throws Exception{
+        String sql = "Delete from genebin";
+        update(sql);
+    }
     /**
      * Exception class for GeneBinDao
      */
