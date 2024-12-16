@@ -451,7 +451,7 @@ public class VariantDAO extends AbstractDAO {
         String sql = "INSERT INTO variant_sample_detail (RGD_ID,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ) VALUES (?,?,?,?)";
         return update(sql,vs.getId(),vs.getSampleId(),vs.getDepth(),vs.getVariantFrequency());
     }
-    public void insertVariantExt(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariantExt(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_ext (" +
                         " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
@@ -466,7 +466,7 @@ public class VariantDAO extends AbstractDAO {
         sql1.flush();
     }
 
-    public void insertVariants(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariants(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant (" +
                         " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
@@ -481,7 +481,7 @@ public class VariantDAO extends AbstractDAO {
         sql1.flush();
     }
 
-    public void insertVariantMapData(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariantMapData(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql2 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_map_data (" +
                         " RGD_ID,CHROMOSOME,START_POS,END_POS,PADDING_BASE,GENIC_STATUS,MAP_KEY)" +
@@ -494,7 +494,7 @@ public class VariantDAO extends AbstractDAO {
         }
         sql2.flush();
     }
-    public int insertVariantSample(List<VariantSampleDetail> sampleData) throws Exception {
+    public int insertVariantSample(Collection<VariantSampleDetail> sampleData) throws Exception {
         BatchSqlUpdate bsu= new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_sample_detail (" +
                         " RGD_ID,SOURCE,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ,ZYGOSITY_STATUS,ZYGOSITY_PERCENT_READ," +
@@ -516,7 +516,7 @@ public class VariantDAO extends AbstractDAO {
         return totalRowsAffected;
     }
 
-    public int insertVariantRgdIds(List<VariantMapData> vmds) throws Exception{
+    public int insertVariantRgdIds(Collection<VariantMapData> vmds) throws Exception{
         BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER},5000);
         sql.compile();
