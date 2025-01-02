@@ -31,6 +31,11 @@ public class XdbIdDAO extends AbstractDAO {
 
         return GeneQuery.execute(this, sql, xdbKey, accId);
     }
+    public List<Gene> getGenesByXdbId(int xdbKey, String accId, String geneType) throws Exception {
+        String sql = "SELECT DISTINCT g.*, r.species_type_key FROM genes g, rgd_ids r, rgd_acc_xdb x WHERE r.rgd_id=g.rgd_id AND x.rgd_id=g.rgd_id AND x.xdb_key=? AND x.acc_id=? and g.gene_type_lc=?";
+
+        return GeneQuery.execute(this, sql, xdbKey, accId,geneType);
+    }
 
     /**
      * get genes by acc id
