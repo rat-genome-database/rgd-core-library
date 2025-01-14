@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import edu.mcw.rgd.dao.AbstractDAO;
 
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
 
@@ -38,63 +39,76 @@ public class SolrDocsDAO extends AbstractDAO {
             connection.setAutoCommit(false);
             for(SolrDoc solrDoc:solrDocs) {
                 SolrDocDB doc = buildSolrDocDB(solrDoc);
-                preparedStatement.setString(1, doc.getGeneCount());
-                preparedStatement.setString(2,doc.getMpId());
-                preparedStatement.setString(3,doc.getDoiS());
-                preparedStatement.setString(4,doc.getChebiPos());
-                preparedStatement.setString(5,doc.getVtId() );
-                preparedStatement.setString(6,	doc.getBpTerm());
-                preparedStatement.setString(7,	doc.getChebiTerm());
-                preparedStatement.setDate(8,	doc.getpDate());
-                preparedStatement.setString(9,	doc.getXcoTerm());
-                preparedStatement.setString(10,	doc.getChebiCount());
-                preparedStatement.setString(11,	doc.getRsTerm());
-                preparedStatement.setString(12,	doc.getMpTerm());
-                preparedStatement.setString(13,	doc.getRdoId());
-                preparedStatement.setString(14,	doc.getNboPos());
-                preparedStatement.setString(15,	doc.getGene());
-                preparedStatement.setString(16	, doc.getRsId());
-                preparedStatement.setString(17,	doc.getSoTerm());
-                preparedStatement.setString(18,	doc.getMpCount());
-                preparedStatement.setString(19,	doc.getVtCount());
-                preparedStatement.setString(20,	doc.getBpId());
-                preparedStatement.setString(21,	doc.getRgdObjCount());
-                preparedStatement.setString(22,	doc.getVtPos());
-                preparedStatement.setString(23,	doc.getpType() );
-                preparedStatement.setString(	24,doc.getNboCount());
-                preparedStatement.setString(25,	doc.getXcoId());
-                preparedStatement.setInt(26,	doc.getpYear());
-                preparedStatement.setString(27,doc.getAuthors());
-                preparedStatement.setString(28,doc.getXcoCount());
-                preparedStatement.setString(29,	doc.getRdoCount());
-                preparedStatement.setString(30,	doc.getTitle());
-                preparedStatement.setString(31,	doc.getNboTerm());
-                preparedStatement.setString(32,	doc.getVtTerm());
-                preparedStatement.setString(33,	doc.getHpPos());
-                preparedStatement.setString(34,	doc.getNboId());
-                preparedStatement.setString(35,	doc.getSoCount());
-                preparedStatement.setString(36,	doc.getHpTerm());
-                preparedStatement.setString(37,	doc.getSoId());
-                preparedStatement.setString(38,	doc.getRgdObjPos());
-                preparedStatement.setString(39,	doc.getXcoPos());
-                preparedStatement.setString(40,	doc.getRsPos());
-                preparedStatement.setString(41,	doc.getHpId());
-                preparedStatement.setString(42,	doc.getRdoPos());
-                preparedStatement.setString(43,	doc.getRsCount());
-                preparedStatement.setString(44,	doc.getRgdObjTerm());
-                preparedStatement.setString(45,	doc.get_abstract());
-                preparedStatement.setString(46,	doc.getPmid());
-                preparedStatement.setString(47,	doc.getBpCount());
-                preparedStatement.setString(48,	doc.getMpPos());
-                preparedStatement.setString(49,	doc.getHpCount());
-                preparedStatement.setString(50,	doc.getXdbId());
-                preparedStatement.setString(51,	doc.getRgdObjId());
-                preparedStatement.setString(52,	doc.getBpPos());
-                preparedStatement.setString(53,	doc.getGenePos());
-                preparedStatement.setString(54,	doc.getSoPos());
-                preparedStatement.setString(55,	doc.getRdoTerm());
-                preparedStatement.setString(56,	doc.getChebiId());
+               // if(!exists(doc.getPmid())) {
+                    preparedStatement.setString(1, doc.getGeneCount());
+                    preparedStatement.setString(2, doc.getMpId());
+                    preparedStatement.setString(3, doc.getDoiS());
+                    if(doc.getChebiPos().length()<1000)
+                    preparedStatement.setString(4, doc.getChebiPos());
+                    else
+                        preparedStatement.setString(4, "");
 
+                    preparedStatement.setString(5, doc.getVtId());
+                    preparedStatement.setString(6, doc.getBpTerm());
+                    if(doc.getChebiTerm().length()<1000)
+                    preparedStatement.setString(7, doc.getChebiTerm());
+                    else
+                        preparedStatement.setString(7, "");
+
+                preparedStatement.setDate(8, doc.getpDate());
+                    preparedStatement.setString(9, doc.getXcoTerm());
+                    if(doc.getChebiCount().length()<1000)
+                    preparedStatement.setString(10, doc.getChebiCount());
+                    else preparedStatement.setString(10, "");
+                    preparedStatement.setString(11, doc.getRsTerm());
+                    preparedStatement.setString(12, doc.getMpTerm());
+                    preparedStatement.setString(13, doc.getRdoId());
+                    preparedStatement.setString(14, doc.getNboPos());
+                    preparedStatement.setString(15, doc.getGene());
+                    preparedStatement.setString(16, doc.getRsId());
+                    preparedStatement.setString(17, doc.getSoTerm());
+                    preparedStatement.setString(18, doc.getMpCount());
+                    preparedStatement.setString(19, doc.getVtCount());
+                    preparedStatement.setString(20, doc.getBpId());
+                    preparedStatement.setString(21, doc.getRgdObjCount());
+                    preparedStatement.setString(22, doc.getVtPos());
+                    preparedStatement.setString(23, doc.getpType());
+                    preparedStatement.setString(24, doc.getNboCount());
+                    preparedStatement.setString(25, doc.getXcoId());
+                    preparedStatement.setInt(26, doc.getpYear());
+                    preparedStatement.setString(27, doc.getAuthors());
+                    preparedStatement.setString(28, doc.getXcoCount());
+                    preparedStatement.setString(29, doc.getRdoCount());
+                    preparedStatement.setString(30, doc.getTitle());
+                    preparedStatement.setString(31, doc.getNboTerm());
+                    preparedStatement.setString(32, doc.getVtTerm());
+                    preparedStatement.setString(33, doc.getHpPos());
+                    preparedStatement.setString(34, doc.getNboId());
+                    preparedStatement.setString(35, doc.getSoCount());
+                    preparedStatement.setString(36, doc.getHpTerm());
+                    preparedStatement.setString(37, doc.getSoId());
+                    preparedStatement.setString(38, doc.getRgdObjPos());
+                    preparedStatement.setString(39, doc.getXcoPos());
+                    preparedStatement.setString(40, doc.getRsPos());
+                    preparedStatement.setString(41, doc.getHpId());
+                    preparedStatement.setString(42, doc.getRdoPos());
+                    preparedStatement.setString(43, doc.getRsCount());
+                    preparedStatement.setString(44, doc.getRgdObjTerm());
+                    preparedStatement.setString(45, doc.get_abstract());
+                    preparedStatement.setString(46, doc.getPmid());
+                    preparedStatement.setString(47, doc.getBpCount());
+                    preparedStatement.setString(48, doc.getMpPos());
+                    preparedStatement.setString(49, doc.getHpCount());
+                    preparedStatement.setString(50, doc.getXdbId());
+                    preparedStatement.setString(51, doc.getRgdObjId());
+                    preparedStatement.setString(52, doc.getBpPos());
+                    preparedStatement.setString(53, doc.getGenePos());
+                    preparedStatement.setString(54, doc.getSoPos());
+                    preparedStatement.setString(55, doc.getRdoTerm());
+                    if(doc.getChebiId().length()<1000)
+                    preparedStatement.setString(56, doc.getChebiId());
+
+                    else preparedStatement.setString(56, "");
 
 //                Map<String, Object> map = mapper.readValue(gson.toJson(doc), Map.class);
 //                int count = 1;
@@ -126,7 +140,8 @@ public class SolrDocsDAO extends AbstractDAO {
 //                    count++;
 //                }
 
-                preparedStatement.addBatch();
+                    preparedStatement.addBatch();
+               // }
             }
             int [] numUpdates=preparedStatement.executeBatch();
             for(int i=0; i<numUpdates.length;i++){
@@ -140,6 +155,13 @@ public class SolrDocsDAO extends AbstractDAO {
             e.printStackTrace();
         }
 
+    }
+    public boolean exists(String pmid) throws Exception {
+        String sql="select pmid from solr_docs where pmid=?";
+        StringListQuery query=new StringListQuery(this.getDataSource(), sql);
+        List<String> pmids=execute(query, pmid);
+
+        return pmids.size()>0;
     }
     public int insert(SolrDoc solrDoc) throws Exception {
 
