@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class SolrDocsDAO extends AbstractDAO {
     ObjectMapper mapper=new ObjectMapper();
     Gson gson=new Gson();
-    public void addBatch(List<SolrDoc> solrDocs) throws Exception {
+    public int addBatch(List<SolrDoc> solrDocs, Set<String> pmidsChunked) throws Exception {
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
                 "SOLR_DOC_SEQ.NEXTVAL, " +
@@ -37,34 +37,69 @@ public class SolrDocsDAO extends AbstractDAO {
         try(Connection connection=this.getConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
             connection.setAutoCommit(false);
+            int chunkedDataCount=0;
+            boolean flag=false;
             for(SolrDoc solrDoc:solrDocs) {
                 SolrDocDB doc = buildSolrDocDB(solrDoc);
                // if(!exists(doc.getPmid())) {
+                if(doc.getGeneCount()!=null && doc.getGeneCount().length()<4000)
                     preparedStatement.setString(1, doc.getGeneCount());
+                else{
+                    if( doc.getGeneCount()!=null) {
+                        preparedStatement.setString(1, doc.getGeneCount().substring(0, 3999));
+                        flag = true;
+                    }else{
+                        preparedStatement.setString(1, "");
+                    }
+                }
                     preparedStatement.setString(2, doc.getMpId());
                     preparedStatement.setString(3, doc.getDoiS());
-                    if(doc.getChebiPos().length()<1000)
+                    if(doc.getChebiPos()!=null && doc.getChebiPos().length()<4000)
                     preparedStatement.setString(4, doc.getChebiPos());
-                    else
-                        preparedStatement.setString(4, "");
-
+                    else {
+                        if(doc.getChebiPos()!=null) {
+                            preparedStatement.setString(4, doc.getChebiPos().substring(0, 3999));
+                            flag = true;
+                        }else{
+                            preparedStatement.setString(4, "");
+                        }
+                    }
                     preparedStatement.setString(5, doc.getVtId());
                     preparedStatement.setString(6, doc.getBpTerm());
-                    if(doc.getChebiTerm().length()<1000)
+                    if(doc.getChebiTerm()!=null && doc.getChebiTerm().length()<4000)
                     preparedStatement.setString(7, doc.getChebiTerm());
-                    else
-                        preparedStatement.setString(7, "");
-
+                    else {
+                        if(doc.getChebiTerm()!=null) {
+                            preparedStatement.setString(7, doc.getChebiTerm().substring(0, 3999));
+                            flag = true;
+                        }else  preparedStatement.setString(7,"");
+                    }
                 preparedStatement.setDate(8, doc.getpDate());
                     preparedStatement.setString(9, doc.getXcoTerm());
-                    if(doc.getChebiCount().length()<1000)
+                    if(doc.getChebiCount()!=null && doc.getChebiCount().length()<4000)
                     preparedStatement.setString(10, doc.getChebiCount());
-                    else preparedStatement.setString(10, "");
+                    else {
+                        if(doc.getChebiCount()!=null) {
+                            preparedStatement.setString(10, doc.getChebiCount().substring(0, 3999));
+                            flag = true;
+                        }else{
+                            preparedStatement.setString(10, "");
+                        }
+                    }
                     preparedStatement.setString(11, doc.getRsTerm());
                     preparedStatement.setString(12, doc.getMpTerm());
                     preparedStatement.setString(13, doc.getRdoId());
                     preparedStatement.setString(14, doc.getNboPos());
+                    if(doc.getGene()!=null && doc.getGene().length()<4000)
                     preparedStatement.setString(15, doc.getGene());
+                    else {
+                        if(doc.getGene()!=null) {
+                            flag = true;
+                            preparedStatement.setString(15, doc.getGene().substring(0, 3999));
+                        }else{
+                            preparedStatement.setString(15, "");
+                        }
+                    }
                     preparedStatement.setString(16, doc.getRsId());
                     preparedStatement.setString(17, doc.getSoTerm());
                     preparedStatement.setString(18, doc.getMpCount());
@@ -102,13 +137,29 @@ public class SolrDocsDAO extends AbstractDAO {
                     preparedStatement.setString(50, doc.getXdbId());
                     preparedStatement.setString(51, doc.getRgdObjId());
                     preparedStatement.setString(52, doc.getBpPos());
+                    if(doc.getGenePos()!=null && doc.getGenePos().length()<4000)
                     preparedStatement.setString(53, doc.getGenePos());
+                    else {
+                        if (doc.getGenePos() != null) {
+                            preparedStatement.setString(53, doc.getGenePos().substring(0, 3999));
+                            flag = true;
+                        }else{
+                            preparedStatement.setString(53, "");
+                        }
+                    }
                     preparedStatement.setString(54, doc.getSoPos());
                     preparedStatement.setString(55, doc.getRdoTerm());
-                    if(doc.getChebiId().length()<1000)
+                    if(doc.getChebiId()!=null && doc.getChebiId().length()<4000)
                     preparedStatement.setString(56, doc.getChebiId());
 
-                    else preparedStatement.setString(56, "");
+                    else {
+                        if(doc.getChebiId()!=null) {
+                            flag = true;
+                            preparedStatement.setString(56, doc.getChebiId().substring(0,3999));
+                        }else{
+                            preparedStatement.setString(56, "");
+                        }
+                    }
 
 //                Map<String, Object> map = mapper.readValue(gson.toJson(doc), Map.class);
 //                int count = 1;
@@ -139,7 +190,10 @@ public class SolrDocsDAO extends AbstractDAO {
 //                    }
 //                    count++;
 //                }
-
+                    if(flag){
+                        chunkedDataCount++;
+                        pmidsChunked.add(doc.getPmid());
+                    }
                     preparedStatement.addBatch();
                // }
             }
@@ -151,10 +205,12 @@ public class SolrDocsDAO extends AbstractDAO {
                   //  System.out.println("Execution " + i+ " successful: "+ numUpdates[i]+" rows updated");
             }
             connection.commit();
+            return chunkedDataCount;
         }catch (Exception e){
             e.printStackTrace();
         }
 
+        return 0;
     }
     public boolean exists(String pmid) throws Exception {
         String sql="select pmid from solr_docs where pmid=?";
