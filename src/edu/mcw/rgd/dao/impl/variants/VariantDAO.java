@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl.variants;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
@@ -143,6 +144,25 @@ public class VariantDAO extends AbstractDAO {
         VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(rgdId);
+    }
+
+    public VariantSampleDetail getVariantSampleDetailByRGDIdSampleId(int rgdId, int sampleId) throws Exception{
+        String sql = "SELECT * FROM variant_sample_detail  WHERE rgd_id=? AND sample_id=?";
+        VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantSampleDetail> samples = q.execute(rgdId, sampleId);
+        if (samples.isEmpty())
+            return null;
+        return samples.get(0);
+    }
+
+    public int getVariantSampleDetail(int rgdId, int sampleId) throws Exception{
+        String sql = "SELECT count(0) FROM variant_sample_detail  WHERE rgd_id=? AND sample_id=?";
+        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.getCount(new Object[]{rgdId,sampleId});
     }
 
     public VariantMapData getVariant(int rgdId) throws Exception{
