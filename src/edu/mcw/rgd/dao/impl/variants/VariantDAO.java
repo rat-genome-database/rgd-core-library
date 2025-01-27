@@ -157,7 +157,7 @@ public class VariantDAO extends AbstractDAO {
         return samples.get(0);
     }
 
-    public int getVariantSampleDetail(int rgdId, int sampleId) throws Exception{
+    public int getVariantSampleDetailCount(int rgdId, int sampleId) throws Exception{
         String sql = "SELECT count(0) FROM variant_sample_detail  WHERE rgd_id=? AND sample_id=?";
         CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
