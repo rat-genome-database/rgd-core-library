@@ -9,12 +9,10 @@ import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
 
-import org.springframework.jdbc.object.BatchSqlUpdate;
 
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -26,7 +24,7 @@ public class SolrDocsDAO extends AbstractDAO {
     public int addBatch(List<SolrDoc> solrDocs, Set<String> pmidsChunked) throws Exception {
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "SOLR_DOC_SEQ.NEXTVAL, " +
+                "NEXTVAL('SOLR_DOC_SEQ'), " +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
@@ -34,7 +32,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?" +
                 ")";
-        try(Connection connection=this.getConnection();
+        try(Connection connection=this.getPostgressConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
             connection.setAutoCommit(false);
             int chunkedDataCount=0;
@@ -42,68 +40,25 @@ public class SolrDocsDAO extends AbstractDAO {
             for(SolrDoc solrDoc:solrDocs) {
                 SolrDocDB doc = buildSolrDocDB(solrDoc);
                // if(!exists(doc.getPmid())) {
-                if(doc.getGeneCount()!=null && doc.getGeneCount().length()<4000)
-                    preparedStatement.setString(1, doc.getGeneCount());
-                else{
-                    if( doc.getGeneCount()!=null) {
-                        preparedStatement.setString(1, doc.getGeneCount().substring(0, 3999));
-                        flag = true;
-                    }else{
-                        preparedStatement.setString(1, "");
-                    }
-                }
-                    preparedStatement.setString(2, doc.getMpId());
-                    preparedStatement.setString(3, doc.getDoiS());
-                    if(doc.getChebiPos()!=null && doc.getChebiPos().length()<4000)
-                    preparedStatement.setString(4, doc.getChebiPos());
-                    else {
-                        if(doc.getChebiPos()!=null) {
-                            preparedStatement.setString(4, doc.getChebiPos().substring(0, 3999));
-                            flag = true;
-                        }else{
-                            preparedStatement.setString(4, "");
-                        }
-                    }
-                    preparedStatement.setString(5, doc.getVtId());
-                    preparedStatement.setString(6, doc.getBpTerm());
-                    if(doc.getChebiTerm()!=null && doc.getChebiTerm().length()<4000)
-                    preparedStatement.setString(7, doc.getChebiTerm());
-                    else {
-                        if(doc.getChebiTerm()!=null) {
-                            preparedStatement.setString(7, doc.getChebiTerm().substring(0, 3999));
-                            flag = true;
-                        }else  preparedStatement.setString(7,"");
-                    }
+                preparedStatement.setString(1, doc.getGeneCount());
+                preparedStatement.setString(2, doc.getMpId());
+                preparedStatement.setString(3, doc.getDoiS());
+                preparedStatement.setString(4, doc.getChebiPos());
+                preparedStatement.setString(5, doc.getVtId());
+                preparedStatement.setString(6, doc.getBpTerm());
+                preparedStatement.setString(7, doc.getChebiTerm());
                 preparedStatement.setDate(8, doc.getpDate());
-                    preparedStatement.setString(9, doc.getXcoTerm());
-                    if(doc.getChebiCount()!=null && doc.getChebiCount().length()<4000)
-                    preparedStatement.setString(10, doc.getChebiCount());
-                    else {
-                        if(doc.getChebiCount()!=null) {
-                            preparedStatement.setString(10, doc.getChebiCount().substring(0, 3999));
-                            flag = true;
-                        }else{
-                            preparedStatement.setString(10, "");
-                        }
-                    }
-                    preparedStatement.setString(11, doc.getRsTerm());
-                    preparedStatement.setString(12, doc.getMpTerm());
-                    preparedStatement.setString(13, doc.getRdoId());
-                    preparedStatement.setString(14, doc.getNboPos());
-                    if(doc.getGene()!=null && doc.getGene().length()<4000)
-                    preparedStatement.setString(15, doc.getGene());
-                    else {
-                        if(doc.getGene()!=null) {
-                            flag = true;
-                            preparedStatement.setString(15, doc.getGene().substring(0, 3999));
-                        }else{
-                            preparedStatement.setString(15, "");
-                        }
-                    }
-                    preparedStatement.setString(16, doc.getRsId());
-                    preparedStatement.setString(17, doc.getSoTerm());
-                    preparedStatement.setString(18, doc.getMpCount());
-                    preparedStatement.setString(19, doc.getVtCount());
+                preparedStatement.setString(9, doc.getXcoTerm());
+                preparedStatement.setString(10, doc.getChebiCount());
+                preparedStatement.setString(11, doc.getRsTerm());
+                preparedStatement.setString(12, doc.getMpTerm());
+                preparedStatement.setString(13, doc.getRdoId());
+                preparedStatement.setString(14, doc.getNboPos());
+                preparedStatement.setString(15, doc.getGene());
+                preparedStatement.setString(16, doc.getRsId());
+                preparedStatement.setString(17, doc.getSoTerm());
+                preparedStatement.setString(18, doc.getMpCount());
+                preparedStatement.setString(19, doc.getVtCount());
                     preparedStatement.setString(20, doc.getBpId());
                     preparedStatement.setString(21, doc.getRgdObjCount());
                     preparedStatement.setString(22, doc.getVtPos());
@@ -137,59 +92,16 @@ public class SolrDocsDAO extends AbstractDAO {
                     preparedStatement.setString(50, doc.getXdbId());
                     preparedStatement.setString(51, doc.getRgdObjId());
                     preparedStatement.setString(52, doc.getBpPos());
-                    if(doc.getGenePos()!=null && doc.getGenePos().length()<4000)
+
                     preparedStatement.setString(53, doc.getGenePos());
-                    else {
-                        if (doc.getGenePos() != null) {
-                            preparedStatement.setString(53, doc.getGenePos().substring(0, 3999));
-                            flag = true;
-                        }else{
-                            preparedStatement.setString(53, "");
-                        }
-                    }
+
                     preparedStatement.setString(54, doc.getSoPos());
                     preparedStatement.setString(55, doc.getRdoTerm());
-                    if(doc.getChebiId()!=null && doc.getChebiId().length()<4000)
+
                     preparedStatement.setString(56, doc.getChebiId());
 
-                    else {
-                        if(doc.getChebiId()!=null) {
-                            flag = true;
-                            preparedStatement.setString(56, doc.getChebiId().substring(0,3999));
-                        }else{
-                            preparedStatement.setString(56, "");
-                        }
-                    }
 
-//                Map<String, Object> map = mapper.readValue(gson.toJson(doc), Map.class);
-//                int count = 1;
-//                for (String key : map.keySet()) {
-//                    Object val = map.get(key);
-//                    try {
-//                        if (val != null) {
-//                            if (val instanceof String) {
-//                                preparedStatement.setString(count, val.toString());
-//                            } else if (val instanceof java.sql.Date) {
-//                                preparedStatement.setDate(count, (java.sql.Date) val);
-//                            } else if (val instanceof Integer) {
-//                                preparedStatement.setInt(count, Integer.parseInt(val.toString()));
-//                            } else if (val instanceof Number) {
-//                                preparedStatement.setInt(count, Integer.parseInt(val.toString()));
-//                            } else if (val instanceof Clob) {
-//                                preparedStatement.setClob(count, (Clob) val);
-//                            } else {
-//                                preparedStatement.setInt(count, (Integer) val);
-//                            }
-//                        }else{
-//                            preparedStatement.setString(count,null);
-//                        }
-//                    }catch (Exception e){
-//                        preparedStatement.setString(count,null);
-//                        System.out.println("VAL TYPE ISSUE");
-//                        e.printStackTrace();
-//                    }
-//                    count++;
-//                }
+
                     if(flag){
                         chunkedDataCount++;
                         pmidsChunked.add(doc.getPmid());
@@ -214,7 +126,7 @@ public class SolrDocsDAO extends AbstractDAO {
     }
     public boolean exists(String pmid) throws Exception {
         String sql="select pmid from solr_docs where pmid=?";
-        StringListQuery query=new StringListQuery(this.getDataSource(), sql);
+        StringListQuery query=new StringListQuery(this.getPostgressDataSource(), sql);
         List<String> pmids=execute(query, pmid);
 
         return pmids.size()>0;
@@ -224,7 +136,7 @@ public class SolrDocsDAO extends AbstractDAO {
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
         SolrDocDB doc=buildSolrDocDB(solrDoc);
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "SOLR_DOC_SEQ.NEXTVAL, " +
+                "NEXTVAL(SOLR_DOC_SEQ), " +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
@@ -234,7 +146,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 ")";
 
 
-        return   update(sql,
+        return   updateSolrPostgress(sql,
                 doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
                 doc.getBpTerm()	, doc.getChebiTerm()	, doc.getpDate()	, doc.getXcoTerm()	, doc.getChebiCount()	,
                 doc.getRsTerm()	, doc.getMpTerm()	, doc.getRdoId()	, doc.getNboPos()	, doc.getGene()	,
@@ -253,7 +165,7 @@ public class SolrDocsDAO extends AbstractDAO {
         SolrDocDB doc=buildSolrDocDB(solrDoc);
         String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?" +
                 " where pmid=?";
-        return   update(sql,
+        return   updateSolrPostgress(sql,
                 doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
                 doc.getBpTerm()	, doc.getChebiTerm()	, doc.getpDate()	, doc.getXcoTerm()	, doc.getChebiCount()	,
                 doc.getRsTerm()	, doc.getMpTerm()	, doc.getRdoId()	, doc.getNboPos()	, doc.getGene()	,
@@ -268,72 +180,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getChebiId(), doc.getPmid());
 
     }
-
-
-    public int batchSqlUpdate(final List<SolrDoc> solrDocs) throws Exception {
-
-        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
-        BatchSqlUpdate bsu = new BatchSqlUpdate(this.getDataSource(),
-                "INSERT INTO SOLR_DOCS ("+ fields+")" +
-                        " VALUES (" +
-                        "SOLR_DOC_SEQ.NEXTVAL, " +
-                        "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                        "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                        "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                        "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                        "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                        "?," + "?," + "?," + "?," + "?," + "?" +
-                        ")",
-                new int[]{
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CLOB, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
-
-
-                }, 1000);
-        bsu.compile();
-
-        for(SolrDoc doc:solrDocs){
-            List<String> formattedValues= getFormattedValues(doc);
-           bsu.update(formattedValues.toArray());
-        }
-
-        bsu.flush();
-
-        // compute nr of rows affected
-        int totalRowsAffected = 0;
-        for( int rowsAffected: bsu.getRowsAffected() ) {
-            totalRowsAffected += rowsAffected;
-        }
-        return totalRowsAffected;
-    }
-
-    public List<String> getFormattedValues(SolrDoc solrDoc) throws JsonProcessingException {
-        List<String> formattedValues=new ArrayList<>();
-       Map<String, List<String>> docMap=mapper.readValue(gson.toJson(solrDoc), Map.class);
-
-       for(String key:docMap.keySet()){
-           List<String> values=docMap.get(key);
-           if(docMap.get(key)!=null) {
-               try {
-                   if(values.size()>1) {
-                       String val = values.stream().collect(Collectors.joining(" | "));
-                       formattedValues.add(val);
-                   }else{
-                       formattedValues.add(values.get(0));
-                   }
-               } catch (Exception e) {
-                   formattedValues.add(null);
-               }
-           }else {
-               formattedValues.add(null);
-           }
-       }
-       return formattedValues.stream().collect(Collectors.toList());
-    }
+    
     public SolrDocDB buildSolrDocDB(SolrDoc solrDoc) throws JsonProcessingException, ParseException {
         List<String> formattedValues=new ArrayList<>();
         Map<String, List<String>> docMap=mapper.readValue(gson.toJson(solrDoc), Map.class);

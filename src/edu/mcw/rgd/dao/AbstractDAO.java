@@ -34,6 +34,9 @@ public class AbstractDAO implements DAO {
     public DataSource getDataSource() throws Exception{
         return DataSourceFactory.getInstance().getDataSource();
     }
+    public DataSource getPostgressDataSource() throws Exception{
+        return DataSourceFactory.getInstance().getPostgressDataSource();
+    }
 
     /**
      * Returns an initialized DataSource
@@ -62,7 +65,9 @@ public class AbstractDAO implements DAO {
     public Connection getConnection() throws Exception{
         return DataSourceFactory.getInstance().getDataSource().getConnection();
     }
-
+    public Connection getPostgressConnection() throws Exception{
+        return DataSourceFactory.getInstance().getPostgressDataSource().getConnection();
+    }
     /**
      * selects max value from column, and returns the next integer.  Many tables in RGD do not
      * increment key fields automatically.  This method provide a programmatic way to do it.
@@ -243,6 +248,18 @@ public class AbstractDAO implements DAO {
     public int update(String sql, Object ... params) throws Exception {
 
         SqlUpdate su = new SqlUpdate(this.getDataSource(), sql);
+
+        // declare parameters
+        for( Object param: params ) {
+            su.declareParameter(new SqlParameter(getParamType(param)));
+        }
+        su.compile();
+
+        return su.update(params);
+    }
+    public int updateSolrPostgress(String sql, Object ... params) throws Exception {
+
+        SqlUpdate su = new SqlUpdate(this.getPostgressDataSource(), sql);
 
         // declare parameters
         for( Object param: params ) {
