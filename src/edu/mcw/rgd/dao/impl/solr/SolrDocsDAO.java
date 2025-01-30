@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import edu.mcw.rgd.dao.AbstractDAO;
 
+import edu.mcw.rgd.dao.spring.SolrDocQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
-
+import org.json.JSONObject;
 
 
 import java.sql.Connection;
@@ -22,7 +23,7 @@ public class SolrDocsDAO extends AbstractDAO {
     ObjectMapper mapper=new ObjectMapper();
     Gson gson=new Gson();
     public int addBatch(List<SolrDoc> solrDocs, Set<String> pmidsChunked) throws Exception {
-        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
+        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
                 "NEXTVAL('SOLR_DOC_SEQ'), " +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
@@ -30,7 +31,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?" +
+                "?," + "?," + "?," + "?," + "?," + "?," + "NOW()"+
                 ")";
         try(Connection connection=this.getPostgressConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
@@ -180,7 +181,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getChebiId(), doc.getPmid());
 
     }
-    
+
     public SolrDocDB buildSolrDocDB(SolrDoc solrDoc) throws JsonProcessingException, ParseException {
         List<String> formattedValues=new ArrayList<>();
         Map<String, List<String>> docMap=mapper.readValue(gson.toJson(solrDoc), Map.class);
@@ -236,5 +237,29 @@ public class SolrDocsDAO extends AbstractDAO {
                 "chebi_id"
         );
        return fields;
+    }
+    public List<SolrDocDB> getSolrDocs() throws Exception {
+        String sql="select * from solr_docs";
+        SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
+        return query.execute();
+    }
+    public List<SolrDocDB> getSolrDocs(int year) throws Exception {
+        String sql="select * from solr_docs where pYear=?";
+        SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
+        return execute(query,year);
+    }
+    public List<SolrDocDB> getSolrDocs(int year ,int limit) throws Exception {
+        String sql="select * from solr_docs where p_Year=?  limit "+ limit;
+        SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
+        return execute(query,year);
+    }
+    public List<SolrDocDB> getLimitedSolrDocs(int limit) throws Exception {
+        String sql="select * from solr_docs  limit "+ limit;
+        SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
+        return query.execute();
+    }
+    public String getJson(SolrDocDB doc) throws JsonProcessingException {
+        //TODO
+        return null;
     }
 }
