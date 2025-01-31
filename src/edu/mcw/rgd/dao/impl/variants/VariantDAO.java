@@ -2,15 +2,18 @@ package edu.mcw.rgd.dao.impl.variants;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.spring.CountQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantMapQuery;
+import edu.mcw.rgd.dao.spring.variants.VariantSSIdQuery;
 import edu.mcw.rgd.dao.spring.variants.VariantSampleQuery;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.datamodel.VariantResult;
 import edu.mcw.rgd.datamodel.VariantResultBuilder;
 import edu.mcw.rgd.datamodel.VariantSearchBean;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
+import edu.mcw.rgd.datamodel.variants.VariantSSId;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
@@ -140,6 +143,25 @@ public class VariantDAO extends AbstractDAO {
         VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(rgdId);
+    }
+
+    public VariantSampleDetail getVariantSampleDetailByRGDIdSampleId(int rgdId, int sampleId) throws Exception{
+        String sql = "SELECT * FROM variant_sample_detail  WHERE rgd_id=? AND sample_id=?";
+        VariantSampleQuery q = new VariantSampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantSampleDetail> samples = q.execute(rgdId, sampleId);
+        if (samples.isEmpty())
+            return null;
+        return samples.get(0);
+    }
+
+    public int getVariantSampleDetailCount(int rgdId, int sampleId) throws Exception{
+        String sql = "SELECT count(0) FROM variant_sample_detail  WHERE rgd_id=? AND sample_id=?";
+        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.getCount(new Object[]{rgdId,sampleId});
     }
 
     public VariantMapData getVariant(int rgdId) throws Exception{
@@ -448,7 +470,7 @@ public class VariantDAO extends AbstractDAO {
         String sql = "INSERT INTO variant_sample_detail (RGD_ID,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ) VALUES (?,?,?,?)";
         return update(sql,vs.getId(),vs.getSampleId(),vs.getDepth(),vs.getVariantFrequency());
     }
-    public void insertVariantExt(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariantExt(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_ext (" +
                         " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
@@ -463,7 +485,7 @@ public class VariantDAO extends AbstractDAO {
         sql1.flush();
     }
 
-    public void insertVariants(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariants(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql1 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant (" +
                         " RGD_ID,REF_NUC, VARIANT_TYPE, VAR_NUC, RS_ID, CLINVAR_ID, SPECIES_TYPE_KEY)" +
@@ -478,7 +500,7 @@ public class VariantDAO extends AbstractDAO {
         sql1.flush();
     }
 
-    public void insertVariantMapData(List<VariantMapData> mapsData)  throws Exception{
+    public void insertVariantMapData(Collection<VariantMapData> mapsData)  throws Exception{
         BatchSqlUpdate sql2 = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_map_data (" +
                         " RGD_ID,CHROMOSOME,START_POS,END_POS,PADDING_BASE,GENIC_STATUS,MAP_KEY)" +
@@ -491,7 +513,7 @@ public class VariantDAO extends AbstractDAO {
         }
         sql2.flush();
     }
-    public int insertVariantSample(List<VariantSampleDetail> sampleData) throws Exception {
+    public int insertVariantSample(Collection<VariantSampleDetail> sampleData) throws Exception {
         BatchSqlUpdate bsu= new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO variant_sample_detail (" +
                         " RGD_ID,SOURCE,SAMPLE_ID,TOTAL_DEPTH,VAR_FREQ,ZYGOSITY_STATUS,ZYGOSITY_PERCENT_READ," +
@@ -513,7 +535,7 @@ public class VariantDAO extends AbstractDAO {
         return totalRowsAffected;
     }
 
-    public int insertVariantRgdIds(List<VariantMapData> vmds) throws Exception{
+    public int insertVariantRgdIds(Collection<VariantMapData> vmds) throws Exception{
         BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER},5000);
         sql.compile();
@@ -530,5 +552,33 @@ public class VariantDAO extends AbstractDAO {
             su.update(id, sampleId);
         }
         return executeBatch(su);
+    }
+
+    public int insertVariantSSIdsBatch(Collection<VariantSSId> ssIds) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "INSERT INTO VARIANT_SS_IDS (VARIANT_RGD_ID, SS_ID, STRAIN_RGD_ID) VALUES (?,?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR, Types.INTEGER});
+        for (VariantSSId v : ssIds){
+            su.update(v.getVariantRgdId(), v.getSSId(), v.getStrainRgdId());
+        }
+        return executeBatch(su);
+    }
+
+    public List<VariantSSId> getVariantSSIdsByRgdId(int rgdId) throws Exception{
+        String sql = "SELECT * FROM VARIANT_SS_IDS WHERE VARIANT_RGD_ID=?";
+        VariantSSIdQuery q = new VariantSSIdQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId);
+    }
+
+    public VariantSSId getVariantSSIdsByRgdIdSSId(int rgdId, String ssId) throws Exception{
+        String sql = "SELECT * FROM VARIANT_SS_IDS WHERE VARIANT_RGD_ID=? AND SS_ID=?";
+        VariantSSIdQuery q = new VariantSSIdQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        List<VariantSSId> ids = q.execute(rgdId, ssId);
+        if (ids.isEmpty())
+            return null;
+        return ids.get(0);
     }
 }
