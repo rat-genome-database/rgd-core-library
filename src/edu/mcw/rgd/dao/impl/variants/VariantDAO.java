@@ -21,7 +21,6 @@ import org.springframework.jdbc.object.BatchSqlUpdate;
 import java.sql.*;
 import java.util.*;
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 
 
 public class VariantDAO extends AbstractDAO {
