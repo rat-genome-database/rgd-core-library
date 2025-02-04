@@ -104,6 +104,11 @@ public class GeneBinDAO extends AbstractDAO {
         String sql = "Delete from genebin";
         update(sql);
     }
+
+    public void updateGeneChildTerm(int rgdId, String newChildTermAcc) throws Exception {
+        String sql = "UPDATE GENEBIN SET CHILD_TERM_ACC=? WHERE RGD_ID=?";
+        update(sql, newChildTermAcc, rgdId);
+    }
     /**
      * Exception class for GeneBinDao
      */
