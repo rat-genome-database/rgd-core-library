@@ -3,6 +3,7 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.GeneBinCountGenesQuery;
 import edu.mcw.rgd.dao.spring.GeneBinQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.GeneBin.GeneBin;
 import edu.mcw.rgd.datamodel.GeneBin.GeneBinCountGenes;
 
@@ -108,6 +109,11 @@ public class GeneBinDAO extends AbstractDAO {
     public void updateGeneChildTerm(int rgdId, String newChildTermAcc) throws Exception {
         String sql = "UPDATE GENEBIN SET CHILD_TERM_ACC=? WHERE RGD_ID=?";
         update(sql, newChildTermAcc, rgdId);
+    }
+
+    public List<String> getChildTermsForParent(String parentTermAcc) throws Exception {
+        String sql = "SELECT DISTINCT CHILD_TERM_ACC FROM GENEBIN WHERE TERM_ACC=?";
+        return StringListQuery.execute(this, sql, parentTermAcc);
     }
     /**
      * Exception class for GeneBinDao
