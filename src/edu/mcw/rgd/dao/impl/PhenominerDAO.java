@@ -1731,7 +1731,7 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "select * from sample where geo_sample_acc in (" +
                 "SELECT sample_accession_id from rna_seq where geo_accession_id=? and curation_status=? and sample_organism like ? )";
 
-        SampleQuery sq = new SampleQuery(this.getDataSource(), query);
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
         sq.declareParameter(new SqlParameter(Types.VARCHAR));
