@@ -90,13 +90,17 @@ public class SolrDocQuery extends MappingSqlQuery<PubmedSolrDoc> {
 
         for(String field:getFields()){
             if(rs.getString(field)!=null) {
-                if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR"))
-                doc.addField(field, Arrays.stream(rs.getString(field).split("|")).collect(Collectors.toList()));
-                else
-                    if(field.equalsIgnoreCase("P_DATE"))
-                    doc.addField(field,rs.getDate(field));
-                    if(field.equalsIgnoreCase("P_YEAR"))
+                if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR")) {
+                    String value=rs.getString(field);
+
+                    doc.addField(field, Arrays.stream( value.split("\\|")).collect(Collectors.toList()));
+                }
+                else {
+                    if (field.equalsIgnoreCase("P_DATE"))
+                        doc.addField(field, rs.getDate(field));
+                    if (field.equalsIgnoreCase("P_YEAR"))
                         doc.addField(field, rs.getInt(field));
+                }
             }
         }
         return doc;
