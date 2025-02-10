@@ -290,7 +290,7 @@ public class SolrDocsDAO extends AbstractDAO {
         return query.execute();
     }
     public List<SolrInputDocument> getSolrDocs(int year) throws Exception {
-        String sql="select * from solr_docs where pYear=?";
+        String sql="select * from solr_docs where p_Year=?";
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return execute(query,year);
     }
