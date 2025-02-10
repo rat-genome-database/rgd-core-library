@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.spring;
 
 import edu.mcw.rgd.datamodel.solr.PubmedSolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
+import org.apache.solr.common.SolrInputDocument;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
@@ -11,13 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SolrDocQuery extends MappingSqlQuery<PubmedSolrDoc> {
+public class SolrDocQuery extends MappingSqlQuery<SolrInputDocument> {
     public SolrDocQuery(DataSource ds, String sql){
         super(ds,sql);
     }
     @Override
-    protected PubmedSolrDoc mapRow(ResultSet rs, int rowNum) throws SQLException {
-        PubmedSolrDoc doc=new PubmedSolrDoc();
+    protected SolrInputDocument mapRow(ResultSet rs, int rowNum) throws SQLException {
+        SolrInputDocument doc=new SolrInputDocument();
 //        doc.setGeneCount(	rs.getString("GENE_COUNT"));
 //        doc.setMpId(	rs.getString("MP_ID"));
 //        doc.setDoiS(	rs.getString("DOI_S"));

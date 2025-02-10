@@ -65,7 +65,7 @@ public class SolrDocDB {
 
     private String jDates;
     private String citation;
-    private String mesh_terms;
+    private String meshTerms;
     private String keywords;
     private String chemicals;
     private String affiliation;
@@ -76,6 +76,15 @@ public class SolrDocDB {
     private String organismPos;
     private String organismCount;
     private String pmcId;
+    private String lastUpdateDate;
+
+    public String getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(String lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
 
     public String getPmcId() {
         return pmcId;
@@ -549,12 +558,13 @@ public class SolrDocDB {
         this.citation = citation;
     }
 
-    public String getMesh_terms() {
-        return mesh_terms;
+
+    public String getMeshTerms() {
+        return meshTerms;
     }
 
-    public void setMesh_terms(String mesh_terms) {
-        this.mesh_terms = mesh_terms;
+    public void setMeshTerms(String meshTerms) {
+        this.meshTerms = meshTerms;
     }
 
     public String getKeywords() {

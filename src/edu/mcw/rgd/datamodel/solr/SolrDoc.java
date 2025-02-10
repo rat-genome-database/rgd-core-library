@@ -901,12 +901,12 @@ public class SolrDoc {
         return this;
     }
 
-    @JsonProperty("pmid")
+    @JsonProperty("pmc_id")
     public List<String> getPmc_id() {
         return pmid;
     }
 
-    @JsonProperty("pmid")
+    @JsonProperty("pmc_id")
     public void setPmc_id(List<String> pmid) {
         this.pmid = pmid;
     }
