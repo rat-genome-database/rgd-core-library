@@ -105,7 +105,7 @@ public class SolrDocsDAO extends AbstractDAO {
                     //####################################################################
                 preparedStatement.setString(57,doc.getjDates());
                 preparedStatement.setString(58, doc.getCitation());
-                preparedStatement.setString(59,doc.getMesh_terms());
+                preparedStatement.setString(59,doc.getMeshTerms());
                 preparedStatement.setString(60,doc.getKeywords());
                 preparedStatement.setString(61,doc.getChemicals());
                 preparedStatement.setString(62, doc.getAffiliation());
@@ -175,7 +175,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getHpId()	, doc.getRdoPos()	, doc.getRsCount()	, doc.getRgdObjTerm()	, doc.get_abstract()	,
                 doc.getPmid()	, doc.getMpCount()	, doc.getMpPos()	, doc.getHpCount()	, doc.getXdbId()	,
                 doc.getRgdObjId()	, doc.getBpPos()	, doc.getGenePos()	, doc.getSoPos()	, doc.getRdoTerm()	,
-                doc.getChebiId(), doc.getjDates(), doc.getCitation(), doc.getMesh_terms(), doc.getKeywords(),
+                doc.getChebiId(), doc.getjDates(), doc.getCitation(), doc.getMeshTerms(), doc.getKeywords(),
                 doc.getChemicals(), doc.getAffiliation(), doc.getIssn(), doc.getOrganismCommonName(), doc.getOrganismTerm(),
                doc.getOrganismNcbiId(), doc.getOrganismCount(), doc.getOrganismPos(), doc.getPmcId());
 
@@ -199,7 +199,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getChebiId(), doc.getPmid(),
                 doc.getjDates(),
                 doc.getCitation(),
-                doc.getMesh_terms(),
+                doc.getMeshTerms(),
                 doc.getKeywords(),
                 doc.getChemicals(),
                 doc.getAffiliation(),
