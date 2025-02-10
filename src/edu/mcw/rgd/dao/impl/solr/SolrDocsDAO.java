@@ -32,7 +32,8 @@ public class SolrDocsDAO extends AbstractDAO {
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "NOW()"+
+                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+                "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?, NOW()" +
                 ")";
         try(Connection connection=this.getPostgressConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
@@ -101,7 +102,20 @@ public class SolrDocsDAO extends AbstractDAO {
                     preparedStatement.setString(55, doc.getRdoTerm());
 
                     preparedStatement.setString(56, doc.getChebiId());
-
+                    //####################################################################
+                preparedStatement.setString(57,doc.getjDates());
+                preparedStatement.setString(58, doc.getCitation());
+                preparedStatement.setString(59,doc.getMesh_terms());
+                preparedStatement.setString(60,doc.getKeywords());
+                preparedStatement.setString(61,doc.getChemicals());
+                preparedStatement.setString(62, doc.getAffiliation());
+                preparedStatement.setString(63,doc.getIssn());
+                preparedStatement.setString(64,doc.getOrganismCommonName());
+                preparedStatement.setString(65,doc.getOrganismTerm());
+                preparedStatement.setString(66,doc.getOrganismNcbiId());
+                preparedStatement.setString(67,doc.getOrganismCount());
+                preparedStatement.setString(68,doc.getOrganismPos());
+                preparedStatement.setString(69,doc.getPmcId());
 
 
                     if(flag){
@@ -135,16 +149,17 @@ public class SolrDocsDAO extends AbstractDAO {
     }
     public int insert(SolrDoc solrDoc) throws Exception {
 
-        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "));
+        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
         SolrDocDB doc=buildSolrDocDB(solrDoc);
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "NEXTVAL(SOLR_DOC_SEQ), " +
+                "NEXTVAL('SOLR_DOC_SEQ'), " +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
                 "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?" +
+                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+                "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?, NOW()" +
                 ")";
 
 
@@ -160,12 +175,14 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getHpId()	, doc.getRdoPos()	, doc.getRsCount()	, doc.getRgdObjTerm()	, doc.get_abstract()	,
                 doc.getPmid()	, doc.getMpCount()	, doc.getMpPos()	, doc.getHpCount()	, doc.getXdbId()	,
                 doc.getRgdObjId()	, doc.getBpPos()	, doc.getGenePos()	, doc.getSoPos()	, doc.getRdoTerm()	,
-                doc.getChebiId());
+                doc.getChebiId(), doc.getjDates(), doc.getCitation(), doc.getMesh_terms(), doc.getKeywords(),
+                doc.getChemicals(), doc.getAffiliation(), doc.getIssn(), doc.getOrganismCommonName(), doc.getOrganismTerm(),
+               doc.getOrganismNcbiId(), doc.getOrganismCount(), doc.getOrganismPos(), doc.getPmcId());
 
     }
     public int update(SolrDoc solrDoc) throws Exception {
         SolrDocDB doc=buildSolrDocDB(solrDoc);
-        String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?" +
+        String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date=NOW() " +
                 " where pmid=?";
         return   updateSolrPostgress(sql,
                 doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
@@ -179,7 +196,21 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getHpId()	, doc.getRdoPos()	, doc.getRsCount()	, doc.getRgdObjTerm()	, doc.get_abstract()	,
                 doc.getPmid()	, doc.getMpCount()	, doc.getMpPos()	, doc.getHpCount()	, doc.getXdbId()	,
                 doc.getRgdObjId()	, doc.getBpPos()	, doc.getGenePos()	, doc.getSoPos()	, doc.getRdoTerm()	,
-                doc.getChebiId(), doc.getPmid());
+                doc.getChebiId(), doc.getPmid(),
+                doc.getjDates(),
+                doc.getCitation(),
+                doc.getMesh_terms(),
+                doc.getKeywords(),
+                doc.getChemicals(),
+                doc.getAffiliation(),
+                doc.getIssn(),
+                doc.getOrganismCommonName(),
+                doc.getOrganismTerm(),
+                doc.getOrganismNcbiId(),
+                doc.getOrganismCount(),
+                doc.getOrganismPos(),
+                doc.getPmcId());
+
 
     }
 
@@ -235,7 +266,20 @@ public class SolrDocsDAO extends AbstractDAO {
                "hp_id", "rdo_pos", "rs_count", "rgd_obj_term", "abstract",
                 "pmid", "bp_count", "mp_pos", "hp_count", "xdb_id",
                 "rgd_obj_id", "bp_pos", "gene_pos", "so_pos", "rdo_term",
-                "chebi_id"
+                "chebi_id",
+               "j_date_s",
+               "citation",
+               "mesh_terms",
+               "keywords",
+               "chemicals",
+               "affiliation",
+               "issn",
+               "organism_common_name",
+               "organism_term",
+               "organism_ncbi_id",
+               "organism_count",
+               "organism_pos",
+               "pmc_id"
         );
        return fields;
     }
