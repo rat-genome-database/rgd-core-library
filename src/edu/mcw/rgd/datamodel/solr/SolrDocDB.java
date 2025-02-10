@@ -4,7 +4,8 @@ package edu.mcw.rgd.datamodel.solr;
 import java.sql.Date;
 
 public class SolrDocDB {
-   
+
+
     private String geneCount ;
     private String mpId ;
     private String doiS ;
@@ -61,6 +62,28 @@ public class SolrDocDB {
     private String soPos ;
     private String rdoTerm ;
     private String chebiId ;
+
+    private String jDates;
+    private String citation;
+    private String mesh_terms;
+    private String keywords;
+    private String chemicals;
+    private String affiliation;
+    private String issn;
+    private String organismCommonName;
+    private String organismTerm;
+    private String organismNcbiId;
+    private String organismPos;
+    private String organismCount;
+    private String pmcId;
+
+    public String getPmcId() {
+        return pmcId;
+    }
+
+    public void setPmcId(String pmcId) {
+        this.pmcId = pmcId;
+    }
 
     public String getGeneCount() {
         return geneCount;
@@ -508,5 +531,101 @@ public class SolrDocDB {
 
     public void setChebiId(String chebiId) {
         this.chebiId = chebiId;
+    }
+
+    public String getjDates() {
+        return jDates;
+    }
+
+    public void setjDates(String jDates) {
+        this.jDates = jDates;
+    }
+
+    public String getCitation() {
+        return citation;
+    }
+
+    public void setCitation(String citation) {
+        this.citation = citation;
+    }
+
+    public String getMesh_terms() {
+        return mesh_terms;
+    }
+
+    public void setMesh_terms(String mesh_terms) {
+        this.mesh_terms = mesh_terms;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
+    public String getChemicals() {
+        return chemicals;
+    }
+
+    public void setChemicals(String chemicals) {
+        this.chemicals = chemicals;
+    }
+
+    public String getAffiliation() {
+        return affiliation;
+    }
+
+    public void setAffiliation(String affiliation) {
+        this.affiliation = affiliation;
+    }
+
+    public String getIssn() {
+        return issn;
+    }
+
+    public void setIssn(String issn) {
+        this.issn = issn;
+    }
+
+    public String getOrganismCommonName() {
+        return organismCommonName;
+    }
+
+    public void setOrganismCommonName(String organismCommonName) {
+        this.organismCommonName = organismCommonName;
+    }
+
+    public String getOrganismTerm() {
+        return organismTerm;
+    }
+
+    public void setOrganismTerm(String organismTerm) {
+        this.organismTerm = organismTerm;
+    }
+
+    public String getOrganismNcbiId() {
+        return organismNcbiId;
+    }
+
+    public void setOrganismNcbiId(String organismNcbiId) {
+        this.organismNcbiId = organismNcbiId;
+    }
+
+    public String getOrganismPos() {
+        return organismPos;
+    }
+
+    public void setOrganismPos(String organismPos) {
+        this.organismPos = organismPos;
+    }
+
+    public String getOrganismCount() {
+        return organismCount;
+    }
+
+    public void setOrganismCount(String organismCount) {
+        this.organismCount = organismCount;
     }
 }

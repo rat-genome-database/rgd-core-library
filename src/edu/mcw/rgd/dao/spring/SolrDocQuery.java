@@ -1,11 +1,9 @@
 package edu.mcw.rgd.dao.spring;
 
-import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -73,7 +71,18 @@ public class SolrDocQuery extends MappingSqlQuery<SolrDocDB> {
         doc.setRdoTerm(	rs.getString("RDO_TERM"));
         doc.setChebiId(	rs.getString("CHEBI_ID"));
 
-
+        doc.setjDates(rs.getString("j_date_s"));
+        doc.setMesh_terms(rs.getString("mesh_terms"));
+        doc.setCitation(rs.getString("citation"));
+        doc.setKeywords(rs.getString("keywords"));
+        doc.setChemicals(rs.getString("chemicals"));
+        doc.setAffiliation(rs.getString("affiliation"));
+        doc.setIssn(rs.getString("issn"));
+        doc.setOrganismCommonName(rs.getString("organism_common_name"));
+        doc.setOrganismCount(rs.getString("organism_count"));
+        doc.setOrganismTerm(rs.getString("organism_term"));
+        doc.setOrganismNcbiId(rs.getString("organism_ncbi_id"));
+        doc.setOrganismPos(rs.getString("organism_pos"));
 
         return doc;
     }

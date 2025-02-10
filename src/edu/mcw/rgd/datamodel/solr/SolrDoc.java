@@ -13,6 +13,20 @@ import javax.annotation.processing.Generated;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+        "j_date_s",
+        "citation",
+        "mesh_terms",
+        "keywords",
+        "chemicals",
+        "affiliation",
+        "issn",
+        "organism_common_name",
+        "organism_term",
+        "organism_ncbi_id",
+        "organism_count",
+        "organism_pos",
+        "pmc_id",
+        /*******************************/
         "gene_count",
         "mp_id",
         "doi_s",
@@ -185,7 +199,33 @@ public class SolrDoc {
     private List<String> rdoTerm = new ArrayList<String>();
     @JsonProperty("chebi_id")
     private List<String> chebiId = new ArrayList<String>();
+    @JsonProperty("j_date_s")
+    private List<String> jDates= new ArrayList<String>();
+    @JsonProperty("citation")
+    private List<String> citation= new ArrayList<String>();
+    @JsonProperty("mesh_terms")
+    private List<String> meshTerms= new ArrayList<String>();
+    @JsonProperty("keywords")
+    private List<String> keywords= new ArrayList<String>();
+    @JsonProperty("chemicals")
+    private List<String> chemicals= new ArrayList<String>();
+    @JsonProperty("affiliation")
+    private List<String> affiliation= new ArrayList<String>();
+    @JsonProperty("issn")
+    private List<String> issn= new ArrayList<String>();
+    @JsonProperty("organism_common_name")
+    private List<String> organismCommonName= new ArrayList<String>();
+    @JsonProperty("organism_term")
+    private List<String> organismTerm= new ArrayList<String>();
+    @JsonProperty("organism_ncbi_id")
+    private List<String> organismNcbiId= new ArrayList<String>();
+    @JsonProperty("organism_count")
+    private List<String> organismCount= new ArrayList<String>();
+    @JsonProperty("organism_pos")
+    private List<String> organismPos= new ArrayList<String>();
 
+    @JsonProperty("pmc_id")
+    private List<String> pmc_id= new ArrayList<String>();
     @JsonProperty("gene_count")
     public List<String> getGeneCount() {
         return geneCount;
@@ -862,6 +902,20 @@ public class SolrDoc {
     }
 
     @JsonProperty("pmid")
+    public List<String> getPmc_id() {
+        return pmid;
+    }
+
+    @JsonProperty("pmid")
+    public void setPmc_id(List<String> pmid) {
+        this.pmid = pmid;
+    }
+
+    public SolrDoc withPmid(List<String> pmid) {
+        this.pmid = pmid;
+        return this;
+    }
+    @JsonProperty("pmid")
     public List<String> getPmid() {
         return pmid;
     }
@@ -870,12 +924,6 @@ public class SolrDoc {
     public void setPmid(List<String> pmid) {
         this.pmid = pmid;
     }
-
-    public SolrDoc withPmid(List<String> pmid) {
-        this.pmid = pmid;
-        return this;
-    }
-
     @JsonProperty("bp_count")
     public List<String> getBpCount() {
         return bpCount;
@@ -1020,12 +1068,119 @@ public class SolrDoc {
     public void setChebiId(List<String> chebiId) {
         this.chebiId = chebiId;
     }
+//         "j_date_s",
+//                 "citation",
+//                 "mesh_terms",
+//                 "keywords",
+//                 "chemicals",
+//                 "affilication",
+//                 "issn",
+//                 "organism_common_name",
+//                 "organism_term",
+//                 "organism_ncbi_id",
+//                 "organism_count",
+//                 "organism_pos",
 
     public SolrDoc withChebiId(List<String> chebiId) {
         this.chebiId = chebiId;
         return this;
     }
-
+    @JsonProperty("j_date_s")
+    public List<String> getjDates() {
+        return jDates;
+    }
+    @JsonProperty("j_date_s")
+    public void setjDates(List<String> jDates) {
+        this.jDates = jDates;
+    }
+    @JsonProperty("citation")
+    public List<String> getCitation() {
+        return citation;
+    }
+    @JsonProperty("citation")
+    public void setCitation(List<String> citation) {
+        this.citation = citation;
+    }
+    @JsonProperty("mesh_terms")
+    public List<String> getMeshTerms() {
+        return meshTerms;
+    }
+    @JsonProperty("mesh_terms")
+    public void setMeshTerms(List<String> meshTerms) {
+        this.meshTerms = meshTerms;
+    }
+    @JsonProperty("keywords")
+    public List<String> getKeywords() {
+        return keywords;
+    }
+    @JsonProperty("keywords")
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
+    }
+    @JsonProperty("chemicals")
+    public List<String> getChemicals() {
+        return chemicals;
+    }
+    @JsonProperty("chemicals")
+    public void setChemicals(List<String> chemicals) {
+        this.chemicals = chemicals;
+    }
+    @JsonProperty("affiliation")
+    public List<String> getAffiliation() {
+        return affiliation;
+    }
+    @JsonProperty("affiliation")
+    public void setAffiliation(List<String> affiliation) {
+        this.affiliation = affiliation;
+    }
+    @JsonProperty("issn")
+    public List<String> getIssn() {
+        return issn;
+    }
+    @JsonProperty("issn")
+    public void setIssn(List<String> issn) {
+        this.issn = issn;
+    }
+    @JsonProperty("organism_common_name")
+    public List<String> getOrganismCommonName() {
+        return organismCommonName;
+    }
+    @JsonProperty("organism_common_name")
+    public void setOrganismCommonName(List<String> organismCommonName) {
+        this.organismCommonName = organismCommonName;
+    }
+    @JsonProperty("organism_term")
+    public List<String> getOrganismTerm() {
+        return organismTerm;
+    }
+    @JsonProperty("organism_term")
+    public void setOrganismTerm(List<String> organismTerm) {
+        this.organismTerm = organismTerm;
+    }
+    @JsonProperty("organism_ncbi_id")
+    public List<String> getOrganismNcbiId() {
+        return organismNcbiId;
+    }
+    @JsonProperty("organism_ncbi_id")
+    public void setOrganismNcbiId(List<String> organismNcbiId) {
+        this.organismNcbiId = organismNcbiId;
+    }
+    @JsonProperty("organism_count")
+    public List<String> getOrganismCount() {
+        return organismCount;
+    }
+    @JsonProperty("organism_count")
+    public void setOrganismCount(List<String> organismCount) {
+        this.organismCount = organismCount;
+    }
+    @JsonProperty("organism_pos")
+    public List<String> getOrganismPos() {
+        return organismPos;
+    }
+    @JsonProperty("organism_pos")
+    public void setOrganismPos(List<String> organismPos) {
+        this.organismPos = organismPos;
+    }
 //    @JsonAnyGetter
 //    public Map<String, Object> getAdditionalProperties() {
 //        return this.additionalProperties;
