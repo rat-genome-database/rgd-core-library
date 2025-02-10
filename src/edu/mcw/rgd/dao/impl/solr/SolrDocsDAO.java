@@ -7,6 +7,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 
 import edu.mcw.rgd.dao.spring.SolrDocQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
+import edu.mcw.rgd.datamodel.solr.PubmedSolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
 import org.json.JSONObject;
@@ -238,22 +239,22 @@ public class SolrDocsDAO extends AbstractDAO {
         );
        return fields;
     }
-    public List<SolrDocDB> getSolrDocs() throws Exception {
+    public List<PubmedSolrDoc> getSolrDocs() throws Exception {
         String sql="select * from solr_docs";
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return query.execute();
     }
-    public List<SolrDocDB> getSolrDocs(int year) throws Exception {
+    public List<PubmedSolrDoc> getSolrDocs(int year) throws Exception {
         String sql="select * from solr_docs where pYear=?";
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return execute(query,year);
     }
-    public List<SolrDocDB> getSolrDocs(int year ,int limit) throws Exception {
+    public List<PubmedSolrDoc> getSolrDocs(int year ,int limit) throws Exception {
         String sql="select * from solr_docs where p_Year=?  limit "+ limit;
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return execute(query,year);
     }
-    public List<SolrDocDB> getLimitedSolrDocs(int limit) throws Exception {
+    public List<PubmedSolrDoc> getLimitedSolrDocs(int limit) throws Exception {
         String sql="select * from solr_docs  limit "+ limit;
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return query.execute();
