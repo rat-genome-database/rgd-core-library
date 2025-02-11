@@ -15,18 +15,35 @@ public class SolrIndexer {
 
     public static void batchIndexer(int year, String solrCollectionName) throws Exception {
         SolrDocsDAO solrDocsDAO=new SolrDocsDAO();
-
         SolrClient solrClient= new HttpSolrClient.Builder(SOLR_URL+solrCollectionName)
                 .withConnectionTimeout(10000)
                 .withSocketTimeout(60000)
                 .build();
         solrClient.deleteByQuery("*");
         solrClient.commit();
-        //   List<SolrInputDocument> documents=solrDocsDAO.getLimitedSolrDocs(1000);
-        List<SolrInputDocument> documents=solrDocsDAO.getSolrDocs(year);
+
         try{
-            addDocumentsToSolr(solrClient, documents);
-            solrClient.commit();
+            int batchSize=1000;
+            int offset=0;
+            int count=0;
+            int commitInterval=0;
+            while (true){
+                List<SolrInputDocument> documents=solrDocsDAO.getSolrDocs(year,batchSize, offset);
+                if(documents==null || documents.size()==0){
+                    break;
+                }
+                try {
+                    addDocumentsToSolr(solrClient, documents, count);
+                }catch (Exception e){e.printStackTrace();}
+                offset+=batchSize;
+                count++;
+                commitInterval++;
+                if(commitInterval==10){
+                    solrClient.commit();
+                    commitInterval=0;
+                }
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -37,6 +54,11 @@ public class SolrIndexer {
             }
         }
     }
+    private static void addDocumentsToSolr(SolrClient solrClient, List<SolrInputDocument> batch, int batchNumber) throws Exception {
+        UpdateResponse response = solrClient.add(batch);
+        System.out.println("Indexed batch "+batchNumber+" of " + batch.size() + " documents, response status: " + response.getStatus());
+    }
+
     private static void addDocumentsToSolr(SolrClient solrClient, List<SolrInputDocument> batch) throws Exception {
         UpdateResponse response = solrClient.add(batch);
         System.out.println("Indexed batch of " + batch.size() + " documents, response status: " + response.getStatus());
