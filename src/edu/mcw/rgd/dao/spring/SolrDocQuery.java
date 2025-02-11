@@ -22,22 +22,28 @@ public class SolrDocQuery extends MappingSqlQuery<SolrInputDocument> {
         PubmedSolrDoc doc=new PubmedSolrDoc();
 
         for(String field:getFields()){
-            if(rs.getString(field)!=null) {
-                if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR") && !field.equalsIgnoreCase("ABSTRACT")) {
-                    String value=rs.getString(field);
-                    List<String> values= List.of(value.split("\\|")).stream().map(v->v.trim()).collect(Collectors.toList());
-
+            if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR") && !field.equalsIgnoreCase("ABSTRACT")) {
+                String value=rs.getString(field);
+                if(value!=null && !value.equals("")) {
+                    List<String> values = List.of(value.split("\\|")).stream().map(v -> v.trim()).collect(Collectors.toList());
                     doc.addField(field, new ArrayList<>(values));
                 }
-                else {
-                    if (field.equalsIgnoreCase("P_DATE"))
+            } else {
+                    if (field.equalsIgnoreCase("P_DATE") ) {
+                        if(rs.getDate(field)!=null && !rs.getDate(field).toString().equals(""))
                         doc.addField(field, rs.getDate(field));
-                    if (field.equalsIgnoreCase("P_YEAR"))
+                    }
+                    if (field.equalsIgnoreCase("P_YEAR") ) {
+                        if(rs.getInt(field)!=0)
                         doc.addField(field, rs.getInt(field));
-                    if (field.equalsIgnoreCase("ABSTRACT"))
-                        doc.addField(field, rs.getString(field));
+                    }
+                    if (field.equalsIgnoreCase("ABSTRACT") ) {
+                        if(rs.getString(field)!=null && !rs.getString(field).equals("")) {
+                            doc.addField(field, rs.getString(field));
+                        }
+                    }
                 }
-            }
+
         }
         return doc;
     }
