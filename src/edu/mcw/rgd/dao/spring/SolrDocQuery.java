@@ -8,30 +8,34 @@ import org.springframework.jdbc.object.MappingSqlQuery;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SolrDocQuery extends MappingSqlQuery<PubmedSolrDoc> {
+public class SolrDocQuery extends MappingSqlQuery<SolrInputDocument> {
     public SolrDocQuery(DataSource ds, String sql){
         super(ds,sql);
     }
     @Override
-    protected PubmedSolrDoc mapRow(ResultSet rs, int rowNum) throws SQLException {
+    protected SolrInputDocument mapRow(ResultSet rs, int rowNum) throws SQLException {
         PubmedSolrDoc doc=new PubmedSolrDoc();
 
         for(String field:getFields()){
             if(rs.getString(field)!=null) {
-                if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR")) {
+                if(!field.equalsIgnoreCase("P_DATE") && !field.equalsIgnoreCase("P_YEAR") && !field.equalsIgnoreCase("ABSTRACT")) {
                     String value=rs.getString(field);
+                    List<String> values= List.of(value.split("\\|")).stream().map(v->v.trim()).collect(Collectors.toList());
 
-                    doc.addField(field, Arrays.stream( value.split("\\|")).collect(Collectors.toList()));
+                    doc.addField(field, new ArrayList<>(values));
                 }
                 else {
                     if (field.equalsIgnoreCase("P_DATE"))
                         doc.addField(field, rs.getDate(field));
                     if (field.equalsIgnoreCase("P_YEAR"))
                         doc.addField(field, rs.getInt(field));
+                    if (field.equalsIgnoreCase("ABSTRACT"))
+                        doc.addField(field, rs.getString(field));
                 }
             }
         }
