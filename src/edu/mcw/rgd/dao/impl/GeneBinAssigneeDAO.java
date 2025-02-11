@@ -96,4 +96,10 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
         return;
     }
 
+    // Get all records including subsets for a term
+    public List<GeneBinAssignee> getAssigneeRecordsWithSubsets(String termAcc) throws Exception {
+        String sql = "SELECT * FROM GENEBIN_ASSIGNEE WHERE TERM_ACC=? ORDER BY SUBSET_NUM";
+        return GeneBinAssigneeQuery.execute(this, sql, termAcc);
+    }
+
 }

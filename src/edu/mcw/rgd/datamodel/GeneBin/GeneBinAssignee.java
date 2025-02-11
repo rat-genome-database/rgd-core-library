@@ -7,6 +7,7 @@ public class GeneBinAssignee {
     private int completed;
     private int totalGenes;
     private int isParent;
+    private int subsetNum;
 
 
     public GeneBinAssignee() {
@@ -88,6 +89,14 @@ public class GeneBinAssignee {
 
     public void setAssignee(String assignee) {
         this.assignee = assignee;
+    }
+
+    public int getSubsetNum() {
+        return subsetNum;
+    }
+
+    public void setSubsetNum(int subsetNum) {
+        this.subsetNum = subsetNum;
     }
 
     @Override
