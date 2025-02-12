@@ -103,13 +103,18 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
     }
 
     public void insertSubsetRecord(String termAcc, String term, int subsetNum, int totalGenes) throws Exception {
-        String sql = "INSERT INTO GENEBIN_ASSIGNEE (TERM_ACC, TERM, SUBSET_NUM, TOTAL_GENES) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO GENEBIN_ASSIGNEE (TERM_ACC, TERM, SUBSET_NUM, TOTAL_GENES,PARENT) VALUES (?,?,?,?,?)";
         update(sql, termAcc, term, subsetNum, totalGenes);
     }
 
     public void updateSubsetTotalGenes(String termAcc, int subsetNum, int totalGenes) throws Exception {
         String sql = "UPDATE GENEBIN_ASSIGNEE SET TOTAL_GENES=? WHERE TERM_ACC=? AND SUBSET_NUM=?";
         update(sql, totalGenes, termAcc, subsetNum);
+    }
+
+    public void updateSubsetNum(String termAcc,int subsetNum) throws Exception{
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET SUBSET_NUM=? WHERE TERM_ACC=?";
+        update(sql,subsetNum,termAcc);
     }
 
 }
