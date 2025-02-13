@@ -130,5 +130,9 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
         List<GeneBinCountGenes> geneCounts = GeneBinCountGenesQuery.execute(this, GET_GENES_COUNT);
         return geneCounts;
     }
+    public void resetBin(String termAcc) throws Exception {
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET TOTAL_GENES=0, COMPLETED=0, ASSIGNEE=null WHERE TERM_ACC=?";
+        update(sql, termAcc);
+    }
 
 }
