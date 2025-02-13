@@ -2,7 +2,9 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.GeneBinAssigneeQuery;
+import edu.mcw.rgd.dao.spring.GeneBinCountGenesQuery;
 import edu.mcw.rgd.datamodel.GeneBin.GeneBinAssignee;
+import edu.mcw.rgd.datamodel.GeneBin.GeneBinCountGenes;
 
 import java.util.List;
 
@@ -115,6 +117,14 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
     public void updateSubsetNum(String termAcc,int subsetNum) throws Exception{
         String sql = "UPDATE GENEBIN_ASSIGNEE SET SUBSET_NUM=? WHERE TERM_ACC=?";
         update(sql,subsetNum,termAcc);
+    }
+
+    // In GeneBinDAO
+// In GeneBinDAO
+    public List<GeneBinCountGenes> getGeneChildCounts() throws Exception {
+        String GET_GENES_COUNT = "select TERM_ACC, TOTAL_GENES from GENEBIN_ASSIGNEE where TERM_ACC like '%(%)%'";
+        List<GeneBinCountGenes> geneCounts = GeneBinCountGenesQuery.execute(this, GET_GENES_COUNT);
+        return geneCounts;
     }
 
 }
