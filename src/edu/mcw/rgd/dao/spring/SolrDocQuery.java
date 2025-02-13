@@ -6,8 +6,12 @@ import org.apache.solr.common.SolrInputDocument;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,8 +35,31 @@ public class SolrDocQuery extends MappingSqlQuery<SolrInputDocument> {
             } else {
                     if (field.equalsIgnoreCase("P_DATE") ) {
                         if(rs.getDate(field)!=null && !rs.getDate(field).toString().equals(""))
-                        doc.addField(field, rs.getDate(field));
-                    }
+                        {     DateFormat PUB_DATE_DF = new SimpleDateFormat("yyyy/MM/dd" );
+                            String dateStr = rs.getDate(field).toString().replace("-","/");
+
+                            Date jDate;
+                            if (dateStr != null) {
+                                try {
+                                    jDate = new Date(PUB_DATE_DF.parse(dateStr).getTime());
+                                } catch (Exception e) {
+                                    try {
+                                        jDate = new Date(PUB_DATE_DF.parse("1800/01/01").getTime());
+                                    } catch (ParseException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+                                }
+                            } else {
+                                try {
+                                    jDate = new Date(PUB_DATE_DF.parse("1800/01/01").getTime());
+                                } catch (ParseException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            doc.addField(field, jDate);
+
+                        }
+                        }
                     if (field.equalsIgnoreCase("P_YEAR") ) {
                         if(rs.getInt(field)!=0)
                         doc.addField(field, rs.getInt(field));
