@@ -7,9 +7,9 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GeneCountsQuery extends MappingSqlQuery<GeneTypeCounts> {
+public class GeneTypeCountsQuery extends MappingSqlQuery<GeneTypeCounts> {
 
-    public GeneCountsQuery(DataSource ds, String sql){
+    public GeneTypeCountsQuery(DataSource ds, String sql){
         super(ds,sql);
     }
     @Override
@@ -19,6 +19,6 @@ public class GeneCountsQuery extends MappingSqlQuery<GeneTypeCounts> {
         geneCounts.setChromosome(rs.getString("chromosome"));
         geneCounts.setCount(rs.getInt("tot"));
         geneCounts.setMapKey(rs.getInt("map_key"));
-        return null;
+        return geneCounts;
     }
 }

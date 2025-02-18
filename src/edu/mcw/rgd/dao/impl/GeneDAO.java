@@ -2,7 +2,9 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.dao.spring.genomeInfo.GeneTypeCountsQuery;
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.datamodel.genomeInfo.GeneTypeCounts;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.mapping.MapManager;
 import org.springframework.jdbc.core.SqlParameter;
@@ -435,7 +437,15 @@ public class GeneDAO extends AbstractDAO {
 
         return MappedGeneQuery.run(this, query, mapKey);
     }
+    public List<GeneTypeCounts> getAllActiveMappedGeneTypeCounts() throws Exception {
+        String sql = "SELECT COUNT(*) as tot, gene_type_lc, chromosome, map_key" +
+                "FROM genes g, rgd_ids r, maps_data md " +
+                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? "+
+                "GROUP BY gene_type_lc, md.chromosome, md.map_key";
 
+        GeneTypeCountsQuery query=new GeneTypeCountsQuery(this.getDataSource(), sql);
+        return query.execute();
+    }
     public List<MappedGene> getActiveMappedGenesBySpecies(int species, String chr) throws Exception {
         String query = "SELECT g.*, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md\n" +
