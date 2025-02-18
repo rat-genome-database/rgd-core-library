@@ -135,4 +135,9 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
         update(sql, termAcc);
     }
 
+    public void deleteSubsetRecords() throws Exception {
+        String sql = "DELETE FROM GENEBIN_ASSIGNEE WHERE TERM_ACC LIKE '%(%)%'";
+        update(sql);
+    }
+
 }
