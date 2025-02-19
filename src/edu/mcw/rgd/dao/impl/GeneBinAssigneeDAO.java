@@ -2,7 +2,9 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.GeneBinAssigneeQuery;
+import edu.mcw.rgd.dao.spring.GeneBinCountGenesQuery;
 import edu.mcw.rgd.datamodel.GeneBin.GeneBinAssignee;
+import edu.mcw.rgd.datamodel.GeneBin.GeneBinCountGenes;
 
 import java.util.List;
 
@@ -94,6 +96,48 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
         String INSERT_NEW_ASSIGNEE = "INSERT INTO GENEBIN_ASSIGNEE(TERM_ACC, TERM, PARENT) VALUES (?,?,?)";
         update(INSERT_NEW_ASSIGNEE, termAcc, term, parent);
         return;
+    }
+
+    // Get all records including subsets for a term
+    public List<GeneBinAssignee> getAssigneeRecordsWithSubsets(String termAcc) throws Exception {
+        String sql = "SELECT * FROM GENEBIN_ASSIGNEE WHERE TERM_ACC Like ? ORDER BY SUBSET_NUM";
+        return GeneBinAssigneeQuery.execute(this, sql, termAcc);
+    }
+
+    public void insertSubsetRecord(String termAcc, String term, int subsetNum, int totalGenes,int parent) throws Exception {
+        String sql = "INSERT INTO GENEBIN_ASSIGNEE (TERM_ACC, TERM, SUBSET_NUM, TOTAL_GENES,PARENT) VALUES (?,?,?,?,?)";
+        update(sql, termAcc, term, subsetNum, totalGenes, parent);
+    }
+    public void updateSubsetRecord(String termAcc, String term, int subsetNum, int totalGenes, int parent) throws Exception {
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET TERM=?, SUBSET_NUM=?, TOTAL_GENES=?, PARENT=? WHERE TERM_ACC=?";
+        update(sql, term, subsetNum, totalGenes, parent, termAcc);
+    }
+
+    public void updateSubsetTotalGenes(String termAcc, int subsetNum, int totalGenes) throws Exception {
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET TOTAL_GENES=? WHERE TERM_ACC=? AND SUBSET_NUM=?";
+        update(sql, totalGenes, termAcc, subsetNum);
+    }
+
+    public void updateSubsetNum(String termAcc,int subsetNum) throws Exception{
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET SUBSET_NUM=? WHERE TERM_ACC=?";
+        update(sql,subsetNum,termAcc);
+    }
+
+    // In GeneBinDAO
+// In GeneBinDAO
+    public List<GeneBinCountGenes> getGeneChildCounts() throws Exception {
+        String GET_GENES_COUNT = "select TERM_ACC, TOTAL_GENES from GENEBIN_ASSIGNEE where TERM_ACC like '%(%)%'";
+        List<GeneBinCountGenes> geneCounts = GeneBinCountGenesQuery.execute(this, GET_GENES_COUNT);
+        return geneCounts;
+    }
+    public void resetBin(String termAcc) throws Exception {
+        String sql = "UPDATE GENEBIN_ASSIGNEE SET TOTAL_GENES=0, COMPLETED=0, ASSIGNEE=null WHERE TERM_ACC=?";
+        update(sql, termAcc);
+    }
+
+    public void deleteSubsetRecords() throws Exception {
+        String sql = "DELETE FROM GENEBIN_ASSIGNEE WHERE TERM_ACC LIKE '%(%)%'";
+        update(sql);
     }
 
 }
