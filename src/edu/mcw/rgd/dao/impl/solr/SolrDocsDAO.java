@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class SolrDocsDAO extends AbstractDAO {
     ObjectMapper mapper=new ObjectMapper();
     Gson gson=new Gson();
-    public int addBatch(List<SolrDoc> solrDocs, Set<String> pmidsChunked) throws Exception {
+    public int addBatch(List<SolrDoc> solrDocs) throws Exception {
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
                 "NEXTVAL('SOLR_DOC_SEQ'), " +
@@ -39,11 +39,9 @@ public class SolrDocsDAO extends AbstractDAO {
         try(Connection connection=this.getPostgressConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
             connection.setAutoCommit(false);
-            int chunkedDataCount=0;
-            boolean flag=false;
+
             for(SolrDoc solrDoc:solrDocs) {
                 SolrDocDB doc = buildSolrDocDB(solrDoc);
-               // if(!exists(doc.getPmid())) {
                 preparedStatement.setString(1, doc.getGeneCount());
                 preparedStatement.setString(2, doc.getMpId());
                 preparedStatement.setString(3, doc.getDoiS());
@@ -118,13 +116,8 @@ public class SolrDocsDAO extends AbstractDAO {
                 preparedStatement.setString(68,doc.getOrganismPos());
                 preparedStatement.setString(69,doc.getPmcId());
 
-
-                    if(flag){
-                        chunkedDataCount++;
-                        pmidsChunked.add(doc.getPmid());
-                    }
                     preparedStatement.addBatch();
-               // }
+
             }
             int [] numUpdates=preparedStatement.executeBatch();
             for(int i=0; i<numUpdates.length;i++){
@@ -134,7 +127,7 @@ public class SolrDocsDAO extends AbstractDAO {
                   //  System.out.println("Execution " + i+ " successful: "+ numUpdates[i]+" rows updated");
             }
             connection.commit();
-            return chunkedDataCount;
+           return 0;
         }catch (Exception e){
             e.printStackTrace();
         }
