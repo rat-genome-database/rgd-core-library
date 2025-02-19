@@ -287,6 +287,11 @@ public class SolrDocsDAO extends AbstractDAO {
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
         return execute(query,year);
     }
+    public List<SolrInputDocument> getSolrDocByPMID(String pmid) throws Exception {
+        String sql="select * from solr_docs where pmid=?";
+        SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
+        return execute(query,pmid);
+    }
     public List<SolrInputDocument> getSolrDocs(int year, int limit, int offset) throws Exception {
         String sql="select * from solr_docs where p_Year=? LIMIT ? OFFSET ? " ;
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);

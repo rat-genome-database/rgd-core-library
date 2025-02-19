@@ -15,6 +15,7 @@ public class SolrIndexer {
 
     public static void batchIndexer(int year, String solrCollectionName) throws Exception {
         SolrDocsDAO solrDocsDAO=new SolrDocsDAO();
+
         SolrClient solrClient= new HttpSolrClient.Builder(SOLR_URL+solrCollectionName)
                 .withConnectionTimeout(10000)
                 .withSocketTimeout(60000)
@@ -54,16 +55,37 @@ public class SolrIndexer {
             }
         }
     }
+    public static void recordIndexer(String pmid, String solrCollectionName) throws Exception {
+        SolrDocsDAO solrDocsDAO=new SolrDocsDAO();
+        SolrClient solrClient= new HttpSolrClient.Builder(SOLR_URL+solrCollectionName)
+                .withConnectionTimeout(10000)
+                .withSocketTimeout(60000)
+                .build();
+
+        try{
+            List<SolrInputDocument> document=solrDocsDAO.getSolrDocByPMID(pmid);
+            try {
+                addDocumentsToSolr(solrClient, document, 0);
+                solrClient.commit();
+                }catch (Exception e){e.printStackTrace();}
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                solrClient.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     private static void addDocumentsToSolr(SolrClient solrClient, List<SolrInputDocument> batch, int batchNumber) throws Exception {
         UpdateResponse response = solrClient.add(batch);
         System.out.println("Indexed batch "+batchNumber+" of " + batch.size() + " documents, response status: " + response.getStatus());
     }
 
-    private static void addDocumentsToSolr(SolrClient solrClient, List<SolrInputDocument> batch) throws Exception {
-        UpdateResponse response = solrClient.add(batch);
-        System.out.println("Indexed batch of " + batch.size() + " documents, response status: " + response.getStatus());
-    }
-    public static void main(String[] args) throws Exception {
-        batchIndexer(2025, "core_db");
+  public static void main(String[] args) throws Exception {
+       // batchIndexer(2025, "core_db");
+        recordIndexer("39737219", "core_db");
+
     }
 }
