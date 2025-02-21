@@ -1727,6 +1727,20 @@ public class PhenominerDAO extends AbstractDAO {
         return records;
     }
 
+    public List<Sample> getGeoRecordSamplesByStatus(String  geoId, String species, String status) throws Exception {
+        String query = "select * from sample where geo_sample_acc in (" +
+                "SELECT sample_accession_id from rna_seq where geo_accession_id=? and curation_status=? and sample_organism like ? )";
+
+        PhenoSampleQuery sq = new PhenoSampleQuery(this.getDataSource(), query);
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.declareParameter(new SqlParameter(Types.VARCHAR));
+        sq.compile();
+
+        List<Sample> records = sq.execute(geoId,status,species+"%");
+        return records;
+    }
+
 
 
     /**
