@@ -2,9 +2,9 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
-import edu.mcw.rgd.dao.spring.genomeInfo.GeneTypeCountsQuery;
+import edu.mcw.rgd.dao.spring.genomeInfo.ObjectTypeCountsQuery;
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.datamodel.genomeInfo.GeneTypeCounts;
+import edu.mcw.rgd.datamodel.genomeInfo.ObjectTypeCounts;
 import edu.mcw.rgd.process.Utils;
 import edu.mcw.rgd.process.mapping.MapManager;
 import org.springframework.jdbc.core.SqlParameter;
@@ -437,19 +437,65 @@ public class GeneDAO extends AbstractDAO {
 
         return MappedGeneQuery.run(this, query, mapKey);
     }
-    public List<GeneTypeCounts> getAllActiveMappedGeneTypeCounts() throws Exception {
-        String sql = "SELECT COUNT(*) as tot, gene_type_lc, chromosome, map_key" +
-                "FROM genes g, rgd_ids r, maps_data md " +
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? "+
-                "GROUP BY gene_type_lc, md.chromosome, md.map_key";
+    public List<ObjectTypeCounts> getAllActiveMappedGeneTypeCounts() throws Exception {
+        String sql = "SELECT COUNT(*) as tot, gene_type_lc object_name, chromosome, map_key" +
+                "   FROM genes g, rgd_ids r, maps_data md " +
+                "   WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? "+
+                "   GROUP BY gene_type_lc, md.chromosome, md.map_key";
 
-        GeneTypeCountsQuery query=new GeneTypeCountsQuery(this.getDataSource(), sql);
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
         return query.execute();
+    }
+    public List<ObjectTypeCounts> getAllActiveMappedGeneTypeCounts(int mapKey) throws Exception {
+        String sql = "SELECT COUNT(*) as tot, gene_type_lc object_name, chromosome, map_key " +
+                "   FROM genes g, rgd_ids r, maps_data md " +
+                "   WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? AND " +
+                "   m.map_key=?"+
+                "   GROUP BY gene_type_lc, md.chromosome, md.map_key";
+
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return execute(query, mapKey);
+    }
+    public List<ObjectTypeCounts> getAllActiveMappedGeneTypeCounts(int mapKey, String chromosome) throws Exception {
+        String sql = "SELECT COUNT(*) as tot, gene_type_lc as object_name, chromosome, map_key" +
+                "   FROM genes g, rgd_ids r, maps_data md " +
+                "   WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? AND " +
+                "   md.chromosome=? "+
+                "   GROUP BY gene_type_lc, md.chromosome, md.map_key ";
+
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return execute(query,mapKey, chromosome);
+    }
+    public List<ObjectTypeCounts> getAllOtherObjectCounts() throws Exception{
+        String sql="SELECT count(distinct(ri.rgd_id)) as tot, ro.object_name , chromosome, map_key\n" +
+                "   from rgd_ids ri, rgd_objects ro , maps_data m where ri.object_key = ro.object_key \n" +
+                "   AND m.rgd_id=ri.rgd_id  and ri.object_status = 'ACTIVE'\n" +
+                "   GROUP BY ro.object_name, chromosome, map_key ";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return query.execute();
+    }
+    public List<ObjectTypeCounts> getAllOtherObjectCounts(int mapKey) throws Exception{
+        String sql="SELECT count(distinct(ri.rgd_id)) as tot, ro.object_name , chromosome, map_key " +
+                "   from rgd_ids ri, rgd_objects ro , maps_data m where ri.object_key = ro.object_key \n" +
+                "   AND m.rgd_id=ri.rgd_id  and ri.object_status = 'ACTIVE' AND " +
+                "   map_key=?" +
+                "   GROUP BY ro.object_name, chromosome, map_key";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return execute(query,mapKey);
+    }
+    public List<ObjectTypeCounts> getAllOtherObjectCounts(int mapKey, String chromosome) throws Exception{
+        String sql="SELECT count(distinct(ri.rgd_id)) as tot, ro.object_name , chromosome, map_key " +
+                "   from rgd_ids ri, rgd_objects ro , maps_data m where ri.object_key = ro.object_key  " +
+                "   AND m.rgd_id=ri.rgd_id  and ri.object_status = 'ACTIVE' AND " +
+                "   map_key=? and chromosome=?" +
+                "   GROUP BY ro.object_name, chromosome, map_key ";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return execute(query,mapKey,chromosome);
     }
     public List<MappedGene> getActiveMappedGenesBySpecies(int species, String chr) throws Exception {
         String query = "SELECT g.*, r.species_type_key, md.* \n" +
-                "FROM genes g, rgd_ids r, maps_data md\n" +
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id"+
+                "   FROM genes g, rgd_ids r, maps_data md\n" +
+                "   WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id"+
                 " AND md.map_key=? AND md.chromosome=?" +
                 " ORDER BY md.start_pos";
 

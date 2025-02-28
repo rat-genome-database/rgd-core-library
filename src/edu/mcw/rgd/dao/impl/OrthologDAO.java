@@ -2,9 +2,11 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.dao.spring.genomeInfo.ObjectTypeCountsQuery;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.MappedOrtholog;
 import edu.mcw.rgd.datamodel.Ortholog;
+import edu.mcw.rgd.datamodel.genomeInfo.ObjectTypeCounts;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
@@ -476,13 +478,19 @@ public class OrthologDAO extends AbstractDAO {
         return execute(q, params);
     }
 
+    public List<ObjectTypeCounts> getOrthologCountsByChromosome(int mapKey, int speciesTypeKey, String chr) throws Exception {
+        String sql="SELECT d.species_type_key, COUNT(d.species_type_key) as tot \n" +
+                "     FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d \n" +
+                "     WHERE o.src_rgd_id=s.rgd_id AND o.dest_rgd_id=d.rgd_id \n" +
+                "     AND s.species_type_key=? AND s.object_status='ACTIVE' \n" +
+                "     AND d.object_status='ACTIVE' \n" +
+                "     AND EXISTS( SELECT 1 FROM maps_data m WHERE s.rgd_id=m.rgd_id AND m.map_key=? and m.chromosome=?)\n" +
+                "     " +
+                "     group by d.species_type_key ";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(), sql);
+        return execute(query,speciesTypeKey,mapKey, chr );
+    }
     public Map<String, Integer> getOrthologCounts(int mapKey, int speciesTypeKey, String chr) throws Exception {
-       /* String sql="SELECT dest.species_type_key, count(dest.species_type_key) " +
-                "from genetogene_rgd_id_rlt rlt, rgd_ids src, rgd_ids dest, maps_data m " +
-                " where dest.rgd_id=dest_rgd_id and src.rgd_id=src_rgd_id " +
-                "and m.rgd_id=src.rgd_id and m.map_key=?" +
-                " and src.species_type_key=? and src.object_status='ACTIVE' and dest.object_status='ACTIVE' ";*/
-
 
         String sql = "SELECT d.species_type_key, COUNT(d.species_type_key) " +
                 "FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d " +
@@ -497,8 +505,8 @@ public class OrthologDAO extends AbstractDAO {
         }
         sql = sql + ") group by d.species_type_key";
         Map<String, Integer> counts = new HashMap<>();
-        try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = this.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);) {
             stmt.setInt(2, mapKey);
             stmt.setInt(1, speciesTypeKey);
             if (chr != null) {
@@ -586,44 +594,44 @@ public class OrthologDAO extends AbstractDAO {
                 " AND object_status='ACTIVE' and rgd_object_key=1 and evidence in " + evidenceInClause + ")";
 
 
-        System.out.println(sql);
-        Connection conn = this.getConnection();
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-
         HashMap<Integer, HashMap<Integer, List<Integer>>> mapping = new HashMap<Integer, HashMap<Integer, List<Integer>>>();
 
-        while (rs.next()) {
-            HashMap<Integer, List<Integer>> orthoMap = null;
-            List<Integer> orthoList = null;
+        try( Connection conn = this.getConnection();
+        Statement stmt = conn.createStatement();){
+               ResultSet rs = stmt.executeQuery(sql);
 
-            //see if mapping already exists
-            int rgdId = rs.getInt("dest_rgd_id");
-            int orthoId = rs.getInt("src_rgd_id");
-            int orthoSpecies = rs.getInt("src_species_type_key");
 
-            if (mapping.containsKey(rgdId)) {
-                orthoMap = mapping.get(rgdId);
+               while (rs.next()) {
+                   HashMap<Integer, List<Integer>> orthoMap = null;
+                   List<Integer> orthoList = null;
 
-                if (orthoMap.containsKey(orthoSpecies)) {
-                    orthoList = orthoMap.get(orthoSpecies);
-                } else {
-                    orthoList = new ArrayList<Integer>();
-                }
+                   //see if mapping already exists
+                   int rgdId = rs.getInt("dest_rgd_id");
+                   int orthoId = rs.getInt("src_rgd_id");
+                   int orthoSpecies = rs.getInt("src_species_type_key");
 
-            } else {
-                orthoMap = new HashMap<Integer, List<Integer>>();
-                orthoList = new ArrayList<Integer>();
-            }
+                   if (mapping.containsKey(rgdId)) {
+                       orthoMap = mapping.get(rgdId);
 
-            orthoList.add(orthoId);
+                       if (orthoMap.containsKey(orthoSpecies)) {
+                           orthoList = orthoMap.get(orthoSpecies);
+                       } else {
+                           orthoList = new ArrayList<Integer>();
+                       }
 
-            orthoMap.put(orthoSpecies, orthoList);
-            mapping.put(rgdId, orthoMap);
+                   } else {
+                       orthoMap = new HashMap<Integer, List<Integer>>();
+                       orthoList = new ArrayList<Integer>();
+                   }
 
-        }
+                   orthoList.add(orthoId);
 
-        conn.close();
+                   orthoMap.put(orthoSpecies, orthoList);
+                   mapping.put(rgdId, orthoMap);
+
+               }
+               rs.close();
+           }
 
         return mapping;
     }

@@ -1,20 +1,18 @@
 package edu.mcw.rgd.datamodel.genomeInfo;
 
-import java.util.Map;
-
-public class GeneTypeCounts {
-    private String geneTypeLc;
+public class ObjectTypeCounts {
+    private String objectNameLc;
     private int count;
     private String chromosome;
     private int mapKey;
     private int speciesTypeKey;
 
-    public String getGeneTypeLc() {
-        return geneTypeLc;
+    public String getObjectNameLc() {
+        return objectNameLc;
     }
 
-    public void setGeneTypeLc(String geneTypeLc) {
-        this.geneTypeLc = geneTypeLc;
+    public void setObjectNameLc(String objectNameLc) {
+        this.objectNameLc = objectNameLc;
     }
 
     public int getCount() {
