@@ -629,6 +629,21 @@ public class GeneDAO extends AbstractDAO {
         return executeGeneQuery(query, alias.trim(), speciesTypeKey);
     }
 
+    /**
+     * get list of genes with matching alias for given species
+     * @param alias alias name
+     * @param speciesTypeKey  species type key
+     * @return list of genes with matching alias for given species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Gene> getActiveGenesByAlias(String alias, int speciesTypeKey) throws Exception {
+
+        String query = "SELECT g.*,r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r, ALIASES a "+
+                "where a.ALIAS_VALUE_LC=LOWER(?) and g.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=? and a.RGD_ID=g.RGD_ID and r.OBJECT_STATUS='ACTIVE'";
+
+        return executeGeneQuery(query, alias.trim(), speciesTypeKey);
+    }
+
     public List<Gene> getGenesForAffyId(String affyId, int speciesTypeKey) throws Exception {
 
         String query = "select g.*, ri.species_type_key from aliases a, genes g, rgd_ids ri " +
