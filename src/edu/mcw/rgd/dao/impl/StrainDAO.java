@@ -179,7 +179,7 @@ public class StrainDAO extends AbstractDAO {
     }
 
     public Strain getActiveStrainByAlias(String alias, int species) throws Exception{
-        String query = "SELECT s.* from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC=lower(?) and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
+        String query = "SELECT s.*, r.species_type_key from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC=lower(?) and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
         StrainQuery q = new StrainQuery(getDataSource(),query);
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -190,7 +190,7 @@ public class StrainDAO extends AbstractDAO {
     }
 
     public Strain getActiveStrainByAliasUsingLike(String alias, int species) throws Exception{
-        String query = "SELECT s.* from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC like lower('"+alias+"%') and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
+        String query = "SELECT s.*, r.species_type_key from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC like lower('"+alias+"%') and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
         StrainQuery q = new StrainQuery(getDataSource(),query);
 //        q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
