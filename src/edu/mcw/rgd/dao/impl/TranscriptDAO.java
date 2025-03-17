@@ -42,6 +42,11 @@ public class TranscriptDAO extends AbstractDAO {
         return executeTranscriptQuery(query, accId);
     }
 
+    public List<Transcript> getTranscriptByAccIdForActiveGenes(String accId) throws Exception{
+        String query = "SELECT t.* FROM transcripts t, rgd_ids r WHERE t.acc_id=? and t.gene_rgd_id=r.rgd_id and r.OBJECT_STATUS='ACTIVE'";
+        return executeTranscriptQuery(query,accId);
+    }
+
     /**
      * get list of transcripts by refseq protein accession id
      * @param proteinAccId protein accession id like NP_030992
