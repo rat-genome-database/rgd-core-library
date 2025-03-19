@@ -681,6 +681,18 @@ public class GeneDAO extends AbstractDAO {
         return GeneQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey, "NCBI");
     }
 
+    public List<Gene> getAllActiveGenesBySymbol(String geneSymbol, int speciesKey) throws Exception {
+
+        if( geneSymbol == null)
+            return null;
+
+        String query = "SELECT * FROM genes g, rgd_ids r "+
+                "WHERE g.gene_symbol_lc=? AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=? and g.gene_source=? "+
+                "ORDER BY r.object_status"; // active genes are returned first
+
+        return GeneQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey, "NCBI");
+    }
+
     public List<Gene> getAllGenesBySymbolNSource(String geneSymbol, int speciesKey, String source) throws Exception {
 
         if( geneSymbol == null)
