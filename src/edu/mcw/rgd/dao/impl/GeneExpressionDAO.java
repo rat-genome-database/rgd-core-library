@@ -4,7 +4,6 @@ import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.pheno.*;
-import edu.mcw.rgd.datamodel.pheno.GeneExpressionValueCount;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -61,6 +60,22 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return id;
     }
 
+    public int insertGeneExpressionRecordValueBatch(Collection<GeneExpressionRecordValue> values) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"INSERT INTO gene_expression_values (gene_expression_value_id, expressed_object_rgd_id," +
+                "expression_measurement_ont_id, expression_value_notes, gene_expression_exp_record_id," +
+                "expression_value, expression_unit, map_key, EXPRESSION_LEVEL, TPM_VALUE) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                new int[]{Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+                        Types.DOUBLE, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.DOUBLE});
+        su.compile();
+        for (GeneExpressionRecordValue v : values){
+            int id = getNextKeyFromSequence("gene_expression_values_seq");
+            v.setId(id);
+            su.update(v.getId(),v.getExpressedObjectRgdId(),v.getExpressionMeasurementAccId(),v.getNotes(),v.getGeneExpressionRecordId(),
+            v.getExpressionValue(),v.getExpressionUnit(),v.getMapKey(),v.getExpressionLevel(),v.getTpmValue());
+        }
+        return executeBatch(su);
+    }
+
     /**
      * delete a gene expression record value from db
      * @param geneExpressionValueId
@@ -83,6 +98,13 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
         return execute(q, geneExpressionRecordId);
+    }
+
+    public List<GeneExpressionRecordValue> getGeneExpressionRecordValuesByRecordIdAndExpressedObjId(int geneExpressionRecordId, int objRgdId, String unit) throws Exception {
+        String query = "SELECT * FROM gene_expression_values WHERE gene_expression_exp_record_id=? and EXPRESSED_OBJECT_RGD_ID=? and EXPRESSION_UNIT=?";
+
+        GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
+        return execute(q, geneExpressionRecordId, objRgdId, unit);
     }
 
     /**

@@ -305,6 +305,15 @@ public class GeneDAO extends AbstractDAO {
         return GeneQuery.execute(this, query, chr, stopPos, startPos, mapKey);
     }
 
+    public List<Gene> getActiveGenesNSource(String chr, long startPos, long stopPos, int mapKey, String source) throws Exception {
+        String query = "SELECT DISTINCT g.*, r.species_type_key \n" +
+                "FROM genes g, rgd_ids r, maps_data md \n" +
+                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
+                " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? AND g.gene_source=?";
+
+        return GeneQuery.execute(this, query, chr, stopPos, startPos, mapKey, source);
+    }
+
     public List<MappedGenePosition> getActiveMappedGenePositions(String chr, long startPos, long stopPos, int mapKey) throws Exception {
         String query = "SELECT g.rgd_id as rgd_id, g.gene_symbol as symbol, r.species_type_key, md.* \n" +
                 "FROM genes g, rgd_ids r, maps_data md \n" +
@@ -491,6 +500,15 @@ public class GeneDAO extends AbstractDAO {
         return GeneQuery.execute(this, query, speciesKey, symbol);
     }
 
+    public List<Gene> getActiveGenesByEnsemblSymbol(int speciesKey, String symbol) throws Exception {
+
+        String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
+                "WHERE r.object_status='ACTIVE' AND r.species_type_key=? "+
+                "AND NVL(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.ensembl_gene_symbol=?";
+
+        return GeneQuery.execute(this, query, speciesKey, symbol);
+    }
+
     /**
      * get list of active genes of given type for given species
      * @param geneType gene type
@@ -564,6 +582,29 @@ public class GeneDAO extends AbstractDAO {
         return executeGeneQuery(query, alias.trim(), speciesTypeKey);
     }
 
+    /**
+     * get list of genes with matching alias for given species
+     * @param alias alias name
+     * @param speciesTypeKey  species type key
+     * @return list of genes with matching alias for given species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Gene> getActiveGenesByAlias(String alias, int speciesTypeKey) throws Exception {
+
+        String query = "SELECT g.*,r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r, ALIASES a "+
+                "where a.ALIAS_VALUE_LC=LOWER(?) and g.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=? and a.RGD_ID=g.RGD_ID and r.OBJECT_STATUS='ACTIVE'";
+
+        return executeGeneQuery(query, alias.trim(), speciesTypeKey);
+    }
+
+    public List<Gene> getActiveGenesByAlias(String alias, int speciesTypeKey, String source) throws Exception {
+
+        String query = "SELECT g.*,r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r, ALIASES a "+
+                "where a.ALIAS_VALUE_LC=LOWER(?) and g.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=? AND g.gene_source=? and a.RGD_ID=g.RGD_ID and r.OBJECT_STATUS='ACTIVE'";
+
+        return executeGeneQuery(query, alias.trim(), speciesTypeKey, source);
+    }
+
     public List<Gene> getGenesForAffyId(String affyId, int speciesTypeKey) throws Exception {
 
         String query = "select g.*, ri.species_type_key from aliases a, genes g, rgd_ids ri " +
@@ -625,6 +666,18 @@ public class GeneDAO extends AbstractDAO {
 
         String query = "SELECT * FROM genes g, rgd_ids r "+
                 "WHERE g.gene_symbol_lc=? AND g.rgd_id=r.rgd_id AND r.species_type_key=? and g.gene_source=? "+
+                "ORDER BY r.object_status"; // active genes are returned first
+
+        return GeneQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey, "NCBI");
+    }
+
+    public List<Gene> getAllActiveGenesBySymbol(String geneSymbol, int speciesKey) throws Exception {
+
+        if( geneSymbol == null)
+            return null;
+
+        String query = "SELECT * FROM genes g, rgd_ids r "+
+                "WHERE g.gene_symbol_lc=? AND g.rgd_id=r.rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=? and g.gene_source=? "+
                 "ORDER BY r.object_status"; // active genes are returned first
 
         return GeneQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey, "NCBI");
