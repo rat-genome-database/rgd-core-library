@@ -540,8 +540,8 @@ public class VariantDAO extends AbstractDAO {
                 "UPDATE variant_sample_detail set SOURCE=?, TOTAL_DEPTH=?, VAR_FREQ=?, ZYGOSITY_STATUS=?, ZYGOSITY_PERCENT_READ=?," +
                         "ZYGOSITY_POSS_ERROR=?, ZYGOSITY_REF_ALLELE=?, ZYGOSITY_NUM_ALLELE=?, ZYGOSITY_IN_PSEUDO=?, QUALITY_SCORE=? "+
                         "where RGD_ID=? and SAMPLE_ID=? ",
-                new int[]{Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.INTEGER,Types.CHAR, Types.CHAR,
-                        Types.INTEGER, Types.CHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER});
+                new int[]{Types.VARCHAR, Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.INTEGER,Types.CHAR,
+                        Types.CHAR, Types.INTEGER, Types.CHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER});
         su.compile();
         for (VariantSampleDetail v : sampleDetails){
             su.update(v.getSource(), v.getDepth(), v.getVariantFrequency(), v.getZygosityStatus(), v.getZygosityPercentRead(),
