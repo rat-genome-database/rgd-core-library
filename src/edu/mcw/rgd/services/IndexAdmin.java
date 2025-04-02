@@ -84,14 +84,24 @@ public class IndexAdmin {
         if(RgdContext.isProduction() || RgdContext.isPipelines()){
             replicates=1;
         }
-        String analyzers=new String(Files.readAllBytes(Paths.get("data/analyzers.json")));
+        String analyzers=null;
+        try {
+          analyzers=  new String(Files.readAllBytes(Paths.get("data/analyzers.json")));
+        }catch (Exception ignored){}
 
         /********* create index, put mappings and analyzers ****/
         CreateIndexRequest request=new CreateIndexRequest(index);
-        request.settings(Settings.builder()
-                .put("index.number_of_shards",shards)
-                .put("index.number_of_replicas", replicates)
-                .loadFromSource(analyzers, XContentType.JSON));
+        if(analyzers!=null) {
+            request.settings(Settings.builder()
+                    .put("index.number_of_shards", shards)
+                    .put("index.number_of_replicas", replicates)
+                    .loadFromSource(analyzers, XContentType.JSON));
+        }else{
+            request.settings(Settings.builder()
+                    .put("index.number_of_shards", shards)
+                    .put("index.number_of_replicas", replicates));
+        }
+        if(mappings!=null)
         request.mapping(mappings, XContentType.JSON);
         org.elasticsearch.client.indices.CreateIndexResponse createIndexResponse = ClientInit.getClient().indices().create(request, RequestOptions.DEFAULT);
 
