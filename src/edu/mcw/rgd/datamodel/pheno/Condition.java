@@ -1,8 +1,10 @@
 package edu.mcw.rgd.datamodel.pheno;
 
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
+import edu.mcw.rgd.process.Utils;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 /**
  * @author jdepons
@@ -204,5 +206,22 @@ public class Condition {
             if (value_str.equals(SPECIAL_VALUE_STRINGS[i])) return (long) -i;
         }
         return 0l;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Condition c = (Condition) obj;
+        return experimentRecordId == c.getExperimentRecordId() && geneExpressionRecordId==c.getGeneExpressionRecordId() && Objects.equals(ordinality, c.ordinality) &&
+                Utils.stringsAreEqual(units, c.getUnits()) && Utils.stringsAreEqual(valueMin, c.getValueMin()) && Utils.stringsAreEqual(valueMax, c.getValueMax()) &&
+                durationLowerBound==c.getDurationLowerBound() && durationUpperBound==c.getDurationUpperBound() && Utils.stringsAreEqual(notes,c.getNotes()) &&
+                Utils.stringsAreEqual(ontologyId, c.getOntologyId()) && Utils.stringsAreEqual(applicationMethod, c.getApplicationMethod()) && Utils.stringsAreEqual(conditionDescription, c.getConditionDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return  experimentRecordId ^ geneExpressionRecordId ^ ordinality.hashCode() ^ Utils.defaultString(units).hashCode() ^ Utils.defaultString(valueMin).hashCode()
+                ^ Utils.defaultString(valueMax).hashCode() ^ Double.valueOf(durationLowerBound).hashCode() ^ Double.valueOf(durationUpperBound).hashCode()
+                ^ Utils.defaultString(notes).hashCode() ^ Utils.defaultString(ontologyId).hashCode() ^ Utils.defaultString(applicationMethod).hashCode()
+                ^ Utils.defaultString(conditionDescription).hashCode();
     }
 }
