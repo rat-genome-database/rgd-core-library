@@ -457,4 +457,13 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
         return executeBatch(su);
     }
+
+    public int deleteConditionBatch(Collection<Condition> conditions) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"delete FROM EXPERIMENT_CONDITION WHERE experiment_condition_id=?",
+                new int[] {Types.INTEGER});
+        for (Condition c : conditions){
+            su.update(c.getId());
+        }
+        return executeBatch(su);
+    }
 }

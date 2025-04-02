@@ -535,6 +535,28 @@ public class VariantDAO extends AbstractDAO {
         return totalRowsAffected;
     }
 
+    public int updateVariantSample(Collection<VariantSampleDetail> sampleDetails) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
+                "UPDATE variant_sample_detail set SOURCE=?, TOTAL_DEPTH=?, VAR_FREQ=?, ZYGOSITY_STATUS=?, ZYGOSITY_PERCENT_READ=?, " +
+                        "ZYGOSITY_POSS_ERROR=?, ZYGOSITY_REF_ALLELE=?, ZYGOSITY_NUM_ALLELE=?, ZYGOSITY_IN_PSEUDO=?, QUALITY_SCORE=? "+
+                        "where RGD_ID=? and SAMPLE_ID=? ",
+                new int[]{Types.VARCHAR, Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.INTEGER,Types.CHAR,
+                        Types.CHAR, Types.INTEGER, Types.CHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER});
+        su.compile();
+        for (VariantSampleDetail v : sampleDetails){
+            su.update(v.getSource(), v.getDepth(), v.getVariantFrequency(), v.getZygosityStatus(), v.getZygosityPercentRead(),
+                    v.getZygosityPossibleError(), v.getZygosityRefAllele(), v.getZygosityNumberAllele(), v.getZygosityInPseudo(), v.getQualityScore(),
+                    v.getId(), v.getSampleId());
+        }
+        su.flush();
+
+        int totalRowsAffected = 0;
+        for( int rowsAffected: su.getRowsAffected() ) {
+            totalRowsAffected += rowsAffected;
+        }
+        return totalRowsAffected;
+    }
+
     public int insertVariantRgdIds(Collection<VariantMapData> vmds) throws Exception{
         BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER},5000);

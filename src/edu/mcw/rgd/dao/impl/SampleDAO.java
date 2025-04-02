@@ -132,7 +132,7 @@ public class SampleDAO extends JdbcBaseDAO {
     }
     public Sample getSampleByStrainRgdIdNMapKey(int strainRgdId, int mapKey) {
         String sql = "SELECT * FROM sample WHERE strain_rgd_id=? and patient_id in (" +
-                "select patient_id from patient where mapKey=?)";
+                "select patient_id from patient where map_key=?)";
         SampleQuery q = new SampleQuery(this.getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));

@@ -6,6 +6,7 @@ import edu.mcw.rgd.datamodel.MappedStrain;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.datamodel.StrainFiles;
 import edu.mcw.rgd.process.Utils;
+import org.springframework.jdbc.core.SqlParameter;
 
 import java.util.List;
 import java.io.InputStream;
@@ -175,6 +176,28 @@ public class StrainDAO extends AbstractDAO {
                 "r.object_status='ACTIVE' AND s.strain_symbol_lc=?";
         List<Strain> strains = executeStrainQuery(query, strSymbol.toLowerCase());
         return strains.size()==0 ? null : strains.get(0);
+    }
+
+    public Strain getActiveStrainByAlias(String alias, int species) throws Exception{
+        String query = "SELECT s.*, r.species_type_key from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC=lower(?) and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
+        StrainQuery q = new StrainQuery(getDataSource(),query);
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<Strain> strains = q.execute(alias+"%",species);
+        if (strains.isEmpty())
+            return null;
+        return strains.get(0);
+    }
+
+    public Strain getActiveStrainByAliasUsingLike(String alias, int species) throws Exception{
+        String query = "SELECT s.*, r.species_type_key from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC like lower('"+alias+"%') and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
+        StrainQuery q = new StrainQuery(getDataSource(),query);
+//        q.declareParameter(new SqlParameter(Types.VARCHAR));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<Strain> strains = q.execute(species);
+        if (strains.isEmpty())
+            return null;
+        return strains.get(0);
     }
 
     /**
