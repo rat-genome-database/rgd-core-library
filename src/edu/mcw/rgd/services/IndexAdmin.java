@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 public class IndexAdmin {
-    private static Logger log= LogManager.getLogger("main");
+    public static final Logger log= LogManager.getLogger(IndexAdmin.class);
     private RgdIndex rgdIndex;
 
 
@@ -71,7 +71,12 @@ public class IndexAdmin {
 
     public void createNewIndex(String index, String _mappings, String type) throws Exception {
 
-        String path="data/"+_mappings+".json";
+        String path="";
+        String mappings=null;
+        if(_mappings!=null && !_mappings.equals("")){
+            path+="data/"+_mappings+".json";
+            mappings=new String(Files.readAllBytes(Paths.get(path)));
+        }
         log.info("CREATING NEW INDEX..." + index);
         int replicates=0;
         int shards=5;
@@ -79,7 +84,6 @@ public class IndexAdmin {
         if(RgdContext.isProduction() || RgdContext.isPipelines()){
             replicates=1;
         }
-        String mappings=new String(Files.readAllBytes(Paths.get(path)));
         String analyzers=new String(Files.readAllBytes(Paths.get("data/analyzers.json")));
 
         /********* create index, put mappings and analyzers ****/
