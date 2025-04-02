@@ -19,6 +19,13 @@ public class GWASCatalogDAO extends AbstractDAO {
         return GWASCatalogQuery.execute(this,query);
     }
 
+    public List<GWASCatalog> getAllGWASByMapKey(int mapKey) throws Exception {
+        String query = "select * from GWAS_CATALOG where map_key=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey);
+    }
+
     public int deleteGWASBatch(Collection<GWASCatalog> toBeDeleted) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM GWAS_CATALOG WHERE GWAS_ID=?",
                 new int[] {Types.INTEGER});
