@@ -30,7 +30,7 @@ public class GWASCatalog {
     private String studyAcc;
     private String efoId;
     private String orBeta;
-    private int variantRgdId;
+    private Integer variantRgdId;
     private Integer qtlRgdId;
     private int mapKey;
 
@@ -277,7 +277,7 @@ public class GWASCatalog {
         return variantRgdId;
     }
 
-    public void setVariantRgdId(int variantRgdId) {
+    public void setVariantRgdId(Integer variantRgdId) {
         this.variantRgdId = variantRgdId;
     }
 
