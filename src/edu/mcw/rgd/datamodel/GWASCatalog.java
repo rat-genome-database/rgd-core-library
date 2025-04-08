@@ -259,7 +259,7 @@ public class GWASCatalog {
                 Utils.stringsAreEqual(pos,gc.getPos()) && Utils.stringsAreEqual(reportedGenes, gc.getReportedGenes()) && Utils.stringsAreEqual(mappedGene,gc.getMappedGene()) &&
                 Utils.stringsAreEqual(strongSnpRiskallele, gc.getStrongSnpRiskallele()) && Utils.stringsAreEqual(snps,gc.getSnps()) && Utils.stringsAreEqual(curSnpId,gc.getCurSnpId()) &&
                 Utils.stringsAreEqual(context,gc.getContext()) && Utils.stringsAreEqual(riskAlleleFreq,gc.getRiskAlleleFreq()) && Utils.stringsAreEqual(pVal,gc.getpValStr()) &&
-                pValMlog.equals(gc.getpValMlog()) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
+                Utils.doublesAreEqual(pValMlog,gc.getpValMlog(),10) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
                 Utils.stringsAreEqual(efoId, gc.getEfoId()) && Utils.stringsAreEqual(studyAcc,gc.getStudyAcc()) && Utils.stringsAreEqual(orBeta,gc.getOrBeta()) && mapKey==gc.getMapKey();
     }
 
