@@ -268,7 +268,7 @@ public class GWASCatalog {
         return Utils.defaultString(pmid).hashCode() ^ Utils.defaultString(diseaseTrait).hashCode() ^ Utils.defaultString(initialSample).hashCode() ^ Utils.defaultString(replicateSample).hashCode()
                 ^ Utils.defaultString(region).hashCode() ^ Utils.defaultString(chr).hashCode() ^ Utils.defaultString(pos).hashCode() ^ Utils.defaultString(reportedGenes).hashCode() ^
                 Utils.defaultString(mappedGene).hashCode() ^ Utils.defaultString(strongSnpRiskallele).hashCode() ^ Utils.defaultString(snps).hashCode() ^ Utils.defaultString(curSnpId).hashCode()
-                ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ pValMlog.hashCode()
+                ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ ((pValMlog != null) ? pValMlog.hashCode() : 0)
                 ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode()
                 ^ Utils.defaultString(orBeta).hashCode() ^ mapKey;
     }
