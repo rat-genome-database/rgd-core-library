@@ -323,6 +323,14 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(rsID,mapKey,rsID,mapKey);
     }
 
+    public List<IntStringMapQuery.MapPair> getDistinctPosByRgdIdAndMapKey(int rgdId, int mapKey) throws Exception {
+        String sql = "select distinct vm.start_pos, vm.chromosome from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.rgd_id=? and vm.map_key=?";
+        IntStringMapQuery q = new IntStringMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId,mapKey);
+    }
+
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
         String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ? offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
