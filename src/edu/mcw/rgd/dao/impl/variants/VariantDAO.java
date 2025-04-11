@@ -174,6 +174,17 @@ public class VariantDAO extends AbstractDAO {
         return vmds.get(0);
     }
 
+    public VariantMapData getVariant(int rgdId,int mapKey) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=? and vm.map_key=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantMapData> vmds = q.execute(rgdId,mapKey);
+        if (vmds.isEmpty())
+            return null;
+        return vmds.get(0);
+    }
+
     public List<VariantMapData> getVariantsByRgdId(int rgdId) throws Exception{
         String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
         VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
