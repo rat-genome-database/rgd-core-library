@@ -625,7 +625,7 @@ public class VariantDAO extends AbstractDAO {
 
     public int deleteSSIdBatch(Collection<VariantMapData> vars) throws Exception {
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
-                "delete from variant_ss_ids where variant_rgd_id=", new int[] {Types.INTEGER});
+                "delete from variant_ss_ids where variant_rgd_id=?", new int[] {Types.INTEGER});
         for (VariantMapData v : vars){
             su.update(v.getId());
         }
