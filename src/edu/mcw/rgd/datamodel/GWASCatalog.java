@@ -273,7 +273,7 @@ public class GWASCatalog {
                 ^ Utils.defaultString(orBeta).hashCode() ^ mapKey;
     }
 
-    public int getVariantRgdId() {
+    public Integer getVariantRgdId() {
         return variantRgdId;
     }
 
