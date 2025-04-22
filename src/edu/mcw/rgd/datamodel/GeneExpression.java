@@ -9,6 +9,15 @@ public class GeneExpression {
     private GeneExpressionRecordValue geneExpressionRecordValue;
     private Sample sample;
     private Integer refRgdId;
+    private String geoSeriesAcc;
+
+    public String getGeoSeriesAcc() {
+        return geoSeriesAcc;
+    }
+
+    public void setGeoSeriesAcc(String geoSeriesAcc) {
+        this.geoSeriesAcc = geoSeriesAcc;
+    }
 
     public GeneExpressionRecord getGeneExpressionRecord() {
         return geneExpressionRecord;
