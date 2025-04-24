@@ -330,7 +330,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String query;
         query = " SELECT distinct s.* FROM ont_synonyms s WHERE term_acc in ("+
-               termAccIds.stream().filter(Objects::nonNull).collect(Collectors.joining(","))+
+               termAccIds.stream().filter(Objects::nonNull).map(t->"\""+t+"\"").collect(Collectors.joining(","))+
                 "  )";
 
         TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
