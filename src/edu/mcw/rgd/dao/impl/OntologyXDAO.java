@@ -326,13 +326,13 @@ public class OntologyXDAO extends AbstractDAO {
         TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
         return execute(q, termAcc);
     }
-    public List<TermSynonym> getSynonyms(List<String> termAccIds) throws Exception {
+    public List<TermSynonym> getSynonymsByTermAccIdList(List<String> termAccIds) throws Exception {
 
-        String query;
-        query = " SELECT distinct s.* FROM ont_synonyms s WHERE term_acc in ("+
-               termAccIds.stream().filter(Objects::nonNull).map(t->"\""+t+"\"").collect(Collectors.joining(","))+
+        String query = " SELECT distinct s.* FROM ont_synonyms s WHERE term_acc in ("+
+               "'"+termAccIds.stream().filter(Objects::nonNull).collect(Collectors.joining("','"))+"'"+
                 "  )";
 
+        System.out.println("QUERY:"+query);
         TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
         return q.execute();
     }
