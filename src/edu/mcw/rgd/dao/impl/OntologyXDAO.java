@@ -14,6 +14,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 /**
@@ -325,6 +326,18 @@ public class OntologyXDAO extends AbstractDAO {
         TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
         return execute(q, termAcc);
     }
+    public List<TermSynonym> getSynonymsByTermAccIdList(List<String> termAccIds) throws Exception {
+
+        String query = " SELECT distinct s.* FROM ont_synonyms s WHERE term_acc in ("+
+               "'"+termAccIds.stream().filter(Objects::nonNull).collect(Collectors.joining("','"))+"'"+
+                "  )";
+
+        System.out.println("QUERY:"+query);
+        TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
+        return q.execute();
+    }
+
+
 
     /**
      * find all active terms where 'termPart' is either an accession id, or is part of a term name;
