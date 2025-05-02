@@ -24,6 +24,7 @@ public class Sample {
     private String curatorNotes;
     private Integer cultureDur;
     private String cultureDurUnit;
+    private String computedSex;
 
     public int getId() {
         return id;
@@ -167,5 +168,13 @@ public class Sample {
 
     public void setCultureDurUnit(String cultureDurUnit) {
         this.cultureDurUnit = cultureDurUnit;
+    }
+
+    public String getComputedSex() {
+        return computedSex;
+    }
+
+    public void setComputedSex(String computedSex) {
+        this.computedSex = computedSex;
     }
 }

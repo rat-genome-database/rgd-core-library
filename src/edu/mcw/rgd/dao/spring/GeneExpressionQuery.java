@@ -66,6 +66,7 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         s.setCuratorNotes(rs.getString("CURATOR_NOTES"));
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
         ge.setSample(s);
 
         ge.setRefRgdId(rs.getInt("REF_RGD_ID"));

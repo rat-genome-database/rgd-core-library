@@ -84,6 +84,7 @@ public class RecordQuery extends MappingSqlQuery {
         s.setTissueAccId(rs.getString("TISSUE_ONT_ID"));
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
 
         rec.setSample(s);
 
