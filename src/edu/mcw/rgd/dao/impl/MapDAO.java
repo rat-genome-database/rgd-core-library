@@ -446,7 +446,7 @@ public class MapDAO extends AbstractDAO {
                 "start_pos, stop_pos, multiple_chromosome, strand, maps_data_position_method_id, src_pipeline, maps_data_key) " +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-        int mdKey = getNextKey("MAPS_DATA", "MAPS_DATA_KEY");
+        int mdKey = this.getNextKeyFromSequence("MAPS_DATA_KEY_SEQ");
         for( MapData md: mds ) {
             md.setKey(mdKey++);
         }
