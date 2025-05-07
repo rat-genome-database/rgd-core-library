@@ -15,6 +15,9 @@ public class Sample {
     private String strainAccId;
     private String tissueAccId;
     private String cellTypeAccId;
+    private String strainTerm;
+    private String tissueTerm;
+    private String cellTypeTerm;
     private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
@@ -167,5 +170,29 @@ public class Sample {
 
     public void setCultureDurUnit(String cultureDurUnit) {
         this.cultureDurUnit = cultureDurUnit;
+    }
+
+    public String getStrainTerm() {
+        return strainTerm;
+    }
+
+    public void setStrainTerm(String strainTerm) {
+        this.strainTerm = strainTerm;
+    }
+
+    public String getTissueTerm() {
+        return tissueTerm;
+    }
+
+    public void setTissueTerm(String tissueTerm) {
+        this.tissueTerm = tissueTerm;
+    }
+
+    public String getCellTypeTerm() {
+        return cellTypeTerm;
+    }
+
+    public void setCellTypeTerm(String cellTypeTerm) {
+        this.cellTypeTerm = cellTypeTerm;
     }
 }
