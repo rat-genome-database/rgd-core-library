@@ -174,6 +174,17 @@ public class VariantDAO extends AbstractDAO {
         return vmds.get(0);
     }
 
+    public VariantMapData getVariant(int rgdId,int mapKey) throws Exception{
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=? and vm.map_key=?";
+        VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantMapData> vmds = q.execute(rgdId,mapKey);
+        if (vmds.isEmpty())
+            return null;
+        return vmds.get(0);
+    }
+
     public List<VariantMapData> getVariantsByRgdId(int rgdId) throws Exception{
         String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=?";
         VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
@@ -321,6 +332,14 @@ public class VariantDAO extends AbstractDAO {
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         return q.execute(rsID,mapKey,rsID,mapKey);
+    }
+
+    public List<IntStringMapQuery.MapPair> getDistinctPosByRgdIdAndMapKey(int rgdId, int mapKey) throws Exception {
+        String sql = "select distinct vm.start_pos, vm.chromosome from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.rgd_id=? and vm.map_key=?";
+        IntStringMapQuery q = new IntStringMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(rgdId,mapKey);
     }
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
@@ -535,6 +554,28 @@ public class VariantDAO extends AbstractDAO {
         return totalRowsAffected;
     }
 
+    public int updateVariantSample(Collection<VariantSampleDetail> sampleDetails) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
+                "UPDATE variant_sample_detail set SOURCE=?, TOTAL_DEPTH=?, VAR_FREQ=?, ZYGOSITY_STATUS=?, ZYGOSITY_PERCENT_READ=?, " +
+                        "ZYGOSITY_POSS_ERROR=?, ZYGOSITY_REF_ALLELE=?, ZYGOSITY_NUM_ALLELE=?, ZYGOSITY_IN_PSEUDO=?, QUALITY_SCORE=? "+
+                        "where RGD_ID=? and SAMPLE_ID=? ",
+                new int[]{Types.VARCHAR, Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.INTEGER,Types.CHAR,
+                        Types.CHAR, Types.INTEGER, Types.CHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER});
+        su.compile();
+        for (VariantSampleDetail v : sampleDetails){
+            su.update(v.getSource(), v.getDepth(), v.getVariantFrequency(), v.getZygosityStatus(), v.getZygosityPercentRead(),
+                    v.getZygosityPossibleError(), v.getZygosityRefAllele(), v.getZygosityNumberAllele(), v.getZygosityInPseudo(), v.getQualityScore(),
+                    v.getId(), v.getSampleId());
+        }
+        su.flush();
+
+        int totalRowsAffected = 0;
+        for( int rowsAffected: su.getRowsAffected() ) {
+            totalRowsAffected += rowsAffected;
+        }
+        return totalRowsAffected;
+    }
+
     public int insertVariantRgdIds(Collection<VariantMapData> vmds) throws Exception{
         BatchSqlUpdate sql = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
                 "INSERT INTO VARIANT_RGD_IDS (RGD_ID) VALUES (?)", new int[]{Types.INTEGER},5000);
@@ -580,5 +621,14 @@ public class VariantDAO extends AbstractDAO {
         if (ids.isEmpty())
             return null;
         return ids.get(0);
+    }
+
+    public int deleteSSIdBatch(Collection<VariantMapData> vars) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "delete from variant_ss_ids where variant_rgd_id=?", new int[] {Types.INTEGER});
+        for (VariantMapData v : vars){
+            su.update(v.getId());
+        }
+        return executeBatch(su);
     }
 }
