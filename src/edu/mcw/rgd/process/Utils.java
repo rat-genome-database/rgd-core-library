@@ -873,4 +873,14 @@ public class Utils {
         }
         return new String(hexChars);
     }
+    public static double findMedian(List<Double> list) {
+        Collections.sort(list);
+        int middle = list.size() / 2;
+
+        if (list.size() % 2 == 0) {
+            return (double) (list.get(middle - 1) + list.get(middle)) / 2;
+        } else {
+            return list.get(middle);
+        }
+    }
 }

@@ -32,6 +32,9 @@ public class GeneExpressionQuery extends MappingSqlQuery {
 
         GeneExpressionRecordValue recV = new GeneExpressionRecordValue();
         recV.setId(rs.getInt("gene_expression_value_id"));
+        try{
+            recV.setExpressedGeneSymbol(rs.getString("gene_symbol"));
+        }catch (Exception ignored){}
         recV.setExpressedObjectRgdId(rs.getInt("expressed_object_rgd_id"));
         recV.setExpressionMeasurementAccId(rs.getString("expression_measurement_ont_id"));
         recV.setNotes(rs.getString("expression_value_notes"));
@@ -66,6 +69,13 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         s.setCuratorNotes(rs.getString("CURATOR_NOTES"));
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        try {
+            s.setStrainTerm(rs.getString("strain_term"));
+        }catch (Exception ignored){}
+        try{
+            s.setTissueTerm(rs.getString("tissue_term"));
+        }catch (Exception ignored){}
+
         ge.setSample(s);
 
         ge.setRefRgdId(rs.getInt("REF_RGD_ID"));

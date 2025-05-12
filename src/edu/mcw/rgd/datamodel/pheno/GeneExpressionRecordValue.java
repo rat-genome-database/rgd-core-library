@@ -7,6 +7,7 @@ public class GeneExpressionRecordValue {
 
     private int id; // GENE_EXPRESSION_VALUE_ID
     private int expressedObjectRgdId;
+    private String expressedGeneSymbol;
     private String expressionMeasurementAccId;
     private String notes; // EXPRESSION_VALUE_NOTES
     private int geneExpressionRecordId; // GENE_EXPRESSION_EXP_RECORD_ID
@@ -15,6 +16,14 @@ public class GeneExpressionRecordValue {
     private int mapKey;
     private String expressionLevel;
     private Double tpmValue;
+
+    public String getExpressedGeneSymbol() {
+        return expressedGeneSymbol;
+    }
+
+    public void setExpressedGeneSymbol(String expressedGeneSymbol) {
+        this.expressedGeneSymbol = expressedGeneSymbol;
+    }
 
     public boolean deleteFlag; // if true, the value should be deleted
 

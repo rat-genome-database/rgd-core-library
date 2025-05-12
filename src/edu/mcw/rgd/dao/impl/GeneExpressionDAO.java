@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.pheno.*;
+import edu.mcw.rgd.datamodel.pheno.GeneExpressionValueCount;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -376,8 +377,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,termAcc,rgdId,unit);
     }
-<<<<<<< Updated upstream
-=======
+
     public List<GeneExpression> getGeneExpressionObjectsByRgdIdUnit(int rgdId, String unit) throws Exception{
         String query = """
                 select ge.*,gr.*,s.*, st.ref_rgd_id from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t 
@@ -405,21 +405,40 @@ public class GeneExpressionDAO extends PhenominerDAO {
 //        return execute(q,unit, geneId, tissueOntId);
 //    }
     public List<GeneExpression> getGeneExpressionByGeneTissueStrain(int geneId, String tissueOntId, String strainOntId, String unit) throws Exception{
-        String query = """                              
-             select * from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t
-                where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
-                and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
-                t.is_obsolete=0  and ge.expression_unit =?
-                and gr.experiment_id=e.experiment_id
-                and e.study_id=st.study_id
-                and ge.expressed_object_rgd_id=?
-                and s.tissue_ont_id=?
-                 and s.strain_ont_id=?
-                and expression_level in ('low','medium','high')""";
+//        String query = """
+//             select * from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t
+//                where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+//                and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
+//                t.is_obsolete=0  and ge.expression_unit =?
+//                and gr.experiment_id=e.experiment_id
+//                and e.study_id=st.study_id
+//                and ge.expressed_object_rgd_id=?
+//                and s.tissue_ont_id=?
+//                 and s.strain_ont_id=?
+//                and expression_level in ('low','medium','high')""";
+        String query= """
+                                 select ge.*,gr.*,s.*,e.*,st.*,g.*,t.term as tissue_term, sterm.term as strain_term, vtTerm.term as trait_term ,g.gene_symbol from 
+                                 gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t, ont_terms sterm, ont_terms vtTerm,
+                                               genes g
+                                               where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
+                                               and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
+                                               t.is_obsolete=0
+                                               and sterm.term_acc=s.strain_ont_id
+                                               and sterm.is_obsolete=0
+                                                and vtTerm.term_acc=e.trait_ont_id
+                                               and vtTerm.is_obsolete=0
+                                               and g.rgd_id=ge.expressed_object_rgd_id
+                                                and ge.expression_unit =?
+                                               and gr.experiment_id=e.experiment_id
+                                               and e.study_id=st.study_id
+                                               and ge.expressed_object_rgd_id=?
+                                               and s.tissue_ont_id=?
+                                                and s.strain_ont_id=? and expression_level in ('low','medium','high')
+                """;
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,unit, geneId, tissueOntId,strainOntId);
     }
->>>>>>> Stashed changes
+
 
     public int getGeneExpressionCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
         String query = """
