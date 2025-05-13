@@ -7,8 +7,8 @@ package edu.mcw.rgd.datamodel.pheno;
 public class Sample {
 
     private int id;
-    private Integer ageDaysFromHighBound;
-    private Integer ageDaysFromLowBound;
+    private Double ageDaysFromHighBound;
+    private Double ageDaysFromLowBound;
     private Integer numberOfAnimals = 0;
     private String notes;
     private String sex;
@@ -33,19 +33,19 @@ public class Sample {
         this.id = id;
     }
 
-    public Integer getAgeDaysFromHighBound() {
+    public Double getAgeDaysFromHighBound() {
         return ageDaysFromHighBound;
     }
 
-    public void setAgeDaysFromHighBound(Integer ageDaysFromHighBound) {
+    public void setAgeDaysFromHighBound(Double ageDaysFromHighBound) {
         this.ageDaysFromHighBound = ageDaysFromHighBound;
     }
 
-    public Integer getAgeDaysFromLowBound() {
+    public Double getAgeDaysFromLowBound() {
         return ageDaysFromLowBound;
     }
 
-    public void setAgeDaysFromLowBound(Integer ageDaysFromLowBound) {
+    public void setAgeDaysFromLowBound(Double ageDaysFromLowBound) {
         this.ageDaysFromLowBound = ageDaysFromLowBound;
     }
 

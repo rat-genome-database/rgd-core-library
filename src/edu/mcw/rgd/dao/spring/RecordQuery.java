@@ -59,11 +59,11 @@ public class RecordQuery extends MappingSqlQuery {
 
         Sample s = new Sample();
         s.setId(rs.getInt("sample_id"));
-        s.setAgeDaysFromHighBound(rs.getInt("age_days_from_dob_high_bound"));
+        s.setAgeDaysFromHighBound(rs.getDouble("age_days_from_dob_high_bound"));
         if (rs.wasNull()) {
             s.setAgeDaysFromHighBound(null);
         }
-        s.setAgeDaysFromLowBound(rs.getInt("age_days_from_dob_low_bound"));
+        s.setAgeDaysFromLowBound(rs.getDouble("age_days_from_dob_low_bound"));
         if (rs.wasNull()) {
            s.setAgeDaysFromLowBound(null);
         }
