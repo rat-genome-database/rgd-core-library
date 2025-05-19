@@ -131,6 +131,10 @@ public class GWASCatalogDAO extends AbstractDAO {
         return list.get(0);
     }
 
+    public List<GWASVersion> getAllGWASVersion() throws Exception{
+        String sql = "select * from GWAS_VERSION";
+        return GWASVersionQuery.execute(this, sql);
+    }
     public List<GWASVersion> getGWASVersionById(int gwasId) throws Exception{
         String sql = "select * from GWAS_VERSION where GWAS_ID=?";
         GWASVersionQuery q = new GWASVersionQuery(DataSourceFactory.getInstance().getDataSource(), sql);
