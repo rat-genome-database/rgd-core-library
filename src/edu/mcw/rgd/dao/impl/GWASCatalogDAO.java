@@ -3,7 +3,9 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.GWASCatalogQuery;
+import edu.mcw.rgd.dao.spring.GWASVersionQuery;
 import edu.mcw.rgd.datamodel.GWASCatalog;
+import edu.mcw.rgd.datamodel.GWASVersion;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -52,6 +54,27 @@ public class GWASCatalogDAO extends AbstractDAO {
         }
         return executeBatch(su);
     }
+
+    public int insertGWASVersionBatch(Collection<GWASVersion> insert) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "insert into GWAS_VERSION (GWAS_ID, VERSION) values (?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (GWASVersion g : insert){
+            su.update(g.getGwasId(), g.getVersion());
+        }
+        return executeBatch(su);
+    }
+
+    public int deleteGWASVersionBatch(Collection<GWASVersion> delete) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "delete from GWAS_VERSION where GWAS_ID=? and VERSION=?",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (GWASVersion g : delete){
+            su.update(g.getGwasId(), g.getVersion());
+        }
+        return executeBatch(su);
+    }
+
     public int updateGWASBatch(Collection<GWASCatalog> toBeUpdated) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
                 "update GWAS_CATALOG set VARIANT_RGD_ID=? where GWAS_ID=?",
@@ -106,5 +129,12 @@ public class GWASCatalogDAO extends AbstractDAO {
         if (list.size() != 1)
             return null;
         return list.get(0);
+    }
+
+    public List<GWASVersion> getGWASVersionById(int gwasId) throws Exception{
+        String sql = "select * from GWAS_VERSION where GWAS_ID=?";
+        GWASVersionQuery q = new GWASVersionQuery(DataSourceFactory.getInstance().getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(gwasId);
     }
 }
