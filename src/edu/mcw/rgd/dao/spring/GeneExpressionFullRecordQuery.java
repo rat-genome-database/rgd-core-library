@@ -62,6 +62,7 @@ public class GeneExpressionFullRecordQuery extends MappingSqlQuery {
         }
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
 
         rec.setSample(s);
         return rec;

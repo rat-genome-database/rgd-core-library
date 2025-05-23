@@ -1524,11 +1524,12 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
                 "geo_sample_acc=?, biosample_id=?, life_stage=?, curator_notes=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP, " +
-                "CULTURE_DUR_VALUE=?, CULTURE_DUR_UNIT=? WHERE sample_id=?";
+                "CULTURE_DUR_VALUE=?, CULTURE_DUR_UNIT=?, COMPUTED_SEX=? WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
                 s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(), s.getGeoSampleAcc(),
-                s.getBioSampleId(), s.getLifeStage(), s.getCuratorNotes(),s.getLastModifiedBy(), s.getCultureDur(), s.getCultureDurUnit(), s.getId());
+                s.getBioSampleId(), s.getLifeStage(), s.getCuratorNotes(),s.getLastModifiedBy(), s.getCultureDur(),
+                s.getCultureDurUnit(), s.getComputedSex(), s.getId());
     }
 
     /**
@@ -1756,13 +1757,13 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "INSERT INTO sample (age_days_from_dob_high_bound, age_days_from_dob_low_bound, " +
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
                 "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,CURATOR_NOTES,last_modified_by,created_by, " +
-                "CULTURE_DUR_VALUE, CULTURE_DUR_UNIT,created_date, last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "CULTURE_DUR_VALUE, CULTURE_DUR_UNIT, COMPUTED_SEX, created_date, last_modified_date) "+
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
                 s.getGeoSampleAcc(), s.getBioSampleId(), next,s.getLifeStage(),s.getCuratorNotes(),s.getLastModifiedBy(),s.getCreatedBy(),
-                s.getCultureDur(), s.getCultureDurUnit());
+                s.getCultureDur(), s.getCultureDurUnit(), s.getComputedSex());
         return next;
     }
 
@@ -1777,6 +1778,16 @@ public class PhenominerDAO extends AbstractDAO {
         sql.compile();
         for (Sample s : samples){
             sql.update(s.getLifeStage(), s.getId());
+        }
+        sql.flush();
+    }
+
+    public void updateSampleComputedSexBatch(List<Sample> samples) throws Exception{
+        String query = "update sample set COMPUTED_SEX=? where sample_id=?";
+        BatchSqlUpdate sql =new BatchSqlUpdate(this.getDataSource(), query, new int[]{Types.VARCHAR,Types.INTEGER}, 1000);
+        sql.compile();
+        for (Sample s : samples){
+            sql.update(s.getComputedSex(), s.getId());
         }
         sql.flush();
     }
