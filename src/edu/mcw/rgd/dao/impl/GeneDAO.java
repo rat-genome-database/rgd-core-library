@@ -283,6 +283,7 @@ public class GeneDAO extends AbstractDAO {
                 "FROM genes g, rgd_ids r, maps_data md \n" +
                 "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
                 " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? " +
+                " AND NVL(gene_type_lc,'*') NOT IN('splice','allele') "+
                 " order by g.gene_symbol";
 
         return GeneQuery.execute(this, query, chr, stopPos, startPos, mapKey);
