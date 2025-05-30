@@ -3,6 +3,7 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.HrdpPortalCacheQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.HrdpPortalCache;
 
 import java.util.List;
@@ -40,4 +41,22 @@ public class HrdpPortalCacheDAO extends AbstractDAO {
         List<Integer> count = IntListQuery.execute(this,sql,strainId,groupName);
         return count.get(0).intValue()>0;
    }
+   
+    /**
+     * Responsible for portals field in strain report pages
+     * @param availStrainId
+     * @return returns true if the strain id exists in available_strain_id column
+     * @throws Exception
+     */
+    public boolean checkAvailableStrainExists(String availStrainId) throws Exception {
+
+        String sql= """
+                SELECT strain_id
+                FROM HRDP_PORTAL_CACHE
+               WHERE REGEXP_LIKE(available_strain_id, '(^|,)' || :availStrainId || '(,|$)')               
+                """;
+
+        List<String> strain = StringListQuery.execute(this,sql,availStrainId);
+        return strain.size()>0;
+    }
 }
