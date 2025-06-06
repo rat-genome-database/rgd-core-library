@@ -405,17 +405,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
 //        return execute(q,unit, geneId, tissueOntId);
 //    }
     public List<GeneExpression> getGeneExpressionByGeneTissueStrain(int geneId, String tissueOntId, String strainOntId, String unit) throws Exception{
-//        String query = """
-//             select * from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t
-//                where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
-//                and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
-//                t.is_obsolete=0  and ge.expression_unit =?
-//                and gr.experiment_id=e.experiment_id
-//                and e.study_id=st.study_id
-//                and ge.expressed_object_rgd_id=?
-//                and s.tissue_ont_id=?
-//                 and s.strain_ont_id=?
-//                and expression_level in ('low','medium','high')""";
+
         String query= """
                                  select ge.*,gr.*,s.*,e.*,st.*,g.*,t.term as tissue_term, sterm.term as strain_term, vtTerm.term as trait_term ,g.gene_symbol from 
                                  gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t, ont_terms sterm, ont_terms vtTerm,
@@ -439,6 +429,29 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return execute(q,unit, geneId, tissueOntId,strainOntId);
     }
 
+    public List<Study> getGeneExpressionStudies() throws Exception {
+        String query="select *  from study where study_type=?";
+        StudyQuery studyQuery=new StudyQuery(this.getDataSource(), query);
+        return execute(studyQuery, "RNA-SEQ");
+
+    }
+
+    public List<GeneExpression> getGeneExpressionByStudyId(int studyId, String unit) throws Exception{
+        String query="select ge.*,gr.*,s.*,e.*,st.*,g.*,t.term as tissue_term, sterm.term as strain_term, vtTerm.term as trait_term ,g.gene_symbol " +
+                "   from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t, ont_terms sterm, ont_terms vtTerm,"
+                +"    genes g where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id "
+                +"    and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and"
+                +"    t.is_obsolete=0  and sterm.term_acc=s.strain_ont_id"
+                +" and sterm.is_obsolete=0  and vtTerm.term_acc=e.trait_ont_id"
+                +"   and vtTerm.is_obsolete=0"
+                +"   and g.rgd_id=ge.expressed_object_rgd_id"
+                +"    and gr.experiment_id=e.experiment_id"
+                +"    and e.study_id=st.study_id"
+                +"    and expression_level in ('low','medium','high')"
+                +"    and st.study_id=? ";
+        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
+        return execute(q,unit, studyId);
+    }
 
     public int getGeneExpressionCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
         String query = """
