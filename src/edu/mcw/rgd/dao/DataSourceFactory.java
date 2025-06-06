@@ -56,6 +56,9 @@ public class DataSourceFactory {
     public DataSource getDataSource() throws Exception{
         return getDataSource(""); // get default data source
     }
+    public DataSource getPostgressDataSource() throws Exception{
+        return getDataSource("solrPostgress"); // get default data source
+    }
 
     /**
      * Returns a DataSource object for specific domain RGD database on that server

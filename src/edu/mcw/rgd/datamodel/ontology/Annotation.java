@@ -2,6 +2,7 @@ package edu.mcw.rgd.datamodel.ontology;
 
 import edu.mcw.rgd.datamodel.Dumpable;
 import edu.mcw.rgd.process.Dumper;
+import edu.mcw.rgd.process.Utils;
 
 import java.util.Date;
 
@@ -261,5 +262,19 @@ public class Annotation implements Cloneable, Dumpable {
             .put("PRODUCT_ID", geneProductFormId)
             .put("ORIG_CREATED_DATE", originalCreatedDate)
             .dump();
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        Annotation a = (Annotation) obj;
+        return Utils.intsAreEqual(annotatedObjectRgdId, a.getAnnotatedObjectRgdId()) && Utils.intsAreEqual(refRgdId, a.getRefRgdId()) && Utils.stringsAreEqual(termAcc,a.getTermAcc())
+                && Utils.stringsAreEqual(evidence, a.getEvidence()) && Utils.stringsAreEqual(withInfo, a.getWithInfo()) && Utils.stringsAreEqual(qualifier, a.getQualifier()) &&
+                Utils.stringsAreEqual(xrefSource, a.getXrefSource());
+    }
+
+    @Override
+    public int hashCode() {
+        return getAnnotatedObjectRgdId() ^ getRefRgdId() ^ Utils.defaultString(getTermAcc()).hashCode() ^ Utils.defaultString(getEvidence()).hashCode() ^
+                Utils.defaultString(getWithInfo()).hashCode() ^ Utils.defaultString(getQualifier()).hashCode() ^ Utils.defaultString(getXrefSource()).hashCode();
     }
 }

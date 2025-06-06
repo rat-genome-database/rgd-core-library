@@ -7,8 +7,8 @@ package edu.mcw.rgd.datamodel.pheno;
 public class Sample {
 
     private int id;
-    private Integer ageDaysFromHighBound;
-    private Integer ageDaysFromLowBound;
+    private Double ageDaysFromHighBound;
+    private Double ageDaysFromLowBound;
     private Integer numberOfAnimals = 0;
     private String notes;
     private String sex;
@@ -27,6 +27,7 @@ public class Sample {
     private String curatorNotes;
     private Integer cultureDur;
     private String cultureDurUnit;
+    private String computedSex;
 
     public int getId() {
         return id;
@@ -36,19 +37,19 @@ public class Sample {
         this.id = id;
     }
 
-    public Integer getAgeDaysFromHighBound() {
+    public Double getAgeDaysFromHighBound() {
         return ageDaysFromHighBound;
     }
 
-    public void setAgeDaysFromHighBound(Integer ageDaysFromHighBound) {
+    public void setAgeDaysFromHighBound(Double ageDaysFromHighBound) {
         this.ageDaysFromHighBound = ageDaysFromHighBound;
     }
 
-    public Integer getAgeDaysFromLowBound() {
+    public Double getAgeDaysFromLowBound() {
         return ageDaysFromLowBound;
     }
 
-    public void setAgeDaysFromLowBound(Integer ageDaysFromLowBound) {
+    public void setAgeDaysFromLowBound(Double ageDaysFromLowBound) {
         this.ageDaysFromLowBound = ageDaysFromLowBound;
     }
 
@@ -170,6 +171,14 @@ public class Sample {
 
     public void setCultureDurUnit(String cultureDurUnit) {
         this.cultureDurUnit = cultureDurUnit;
+    }
+
+    public String getComputedSex() {
+        return computedSex;
+    }
+
+    public void setComputedSex(String computedSex) {
+        this.computedSex = computedSex;
     }
 
     public String getStrainTerm() {

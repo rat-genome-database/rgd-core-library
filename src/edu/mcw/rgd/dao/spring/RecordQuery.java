@@ -59,11 +59,11 @@ public class RecordQuery extends MappingSqlQuery {
 
         Sample s = new Sample();
         s.setId(rs.getInt("sample_id"));
-        s.setAgeDaysFromHighBound(rs.getInt("age_days_from_dob_high_bound"));
+        s.setAgeDaysFromHighBound(rs.getDouble("age_days_from_dob_high_bound"));
         if (rs.wasNull()) {
             s.setAgeDaysFromHighBound(null);
         }
-        s.setAgeDaysFromLowBound(rs.getInt("age_days_from_dob_low_bound"));
+        s.setAgeDaysFromLowBound(rs.getDouble("age_days_from_dob_low_bound"));
         if (rs.wasNull()) {
            s.setAgeDaysFromLowBound(null);
         }
@@ -81,8 +81,10 @@ public class RecordQuery extends MappingSqlQuery {
 
         String strainOntId = rs.getString("strain_ont_id");
         s.setStrainAccId(strainOntId);
+        s.setTissueAccId(rs.getString("TISSUE_ONT_ID"));
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
 
         rec.setSample(s);
 

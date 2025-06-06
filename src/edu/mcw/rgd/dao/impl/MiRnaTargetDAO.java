@@ -5,11 +5,16 @@ import edu.mcw.rgd.dao.spring.GeneQuery;
 import edu.mcw.rgd.dao.spring.MiRnaTargetQuery;
 import edu.mcw.rgd.dao.spring.MiRnaTargetStatQuery;
 import edu.mcw.rgd.dao.spring.StringMapQuery;
+import edu.mcw.rgd.dao.spring.genomeInfo.ObjectTypeCountsQuery;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.MiRnaTarget;
 import edu.mcw.rgd.datamodel.MiRnaTargetStat;
+import edu.mcw.rgd.datamodel.genomeInfo.ObjectTypeCounts;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.Collection;
 import java.util.Date;
@@ -279,5 +284,34 @@ public class MiRnaTargetDAO extends AbstractDAO {
         }
         while( rowsAffected>0 );
         return totalRowsAffected;
+    }
+    public List<ObjectTypeCounts> getMirnaTargetCountsMap(int mapKey) throws Exception {
+        Map<String, Integer> targetsMap= new HashMap<>();
+
+
+        String sql="SELECT COUNT(gene_rgd_id) AS tot, target_type AS object_name, map_key, chromosome \n" +
+                "   FROM rgd_ids r,  (SELECT DISTINCT gene_rgd_id,target_type FROM mirna_targets) t , maps_data m\n" +
+                "   WHERE r.rgd_id=gene_rgd_id \n" +
+                "   AND gene_rgd_id=m.rgd_id\n" +
+                "   AND r.object_status='ACTIVE'\n" +
+                "   AND m.map_key=?" +
+         "  GROUP BY target_type,  chromosome,map_key";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(),sql);
+        return execute(query, mapKey);
+
+    }
+    public List<ObjectTypeCounts> getMirnaTargetCountsMap(int mapKey, String chr) throws Exception {
+
+        String sql="SELECT COUNT(gene_rgd_id) AS tot, target_type AS object_name, map_key, chromosome " +
+                "   FROM rgd_ids r,  (SELECT DISTINCT gene_rgd_id,target_type FROM mirna_targets) t , maps_data m " +
+                "   WHERE r.rgd_id=gene_rgd_id  " +
+                "   AND gene_rgd_id=m.rgd_id " +
+                "   AND r.object_status='ACTIVE' " +
+                "   AND m.map_key=?" +
+                "   and m.chromosome=? "+
+                 "   GROUP BY target_type,  chromosome, map_key";
+        ObjectTypeCountsQuery query=new ObjectTypeCountsQuery(this.getDataSource(),sql);
+        return execute(query,mapKey,chr);
+
     }
 }

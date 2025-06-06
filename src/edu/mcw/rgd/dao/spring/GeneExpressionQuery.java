@@ -52,8 +52,8 @@ public class GeneExpressionQuery extends MappingSqlQuery {
 
         Sample s = new Sample();
         s.setId(rs.getInt("sample_id"));
-        s.setAgeDaysFromHighBound(rs.getInt("age_days_from_dob_high_bound"));
-        s.setAgeDaysFromLowBound(rs.getInt("age_days_from_dob_low_bound"));
+        s.setAgeDaysFromHighBound(rs.getDouble("age_days_from_dob_high_bound"));
+        s.setAgeDaysFromLowBound(rs.getDouble("age_days_from_dob_low_bound"));
         s.setNumberOfAnimals(rs.getInt("number_of_animals"));
         s.setNotes(rs.getString("sample_notes"));
         s.setSex(rs.getString("sex"));
@@ -76,10 +76,13 @@ public class GeneExpressionQuery extends MappingSqlQuery {
             s.setTissueTerm(rs.getString("tissue_term"));
         }catch (Exception ignored){}
 
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
         ge.setSample(s);
 
         ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
-
+        try {
+            ge.setGeoSeriesAcc(rs.getString("GEO_SERIES_ACC"));
+        }catch (Exception ignored){}
         return ge;
     }
 }

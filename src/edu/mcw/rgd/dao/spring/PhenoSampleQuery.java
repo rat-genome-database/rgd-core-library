@@ -21,8 +21,8 @@ public class PhenoSampleQuery extends MappingSqlQuery {
         Sample s = new Sample();
 
         s.setId(rs.getInt("sample_id"));
-        s.setAgeDaysFromHighBound(rs.getInt("age_days_from_dob_high_bound"));
-        s.setAgeDaysFromLowBound(rs.getInt("age_days_from_dob_low_bound"));
+        s.setAgeDaysFromHighBound(rs.getDouble("age_days_from_dob_high_bound"));
+        s.setAgeDaysFromLowBound(rs.getDouble("age_days_from_dob_low_bound"));
         s.setNumberOfAnimals(rs.getInt("number_of_animals"));
         s.setNotes(rs.getString("sample_notes"));
         s.setSex(rs.getString("sex"));
@@ -38,6 +38,7 @@ public class PhenoSampleQuery extends MappingSqlQuery {
         s.setCuratorNotes(rs.getString("CURATOR_NOTES"));
         s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
         s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
+        s.setComputedSex(rs.getString("COMPUTED_SEX"));
         return s;
     }
 
