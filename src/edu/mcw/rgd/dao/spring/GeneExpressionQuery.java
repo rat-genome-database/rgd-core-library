@@ -70,6 +70,7 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         ge.setSample(s);
 
         ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
+        ge.setStudyId(rs.getInt("STUDY_ID"));
         try {
             ge.setGeoSeriesAcc(rs.getString("GEO_SERIES_ACC"));
         }catch (Exception ignored){}
