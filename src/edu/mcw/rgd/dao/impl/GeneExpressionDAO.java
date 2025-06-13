@@ -372,7 +372,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
                         where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
                         t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
                         CONNECT BY PRIOR child_term_acc=parent_term_acc )
-                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ? and gr.experiment_id=e.experiment_id and e.study_id=st.study_id""";
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ? and gr.experiment_id=e.experiment_id and e.study_id=st.study_id order by ge.map_key desc""";
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,termAcc,rgdId,unit);
     }
