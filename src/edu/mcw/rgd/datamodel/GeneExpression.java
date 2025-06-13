@@ -9,6 +9,16 @@ public class GeneExpression {
     private GeneExpressionRecordValue geneExpressionRecordValue;
     private Sample sample;
     private Integer refRgdId;
+    private Integer studyId;
+    private String geoSeriesAcc;
+
+    public String getGeoSeriesAcc() {
+        return geoSeriesAcc;
+    }
+
+    public void setGeoSeriesAcc(String geoSeriesAcc) {
+        this.geoSeriesAcc = geoSeriesAcc;
+    }
 
     public GeneExpressionRecord getGeneExpressionRecord() {
         return geneExpressionRecord;
@@ -40,5 +50,13 @@ public class GeneExpression {
 
     public void setRefRgdId(Integer refRgdId) {
         this.refRgdId = refRgdId;
+    }
+
+    public Integer getStudyId() {
+        return studyId;
+    }
+
+    public void setStudyId(Integer studyId) {
+        this.studyId = studyId;
     }
 }
