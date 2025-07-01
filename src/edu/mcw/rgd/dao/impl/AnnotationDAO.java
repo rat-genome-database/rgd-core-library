@@ -941,6 +941,12 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND species_type_key=? AND object_key=?";
         return executeAnnotationQuery(query, speciesTypeKey, objectKey);
     }
+    public List<Annotation> getDiseaseAndStrainAnnotationsBySpecies(int speciesTypeKey, int objectKey) throws Exception {
+        String query = "SELECT a.*,r.species_type_key FROM full_annot a,rgd_ids r "+
+                "WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND species_type_key=? AND object_key=?" +
+                "   and aspect in ('D', 'N')";
+        return executeAnnotationQuery(query, speciesTypeKey, objectKey);
+    }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesTypeKey, String aspect) throws Exception {
         String sql = "SELECT a.* FROM full_annot a,rgd_ids r\n" +
