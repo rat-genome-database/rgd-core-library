@@ -448,7 +448,7 @@ public class MapDAO extends AbstractDAO {
         
         for( MapData md: mds ) {
             int mdKey = this.getNextKeyFromSequence("MAPS_DATA_KEY_SEQ");
-            md.setKey(mdKey++);
+            md.setKey(mdKey);
         }
         return upsertMapData(sql, mds);
     }
