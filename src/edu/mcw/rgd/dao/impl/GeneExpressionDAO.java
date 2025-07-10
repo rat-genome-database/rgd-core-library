@@ -384,7 +384,9 @@ public class GeneExpressionDAO extends PhenominerDAO {
             and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
         t.is_obsolete=0 and ge.expressed_object_rgd_id=?   and ge.expression_unit = ?
                                                               and gr.experiment_id=e.experiment_id
-                                                             and e.study_id=st.study_id""";
+                                                             and e.study_id=st.study_id
+                                                             and st.STUDY_SOURCE='GEO'
+                                                             """;
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,rgdId,unit);
     }
