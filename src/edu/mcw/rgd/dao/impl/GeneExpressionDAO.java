@@ -404,7 +404,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
                         join sample s on s.sample_id = gr.sample_id
                         join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
                         CONNECT BY PRIOR child_term_acc=parent_term_acc )
-                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=? and and ge.expression_level=?""";
+                        AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=? and ge.expression_level=?""";
         return getCount(query, termAcc, rgdId, unit, level);
     }
 
