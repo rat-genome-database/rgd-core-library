@@ -76,6 +76,8 @@ public class MapManager {
                     chromosomeHash.put(map.getKey(),dao.getChromosomes(map.getKey()));
                 }
             }
+
+            System.out.println("MapManager ok -- maps loaded -- "+maps.size()+" maps, for "+mapHash.size()+" species");
         } catch( Exception e ) {
             e.printStackTrace();
         }
