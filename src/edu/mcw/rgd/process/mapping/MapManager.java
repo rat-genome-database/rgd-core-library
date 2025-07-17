@@ -164,9 +164,14 @@ public class MapManager {
         }
 
         List<Map> list = new ArrayList<>();
-        for( Map map: getAllMaps(speciesTypeKey) ) {
-            if( Utils.stringsAreEqualIgnoreCase(mapUnit, map.getUnit()) ) {
-                list.add(map);
+        List<Map> allMaps = getAllMaps(speciesTypeKey);
+        if( allMaps==null ) {
+            System.out.println("unexpected: no maps for speciesTypeKey="+speciesTypeKey);
+        } else {
+            for (Map map : allMaps) {
+                if (Utils.stringsAreEqualIgnoreCase(mapUnit, map.getUnit())) {
+                    list.add(map);
+                }
             }
         }
         return list;
