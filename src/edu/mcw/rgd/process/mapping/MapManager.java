@@ -88,7 +88,18 @@ public class MapManager {
     }
 
     public List<Map> getAllMaps(int speciesTypeKey) {
-        return mapHash.get(speciesTypeKey);
+        // original code
+        //return mapHash.get(speciesTypeKey);
+
+        // new code
+        List<Map> maps = mapHash.get(speciesTypeKey);
+        if( maps==null && speciesTypeKey>0 && speciesTypeKey<=17 ) {
+            synchronized (MapManager.class) {
+                loadDataFromDatabase();
+                maps = mapHash.get(speciesTypeKey);
+            }
+        }
+        return maps;
     }
 
     /**
