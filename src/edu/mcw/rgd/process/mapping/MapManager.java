@@ -1,11 +1,16 @@
 package edu.mcw.rgd.process.mapping;
 
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.impl.MapDAO;
 import edu.mcw.rgd.datamodel.Chromosome;
 import edu.mcw.rgd.datamodel.Map;
 import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.datamodel.XDBIndex;
 import edu.mcw.rgd.process.Utils;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -49,8 +54,7 @@ public class MapManager {
     private void loadDataFromDatabase() {
 
         try {
-            MapDAO dao = new MapDAO();
-            List<Map> maps = dao.getActiveMaps(null);
+            List<Map> maps = getActiveMaps2();
 
             for( Map map: maps ) {
                 int speciesTypeKey = map.getSpeciesTypeKey();
@@ -73,7 +77,7 @@ public class MapManager {
 
                 if (!chromosomeHash.containsKey(map.getKey())) {
                     //ensure map is loaded
-                    chromosomeHash.put(map.getKey(),dao.getChromosomes(map.getKey()));
+                    chromosomeHash.put(map.getKey(), new MapDAO().getChromosomes(map.getKey()));
                 }
             }
 
@@ -81,6 +85,50 @@ public class MapManager {
         } catch( Exception e ) {
             e.printStackTrace();
         }
+    }
+
+    private List<Map> getActiveMaps2() {
+
+        // original code
+        //MapDAO dao = new MapDAO();
+        //List<Map> maps = dao.getActiveMaps(null);
+
+        // new code
+        List<Map> result = new ArrayList<>();
+
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ){
+
+            String sql = "SELECT m.*, i.species_type_key FROM rgd_ids i, maps m " +
+                    "WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status='ACTIVE'";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+
+                Map map = new Map();
+                map.setDescription(rs.getString("map_description"));
+                map.setKey(rs.getInt("map_key"));
+                map.setMethodKey(rs.getInt("method_key"));
+                map.setName(rs.getString("map_name"));
+                map.setRgdId(rs.getInt("rgd_id"));
+                map.setUnit(rs.getString("map_unit"));
+                map.setVersion(rs.getString("map_version"));
+                map.setNotes(rs.getString("notes"));
+                map.setPrimaryRefAssembly(rs.getString("primary_ref_assembly_ind").equals("Y")?true:false);
+                map.setSpeciesTypeKey(rs.getInt("species_type_key"));
+                map.setDbsnpVersion(rs.getString("dbsnp_version"));
+                map.setRank(rs.getInt("rank"));
+                map.setUcscAssemblyId(rs.getString("ucsc_assembly_id"));
+                map.setRefSeqAssemblyAcc(rs.getString("refseq_assembly_acc"));
+                map.setRefSeqAssemblyName(rs.getString("refseq_assembly_name"));
+                map.setSource(rs.getString("source"));
+
+                result.add(map);
+            }
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
+        return result;
     }
 
     public List<Chromosome> getChromosomes(int mapKey) {
