@@ -35,7 +35,7 @@ public class MapManager {
 
     public static MapManager getInstance() throws Exception {
         if( __instance==null ) {
-            synchronized( SpeciesType.class ) {
+            synchronized( MapManager.class ) {
                 if( __instance==null ) {
                     __instance = new MapManager();
                 }
@@ -49,38 +49,36 @@ public class MapManager {
     private void loadDataFromDatabase() {
 
         try {
-            Collection<Integer> speciesTypeKeys = SpeciesType.getSpeciesTypeKeys();
-            for (int speciesTypeKey : speciesTypeKeys) {
-                loadForSpecies(speciesTypeKey);
+            MapDAO dao = new MapDAO();
+            List<Map> maps = dao.getActiveMaps(null);
+
+            for( Map map: maps ) {
+                int speciesTypeKey = map.getSpeciesTypeKey();
+                keyedHash.put(map.getKey(), map);
+
+                List<Map> spMaps = mapHash.get(speciesTypeKey);
+                if( spMaps==null ) {
+                    spMaps = new ArrayList<>();
+                    mapHash.put(speciesTypeKey, spMaps);
+                }
+                spMaps.add(map);
+
+                if( map.isPrimaryRefAssembly() ) {
+                    if( map.getSource().equals("NCBI") ) {
+                        primaryMapsForNCBI.put(speciesTypeKey, map);
+                    } else if( map.getSource().equals("Ensembl") ) {
+                        primaryMapsForEnsembl.put(speciesTypeKey, map);
+                    }
+                }
+
+                if (!chromosomeHash.containsKey(map.getKey())) {
+                    //ensure map is loaded
+                    chromosomeHash.put(map.getKey(),dao.getChromosomes(map.getKey()));
+                }
             }
         } catch( Exception e ) {
             e.printStackTrace();
         }
-    }
-
-    private Exception loadForSpecies(int speciesTypeKey) throws Exception{
-        MapDAO dao = new MapDAO();
-        List<Map> maps = dao.getActiveMaps(speciesTypeKey, null);
-
-        mapHash.putIfAbsent(speciesTypeKey, maps);
-
-        for( Map map: maps ) {
-            keyedHash.putIfAbsent(map.getKey(), map);
-
-            if( map.isPrimaryRefAssembly() ) {
-                if( map.getSource().equals("NCBI") ) {
-                    primaryMapsForNCBI.putIfAbsent(speciesTypeKey, map);
-                } else if( map.getSource().equals("Ensembl") ) {
-                    primaryMapsForEnsembl.putIfAbsent(speciesTypeKey, map);
-                }
-            }
-
-            if (!chromosomeHash.containsKey(map.getKey())) {
-                //ensure map is loaded
-                chromosomeHash.put(map.getKey(),dao.getChromosomes(map.getKey()));
-            }
-        }
-        return null;
     }
 
     public List<Chromosome> getChromosomes(int mapKey) {
