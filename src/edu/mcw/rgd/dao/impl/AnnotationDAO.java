@@ -14,6 +14,7 @@ import org.springframework.jdbc.object.BatchSqlUpdate;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * @author jdepons
@@ -167,8 +168,21 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     public List<Annotation> getAnnotationsForOntology(int annotatedObjectRGDId, String ontologyPrefix) throws Exception {
-        String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? AND term_acc LIKE ?";
+        String query = "SELECT * FROM full_annot a , rgd_ids r WHERE " +
+                "   a.annotated_object_rgd_id=r.rgd_id and" +
+                "   a.annotated_object_rgd_id=? AND term_acc LIKE ?" +
+                "   and r.object_status='ACTIVE'";
         return executeAnnotationQuery(query, annotatedObjectRGDId, ontologyPrefix+"%");
+    }
+    public List<Annotation> getAnnotationsForRgdIdListAndOntology(List<Integer> annotatedObjectRGDIds, String ontologyPrefix) throws Exception {
+        String query = "SELECT * FROM full_annot a , rgd_ids r WHERE " +
+                "   a.annotated_object_rgd_id=r.rgd_id " +
+                "    AND term_acc LIKE ?" +
+                "   and r.object_status='ACTIVE'" +
+                "   AND a.annotated_object_rgd_id in (";
+        String ids=annotatedObjectRGDIds.stream().map(Object::toString).collect(Collectors.joining(","));
+        query+=ids+")";
+        return executeAnnotationQuery(query, ontologyPrefix+"%");
     }
 
     /**
