@@ -168,7 +168,7 @@ public class GeneratorCommandParser {
             terms.add(command);
 
             //check the size first
-            if (count < 25000) {
+            if (count < 40000) {
                 //allGenes = adao.getAnnotatedSymbols(terms, speciesType, oKey);
                 if (oKey==1) {
                     allGenes = adao.getAnnotatedGenes(terms, speciesType);
