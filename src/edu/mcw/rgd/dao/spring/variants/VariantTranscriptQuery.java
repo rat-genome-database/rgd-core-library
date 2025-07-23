@@ -31,6 +31,12 @@ public class VariantTranscriptQuery extends MappingSqlQuery<VariantTranscript> {
         t.setTripletError(rs.getString("triplet_error"));
         t.setFrameShift(rs.getString("frameshift"));
         t.setPolyphenStatus(rs.getString("PREDICTION"));
+        try{
+            t.setTranscriptSymbol(rs.getString("acc_id"));
+        }catch (Exception ignored){}
+        try{
+            t.setProteinSymbol(rs.getString("protein_acc_id"));
+        }catch (Exception ignored){}
         return t;
 
     }

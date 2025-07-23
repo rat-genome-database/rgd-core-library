@@ -11,6 +11,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jdepons
@@ -1179,5 +1180,12 @@ public class GeneDAO extends AbstractDAO {
                 ")";
 
         return GeneQuery.execute(this, sql, proteinDomainRgdId);
+    }
+    public List<Gene> getGenesByTranscriptIdsList(List<Integer> transcriptRgdIds) throws Exception {
+        String sql=" select * from genes where rgd_id in (select gene_rgd_id from transcripts where transcript_rgd_id in (";
+        sql+=transcriptRgdIds.stream().map(i->i+"").collect(Collectors.joining(","));
+        sql+="))";
+        GeneQuery query=new GeneQuery(this.getDataSource(), sql);
+        return  query.execute();
     }
 }
