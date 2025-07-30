@@ -6,7 +6,8 @@ import edu.mcw.rgd.datamodel.HgvsName;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.VariantInfo;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author mtutaj
@@ -27,7 +28,31 @@ public class VariantInfoDAO extends GenomicElementDAO {
         }
         return rows.get(0);
     }
+    public Map<Integer, Set<String>> getClinicalSignificance(List<Long> rgdIdsList) throws Exception {
 
+        String query = "SELECT g.*,r.*,v.* FROM rgd_ids r,genomic_elements g,clinvar v "+
+                "WHERE r.rgd_id=g.rgd_id AND g.rgd_id=v.rgd_id AND r.rgd_id in (" +
+                rgdIdsList.stream().map(id->id+"").collect(Collectors.joining(","))+
+                ") ";
+        VariantQuery q = new VariantQuery(this.getDataSource(), query);
+
+        List<VariantInfo> rows = q.execute();
+        if( rows.isEmpty() ) {
+            return null;
+        }else{
+            Map<Integer, Set<String>> infoMap=new HashMap<>();
+            for(VariantInfo info:rows){
+                Set<String> clinicalSignificance=new HashSet<>();
+                if(infoMap.get(info.getRgdId())!=null){
+                    clinicalSignificance.addAll((infoMap.get(info.getRgdId())));
+                }
+                clinicalSignificance.add(info.getClinicalSignificance());
+                infoMap.put(info.getRgdId(), clinicalSignificance);
+            }
+            return infoMap;
+        }
+
+    }
     /**
      * insert new variant object into CLINVAR table
      * <br>

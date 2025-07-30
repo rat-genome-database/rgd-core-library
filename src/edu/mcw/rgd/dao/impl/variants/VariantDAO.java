@@ -12,11 +12,13 @@ import edu.mcw.rgd.datamodel.variants.VariantIndex;
 import edu.mcw.rgd.datamodel.variants.VariantMapData;
 import edu.mcw.rgd.datamodel.variants.VariantSSId;
 import edu.mcw.rgd.datamodel.variants.VariantSampleDetail;
+import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 
@@ -37,15 +39,28 @@ public class VariantDAO extends AbstractDAO {
 
         return execute(q, startPos,chr);
     }
+    public List<ConservationScore> getConservationScoresByPositionsList(int mapKey, String chr, List<Long> positions) throws Exception {
+        VariantSearchBean vsb=new VariantSearchBean(mapKey);
+        if(vsb.getConScoreTable()!=null && !vsb.getConScoreTable().equals("")) {
+            String sql = "select * from " + vsb.getConScoreTable() + " where  chr=? and position in (" +
+                    positions.stream().map(p -> p + "").collect(Collectors.joining(",")) + ")";
+            ConservationScoreMapper q = new ConservationScoreMapper(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+
+            return execute(q, chr);
+        }
+        return null;
+    }
     public List<VariantIndex> getVariantIndexDocs(int mapKey, String chromosome, int limit, int offset) throws Exception {
         String sql="select v.*,vmd.*" ;
         sql+=   " from variant v " +
                 " left outer join variant_map_data vmd on (vmd.rgd_id=v.rgd_id) " +
-                " where  vmd.map_key=? and vmd.chromosome=? Order by v.rgd_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                " where  vmd.map_key=? and vmd.chromosome=?" ;
+//                +
+//                " Order by v.rgd_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         VariantIndexQuery query=new VariantIndexQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
 
-        return execute(query, mapKey, chromosome,offset, limit);
+        return execute(query, mapKey, chromosome);
     }
 
     public List<edu.mcw.rgd.datamodel.variants.VariantTranscript> getVariantTranscripts(long rgdId, int mapKey) throws Exception {
@@ -60,88 +75,93 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(rgdId, mapKey);
     }
 
-//  public List<VariantResult> getVariantsNewTbaleStructure(VariantSearchBean vsb) throws Exception {
+    public List<VariantIndex> getVariantsNewTableStructure(  int mapKey, List<Integer> variantIdsList) throws Exception {
+
+        String sql="select vsd.*,vt.*,t.acc_id as transcript_acc_id,t.protein_acc_id as protein_acc_id, p.prediction , g.rgd_id as gene_rgd_id, g.gene_symbol_lc as gene_symbol_lc, md.strand as strand\n" +
+                "   from Variant_sample_detail vsd\n" +
+                "   left outer join variant_transcript vt on ( vsd.rgd_id=vt.variant_rgd_id )   \n" +
+                "   left outer join transcripts t on (t.transcript_rgd_id=vt.transcript_rgd_id)  \n" +
+                "   left outer join genes g on (g.rgd_id=t.gene_rgd_id)  \n" +
+                "   left outer join maps_data md on ( md.rgd_id=g.rgd_id)  \n" +
+                "   left outer join polyphen  p on (vt.variant_rgd_id =p.variant_rgd_id and vt.transcript_rgd_id=p.transcript_rgd_id)   \n" +
+                "          where \n" +
+                "          vsd.sample_id in (select sample_id from sample where map_key=?)  \n" +
+                "          and vsd.rgd_id in (" ;
+
+        String ids=  variantIdsList.stream().map(Object::toString).collect(Collectors.joining(","));
+        sql=sql+ids;
+        sql=sql+") ";
+
+
+        VariantIndexQuery query=new VariantIndexQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        return  execute(query, mapKey);
+//        List<VariantIndex> variants=  execute(query, mapKey, mapKey,mapKey);
+//        List<VariantIndex> vrList=new ArrayList<>();
+//        Set<String> variantIds=new HashSet<>();
+//        java.util.Map<String, VariantIndex>  sortedVariants=new HashMap<>();
+//        Set<Long> variantIdsWithTrancripts=new HashSet<>();
+//        for(VariantIndex variant:variants){
+//            variantIdsWithTrancripts.add(variant.getVariant_id());
+//            String key=variant.getVariant_id()+"-"+variant.getSampleId()+"-"+variant.getMapKey();
+//            if(mapKey==38 || mapKey==17){
+//                try {
+//                    String clinvarSignificance = getClinvarInfo((int) variant.getVariant_id());
+//                    if (clinvarSignificance != null && !clinvarSignificance.equals(""))
+//                        variant.setClinicalSignificance(clinvarSignificance);
+//                }catch (Exception e){
+//                    System.out.println("NO CLINICAL SIGNIFICACE SAMPLE_ID:"+ variant.getSampleId() +" RGD_ID:"+variant.getVariant_id());
+//                }
+//            }
+//            if(!variantIds.contains(key)){
+//                variantIds.add(key);
+//                sortedVariants.put(key,variant);
+//            }else{
+//                VariantIndex obj = sortedVariants.get(key);
+//                List<VariantTranscript>vtranscripts=new ArrayList<>();
+//                boolean exists = false;
+//                if(variant.getVariantTranscripts()!=null)
+//                    for(VariantTranscript transcript:variant.getVariantTranscripts()) {
+//                        if (obj != null) {
 //
-//        String csTable=vsb.getConScoreTable();
-//        String sql="select  v.*,vmd.*, vsd.*,vt.*, p.*,cs.* ,gl.gene_symbols as region_name, " +
-//                " rseqData.seq_data as full_ref_aa, " +
-//                " nseqData.seq_data as full_ref_nuc" +
-//                " from variant v " +
-//                " left outer join variant_map_data vmd on (vmd.rgd_id=v.rgd_id) " +
-//                " left outer join variant_sample_detail vsd on (vsd.rgd_id=v.rgd_id) " +
-//                " left outer join variant_transcript vt on v.rgd_id=vt.variant_rgd_id  " +
-//                " left outer join rgd_sequences rseq on rseq.seq_key=vt.full_ref_aa_seq_key " +
-//                " left outer join seq_data rseqData on rseq.seq_data_md5=rseqData.data_md5 " +
-//                " left outer join rgd_sequences nseq on nseq.seq_key=vt.full_ref_nuc_seq_key " +
-//                " left outer join seq_data nseqData on nseq.seq_data_md5=nseqData.data_md5 " +
-//                " left outer join polyphen  p on (v.rgd_id =p.variant_rgd_id)   " +
-//                " left outer join "+ csTable + " cs on (cs.position=vmd.start_pos and cs.chr=vmd.chromosome)     " +
-//                "  left outer join gene_loci gl on (gl.map_key=vmd.map_key and gl.chromosome=vmd.chromosome and gl.pos=vmd.start_pos)         " +
-//                "   where  " +
-//                "                v.rgd_id in (" ;
-//        //   "63409322)";
-//        String ids= String.valueOf(vsb.getVariantId());
-//        sql=sql+ids;
-//        sql=sql+")";
-//            System.out.println(sql);
-//        List<VariantResult> vrList = new ArrayList<VariantResult>();
-//        Connection conn = null;
-//        Statement stmt;
-//        ResultSet rs;
-//
-//        try {
-//
-//            conn = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
-//            stmt = conn.createStatement();
-//            rs = stmt.executeQuery(sql);
-//
-//            long lastVariant = 0;
-//
-//            VariantResultBuilder vrb = null;
-//
-//            while (rs.next()) {
-//                long variantId = rs.getLong("rgd_id");
-//                if (variantId != lastVariant) {
-//                    if (lastVariant != 0) {
-//                        vrList.add(vrb.getVariantResult());
+//                            vtranscripts = obj.getVariantTranscripts();
+//                            for (VariantTranscript variantTranscript : vtranscripts) {
+//                                if (transcript.getTranscriptRgdId() == variantTranscript.getTranscriptRgdId()) {
+//                                    exists = true;
+//                                }
+//                            }
+//                            if (!exists) {
+//                                vtranscripts.add(transcript);
+//                                obj.setVariantTranscripts(vtranscripts);
+//                            }
+//                        }
 //                    }
-//                    lastVariant = variantId;
-//                    vrb = new VariantResultBuilder();
-//
-//                    vrb.mapVariant(rs);
-//                    vrb.mapConservation(rs);
-//                }
-//
-//                if (vrb != null) {
-//                    vrb.mapTranscript(rs);
-//                }
-//                if (vrb != null) {
-//                    vrb.mapPolyphen(rs);
-//                }
-//                // vrb.mapDBSNP(rs, vsb);
-//             //   vrb.mapClinVar(rs);
-//            }
-//
-//            if (vrb != null) {
-//                vrList.add(vrb.getVariantResult());
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                conn.close();
-//            } catch (Exception ignored) {
-//                logger.error("Exception closing connection");
+//                sortedVariants.put(key, obj);
 //            }
 //        }
 //
-//        edu.mcw.rgd.dao.impl.VariantDAO.lastQuery = sql;
-//        logger.debug("found vrList size " + vrList.size());
+//
+//        for(Map.Entry e:sortedVariants.entrySet()){
+//            vrList.add((VariantIndex) e.getValue());
+//        }
+//        System.out.println("varaiants size: "+ vrList.size());
+//
+//        Set<Long> variantIdsWithoutTranscripts=new HashSet<>();
+//        if(variantIdsList.size()>variantIdsWithTrancripts.size()){
+//            for(int id:variantIdsList){
+//                if(!variantIdsWithTrancripts.contains((long)id)){
+//                    variantIdsWithoutTranscripts.add((long) id);
+//                }
+//            }
+//            System.out.println("Queried IDS:"+variantIdsList.size()+"\nIds without transcripts:"+ variantIdsWithoutTranscripts.size());
+//            if(variantIdsWithoutTranscripts.size()>0) {
+//                List<VariantIndex> variantsWithoutTranscripts = getVariantsWithoutTranscripts(mapKey, variantIdsWithoutTranscripts);
+//                vrList.addAll(variantsWithoutTranscripts);
+//            }
+//        }
+//        System.out.println("varaiants size include no transcript variants: "+ vrList.size());
 //        return vrList;
-//
-//
-//    }
+    }
+
     public int getMapKeyByVariantId(int variantId) throws Exception {
         String sql="select distinct(vmd.map_key) from variant_map_data vmd where rgd_id=? ";
         IntListQuery q=new IntListQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
