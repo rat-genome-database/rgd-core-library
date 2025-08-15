@@ -42,19 +42,39 @@ FROM SSLPS
 public class GenomicElementDAO extends AbstractDAO {
 
     /**
-     * get list of active genomic elements of given object key
+     * get list of active genomic elements for given object type
      * @param objectKey object key
      * @return List of GenomicElement objects
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<GenomicElement> getActiveElements(int objectKey) throws Exception {
 
-        String sql = "SELECT ge.*,r.species_type_key,r.object_status,r.object_key "+
-                "FROM genomic_elements ge, rgd_ids r "+
-                "WHERE r.object_key=? AND ge.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+        String sql = """
+            SELECT ge.*,r.species_type_key,r.object_status,r.object_key
+            FROM genomic_elements ge, rgd_ids r
+            WHERE r.object_key=? AND ge.rgd_id=r.rgd_id AND r.object_status='ACTIVE'
+            """;
 
         GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), sql);
         return execute(q, objectKey);
+    }
+
+    /**
+     * get list of active genomic elements for given object type and species
+     * @param objectKey object key
+     * @param speciesTypeKey species type key
+     * @return List of GenomicElement objects
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<GenomicElement> getActiveElements(int objectKey, int speciesTypeKey) throws Exception {
+
+        String sql = """
+            SELECT ge.*,r.species_type_key,r.object_status,r.object_key
+            FROM genomic_elements ge, rgd_ids r
+            WHERE r.object_key=? AND species_type_key=? AND ge.rgd_id=r.rgd_id AND r.object_status='ACTIVE'
+            """;
+        GenomicElementQuery q = new GenomicElementQuery(this.getDataSource(), sql);
+        return execute(q, objectKey, speciesTypeKey);
     }
 
     /**
