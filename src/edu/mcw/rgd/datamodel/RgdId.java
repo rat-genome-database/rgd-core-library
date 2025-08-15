@@ -10,7 +10,8 @@ import java.util.Date;
  */
 public class RgdId implements Identifiable, Speciated {
 
-    // for your convenience: copied from RGD_OBJECTS table as of Feb 2014
+    // for your convenience: copied from RGD_OBJECTS table as of Jul 2025
+    static public final int OBJECT_KEY_BIOLOGICAL_REGIONS = 25;
     static public final int OBJECT_KEY_CDSS = 18;
     static public final int OBJECT_KEY_CELL_LINES = 11;
     static public final int OBJECT_KEY_CHROMOSOME = 22;
@@ -171,6 +172,7 @@ public class RgdId implements Identifiable, Speciated {
             case OBJECT_KEY_VARIANTS:   return "Variant";
             case OBJECT_KEY_RGDVARIANT: return "RgdVariant";
             case OBJECT_KEY_PROTEINS:   return "Protein";
+            case OBJECT_KEY_BIOLOGICAL_REGIONS:   return "Biological Region";
             default:                    return objectKey + "";
         }
     }
