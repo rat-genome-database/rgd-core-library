@@ -74,7 +74,8 @@ public class IndexAdmin {
         String path="";
         String mappings=null;
         if(_mappings!=null && !_mappings.equals("")){
-
+            path+="data/"+_mappings+".json";
+            mappings=new String(Files.readAllBytes(Paths.get(path)));
           //  mappings= new String(Files.readAllBytes(Paths.get("resources/variant_mappings.json")));
         }
         log.info("CREATING NEW INDEX..." + index);
