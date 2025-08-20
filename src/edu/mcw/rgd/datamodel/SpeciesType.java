@@ -34,6 +34,8 @@ public final class SpeciesType {
     public static final int VERVET = 13;
     public static final int NAKED_MOLE_RAT = 14;
 
+    public static final int BLACK_RAT = 17;
+
     public static final int ALL = 0;
     public static final int UNKNOWN = -1;
 
@@ -102,38 +104,23 @@ public final class SpeciesType {
 
 
     public static String getImageUrl(int speciesTypeKey) {
-        if (speciesTypeKey == SpeciesType.HUMAN) {
-            return "humanS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.MOUSE) {
-            return "mouseS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.RAT) {
-            return "ratS.png";
-        }
-        if (speciesTypeKey == SpeciesType.CHINCHILLA) {
-            return "chinchillaS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.BONOBO) {
-            return "bonoboS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.DOG) {
-            return "dogS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.SQUIRREL) {
-            return "squirrelS.jpg";
-        }
-        if (speciesTypeKey == SpeciesType.PIG) {
-            return "pig.png";
-        }
-        if (speciesTypeKey == SpeciesType.VERVET) {
-            return "green-monkeyS.png";
-        }
-        if (speciesTypeKey == SpeciesType.NAKED_MOLE_RAT) {
-            return "mole-ratS.png";
-        }
 
-        return "";
+        String image = switch (speciesTypeKey) {
+            case SpeciesType.HUMAN -> "humanS.jpg";
+            case SpeciesType.MOUSE -> "mouseS.jpg";
+            case SpeciesType.RAT -> "ratS.png";
+            case SpeciesType.CHINCHILLA -> "chinchillaS.jpg";
+            case SpeciesType.BONOBO -> "bonoboS.jpg";
+            case SpeciesType.DOG -> "dogS.jpg";
+            case SpeciesType.SQUIRREL -> "squirrelS.jpg";
+            case SpeciesType.PIG -> "pig.png";
+            case SpeciesType.VERVET -> "green-monkeyS.png";
+            case SpeciesType.NAKED_MOLE_RAT -> "mole-ratS.png";
+            case SpeciesType.BLACK_RAT -> "black-ratS.png";
+            default -> "";
+        };
+
+        return image;
     }
 
 
