@@ -1453,24 +1453,29 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public List<Term> getOrphanedTerms(String ontId) throws Exception {
 
-        String sql = "SELECT * FROM ont_terms \n" +
-                "WHERE is_obsolete=0 AND ont_id=? \n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)";
+        String sql = """
+            SELECT * FROM ont_terms
+            WHERE is_obsolete=0 AND ont_id=?
+              AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)
+            """;
 
         return executeTermQuery(sql, ontId);
     }
 
     /**
      * examines all terms and orphaned terms (all active terms that do not appear in ontology dag trees)
-     * receive 'obsolete' status = 2
+     * receive 'obsolete' status = 1
      * @param ontId ontology id
      * @return count of terms made obsolete
      * @throws Exception if something wrong happens in spring framework
      */
     public int obsoleteOrphanedTerms(String ontId) throws Exception {
-        String sql = "UPDATE ont_terms SET is_obsolete=2, modification_date=SYSDATE \n" +
-                "WHERE is_obsolete=0 AND ont_id=? \n" +
-                "AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)";
+
+        String sql = """
+            UPDATE ont_terms SET is_obsolete=1, modification_date=SYSDATE
+            WHERE is_obsolete=0 AND ont_id=?
+              AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)
+            """;
 
         return update(sql, ontId);
     }
