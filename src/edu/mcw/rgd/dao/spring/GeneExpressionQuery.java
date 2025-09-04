@@ -75,6 +75,15 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         try{
             s.setTissueTerm(rs.getString("tissue_term"));
         }catch (Exception ignored){}
+        try{
+            s.setTraitTerm(rs.getString("trait_term"));
+        }catch (Exception ignored){}
+        try{
+            s.setMeasurementTerm(rs.getString("measurement"));
+        }catch (Exception ignored){}
+        try{
+            s.setExperimentCondition(rs.getString("condition"));
+        }catch (Exception ignored){}
 
         s.setComputedSex(rs.getString("COMPUTED_SEX"));
         ge.setSample(s);

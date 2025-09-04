@@ -18,6 +18,9 @@ public class Sample {
     private String strainTerm;
     private String tissueTerm;
     private String cellTypeTerm;
+    private String traitTerm;
+    private String measurementTerm;
+    private String experimentCondition;
     private String cellLineId;
     private String geoSampleAcc;
     private String bioSampleId;
@@ -203,5 +206,29 @@ public class Sample {
 
     public void setCellTypeTerm(String cellTypeTerm) {
         this.cellTypeTerm = cellTypeTerm;
+    }
+
+    public String getTraitTerm() {
+        return traitTerm;
+    }
+
+    public void setTraitTerm(String traitTerm) {
+        this.traitTerm = traitTerm;
+    }
+
+    public String getMeasurementTerm() {
+        return measurementTerm;
+    }
+
+    public void setMeasurementTerm(String measurementTerm) {
+        this.measurementTerm = measurementTerm;
+    }
+
+    public String getExperimentCondition() {
+        return experimentCondition;
+    }
+
+    public void setExperimentCondition(String experimentCondition) {
+        this.experimentCondition = experimentCondition;
     }
 }
