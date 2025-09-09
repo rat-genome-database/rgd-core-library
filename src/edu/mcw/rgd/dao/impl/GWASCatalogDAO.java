@@ -3,7 +3,9 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.GWASCatalogQuery;
+import edu.mcw.rgd.dao.spring.GWASVersionQuery;
 import edu.mcw.rgd.datamodel.GWASCatalog;
+import edu.mcw.rgd.datamodel.GWASVersion;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -19,6 +21,13 @@ public class GWASCatalogDAO extends AbstractDAO {
         return GWASCatalogQuery.execute(this,query);
     }
 
+    public List<GWASCatalog> getAllGWASByMapKey(int mapKey) throws Exception {
+        String query = "select * from GWAS_CATALOG where map_key=?";
+        GWASCatalogQuery q = new GWASCatalogQuery(DataSourceFactory.getInstance().getDataSource(), query);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(mapKey);
+    }
+
     public int deleteGWASBatch(Collection<GWASCatalog> toBeDeleted) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"DELETE FROM GWAS_CATALOG WHERE GWAS_ID=?",
                 new int[] {Types.INTEGER});
@@ -30,9 +39,10 @@ public class GWASCatalogDAO extends AbstractDAO {
     }
     public int insertGWASBatch(Collection<GWASCatalog> toBeInserted) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),"insert into gwas_catalog (gwas_id, pmid, disease_trait, init_sample_size, replicate_sample_size, region, chromosome, pos, report_genes, mapped_genes, snp_risk_allele, " +
-                "snps, cur_snp_id, context, risk_allele_freq, p_value, p_value_mlog, snp_passing_qc, mapped_trait, efo_ids, study_acc, or_or_beta) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "snps, cur_snp_id, context, risk_allele_freq, p_value, p_value_mlog, snp_passing_qc, mapped_trait, efo_ids, study_acc, or_or_beta, VARIANT_RGD_ID, MAP_KEY) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 new int[]{Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,
-                        Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.FLOAT,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
+                        Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.FLOAT,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR, Types.INTEGER,
+                        Types.INTEGER});
         su.compile();
         for (GWASCatalog gc : toBeInserted){
             int gwasId = this.getNextKeyFromSequence("GWAS_CAT_SEQ");
@@ -40,10 +50,31 @@ public class GWASCatalogDAO extends AbstractDAO {
 
             su.update(gc.getGwasId(),gc.getPmid(),gc.getDiseaseTrait(),gc.getInitialSample(), gc.getReplicateSample(),gc.getRegion(),gc.getChr(),gc.getPos(),
             gc.getReportedGenes(),gc.getMappedGene(),gc.getStrongSnpRiskallele(),gc.getSnps(),gc.getCurSnpId(),gc.getContext(),gc.getRiskAlleleFreq(),gc.getpValStr(),gc.getpValMlog(),
-            gc.getSnpPassQc(),gc.getMapTrait(),gc.getEfoId(),gc.getStudyAcc(),gc.getOrBeta());
+            gc.getSnpPassQc(),gc.getMapTrait(),gc.getEfoId(),gc.getStudyAcc(),gc.getOrBeta(), gc.getVariantRgdId(), gc.getMapKey());
         }
         return executeBatch(su);
     }
+
+    public int insertGWASVersionBatch(Collection<GWASVersion> insert) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "insert into GWAS_VERSION (GWAS_ID, VERSION) values (?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (GWASVersion g : insert){
+            su.update(g.getGwasId(), g.getVersion());
+        }
+        return executeBatch(su);
+    }
+
+    public int deleteGWASVersionBatch(Collection<GWASVersion> delete) throws Exception {
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "delete from GWAS_VERSION where GWAS_ID=? and VERSION=?",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (GWASVersion g : delete){
+            su.update(g.getGwasId(), g.getVersion());
+        }
+        return executeBatch(su);
+    }
+
     public int updateGWASBatch(Collection<GWASCatalog> toBeUpdated) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
                 "update GWAS_CATALOG set VARIANT_RGD_ID=? where GWAS_ID=?",
@@ -98,5 +129,16 @@ public class GWASCatalogDAO extends AbstractDAO {
         if (list.size() != 1)
             return null;
         return list.get(0);
+    }
+
+    public List<GWASVersion> getAllGWASVersion() throws Exception{
+        String sql = "select * from GWAS_VERSION";
+        return GWASVersionQuery.execute(this, sql);
+    }
+    public List<GWASVersion> getGWASVersionById(int gwasId) throws Exception{
+        String sql = "select * from GWAS_VERSION where GWAS_ID=?";
+        GWASVersionQuery q = new GWASVersionQuery(DataSourceFactory.getInstance().getDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(gwasId);
     }
 }

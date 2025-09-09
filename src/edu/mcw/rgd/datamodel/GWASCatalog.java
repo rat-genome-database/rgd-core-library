@@ -30,8 +30,10 @@ public class GWASCatalog {
     private String studyAcc;
     private String efoId;
     private String orBeta;
-    private int variantRgdId;
+    private Integer variantRgdId;
     private Integer qtlRgdId;
+    private int mapKey;
+
     public GWASCatalog(){};
 
     public GWASCatalog(GWASCatalog gc, String chrom, String position, String riskAllele, String snp){
@@ -257,8 +259,8 @@ public class GWASCatalog {
                 Utils.stringsAreEqual(pos,gc.getPos()) && Utils.stringsAreEqual(reportedGenes, gc.getReportedGenes()) && Utils.stringsAreEqual(mappedGene,gc.getMappedGene()) &&
                 Utils.stringsAreEqual(strongSnpRiskallele, gc.getStrongSnpRiskallele()) && Utils.stringsAreEqual(snps,gc.getSnps()) && Utils.stringsAreEqual(curSnpId,gc.getCurSnpId()) &&
                 Utils.stringsAreEqual(context,gc.getContext()) && Utils.stringsAreEqual(riskAlleleFreq,gc.getRiskAlleleFreq()) && Utils.stringsAreEqual(pVal,gc.getpValStr()) &&
-                pValMlog.equals(gc.getpValMlog()) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
-                Utils.stringsAreEqual(efoId, gc.getEfoId()) && Utils.stringsAreEqual(studyAcc,gc.getStudyAcc()) && Utils.stringsAreEqual(orBeta,gc.getOrBeta());
+                Utils.doublesAreEqual(pValMlog,gc.getpValMlog(),10) && Utils.stringsAreEqual(snpPassQc,gc.getSnpPassQc()) && Utils.stringsAreEqual(mapTrait,gc.getMapTrait()) &&
+                Utils.stringsAreEqual(efoId, gc.getEfoId()) && Utils.stringsAreEqual(studyAcc,gc.getStudyAcc()) && Utils.stringsAreEqual(orBeta,gc.getOrBeta()) && mapKey==gc.getMapKey();
     }
 
     @Override
@@ -266,15 +268,16 @@ public class GWASCatalog {
         return Utils.defaultString(pmid).hashCode() ^ Utils.defaultString(diseaseTrait).hashCode() ^ Utils.defaultString(initialSample).hashCode() ^ Utils.defaultString(replicateSample).hashCode()
                 ^ Utils.defaultString(region).hashCode() ^ Utils.defaultString(chr).hashCode() ^ Utils.defaultString(pos).hashCode() ^ Utils.defaultString(reportedGenes).hashCode() ^
                 Utils.defaultString(mappedGene).hashCode() ^ Utils.defaultString(strongSnpRiskallele).hashCode() ^ Utils.defaultString(snps).hashCode() ^ Utils.defaultString(curSnpId).hashCode()
-                ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ pValMlog.hashCode()
-                ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode() ^ Utils.defaultString(orBeta).hashCode();
+                ^ Utils.defaultString(context).hashCode() ^ Utils.defaultString(riskAlleleFreq).hashCode() ^ Utils.defaultString(pVal).hashCode() ^ ((pValMlog != null) ? pValMlog.hashCode() : 0)
+                ^ Utils.defaultString(snpPassQc).hashCode() ^ Utils.defaultString(mapTrait).hashCode() ^ Utils.defaultString(efoId).hashCode() ^ Utils.defaultString(studyAcc).hashCode()
+                ^ Utils.defaultString(orBeta).hashCode() ^ mapKey;
     }
 
-    public int getVariantRgdId() {
+    public Integer getVariantRgdId() {
         return variantRgdId;
     }
 
-    public void setVariantRgdId(int variantRgdId) {
+    public void setVariantRgdId(Integer variantRgdId) {
         this.variantRgdId = variantRgdId;
     }
 
@@ -284,5 +287,13 @@ public class GWASCatalog {
 
     public void setQtlRgdId(Integer qtlRgdId) {
         this.qtlRgdId = qtlRgdId;
+    }
+
+    public int getMapKey() {
+        return mapKey;
+    }
+
+    public void setMapKey(int mapKey) {
+        this.mapKey = mapKey;
     }
 }
