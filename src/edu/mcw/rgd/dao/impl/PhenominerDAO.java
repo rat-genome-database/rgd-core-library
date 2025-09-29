@@ -93,6 +93,16 @@ public class PhenominerDAO extends AbstractDAO {
         return studies.get(0);
     }
 
+    public List<Study> getStudiesByGeoId(String  id) throws Exception {
+        String query = "SELECT * FROM study WHERE geo_series_acc=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        return studies;
+    }
+
     public Study getStudyByGeoIdWithReferences(String  id) throws Exception {
         String query = "SELECT * FROM study WHERE geo_series_acc=?";
 
