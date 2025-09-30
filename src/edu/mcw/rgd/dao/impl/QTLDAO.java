@@ -242,4 +242,9 @@ public class QTLDAO extends AbstractDAO {
         String sql = "select q.*, r.SPECIES_TYPE_KEY from QTLs q, RGD_IDS r WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id and qtl_symbol like 'GWAS%'";
         return executeQtlQuery(sql);
     }
+
+    public List<QTL> getAllGWASQtlsBySpecies(int speciesType) throws Exception{
+        String sql = "select q.*, r.SPECIES_TYPE_KEY from QTLs q, RGD_IDS r WHERE r.species_type_key=? and r.rgd_id=q.rgd_id and qtl_symbol like 'GWAS%'";
+        return executeQtlQuery(sql,speciesType);
+    }
 }
