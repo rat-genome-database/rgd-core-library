@@ -239,13 +239,13 @@ public class PhenominerDAO extends AbstractDAO {
      *  Return all GEO studies
      *  @return list of all studies
      */
-    public HashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
+    public LinkedHashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
 
         String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY pubmed_id,geo_accession_id desc";
 
         GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
         List<GeoRecord> result = execute(q,species+"%",status);
-        HashMap r = new HashMap();
+        LinkedHashMap r = new LinkedHashMap();
         List<String> studyList = new ArrayList<>();
         if(result != null) {
             for(GeoRecord s:result){
