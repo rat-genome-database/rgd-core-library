@@ -32,6 +32,7 @@ public class OntologyQuery extends MappingSqlQuery {
         ont.setHomePage(rs.getString("HOME_PAGE"));
         ont.setLogoUrl(rs.getString("LOGO_URL"));
         ont.setRootTermAcc(rs.getString("ROOT_TERM_ACC"));
+        ont.setRefRgdId(rs.getInt("REF_RGD_ID"));
         return ont;
     }
 }
