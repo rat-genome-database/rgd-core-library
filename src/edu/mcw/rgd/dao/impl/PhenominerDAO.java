@@ -241,7 +241,7 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public HashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
 
-        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY geo_accession_id desc";
+        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY pubmed_id,geo_accession_id desc";
 
         GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
         List<GeoRecord> result = execute(q,species+"%",status);
