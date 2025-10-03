@@ -24,6 +24,7 @@ public class Ontology {
     private String homePage; // ontology home page
     private String logoUrl; // url of the ontology logo (url to picture)
     private String rootTermAcc; // accession id of the ontology root term
+    private int refRgdId;
 
     /**
      * check whether given ontology is an external ontology, or internal ontology;
@@ -158,5 +159,13 @@ public class Ontology {
 
         // normalize acc id
         return buildId(accId.substring(0, colonPos), accId.substring(colonPos+1));
+    }
+
+    public int getRefRgdId() {
+        return refRgdId;
+    }
+
+    public void setRefRgdId(int refRgdId) {
+        this.refRgdId = refRgdId;
     }
 }
