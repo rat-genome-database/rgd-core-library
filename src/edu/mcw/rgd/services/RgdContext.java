@@ -48,6 +48,7 @@ public class RgdContext {
     }
 
     static void parseHostName() throws UnknownHostException {
+        System.out.println("HOSTNAME:"+ hostname);
         if( hostname!=null )
             return;
         try {
@@ -64,6 +65,7 @@ public class RgdContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("HOSTNAME:"+ hostname);
     }
 
     public static boolean isCurator() throws UnknownHostException {
