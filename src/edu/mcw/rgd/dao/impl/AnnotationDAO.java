@@ -664,7 +664,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReferenceAndEvidence(int refRgdId, String evidence) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 " AND a.evidence=? \n" +
                 " AND a.annotated_object_rgd_id=r.rgd_id \n" +
                 " AND r.object_status='ACTIVE'";
@@ -680,7 +680,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReferenceAndTermAcc(int refRgdId, String termAcc) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 " AND a.term_acc=? \n" +
                 " AND a.annotated_object_rgd_id=r.rgd_id \n" +
                 " AND r.object_status='ACTIVE' \n" +
@@ -697,7 +697,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
                 "and a.ASPECT=o.ASPECT \n" +
@@ -718,7 +718,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, String src) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "AND a.data_src=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
@@ -740,7 +740,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, int objKey) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "and a.RGD_OBJECT_KEY=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
@@ -764,7 +764,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, int objKey, String src) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
                 "FROM full_annot a,rgd_ids r, ontologies o, references ref \n" +
-                "WHERE ref_rgd_id=? \n" +
+                "WHERE a.ref_rgd_id=? \n" +
                 "AND a.aspect=? \n" +
                 "and a.RGD_OBJECT_KEY=? \n" +
                 "AND a.data_src=? \n" +
