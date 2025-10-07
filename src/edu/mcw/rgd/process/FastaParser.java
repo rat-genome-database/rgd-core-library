@@ -48,6 +48,7 @@ public class FastaParser {
             case 634: chrDir=dir+"ROS_Cfam_1.0"; break;
             case 910: chrDir=dir+"susScr3"; break;
             case 911: chrDir=dir+"susScr11"; break;
+            case 1311: chrDir=dir+"chlSab2"; break;
             default: chrDir = null; lastError="ERROR: Unsupported mapKey="+mapKey; break;
         }
         setMapKey(mapKey, chrDir);
