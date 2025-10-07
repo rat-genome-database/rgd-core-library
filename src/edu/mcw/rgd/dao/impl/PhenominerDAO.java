@@ -93,6 +93,16 @@ public class PhenominerDAO extends AbstractDAO {
         return studies.get(0);
     }
 
+    public List<Study> getStudiesByGeoId(String  id) throws Exception {
+        String query = "SELECT * FROM study WHERE geo_series_acc=?";
+
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        List<Study> studies = execute(q, id);
+        if( studies.isEmpty() )
+            return null;
+        return studies;
+    }
+
     public Study getStudyByGeoIdWithReferences(String  id) throws Exception {
         String query = "SELECT * FROM study WHERE geo_series_acc=?";
 
@@ -229,13 +239,13 @@ public class PhenominerDAO extends AbstractDAO {
      *  Return all GEO studies
      *  @return list of all studies
      */
-    public HashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
+    public LinkedHashMap<String,GeoRecord> getGeoStudies(String species,String status) throws Exception {
 
-        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY geo_accession_id desc";
+        String query = "SELECT * FROM rna_seq where sample_organism like ? and platform_technology= 'high-throughput sequencing' and curation_status = ? ORDER BY pubmed_id,geo_accession_id desc";
 
         GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
         List<GeoRecord> result = execute(q,species+"%",status);
-        HashMap r = new HashMap();
+        LinkedHashMap r = new LinkedHashMap();
         List<String> studyList = new ArrayList<>();
         if(result != null) {
             for(GeoRecord s:result){
