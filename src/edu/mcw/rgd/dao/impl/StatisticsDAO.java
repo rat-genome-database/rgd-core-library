@@ -312,7 +312,7 @@ public class StatisticsDAO extends AbstractDAO {
      */
     public java.util.Map<String,String> getAnnotatedReferencesCount(int speciesTypeKey) throws Exception {
 
-        String sql = "SELECT COUNT(DISTINCT ref_rgd_id) tot, o.ont_name object_name \n" +
+        String sql = "SELECT COUNT(DISTINCT a.ref_rgd_id) tot, o.ont_name object_name \n" +
                 "  FROM full_annot a,ont_terms t,ontologies o,rgd_ids r \n" +
                 "  WHERE a.term_acc=t.term_acc AND t.ont_id=o.ont_id AND t.is_obsolete=0 \n" +
                 "    AND annotated_object_rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
@@ -321,7 +321,7 @@ public class StatisticsDAO extends AbstractDAO {
         }
         sql += "  GROUP BY ont_name \n" +
                "UNION ALL \n" +
-               "SELECT COUNT(DISTINCT ref_rgd_id) tot, 'All Ontologies' object_name \n" +
+               "SELECT COUNT(DISTINCT a.ref_rgd_id) tot, 'All Ontologies' object_name \n" +
                "  FROM full_annot a,ont_terms t,rgd_ids r \n" +
                "  WHERE a.term_acc=t.term_acc  AND t.is_obsolete=0 \n" +
                "    AND annotated_object_rgd_id=r.rgd_id AND r.object_status='ACTIVE' ";
