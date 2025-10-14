@@ -67,8 +67,11 @@ public class TranscriptDAO extends AbstractDAO {
      * @throws Exception on error in framework
      */
     public List<Transcript> getTranscriptsForGene(int geneRgdId, int mapKey) throws Exception {
-        String query = "select t.* from TRANSCRIPTS t, maps_data md where t.GENE_RGD_ID=? and md.rgd_id=t.transcript_rgd_id and md.map_key=?";
-        return executeTranscriptQuery(query, geneRgdId, mapKey);
+        String query = """
+            SELECT t.* FROM transcripts t, maps_data md
+            WHERE t.gene_rgd_id=? AND md.rgd_id=t.transcript_rgd_id AND md.map_key=?
+            """;
+        return executeTranscriptQueryForMapKey(query, mapKey, geneRgdId, mapKey);
     }
 
 
@@ -485,10 +488,12 @@ public class TranscriptDAO extends AbstractDAO {
 
 
     public List<Transcript> getTranscripts(int mapKey) throws Exception {
-        String query = "SELECT t.* " +
-                "FROM transcripts t, genes g, maps_data md "+
-                "WHERE g.rgd_id = t.gene_rgd_id AND md.rgd_id=g.rgd_id AND map_key=?";
-        return executeTranscriptQuery(query, mapKey);
+        String query = """
+            SELECT t.*
+            FROM transcripts t, genes g, maps_data md
+            WHERE g.rgd_id = t.gene_rgd_id AND md.rgd_id=g.rgd_id AND map_key=?
+            """;
+        return executeTranscriptQueryForMapKey(query, mapKey, mapKey);
     }
 
     /**
@@ -543,6 +548,19 @@ public class TranscriptDAO extends AbstractDAO {
         if( transcripts!=null ) {
             for( Transcript transcript: transcripts ) {
                 transcript.setGenomicPositions(mapDAO.getMapData(transcript.getRgdId()));
+            }
+        }
+        return transcripts;
+    }
+
+    public List<Transcript> executeTranscriptQueryForMapKey(String query, int mapKey, Object ... params) throws Exception {
+        TranscriptQuery q = new TranscriptQuery(this.getDataSource(), query);
+        List<Transcript> transcripts = execute(q, params);
+
+        // now load genomic positions
+        if( transcripts!=null ) {
+            for( Transcript transcript: transcripts ) {
+                transcript.setGenomicPositions(mapDAO.getMapData(transcript.getRgdId(), mapKey));
             }
         }
         return transcripts;
