@@ -45,6 +45,15 @@ public class SSLPDAO extends AbstractDAO {
         return MappedSSLPQuery.run(this,query, chr, stopPos, startPos, mapKey);
     }
 
+    public List<MappedSSLP> getActiveMappedSSLPsByType(String type) throws Exception{
+        String sql = """
+                select s.*, r.SPECIES_TYPE_KEY,md.*
+                    from SSLPs s, RGD_IDS r , maps_data md
+                    where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID
+                    and md.rgd_id=s.rgd_id and s.sslp_type=?""";
+        return MappedSSLPQuery.run(this, sql, type);
+    }
+
     /**
      * get all active SSLP objects for given species
      * @param speciesType species type key
