@@ -12,6 +12,7 @@ public class StudySampleMetadataDAO extends AbstractDAO {
         String sql= """
                 SELECT\s
                     s.GEO_SAMPLE_ACC,
+                    ec.EXP_COND_ORDINALITY,
                     tissue_terms.TERM as Tissue,
                     strain_terms.TERM as Strain,
                     s.SEX,
@@ -38,6 +39,7 @@ public class StudySampleMetadataDAO extends AbstractDAO {
                 LEFT JOIN ONT_TERMS exp_cond_terms ON ec.EXP_COND_ONT_ID = exp_cond_terms.TERM_ACC
                 LEFT JOIN ONT_TERMS cell_type_terms ON s.CELL_TYPE_ONT_ID = cell_type_terms.TERM_ACC
                 WHERE st.STUDY_ID = ?
+                ORDER BY s.GEO_SAMPLE_ACC, ec.EXP_COND_ORDINALITY ASC
                 """;
         return StudySampleMetadataQuery.execute(this,sql,studyId);
     }
