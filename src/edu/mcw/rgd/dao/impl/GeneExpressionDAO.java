@@ -457,20 +457,23 @@ public class GeneExpressionDAO extends PhenominerDAO {
 //
 //                +"    and expression_level in ('low','medium','high')"
 //                +"    and st.study_id=? ";
-        String query="select   ge.*,gr.*,s.*,e.*,st.*,g.*,tissue.term as tissue_term, strain.term as strain_term, trait.term as trait_term ,g.gene_symbol,c.*,measurement.term as measurement,xcondition.term as condition\n" +
-                "from study st inner join experiment e on e.study_id=st.study_id\n" +
-                "left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id\n" +
-                "left outer join sample s on s.sample_id=gr.sample_id \n" +
-                "left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id\n" +
-                "left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id\n" +
-                "left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id \n" +
-                "left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id\n" +
-                "left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id\n" +
-                "left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id\n" +
-                "left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id\n" +
-                "left outer join ont_terms strain on strain.term_acc=s.strain_ont_id\n" +
-                "left outer join ont_terms trait on trait.term_acc=e.trait_ont_id\n" +
-                " where  ge.expression_unit =? and  st.study_id=?";
+        String query="select   ge.*,gr.*,s.*,e.*,st.*,g.*,tissue.term as tissue_term, strain.term as strain_term, trait.term as trait_term ,g.gene_symbol,c.*,measurement.term as measurement,xcondition.term as condition" +
+                "   from study st inner join experiment e on e.study_id=st.study_id" +
+                "   left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id" +
+                "   left outer join sample s on s.sample_id=gr.sample_id " +
+                "   left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id" +
+                "   left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id" +
+                "   left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id " +
+                "   left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id" +
+                "   left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id" +
+                "   left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id" +
+                "   left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id" +
+                "   left outer join ont_terms strain on strain.term_acc=s.strain_ont_id" +
+                "   left outer join ont_terms trait on trait.term_acc=e.trait_ont_id" +
+                " where   st.study_id=? "
+//                +
+//                "   and ge.expression_unit =?  "
+                ;
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,unit, studyId);
     }
