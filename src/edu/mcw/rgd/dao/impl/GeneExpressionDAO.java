@@ -475,7 +475,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
 //                "   and ge.expression_unit =?  "
                 ;
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
-        return execute(q,unit, studyId);
+        return execute(q,studyId);
     }
 
     public int getGeneExpressionCountByTermRgdIdUnit(String termAcc, int rgdId, String unit) throws Exception{
