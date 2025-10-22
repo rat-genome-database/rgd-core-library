@@ -247,4 +247,12 @@ public class QTLDAO extends AbstractDAO {
         String sql = "select q.*, r.SPECIES_TYPE_KEY from QTLs q, RGD_IDS r WHERE r.species_type_key=? and r.rgd_id=q.rgd_id and qtl_symbol like 'GWAS%'";
         return executeQtlQuery(sql,speciesType);
     }
+
+    public QTL getQtlByChrPValPeakRs(String chr, String pval, String pvmlog, String rsId) throws Exception{
+        String sql = "select * from QTL where chromosome=? and p_value=? and p_value_mlog=? and peak_rs_id=?";
+        List<QTL> qtls = executeQtlQuery(sql, chr, pval, pvmlog, rsId);
+        if (qtls.isEmpty())
+            return null;
+        return qtls.get(0);
+    }
 }
