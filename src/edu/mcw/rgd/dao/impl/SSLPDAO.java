@@ -110,6 +110,12 @@ public class SSLPDAO extends AbstractDAO {
         return executeSSLPQuery(query, rgdId);
     }
 
+    public List<SSLP> getSSLPsByType(String type) throws Exception{
+        String sql = "select s.*,r.species_type_key from sslps s, rgd_ids r where r.rgd_id=s.rgd_id and s.sslp_type=?";
+
+        return executeSSLPQuery(sql, type);
+    }
+
     /**
      * get list of active sslps given sslp name and species
      * @param sslpName sslp name (case is not important)
