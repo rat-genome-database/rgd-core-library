@@ -54,6 +54,8 @@ public class QTLQuery extends MappingSqlQuery {
         qtl.setPeakRsId(rs.getString("PEAK_RS_ID"));
         qtl.setpValueMlog(rs.getDouble("P_VAL_MLOG"));
         if (rs.wasNull()) qtl.setpValueMlog(null);
+        qtl.setFlank1RsId(rs.getString("FLANK_1_RS_ID"));
+        qtl.setFlank2RsId(rs.getString("FLANK_2_RS_ID"));
         return qtl;
     }
 
