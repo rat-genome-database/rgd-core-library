@@ -34,11 +34,13 @@ public class StudySampleMetadataDAO extends AbstractDAO {
                 JOIN GENE_EXPRESSION_EXP_RECORD ger ON e.EXPERIMENT_ID = ger.EXPERIMENT_ID
                 JOIN SAMPLE s ON ger.SAMPLE_ID = s.SAMPLE_ID
                 LEFT JOIN EXPERIMENT_CONDITION ec ON ger.GENE_EXPRESSION_EXP_RECORD_ID = ec.GENE_EXPRESSION_EXP_RECORD_ID
+                LEFT JOIN RNA_SEQ rs ON rs.SAMPLE_ACCESSION_ID = s.GEO_SAMPLE_ACC
                 JOIN ONT_TERMS tissue_terms ON s.TISSUE_ONT_ID = tissue_terms.TERM_ACC
                 JOIN ONT_TERMS strain_terms ON s.STRAIN_ONT_ID = strain_terms.TERM_ACC
                 LEFT JOIN ONT_TERMS exp_cond_terms ON ec.EXP_COND_ONT_ID = exp_cond_terms.TERM_ACC
                 LEFT JOIN ONT_TERMS cell_type_terms ON s.CELL_TYPE_ONT_ID = cell_type_terms.TERM_ACC
                 WHERE st.STUDY_ID = ?
+                  AND (rs.CURATION_STATUS IS NULL OR rs.CURATION_STATUS != 'futureCuration')
                 ORDER BY s.GEO_SAMPLE_ACC, ec.EXP_COND_ORDINALITY ASC
                 """;
         return StudySampleMetadataQuery.execute(this,sql,studyId);
