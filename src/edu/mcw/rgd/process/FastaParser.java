@@ -49,6 +49,7 @@ public class FastaParser {
             case 910: chrDir=dir+"susScr3"; break;
             case 911: chrDir=dir+"susScr11"; break;
             case 1311: chrDir=dir+"chlSab2"; break;
+            case 1701: chrDir=dir+"blackrat"; break;
             default: chrDir = null; lastError="ERROR: Unsupported mapKey="+mapKey; break;
         }
         setMapKey(mapKey, chrDir);
