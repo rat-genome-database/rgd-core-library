@@ -28,27 +28,66 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         rec.setCurationStatus(rs.getInt("curation_status"));
         rec.setSpeciesTypeKey(rs.getInt("species_type_key"));
         rec.setClinicalMeasurementId(rs.getInt("CLINICAL_MEASUREMENT_ID"));
+        try{
+            rec.setTraitTerm(rs.getString("trait_term"));
+        }catch (Exception ignored){}
+        try{
+            rec.setMeasurementTerm(rs.getString("measurement"));
+        }catch (Exception ignored){}
+        try{
+            rec.setExperimentCondition(rs.getString("condition"));
+        }catch (Exception ignored){}
+        try{
+            rec.setConditionAccId(rs.getString("condition_acc"));
+        }catch (Exception ignored){}
         ge.setGeneExpressionRecord(rec);
 
         GeneExpressionRecordValue recV = new GeneExpressionRecordValue();
-        recV.setId(rs.getInt("gene_expression_value_id"));
-        try{
-            recV.setExpressedGeneSymbol(rs.getString("gene_symbol"));
-        }catch (Exception ignored){}
-        recV.setExpressedObjectRgdId(rs.getInt("expressed_object_rgd_id"));
-        recV.setExpressionMeasurementAccId(rs.getString("expression_measurement_ont_id"));
-        recV.setNotes(rs.getString("expression_value_notes"));
-        recV.setGeneExpressionRecordId(rs.getInt("gene_expression_exp_record_id"));
-        recV.setExpressionValue(rs.getDouble("expression_value"));
-        recV.setExpressionUnit(rs.getString("expression_unit"));
-        recV.setMapKey(rs.getInt("map_key"));
-        recV.setExpressionLevel(rs.getString("expression_level"));
 
+        try{
+            recV.setId(rs.getInt("gene_expression_value_id"));
+        }catch (Exception ignored){}
+        try{
+        recV.setExpressedGeneSymbol(rs.getString("gene_symbol"));
+    }catch (Exception ignored){}
+  try{
+        recV.setExpressedObjectRgdId(rs.getInt("expressed_object_rgd_id"));
+}catch (Exception ignored){}
+  try{
+        }catch (Exception ignored){}
+        try{
+        recV.setExpressionMeasurementAccId(rs.getString("expression_measurement_ont_id"));
+        }catch (Exception ignored){}
+        try{
+        recV.setNotes(rs.getString("expression_value_notes"));
+        }catch (Exception ignored){}
+        try{
+        recV.setGeneExpressionRecordId(rs.getInt("gene_expression_exp_record_id"));
+        }catch (Exception ignored){}
+        try{
+        recV.setExpressionValue(rs.getDouble("expression_value"));
+        }catch (Exception ignored){}
+        try{
+        recV.setExpressionUnit(rs.getString("expression_unit"));
+        }catch (Exception ignored){}
+        try{
+        recV.setMapKey(rs.getInt("map_key"));
+        }catch (Exception ignored){}
+        try{
+        recV.setExpressionLevel(rs.getString("expression_level"));
+        }catch (Exception ignored){}
+
+        try{
         recV.setTpmValue(rs.getDouble("tpm_value"));
-        if( rs.wasNull() ) {
-            recV.setTpmValue(null);
-        }
+        }catch (Exception ignored){}
+        try{
+            if( rs.wasNull() ) {
+                recV.setTpmValue(null);
+            }
+        }catch (Exception ignored){}
+        try{
         ge.setGeneExpressionRecordValue(recV);
+        }catch (Exception ignored){}
 
         Sample s = new Sample();
         s.setId(rs.getInt("sample_id"));
@@ -75,21 +114,16 @@ public class GeneExpressionQuery extends MappingSqlQuery {
         try{
             s.setTissueTerm(rs.getString("tissue_term"));
         }catch (Exception ignored){}
-        try{
-            s.setTraitTerm(rs.getString("trait_term"));
-        }catch (Exception ignored){}
-        try{
-            s.setMeasurementTerm(rs.getString("measurement"));
-        }catch (Exception ignored){}
-        try{
-            s.setExperimentCondition(rs.getString("condition"));
-        }catch (Exception ignored){}
+
 
         s.setComputedSex(rs.getString("COMPUTED_SEX"));
         ge.setSample(s);
-
-        ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
-        ge.setStudyId(rs.getInt("STUDY_ID"));
+        try {
+            ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
+        }catch (Exception ignored){}
+        try {
+            ge.setStudyId(rs.getInt("STUDY_ID"));
+        }catch (Exception ignored){}
         try {
             ge.setGeoSeriesAcc(rs.getString("GEO_SERIES_ACC"));
         }catch (Exception ignored){}

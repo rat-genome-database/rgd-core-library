@@ -141,6 +141,51 @@ public class SolrDocsDAO extends AbstractDAO {
 
         return pmids.size()>0;
     }
+
+    /**
+     * Batch check for existing PMIDs in the database
+     * @param pmids List of PMIDs to check
+     * @return Set of PMIDs that exist in the database
+     * @throws Exception if database error occurs
+     */
+    public Set<String> getExistingPmids(List<String> pmids) throws Exception {
+        if (pmids == null || pmids.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        // Remove nulls and filter only valid pmids
+        List<String> validPmids = pmids.stream()
+                .filter(Objects::nonNull)
+                .filter(p -> !p.trim().isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (validPmids.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<String> existingPmids = new HashSet<>();
+
+        // Process in chunks of 1000 to avoid SQL query size limits
+        int chunkSize = 1000;
+        for (int i = 0; i < validPmids.size(); i += chunkSize) {
+            int endIndex = Math.min(i + chunkSize, validPmids.size());
+            List<String> chunk = validPmids.subList(i, endIndex);
+
+            // Build SQL with IN clause
+            String placeholders = chunk.stream()
+                    .map(p -> "?")
+                    .collect(Collectors.joining(","));
+            String sql = "SELECT pmid FROM solr_docs WHERE pmid IN (" + placeholders + ")";
+
+            StringListQuery query = new StringListQuery(this.getPostgressDataSource(), sql);
+            List<String> foundPmids = execute(query, chunk.toArray());
+
+            existingPmids.addAll(foundPmids);
+        }
+
+        return existingPmids;
+    }
     public int insert(SolrDoc solrDoc) throws Exception {
 
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
