@@ -1,8 +1,11 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.impl.variants.VariantDAO;
 import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.datamodel.variants.VariantMapData;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.*;
 
@@ -26,6 +29,7 @@ public class AssociationDAO extends AbstractDAO {
     QTLDAO qtlDAO = null;
     SSLPDAO sslpDAO = null;
     StrainDAO strainDAO = null;
+    VariantDAO vdao = null;
     ReferenceDAO refDAO = null;
 
     // lazy creation of DAO objects
@@ -51,6 +55,12 @@ public class AssociationDAO extends AbstractDAO {
         if( strainDAO==null )
             strainDAO = new StrainDAO();
         return strainDAO;
+    }
+
+    public VariantDAO getVariantDAO() {
+        if (vdao == null)
+            vdao = new VariantDAO();
+        return vdao;
     }
 
     public ReferenceDAO getReferenceDAO() {
@@ -155,6 +165,9 @@ public class AssociationDAO extends AbstractDAO {
                 }else if (objectKey==RgdId.OBJECT_KEY_STRAINS) {
                     acc.add(getStrainDAO().getStrain(rgdId));
                 }
+                else if (objectKey==RgdId.OBJECT_KEY_VARIANTS){
+                    acc.add(getVariantDAO().getVariant(rgdId));
+                }
                 else {
                     acc.add(rgdId);
                 }
@@ -203,6 +216,9 @@ public class AssociationDAO extends AbstractDAO {
                     acc.add(getSslpDAO().getSSLP(rgdId));
                 }else if (objectKey==RgdId.OBJECT_KEY_STRAINS) {
                     acc.add(getStrainDAO().getStrain(rgdId));
+                }
+                else if (objectKey==RgdId.OBJECT_KEY_VARIANTS){
+                    acc.add(getVariantDAO().getVariant(rgdId));
                 }
                 else {
                     acc.add(rgdId);
@@ -267,6 +283,40 @@ public class AssociationDAO extends AbstractDAO {
                 "ORDER BY a.region_name,a.marker_type";
 
         return getStrain2ObjectAssociations(strainRgdId, query);
+    }
+
+    public List<Strain2MarkerAssociation> getStrain2VariantAssociations(int strainRgdId) throws Exception{
+        List<Strain2MarkerAssociation> assocs = new ArrayList<>();
+        VariantDAO vdao = new VariantDAO();
+        try (Connection con = this.getConnection()){
+            String query = "select rs.* from rgd_strains_rgd rs, rgd_ids r where strain_key=(select strain_key from strains where rgd_id=?) and r.rgd_id=rs.rgd_id and r.object_key=?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setInt(1, strainRgdId);
+            ps.setInt(2, RgdId.OBJECT_KEY_VARIANTS);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()){
+                Strain2MarkerAssociation assoc = new Strain2MarkerAssociation();
+                assoc.setDetailRgdId(rs.getInt("RGD_ID"));
+                assoc.setAssocType(rs.getString("MARKER_TYPE"));
+                assoc.setAssocSubType(rs.getString("REGION_NAME"));
+                assoc.setAssocKey(rs.getInt("STRAIN_KEY"));
+                assoc.setMasterRgdId(strainRgdId);
+                assocs.add(assoc);
+            }
+        }
+        catch (Exception e){
+
+        }
+
+        for (Strain2MarkerAssociation a : assocs){
+            VariantMapData vmd = vdao.getVariant(a.getDetailRgdId());
+            if (vmd!=null){
+                a.setSrcPipeline(vmd.getRsId());
+            }
+        }
+
+        return assocs;
     }
 
     private List<Strain2MarkerAssociation> getStrain2ObjectAssociations(int strainRgdId, String query) throws Exception{
