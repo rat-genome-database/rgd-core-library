@@ -207,7 +207,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public VariantMapData getVariant(int rgdId,int mapKey) throws Exception{
-        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=? and vm.map_key=?";
+        String sql = "SELECT * FROM variant v inner join variant_map_data vmd on v.rgd_id=vmd.rgd_id where v.rgd_id=? and vmd.map_key=?";
         VariantMapQuery q = new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
