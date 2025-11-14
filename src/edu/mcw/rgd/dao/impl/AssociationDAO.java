@@ -289,6 +289,7 @@ public class AssociationDAO extends AbstractDAO {
         List<Strain2MarkerAssociation> assocs = new ArrayList<>();
         VariantDAO vdao = new VariantDAO();
         try (Connection con = this.getConnection()){
+            List<Strain2MarkerAssociation> tmp = new ArrayList<>();
             String query = "select rs.* from rgd_strains_rgd rs, rgd_ids r where strain_key=(select strain_key from strains where rgd_id=?) and r.rgd_id=rs.rgd_id and r.object_key=?";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setInt(1, strainRgdId);
@@ -302,18 +303,19 @@ public class AssociationDAO extends AbstractDAO {
                 assoc.setAssocSubType(rs.getString("REGION_NAME"));
                 assoc.setAssocKey(rs.getInt("STRAIN_KEY"));
                 assoc.setMasterRgdId(strainRgdId);
-                assocs.add(assoc);
+                tmp.add(assoc);
+            }
+
+            for (Strain2MarkerAssociation a : tmp){
+                VariantMapData vmd = vdao.getVariant(a.getDetailRgdId());
+                if (vmd!=null){
+                    a.setSrcPipeline(vmd.getRsId());
+                    assocs.add(a);
+                }
             }
         }
         catch (Exception e){
-
-        }
-
-        for (Strain2MarkerAssociation a : assocs){
-            VariantMapData vmd = vdao.getVariant(a.getDetailRgdId());
-            if (vmd!=null){
-                a.setSrcPipeline(vmd.getRsId());
-            }
+            e.printStackTrace();
         }
 
         return assocs;
