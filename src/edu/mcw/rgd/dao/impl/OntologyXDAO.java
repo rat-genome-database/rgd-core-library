@@ -321,7 +321,11 @@ public class OntologyXDAO extends AbstractDAO {
             "  START WITH child_term_acc=? \n"+
             "  CONNECT BY PRIOR parent_term_acc=child_term_acc \n"+
             ")d, ont_synonyms s \n"+
-            " WHERE child_term_acc=term_acc AND synonym_type IN("+Utils.buildInPhraseQuoted(synonymTypes)+")";
+            " WHERE child_term_acc=term_acc AND synonym_type IN(";
+         //       +Utils.buildInPhraseQuoted(synonymTypes)
+        String accVal= synonymTypes.stream().map(t -> "'" + t + "'").collect(Collectors.joining(", "));
+        query+=accVal;
+                        query+=")";
 
         TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), query);
         return execute(q, termAcc);
@@ -534,8 +538,11 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql = "select distinct d.child_term_acc,d.parent_term_acc,d.ont_rel_id,t.term parent_term_name from (\n" +
                 "select d.* from ont_dag d\n" +
-                "start with parent_term_acc in ("+Utils.buildInPhraseQuoted(termAccList)+
-                ") connect by prior child_term_acc=parent_term_acc\n" +
+                "start with parent_term_acc in (";
+      //  +Utils.buildInPhraseQuoted(termAccList)+
+                String accVal= termAccList.stream().map(t -> "'" + t + "'").collect(Collectors.joining(", "));
+               sql+=accVal;
+                sql+= ") connect by prior child_term_acc=parent_term_acc\n" +
                 ")d, ont_terms t where child_term_acc=term_acc";
         TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(), sql);
         return execute(q);
