@@ -11,6 +11,16 @@ public class GeneExpression {
     private Integer refRgdId;
     private Integer studyId;
     private String geoSeriesAcc;
+    private String studySource;
+    public String getStudySource() {
+        return studySource;
+    }
+
+    public void setStudySource(String studySource) {
+        this.studySource = studySource;
+    }
+
+
 
     public String getGeoSeriesAcc() {
         return geoSeriesAcc;
