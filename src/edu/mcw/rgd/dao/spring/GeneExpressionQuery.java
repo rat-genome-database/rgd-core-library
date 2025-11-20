@@ -125,6 +125,9 @@ public class GeneExpressionQuery extends MappingSqlQuery {
             ge.setStudyId(rs.getInt("STUDY_ID"));
         }catch (Exception ignored){}
         try {
+            ge.setStudySource(rs.getString("STUDY_SOURCE"));
+        }catch (Exception ignored){}
+        try {
             ge.setGeoSeriesAcc(rs.getString("GEO_SERIES_ACC"));
         }catch (Exception ignored){}
         return ge;
