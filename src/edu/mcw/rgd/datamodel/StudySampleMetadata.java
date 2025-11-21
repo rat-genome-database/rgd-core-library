@@ -3,6 +3,7 @@ package edu.mcw.rgd.datamodel;
 public class StudySampleMetadata {
 
     private String geoSampleAcc;
+    private Integer experimentId;
     private Integer ordinality;
     private String tissue;
     private String strain;
@@ -27,6 +28,14 @@ public class StudySampleMetadata {
 
     public void setGeoSampleAcc(String geoSampleAcc) {
         this.geoSampleAcc = geoSampleAcc;
+    }
+
+    public Integer getExperimentId() {
+        return experimentId;
+    }
+
+    public void setExperimentId(Integer experimentId) {
+        this.experimentId = experimentId;
     }
 
     public Integer getOrdinality() {
