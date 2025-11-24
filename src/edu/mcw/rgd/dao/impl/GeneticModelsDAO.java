@@ -51,7 +51,7 @@ public class GeneticModelsDAO extends AbstractDAO {
     public List<GeneticModel> getAllModels() throws Exception{
         String sql="SELECT gg.rgd_id as gene_rgd_id,gg.full_name, gg.gene_symbol, ga.rgd_id as allele_rgd_id, "+
                 "ga.gene_symbol as allele_symbol, s.rgd_id as strain_rgd_id, s.strain_symbol, s.source,s.origination, "+
-                "s.modification_method, s.background_strain_rgd_id "+
+                "s.modification_method, s.background_strain_rgd_id, s.strain_type_name_lc "+
                 "FROM rgd_strains_rgd rs "+
                 "JOIN rgd_ids r on r.rgd_id=rs.rgd_id "+
                 "JOIN strains s on s.strain_key=rs.strain_key "+
@@ -60,7 +60,7 @@ public class GeneticModelsDAO extends AbstractDAO {
                 "JOIN genes_variations gv on gv.variation_key=ga.gene_key "+
                 "JOIN genes gg on gg.gene_key=gv.gene_key "+
                 "WHERE gv.gene_variation_type=\'allele\'"+
-                " AND ( s.strain_type_name_lc='mutant' )" +
+                " AND ( s.strain_type_name_lc in ('transgenic', 'mutant' ))" +
                 " AND r.object_status='ACTIVE' AND r2.object_status='ACTIVE' "+
                 "ORDER BY s.origination desc ";
         GeneticModelQuery q= new GeneticModelQuery(this.getDataSource(), sql);

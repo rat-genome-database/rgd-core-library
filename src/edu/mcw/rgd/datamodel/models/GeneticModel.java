@@ -32,6 +32,23 @@ public class GeneticModel   {
     private String lastStatus;
 
     private String origination;
+    private String strainType;
+
+    public String getStrainType() {
+        return strainType;
+    }
+
+    public void setStrainType(String strainType) {
+        this.strainType = strainType;
+    }
+
+    public static Comparator<GeneticModel> getGeneSymbolComparator() {
+        return GeneSymbolComparator;
+    }
+
+    public static void setGeneSymbolComparator(Comparator<GeneticModel> geneSymbolComparator) {
+        GeneSymbolComparator = geneSymbolComparator;
+    }
 
     public String getLastStatus() {
         return lastStatus;

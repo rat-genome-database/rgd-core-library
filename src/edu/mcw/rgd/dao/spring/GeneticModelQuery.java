@@ -38,6 +38,9 @@ public class GeneticModelQuery extends MappingSqlQuery {
         } catch (Exception e) {
            // e.printStackTrace();
         }
+        try{
+            strain.setStrainType(rs.getString("strain_type_name_lc"));
+        }catch (Exception ignored){}
         return strain;
     }
     public String getBackgroundStrainSymbol(int backgroundStrainRgdId) throws Exception {
