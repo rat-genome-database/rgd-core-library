@@ -20,6 +20,10 @@ public class StudySampleMetadataQuery extends MappingSqlQuery {
         StudySampleMetadata metadata = new StudySampleMetadata();
         // Sample fields
         metadata.setGeoSampleAcc(rs.getString("GEO_SAMPLE_ACC"));
+        metadata.setExperimentId(rs.getInt("EXPERIMENT_ID"));
+        if (rs.wasNull()) {
+            metadata.setExperimentId(null);
+        }
         metadata.setOrdinality(rs.getInt("EXP_COND_ORDINALITY"));
         if (rs.wasNull()) {
             metadata.setOrdinality(null);

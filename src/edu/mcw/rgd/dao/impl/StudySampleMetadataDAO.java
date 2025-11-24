@@ -12,6 +12,7 @@ public class StudySampleMetadataDAO extends AbstractDAO {
         String sql= """
                 SELECT\s
                     s.GEO_SAMPLE_ACC,
+                    e.EXPERIMENT_ID,
                     ec.EXP_COND_ORDINALITY,
                     tissue_terms.TERM as Tissue,
                     strain_terms.TERM as Strain,
