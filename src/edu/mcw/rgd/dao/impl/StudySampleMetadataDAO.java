@@ -42,6 +42,7 @@ public class StudySampleMetadataDAO extends AbstractDAO {
                 LEFT JOIN ONT_TERMS cell_type_terms ON s.CELL_TYPE_ONT_ID = cell_type_terms.TERM_ACC
                 WHERE st.STUDY_ID = ?
                   AND (rs.CURATION_STATUS IS NULL OR rs.CURATION_STATUS != 'futureCuration')
+                  AND ger.CURATION_STATUS=35
                   AND st.geo_series_acc=rs.geo_accession_id
                 ORDER BY s.GEO_SAMPLE_ACC, ec.EXP_COND_ORDINALITY ASC
                 """;
