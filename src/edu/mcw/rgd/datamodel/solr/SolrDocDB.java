@@ -4,79 +4,496 @@ package edu.mcw.rgd.datamodel.solr;
 import java.sql.Date;
 
 public class SolrDocDB {
+    String	geneCount;
+    String	mpId;
+    String	doiS;
+    String	chebiPos;
+    String	vtId;
+    String	bpTerm;
+    String	chebiTerm;
+    Date	pDate;
+    String	xcoTerm;
+    String	chebiCount;
+    String	rsTerm;
+    String	mpTerm;
+    String	rdoId;
+    String	nboPos;
+    String	gene;
+    String	rsId;
+    String	soTerm;
+    String	mpCount;
+    String	vtCount;
+    String	bpId;
+    String	rgdObjCount;
+    String	vtPos;
+    String	pType;
+    String	nboCount;
+    String	xcoId;
+    int	pYear;
+    String	xcoCount;
+    String	rdoCount;
+    String	title;
+    String	nboTerm;
+    String	vtTerm;
+    String	hpPos;
+    String	nboId;
+    String	soCount;
+    String	hpTerm;
+    String	soId;
+    String	rgdObjPos;
+    String	xcoPos;
+    String	rsPos;
+    String	hpId;
+    String	rdoPos;
+    String	rsCount;
+    String	rgdObjTerm;
+    String	pmid;
+    String	bpCount;
+    String	mpPos;
+    String	hpCount;
+    String	xdbId;
+    String	rgdObjId;
+    String	bpPos;
+    String	genePos;
+    String	soPos;
+    String	rdoTerm;
+    String	chebiId;
+    String	solrDocId;
+    String	_abstract;
+    String	authors;
+    String	lastUpdateDate;
+    String	jDates;
+    String	citation;
+    String	meshTerms;
+    String	keywords;
+    String	chemicals;
+    String	affiliation;
+    String	issn;
+    String	organismCommonName;
+    String	organismTerm;
+    String	organismNcbiId;
+    String	organismCount;
+    String	organismPos;
+    String	pmcId;
+    String	ccCount;
+    String	ccId;
+    String	ccTerm;
+    String	ccPos;
+    String	mfCount;
+    String	mfId;
+    String	mfPos;
+    String	mfTerm;
+    String	mtId;
+    String	mtTerm;
+    String	mtPos;
+    String	mtCount;
+    String	pSource;
+    String	zfaId;
+    String	zfaTerm;
+    String	zfaCount;
+    String	zfaPos;
+    String	maId;
+    String	maCount;
+    String	maPos;
+    String	maTerm;
+    String	mmoId;
+    String	mmoCount;
+    String	mmoPos;
+    String	mmoTerm;
+    String	pwId;
+    String	pwCount;
+    String	pwPos;
+    String	pwTerm;
+    String	cmoId;
+    String	cmoCount;
+    String	cmoPos;
+    String	cmoTerm;
+    String	uberonId;
+    String	uberonCount;
+    String	uberonPos;
+    String	uberonTerm;
+    String	clId;
+    String	clCount;
+    String	clPos;
+    String	clTerm;
+    String	efoId;
+    String	efoCount;
+    String	efoTerm;
+    String	efoPos;
 
 
-    private String geneCount ;
-    private String mpId ;
-    private String doiS ;
-    private String chebiPos ;
-    private String vtId ;
-    private String bpTerm ;
-    private String chebiTerm ;
-    private Date pDate ;
-    private String xcoTerm ;
-    private String chebiCount ;
-    private String rsTerm ;
-    private String mpTerm ;
-    private String rdoId ;
-    private String nboPos ;
-    private String gene ;
-    private String rsId ;
-    private String soTerm ;
-    private String mpCount ;
-    private String vtCount ;
-    private String bpId ;
-    private String rgdObjCount ;
-    private String vtPos ;
-    private String pType ;
-    private String nboCount ;
-    private String xcoId ;
-    private Integer pYear ;
-    private String authors ;
-    private String xcoCount ;
-    private String rdoCount ;
-    private String title ;
-    private String nboTerm ;
-    private String vtTerm ;
-    private String hpPos ;
-    private String nboId ;
-    private String soCount ;
-    private String hpTerm ;
-    private String soId ;
-    private String rgdObjPos ;
-    private String xcoPos ;
-    private String rsPos ;
-    private String hpId ;
-    private String rdoPos ;
-    private String rsCount ;
-    private String rgdObjTerm ;
-    private String _abstract ;
-    private String pmid ;
-    private String bpCount ;
-    private String mpPos ;
-    private String hpCount ;
-    private String xdbId ;
-    private String rgdObjId ;
-    private String bpPos ;
-    private String genePos ;
-    private String soPos ;
-    private String rdoTerm ;
-    private String chebiId ;
 
-    private String jDates;
-    private String citation;
-    private String meshTerms;
-    private String keywords;
-    private String chemicals;
-    private String affiliation;
-    private String issn;
-    private String organismCommonName;
-    private String organismTerm;
-    private String organismNcbiId;
-    private String organismPos;
-    private String organismCount;
-    private String pmcId;
-    private String lastUpdateDate;
+    public String getSolrDocId() {
+        return solrDocId;
+    }
+
+    public void setSolrDocId(String solrDocId) {
+        this.solrDocId = solrDocId;
+    }
+
+    public void setpYear(int pYear) {
+        this.pYear = pYear;
+    }
+
+    public String getCcCount() {
+        return ccCount;
+    }
+
+    public void setCcCount(String ccCount) {
+        this.ccCount = ccCount;
+    }
+
+    public String getCcId() {
+        return ccId;
+    }
+
+    public void setCcId(String ccId) {
+        this.ccId = ccId;
+    }
+
+    public String getCcTerm() {
+        return ccTerm;
+    }
+
+    public void setCcTerm(String ccTerm) {
+        this.ccTerm = ccTerm;
+    }
+
+    public String getCcPos() {
+        return ccPos;
+    }
+
+    public void setCcPos(String ccPos) {
+        this.ccPos = ccPos;
+    }
+
+    public String getMfCount() {
+        return mfCount;
+    }
+
+    public void setMfCount(String mfCount) {
+        this.mfCount = mfCount;
+    }
+
+    public String getMfId() {
+        return mfId;
+    }
+
+    public void setMfId(String mfId) {
+        this.mfId = mfId;
+    }
+
+    public String getMfPos() {
+        return mfPos;
+    }
+
+    public void setMfPos(String mfPos) {
+        this.mfPos = mfPos;
+    }
+
+    public String getMfTerm() {
+        return mfTerm;
+    }
+
+    public void setMfTerm(String mfTerm) {
+        this.mfTerm = mfTerm;
+    }
+
+    public String getMtId() {
+        return mtId;
+    }
+
+    public void setMtId(String mtId) {
+        this.mtId = mtId;
+    }
+
+    public String getMtTerm() {
+        return mtTerm;
+    }
+
+    public void setMtTerm(String mtTerm) {
+        this.mtTerm = mtTerm;
+    }
+
+    public String getMtPos() {
+        return mtPos;
+    }
+
+    public void setMtPos(String mtPos) {
+        this.mtPos = mtPos;
+    }
+
+    public String getMtCount() {
+        return mtCount;
+    }
+
+    public void setMtCount(String mtCount) {
+        this.mtCount = mtCount;
+    }
+
+    public String getpSource() {
+        return pSource;
+    }
+
+    public void setpSource(String pSource) {
+        this.pSource = pSource;
+    }
+
+    public String getZfaId() {
+        return zfaId;
+    }
+
+    public void setZfaId(String zfaId) {
+        this.zfaId = zfaId;
+    }
+
+    public String getZfaTerm() {
+        return zfaTerm;
+    }
+
+    public void setZfaTerm(String zfaTerm) {
+        this.zfaTerm = zfaTerm;
+    }
+
+    public String getZfaCount() {
+        return zfaCount;
+    }
+
+    public void setZfaCount(String zfaCount) {
+        this.zfaCount = zfaCount;
+    }
+
+    public String getZfaPos() {
+        return zfaPos;
+    }
+
+    public void setZfaPos(String zfaPos) {
+        this.zfaPos = zfaPos;
+    }
+
+    public String getMaId() {
+        return maId;
+    }
+
+    public void setMaId(String maId) {
+        this.maId = maId;
+    }
+
+    public String getMaCount() {
+        return maCount;
+    }
+
+    public void setMaCount(String maCount) {
+        this.maCount = maCount;
+    }
+
+    public String getMaPos() {
+        return maPos;
+    }
+
+    public void setMaPos(String maPos) {
+        this.maPos = maPos;
+    }
+
+    public String getMaTerm() {
+        return maTerm;
+    }
+
+    public void setMaTerm(String maTerm) {
+        this.maTerm = maTerm;
+    }
+
+    public String getMmoId() {
+        return mmoId;
+    }
+
+    public void setMmoId(String mmoId) {
+        this.mmoId = mmoId;
+    }
+
+    public String getMmoCount() {
+        return mmoCount;
+    }
+
+    public void setMmoCount(String mmoCount) {
+        this.mmoCount = mmoCount;
+    }
+
+    public String getMmoPos() {
+        return mmoPos;
+    }
+
+    public void setMmoPos(String mmoPos) {
+        this.mmoPos = mmoPos;
+    }
+
+    public String getMmoTerm() {
+        return mmoTerm;
+    }
+
+    public void setMmoTerm(String mmoTerm) {
+        this.mmoTerm = mmoTerm;
+    }
+
+    public String getPwId() {
+        return pwId;
+    }
+
+    public void setPwId(String pwId) {
+        this.pwId = pwId;
+    }
+
+    public String getPwCount() {
+        return pwCount;
+    }
+
+    public void setPwCount(String pwCount) {
+        this.pwCount = pwCount;
+    }
+
+    public String getPwPos() {
+        return pwPos;
+    }
+
+    public void setPwPos(String pwPos) {
+        this.pwPos = pwPos;
+    }
+
+    public String getPwTerm() {
+        return pwTerm;
+    }
+
+    public void setPwTerm(String pwTerm) {
+        this.pwTerm = pwTerm;
+    }
+
+    public String getCmoId() {
+        return cmoId;
+    }
+
+    public void setCmoId(String cmoId) {
+        this.cmoId = cmoId;
+    }
+
+    public String getCmoCount() {
+        return cmoCount;
+    }
+
+    public void setCmoCount(String cmoCount) {
+        this.cmoCount = cmoCount;
+    }
+
+    public String getCmoPos() {
+        return cmoPos;
+    }
+
+    public void setCmoPos(String cmoPos) {
+        this.cmoPos = cmoPos;
+    }
+
+    public String getCmoTerm() {
+        return cmoTerm;
+    }
+
+    public void setCmoTerm(String cmoTerm) {
+        this.cmoTerm = cmoTerm;
+    }
+
+    public String getUberonId() {
+        return uberonId;
+    }
+
+    public void setUberonId(String uberonId) {
+        this.uberonId = uberonId;
+    }
+
+    public String getUberonCount() {
+        return uberonCount;
+    }
+
+    public void setUberonCount(String uberonCount) {
+        this.uberonCount = uberonCount;
+    }
+
+    public String getUberonPos() {
+        return uberonPos;
+    }
+
+    public void setUberonPos(String uberonPos) {
+        this.uberonPos = uberonPos;
+    }
+
+    public String getUberonTerm() {
+        return uberonTerm;
+    }
+
+    public void setUberonTerm(String uberonTerm) {
+        this.uberonTerm = uberonTerm;
+    }
+
+    public String getClId() {
+        return clId;
+    }
+
+    public void setClId(String clId) {
+        this.clId = clId;
+    }
+
+    public String getClCount() {
+        return clCount;
+    }
+
+    public void setClCount(String clCount) {
+        this.clCount = clCount;
+    }
+
+    public String getClPos() {
+        return clPos;
+    }
+
+    public void setClPos(String clPos) {
+        this.clPos = clPos;
+    }
+
+    public String getClTerm() {
+        return clTerm;
+    }
+
+    public void setClTerm(String clTerm) {
+        this.clTerm = clTerm;
+    }
+
+    public String getEfoId() {
+        return efoId;
+    }
+
+    public void setEfoId(String efoId) {
+        this.efoId = efoId;
+    }
+
+    public String getEfoCount() {
+        return efoCount;
+    }
+
+    public void setEfoCount(String efoCount) {
+        this.efoCount = efoCount;
+    }
+
+    public String getEfoTerm() {
+        return efoTerm;
+    }
+
+    public void setEfoTerm(String efoTerm) {
+        this.efoTerm = efoTerm;
+    }
+
+    public String getEfoPos() {
+        return efoPos;
+    }
+
+    public void setEfoPos(String efoPos) {
+        this.efoPos = efoPos;
+    }
 
     public String getLastUpdateDate() {
         return lastUpdateDate;

@@ -13,20 +13,6 @@ import javax.annotation.processing.Generated;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "j_date_s",
-        "citation",
-        "mesh_terms",
-        "keywords",
-        "chemicals",
-        "affiliation",
-        "issn",
-        "organism_common_name",
-        "organism_term",
-        "organism_ncbi_id",
-        "organism_count",
-        "organism_pos",
-        "pmc_id",
-        /*******************************/
         "gene_count",
         "mp_id",
         "doi_s",
@@ -53,7 +39,6 @@ import javax.annotation.processing.Generated;
         "nbo_count",
         "xco_id",
         "p_year",
-        "authors",
         "xco_count",
         "rdo_count",
         "title",
@@ -71,7 +56,6 @@ import javax.annotation.processing.Generated;
         "rdo_pos",
         "rs_count",
         "rgd_obj_term",
-        "abstract",
         "pmid",
         "bp_count",
         "mp_pos",
@@ -82,7 +66,69 @@ import javax.annotation.processing.Generated;
         "gene_pos",
         "so_pos",
         "rdo_term",
-        "chebi_id"
+        "chebi_id",
+        "solr_doc_id",
+        "abstract",
+        "authors",
+        "last_update_date",
+        "j_date_s",
+        "citation",
+        "mesh_terms",
+        "keywords",
+        "chemicals",
+        "affiliation",
+        "issn",
+        "organism_common_name",
+        "organism_term",
+        "organism_ncbi_id",
+        "organism_count",
+        "organism_pos",
+        "pmc_id",
+        "cc_count",
+        "cc_id",
+        "cc_term",
+        "cc_pos",
+        "mf_count",
+        "mf_id",
+        "mf_pos",
+        "mf_term",
+        "mt_id",
+        "mt_term",
+        "mt_pos",
+        "mt_count",
+        "p_source",
+        "zfa_id",
+        "zfa_term",
+        "zfa_count",
+        "zfa_pos",
+        "ma_id",
+        "ma_count",
+        "ma_pos",
+        "ma_term",
+        "mmo_id",
+        "mmo_count",
+        "mmo_pos",
+        "mmo_term",
+        "pw_id",
+        "pw_count",
+        "pw_pos",
+        "pw_term",
+        "cmo_id",
+        "cmo_count",
+        "cmo_pos",
+        "cmo_term",
+        "uberon_id",
+        "uberon_count",
+        "uberon_pos",
+        "uberon_term",
+        "cl_id",
+        "cl_count",
+        "cl_pos",
+        "cl_term",
+        "efo_id",
+        "efo_count",
+        "efo_term",
+        "efo_pos"
 })
 @Generated("jsonschema2pojo")
 public class SolrDoc {
@@ -226,6 +272,100 @@ public class SolrDoc {
 
     @JsonProperty("pmc_id")
     private List<String> pmc_id= new ArrayList<String>();
+
+    @JsonProperty("cc_count")
+    private List<String>	ccCount=new ArrayList<>();
+    @JsonProperty("cc_id")
+    private List<String>	ccId=new ArrayList<>();
+    @JsonProperty("cc_term")
+    private List<String>	ccTerm=new ArrayList<>();
+    @JsonProperty("cc_pos")
+    private List<String>	ccPos= new ArrayList<>();
+    @JsonProperty("mf_count")
+    private List<String>	mfCount;
+    @JsonProperty("mf_id")
+    private List<String>	mfId;
+    @JsonProperty("mf_pos")
+    private List<String>	mfPos;
+    @JsonProperty("mf_term")
+    private List<String>	mfTerm;
+    @JsonProperty("mt_id")
+    private List<String>	mtId;
+    @JsonProperty("mt_term")
+    private List<String>	mtTerm;
+    @JsonProperty("mt_pos")
+    private List<String>	mtPos;
+    @JsonProperty("mt_count")
+    private List<String>	mtCount;
+    @JsonProperty("p_source")
+    private List<String>	pSource;
+    @JsonProperty("zfa_id")
+    private List<String>	zfaId;
+    @JsonProperty("zfa_term")
+    private List<String>	zfaTerm;
+    @JsonProperty("zfa_count")
+    private List<String>	zfaCount;
+    @JsonProperty("zfa_pos")
+    private List<String>	zfaPos;
+    @JsonProperty("ma_id")
+    private List<String>	maId;
+    @JsonProperty("ma_count")
+    private List<String>	maCount;
+    @JsonProperty("ma_pos")
+    private List<String>	maPos;
+    @JsonProperty("ma_term")
+    private List<String>	maTerm;
+    @JsonProperty("mmo_id")
+    private List<String>	mmoId;
+    @JsonProperty("mmo_count")
+    private List<String>	mmoCount;
+    @JsonProperty("mmo_pos")
+    private List<String>	mmoPos;
+    @JsonProperty("mmo_term")
+    private List<String>	mmoTerm;
+    @JsonProperty("pw_id")
+    private List<String>	pwId;
+    @JsonProperty("pw_count")
+    private List<String>	pwCount;
+    @JsonProperty("pw_pos")
+    private List<String>	pwPos;
+    @JsonProperty("pw_term")
+    private List<String>	pwTerm;
+    @JsonProperty("cmo_id")
+    private List<String>	cmoId;
+    @JsonProperty("cmo_count")
+    private List<String>	cmoCount;
+    @JsonProperty("cmo_pos")
+    private List<String>	cmoPos;
+    @JsonProperty("cmo_term")
+    private List<String>	cmoTerm;
+    @JsonProperty("uberon_id")
+    private List<String>	uberonId;
+    @JsonProperty("uberon_count")
+    private List<String>	uberonCount;
+    @JsonProperty("uberon_pos")
+    private List<String>	uberonPos;
+    @JsonProperty("uberon_term")
+    private List<String>	uberonTerm;
+    @JsonProperty("cl_id")
+    private List<String>	clId;
+    @JsonProperty("cl_count")
+    private List<String>	clCount;
+    @JsonProperty("cl_pos")
+    private List<String>	clPos;
+    @JsonProperty("cl_term")
+    private List<String>	clTerm;
+    @JsonProperty("efo_id")
+    private List<String>	efoId;
+    @JsonProperty("efo_count")
+    private List<String>	efoCount;
+    @JsonProperty("efo_term")
+    private List<String>	efoTerm;
+    @JsonProperty("efo_pos")
+    private List<String>	efoPos;
+
+
+
     @JsonProperty("gene_count")
     public List<String> getGeneCount() {
         return geneCount;
@@ -1181,6 +1321,376 @@ public class SolrDoc {
     public void setOrganismPos(List<String> organismPos) {
         this.organismPos = organismPos;
     }
+
+    @JsonProperty("mf_count")
+    public List<String> getMfCount() {
+        return mfCount;
+    }
+    @JsonProperty("mf_count")
+    public void setMfCount(List<String> mfCount) {
+        this.mfCount = mfCount;
+    }
+
+    @JsonProperty("mf_id")
+    public List<String> getMfId() {
+        return mfId;
+    }
+    @JsonProperty("mf_id")
+    public void setMfId(List<String> mfId) {
+        this.mfId = mfId;
+    }
+
+    @JsonProperty("mf_pos")
+    public List<String> getMfPos() {
+        return mfPos;
+    }
+    @JsonProperty("mf_pos")
+    public void setMfPos(List<String> mfPos) {
+        this.mfPos = mfPos;
+    }
+
+    @JsonProperty("mf_term")
+    public List<String> getMfTerm() {
+        return mfTerm;
+    }
+    @JsonProperty("mf_term")
+    public void setMfTerm(List<String> mfTerm) {
+        this.mfTerm = mfTerm;
+    }
+
+    @JsonProperty("mt_id")
+    public List<String> getMtId() {
+        return mtId;
+    }
+    @JsonProperty("mt_id")
+    public void setMtId(List<String> mtId) {
+        this.mtId = mtId;
+    }
+
+    @JsonProperty("mt_term")
+    public List<String> getMtTerm() {
+        return mtTerm;
+    }
+    @JsonProperty("mt_term")
+    public void setMtTerm(List<String> mtTerm) {
+        this.mtTerm = mtTerm;
+    }
+
+    @JsonProperty("mt_pos")
+    public List<String> getMtPos() {
+        return mtPos;
+    }
+    @JsonProperty("mt_pos")
+    public void setMtPos(List<String> mtPos) {
+        this.mtPos = mtPos;
+    }
+
+    @JsonProperty("mt_count")
+    public List<String> getMtCount() {
+        return mtCount;
+    }
+    @JsonProperty("mt_count")
+    public void setMtCount(List<String> mtCount) {
+        this.mtCount = mtCount;
+    }
+
+    @JsonProperty("p_source")
+    public List<String> getpSource() {
+        return pSource;
+    }
+    @JsonProperty("p_source")
+    public void setpSource(List<String> pSource) {
+        this.pSource = pSource;
+    }
+
+    @JsonProperty("zfa_id")
+    public List<String> getZfaId() {
+        return zfaId;
+    }
+    @JsonProperty("zfa_id")
+    public void setZfaId(List<String> zfaId) {
+        this.zfaId = zfaId;
+    }
+
+    @JsonProperty("zfa_term")
+    public List<String> getZfaTerm() {
+        return zfaTerm;
+    }
+    @JsonProperty("zfa_term")
+    public void setZfaTerm(List<String> zfaTerm) {
+        this.zfaTerm = zfaTerm;
+    }
+
+    @JsonProperty("zfa_count")
+    public List<String> getZfaCount() {
+        return zfaCount;
+    }
+    @JsonProperty("zfa_count")
+    public void setZfaCount(List<String> zfaCount) {
+        this.zfaCount = zfaCount;
+    }
+
+    @JsonProperty("zfa_pos")
+    public List<String> getZfaPos() {
+        return zfaPos;
+    }
+    @JsonProperty("zfa_pos")
+    public void setZfaPos(List<String> zfaPos) {
+        this.zfaPos = zfaPos;
+    }
+
+    @JsonProperty("ma_id")
+    public List<String> getMaId() {
+        return maId;
+    }
+    @JsonProperty("ma_id")
+    public void setMaId(List<String> maId) {
+        this.maId = maId;
+    }
+
+    @JsonProperty("ma_count")
+    public List<String> getMaCount() {
+        return maCount;
+    }
+    @JsonProperty("ma_count")
+    public void setMaCount(List<String> maCount) {
+        this.maCount = maCount;
+    }
+
+    @JsonProperty("ma_pos")
+    public List<String> getMaPos() {
+        return maPos;
+    }
+    @JsonProperty("ma_pos")
+    public void setMaPos(List<String> maPos) {
+        this.maPos = maPos;
+    }
+
+    @JsonProperty("ma_term")
+    public List<String> getMaTerm() {
+        return maTerm;
+    }
+    @JsonProperty("ma_term")
+    public void setMaTerm(List<String> maTerm) {
+        this.maTerm = maTerm;
+    }
+
+    @JsonProperty("mmo_id")
+    public List<String> getMmoId() {
+        return mmoId;
+    }
+    @JsonProperty("mmo_id")
+    public void setMmoId(List<String> mmoId) {
+        this.mmoId = mmoId;
+    }
+
+    @JsonProperty("mmo_count")
+    public List<String> getMmoCount() {
+        return mmoCount;
+    }
+    @JsonProperty("mmo_count")
+    public void setMmoCount(List<String> mmoCount) {
+        this.mmoCount = mmoCount;
+    }
+
+    @JsonProperty("mmo_pos")
+    public List<String> getMmoPos() {
+        return mmoPos;
+    }
+    @JsonProperty("mmo_pos")
+    public void setMmoPos(List<String> mmoPos) {
+        this.mmoPos = mmoPos;
+    }
+
+    @JsonProperty("mmo_term")
+    public List<String> getMmoTerm() {
+        return mmoTerm;
+    }
+    @JsonProperty("mmo_term")
+    public void setMmoTerm(List<String> mmoTerm) {
+        this.mmoTerm = mmoTerm;
+    }
+
+    @JsonProperty("pw_id")
+    public List<String> getPwId() {
+        return pwId;
+    }
+    @JsonProperty("pw_id")
+    public void setPwId(List<String> pwId) {
+        this.pwId = pwId;
+    }
+
+    @JsonProperty("pw_count")
+    public List<String> getPwCount() {
+        return pwCount;
+    }
+    @JsonProperty("pw_count")
+    public void setPwCount(List<String> pwCount) {
+        this.pwCount = pwCount;
+    }
+
+    @JsonProperty("pw_pos")
+    public List<String> getPwPos() {
+        return pwPos;
+    }
+    @JsonProperty("pw_pos")
+    public void setPwPos(List<String> pwPos) {
+        this.pwPos = pwPos;
+    }
+
+    @JsonProperty("pw_term")
+    public List<String> getPwTerm() {
+        return pwTerm;
+    }
+    @JsonProperty("pw_term")
+    public void setPwTerm(List<String> pwTerm) {
+        this.pwTerm = pwTerm;
+    }
+
+    @JsonProperty("cmo_id")
+    public List<String> getCmoId() {
+        return cmoId;
+    }
+    @JsonProperty("cmo_id")
+    public void setCmoId(List<String> cmoId) {
+        this.cmoId = cmoId;
+    }
+
+    @JsonProperty("cmo_count")
+    public List<String> getCmoCount() {
+        return cmoCount;
+    }
+    @JsonProperty("cmo_count")
+    public void setCmoCount(List<String> cmoCount) {
+        this.cmoCount = cmoCount;
+    }
+
+    @JsonProperty("cmo_pos")
+    public List<String> getCmoPos() {
+        return cmoPos;
+    }
+    @JsonProperty("cmo_pos")
+    public void setCmoPos(List<String> cmoPos) {
+        this.cmoPos = cmoPos;
+    }
+
+    @JsonProperty("cmo_term")
+    public List<String> getCmoTerm() {
+        return cmoTerm;
+    }
+    @JsonProperty("cmo_term")
+    public void setCmoTerm(List<String> cmoTerm) {
+        this.cmoTerm = cmoTerm;
+    }
+
+    @JsonProperty("uberon_id")
+    public List<String> getUberonId() {
+        return uberonId;
+    }
+    @JsonProperty("uberon_id")
+    public void setUberonId(List<String> uberonId) {
+        this.uberonId = uberonId;
+    }
+
+    @JsonProperty("uberon_count")
+    public List<String> getUberonCount() {
+        return uberonCount;
+    }
+    @JsonProperty("uberon_count")
+    public void setUberonCount(List<String> uberonCount) {
+        this.uberonCount = uberonCount;
+    }
+
+    @JsonProperty("uberon_pos")
+    public List<String> getUberonPos() {
+        return uberonPos;
+    }
+    @JsonProperty("uberon_pos")
+    public void setUberonPos(List<String> uberonPos) {
+        this.uberonPos = uberonPos;
+    }
+
+    @JsonProperty("uberon_term")
+    public List<String> getUberonTerm() {
+        return uberonTerm;
+    }
+    @JsonProperty("uberon_term")
+    public void setUberonTerm(List<String> uberonTerm) {
+        this.uberonTerm = uberonTerm;
+    }
+
+    @JsonProperty("cl_id")
+    public List<String> getClId() {
+        return clId;
+    }
+    @JsonProperty("cl_id")
+    public void setClId(List<String> clId) {
+        this.clId = clId;
+    }
+
+    @JsonProperty("cl_count")
+    public List<String> getClCount() {
+        return clCount;
+    }
+    @JsonProperty("cl_count")
+    public void setClCount(List<String> clCount) {
+        this.clCount = clCount;
+    }
+
+    @JsonProperty("cl_pos")
+    public List<String> getClPos() {
+        return clPos;
+    }
+    @JsonProperty("cl_pos")
+    public void setClPos(List<String> clPos) {
+        this.clPos = clPos;
+    }
+
+    @JsonProperty("cl_term")
+    public List<String> getClTerm() {
+        return clTerm;
+    }
+    @JsonProperty("cl_term")
+    public void setClTerm(List<String> clTerm) {
+        this.clTerm = clTerm;
+    }
+
+    @JsonProperty("efo_id")
+    public List<String> getEfoId() {
+        return efoId;
+    }
+    @JsonProperty("efo_id")
+    public void setEfoId(List<String> efoId) {
+        this.efoId = efoId;
+    }
+
+    @JsonProperty("efo_count")
+    public List<String> getEfoCount() {
+        return efoCount;
+    }
+    @JsonProperty("efo_count")
+    public void setEfoCount(List<String> efoCount) {
+        this.efoCount = efoCount;
+    }
+
+    @JsonProperty("efo_term")
+    public List<String> getEfoTerm() {
+        return efoTerm;
+    }
+    @JsonProperty("efo_term")
+    public void setEfoTerm(List<String> efoTerm) {
+        this.efoTerm = efoTerm;
+    }
+
+    @JsonProperty("efo_pos")
+    public List<String> getEfoPos() {
+        return efoPos;
+    }
+    @JsonProperty("efo_pos")
+    public void setEfoPos(List<String> efoPos) {
+        this.efoPos = efoPos;
+    }
+
 //    @JsonAnyGetter
 //    public Map<String, Object> getAdditionalProperties() {
 //        return this.additionalProperties;

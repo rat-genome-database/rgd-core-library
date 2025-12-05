@@ -7,11 +7,9 @@ import edu.mcw.rgd.dao.AbstractDAO;
 
 import edu.mcw.rgd.dao.spring.SolrDocQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
-import edu.mcw.rgd.datamodel.solr.PubmedSolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDoc;
 import edu.mcw.rgd.datamodel.solr.SolrDocDB;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONObject;
 
 
 import java.sql.Connection;
@@ -27,96 +25,28 @@ public class SolrDocsDAO extends AbstractDAO {
     public int addBatch(List<SolrDoc> solrDocs) throws Exception {
         String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
         String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "NEXTVAL('SOLR_DOC_SEQ'), " +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?, NOW()" +
-                ")";
+                "NEXTVAL('SOLR_DOC_SEQ'), " ;
+        sql+=getSolrDocFields().stream().map(f->"?").collect(Collectors.joining(","));
+        sql+=", NOW())";
         try(Connection connection=this.getPostgressConnection();
             PreparedStatement preparedStatement=connection.prepareStatement(sql)){
             connection.setAutoCommit(false);
 
             for(SolrDoc solrDoc:solrDocs) {
                 SolrDocDB doc = buildSolrDocDB(solrDoc);
-                preparedStatement.setString(1, doc.getGeneCount());
-                preparedStatement.setString(2, doc.getMpId());
-                preparedStatement.setString(3, doc.getDoiS());
-                preparedStatement.setString(4, doc.getChebiPos());
-                preparedStatement.setString(5, doc.getVtId());
-                preparedStatement.setString(6, doc.getBpTerm());
-                preparedStatement.setString(7, doc.getChebiTerm());
-                preparedStatement.setDate(8, doc.getpDate());
-                preparedStatement.setString(9, doc.getXcoTerm());
-                preparedStatement.setString(10, doc.getChebiCount());
-                preparedStatement.setString(11, doc.getRsTerm());
-                preparedStatement.setString(12, doc.getMpTerm());
-                preparedStatement.setString(13, doc.getRdoId());
-                preparedStatement.setString(14, doc.getNboPos());
-                preparedStatement.setString(15, doc.getGene());
-                preparedStatement.setString(16, doc.getRsId());
-                preparedStatement.setString(17, doc.getSoTerm());
-                preparedStatement.setString(18, doc.getMpCount());
-                preparedStatement.setString(19, doc.getVtCount());
-                    preparedStatement.setString(20, doc.getBpId());
-                    preparedStatement.setString(21, doc.getRgdObjCount());
-                    preparedStatement.setString(22, doc.getVtPos());
-                    preparedStatement.setString(23, doc.getpType());
-                    preparedStatement.setString(24, doc.getNboCount());
-                    preparedStatement.setString(25, doc.getXcoId());
-                    preparedStatement.setInt(26, doc.getpYear());
-                    preparedStatement.setString(27, doc.getAuthors());
-                    preparedStatement.setString(28, doc.getXcoCount());
-                    preparedStatement.setString(29, doc.getRdoCount());
-                    preparedStatement.setString(30, doc.getTitle());
-                    preparedStatement.setString(31, doc.getNboTerm());
-                    preparedStatement.setString(32, doc.getVtTerm());
-                    preparedStatement.setString(33, doc.getHpPos());
-                    preparedStatement.setString(34, doc.getNboId());
-                    preparedStatement.setString(35, doc.getSoCount());
-                    preparedStatement.setString(36, doc.getHpTerm());
-                    preparedStatement.setString(37, doc.getSoId());
-                    preparedStatement.setString(38, doc.getRgdObjPos());
-                    preparedStatement.setString(39, doc.getXcoPos());
-                    preparedStatement.setString(40, doc.getRsPos());
-                    preparedStatement.setString(41, doc.getHpId());
-                    preparedStatement.setString(42, doc.getRdoPos());
-                    preparedStatement.setString(43, doc.getRsCount());
-                    preparedStatement.setString(44, doc.getRgdObjTerm());
-                    preparedStatement.setString(45, doc.get_abstract());
-                    preparedStatement.setString(46, doc.getPmid());
-                    preparedStatement.setString(47, doc.getBpCount());
-                    preparedStatement.setString(48, doc.getMpPos());
-                    preparedStatement.setString(49, doc.getHpCount());
-                    preparedStatement.setString(50, doc.getXdbId());
-                    preparedStatement.setString(51, doc.getRgdObjId());
-                    preparedStatement.setString(52, doc.getBpPos());
-
-                    preparedStatement.setString(53, doc.getGenePos());
-
-                    preparedStatement.setString(54, doc.getSoPos());
-                    preparedStatement.setString(55, doc.getRdoTerm());
-
-                    preparedStatement.setString(56, doc.getChebiId());
-                    //####################################################################
-                preparedStatement.setString(57,doc.getjDates());
-                preparedStatement.setString(58, doc.getCitation());
-                preparedStatement.setString(59,doc.getMeshTerms());
-                preparedStatement.setString(60,doc.getKeywords());
-                preparedStatement.setString(61,doc.getChemicals());
-                preparedStatement.setString(62, doc.getAffiliation());
-                preparedStatement.setString(63,doc.getIssn());
-                preparedStatement.setString(64,doc.getOrganismCommonName());
-                preparedStatement.setString(65,doc.getOrganismTerm());
-                preparedStatement.setString(66,doc.getOrganismNcbiId());
-                preparedStatement.setString(67,doc.getOrganismCount());
-                preparedStatement.setString(68,doc.getOrganismPos());
-                preparedStatement.setString(69,doc.getPmcId());
-
-                    preparedStatement.addBatch();
+                List<Object> params=docParams(doc);
+                for(int i=0;i<params.size();i++){
+                    Object value=params.get(i);
+                    int paramIndex=i+1;
+                    if(value instanceof java.sql.Date){
+                        preparedStatement.setDate(paramIndex, (java.sql.Date) value);
+                    }else if(value instanceof Integer){
+                        preparedStatement.setInt(paramIndex, (Integer) value);
+                    }else{
+                        preparedStatement.setString(paramIndex, value!=null? value.toString():null);
+                    }
+                }
+                 preparedStatement.addBatch();
 
             }
             int [] numUpdates=preparedStatement.executeBatch();
@@ -133,6 +63,176 @@ public class SolrDocsDAO extends AbstractDAO {
         }
 
         return 0;
+    }
+    public List<Object> docParams(SolrDocDB doc){
+        return Arrays.asList(
+                doc.getGeneCount(),
+                doc.getMpId(),
+                doc.getDoiS(),
+                doc.getChebiPos(),
+                doc.getVtId(),
+                doc.getBpTerm(),
+                doc.getChebiTerm(),
+                doc.getpDate(),          // java.sql.Date
+                doc.getXcoTerm(),
+                doc.getChebiCount(),
+                doc.getRsTerm(),
+                doc.getMpTerm(),
+                doc.getRdoId(),
+                doc.getNboPos(),
+                doc.getGene(),
+                doc.getRsId(),
+                doc.getSoTerm(),
+                doc.getMpCount(),
+                doc.getVtCount(),
+                doc.getBpId(),
+                doc.getRgdObjCount(),
+                doc.getVtPos(),
+                doc.getpType(),
+                doc.getNboCount(),
+                doc.getXcoId(),
+                doc.getpYear(),          // int
+                doc.getXcoCount(),
+                doc.getRdoCount(),
+                doc.getTitle(),
+                doc.getNboTerm(),
+                doc.getVtTerm(),
+                doc.getHpPos(),
+                doc.getNboId(),
+                doc.getSoCount(),
+                doc.getHpTerm(),
+                doc.getSoId(),
+                doc.getRgdObjPos(),
+                doc.getXcoPos(),
+                doc.getRsPos(),
+                doc.getHpId(),
+                doc.getRdoPos(),
+                doc.getRsCount(),
+                doc.getRgdObjTerm(),
+                doc.getPmid(),
+                doc.getBpCount(),
+                doc.getMpPos(),
+                doc.getHpCount(),
+                doc.getXdbId(),
+                doc.getRgdObjId(),
+                doc.getBpPos(),
+                doc.getGenePos(),
+                doc.getSoPos(),
+                doc.getRdoTerm(),
+                doc.getChebiId(),
+                doc.getSolrDocId(),
+                doc.get_abstract(),
+                doc.getAuthors(),
+                doc.getjDates(),
+                doc.getCitation(),
+                doc.getMeshTerms(),
+                doc.getKeywords(),
+                doc.getChemicals(),
+                doc.getAffiliation(),
+                doc.getIssn(),
+                doc.getOrganismCommonName(),
+                doc.getOrganismTerm(),
+                doc.getOrganismNcbiId(),
+                doc.getOrganismCount(),
+                doc.getOrganismPos(),
+                doc.getPmcId(),
+                doc.getCcCount(),
+                doc.getCcId(),
+                doc.getCcTerm(),
+                doc.getCcPos(),
+                doc.getMfCount(),
+                doc.getMfId(),
+                doc.getMfPos(),
+                doc.getMfTerm(),
+                doc.getMtId(),
+                doc.getMtTerm(),
+                doc.getMtPos(),
+                doc.getMtCount(),
+                doc.getpSource(),
+                doc.getZfaId(),
+                doc.getZfaTerm(),
+                doc.getZfaCount(),
+                doc.getZfaPos(),
+                doc.getMaId(),
+                doc.getMaCount(),
+                doc.getMaPos(),
+                doc.getMaTerm(),
+                doc.getMmoId(),
+                doc.getMmoCount(),
+                doc.getMmoPos(),
+                doc.getMmoTerm(),
+                doc.getPwId(),
+                doc.getPwCount(),
+                doc.getPwPos(),
+                doc.getPwTerm(),
+                doc.getCmoId(),
+                doc.getCmoCount(),
+                doc.getCmoPos(),
+                doc.getCmoTerm(),
+                doc.getUberonId(),
+                doc.getUberonCount(),
+                doc.getUberonPos(),
+                doc.getUberonTerm(),
+                doc.getClId(),
+                doc.getClCount(),
+                doc.getClPos(),
+                doc.getClTerm(),
+                doc.getEfoId(),
+                doc.getEfoCount(),
+                doc.getEfoTerm(),
+                doc.getEfoPos()
+
+        );
+    }
+    public List<Object> docMissingParams(SolrDocDB doc){
+        return Arrays.asList(
+
+                doc.getCcCount(),
+                doc.getCcId(),
+                doc.getCcTerm(),
+                doc.getCcPos(),
+                doc.getMfCount(),
+                doc.getMfId(),
+                doc.getMfPos(),
+                doc.getMfTerm(),
+                doc.getMtId(),
+                doc.getMtTerm(),
+                doc.getMtPos(),
+                doc.getMtCount(),
+                doc.getpSource(),
+                doc.getZfaId(),
+                doc.getZfaTerm(),
+                doc.getZfaCount(),
+                doc.getZfaPos(),
+                doc.getMaId(),
+                doc.getMaCount(),
+                doc.getMaPos(),
+                doc.getMaTerm(),
+                doc.getMmoId(),
+                doc.getMmoCount(),
+                doc.getMmoPos(),
+                doc.getMmoTerm(),
+                doc.getPwId(),
+                doc.getPwCount(),
+                doc.getPwPos(),
+                doc.getPwTerm(),
+                doc.getCmoId(),
+                doc.getCmoCount(),
+                doc.getCmoPos(),
+                doc.getCmoTerm(),
+                doc.getUberonId(),
+                doc.getUberonCount(),
+                doc.getUberonPos(),
+                doc.getUberonTerm(),
+                doc.getClId(),
+                doc.getClCount(),
+                doc.getClPos(),
+                doc.getClTerm(),
+                doc.getEfoId(),
+                doc.getEfoCount(),
+                doc.getEfoTerm(),
+                doc.getEfoPos()
+        );
     }
     public boolean exists(String pmid) throws Exception {
         String sql="select pmid from solr_docs where pmid=?";
@@ -186,39 +286,39 @@ public class SolrDocsDAO extends AbstractDAO {
 
         return existingPmids;
     }
-    public int insert(SolrDoc solrDoc) throws Exception {
-
-        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
-        SolrDocDB doc=buildSolrDocDB(solrDoc);
-        String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "NEXTVAL('SOLR_DOC_SEQ'), " +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
-                "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?, NOW()" +
-                ")";
-
-
-        return   updateSolrPostgress(sql,
-                doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
-                doc.getBpTerm()	, doc.getChebiTerm()	, doc.getpDate()	, doc.getXcoTerm()	, doc.getChebiCount()	,
-                doc.getRsTerm()	, doc.getMpTerm()	, doc.getRdoId()	, doc.getNboPos()	, doc.getGene()	,
-                doc.getRsId()	, doc.getSoTerm()	, doc.getMpCount()	, doc.getVtCount()	, doc.getBpId()	,
-                doc.getRgdObjCount()	, doc.getVtPos()	, doc.getpType()	, doc.getNboCount()	, doc.getXcoId()	,
-                doc.getpYear()	, doc.getAuthors()	, doc.getXcoCount()	, doc.getRdoCount()	, doc.getTitle()	,
-                doc.getNboTerm()	, doc.getVtTerm()	, doc.getHpPos()	, doc.getNboId()	, doc.getSoCount()	,
-                doc.getHpTerm()	, doc.getSoId()	, doc.getRgdObjPos()	, doc.getXcoPos()	, doc.getRsPos()	,
-                doc.getHpId()	, doc.getRdoPos()	, doc.getRsCount()	, doc.getRgdObjTerm()	, doc.get_abstract()	,
-                doc.getPmid()	, doc.getMpCount()	, doc.getMpPos()	, doc.getHpCount()	, doc.getXdbId()	,
-                doc.getRgdObjId()	, doc.getBpPos()	, doc.getGenePos()	, doc.getSoPos()	, doc.getRdoTerm()	,
-                doc.getChebiId(), doc.getjDates(), doc.getCitation(), doc.getMeshTerms(), doc.getKeywords(),
-                doc.getChemicals(), doc.getAffiliation(), doc.getIssn(), doc.getOrganismCommonName(), doc.getOrganismTerm(),
-               doc.getOrganismNcbiId(), doc.getOrganismCount(), doc.getOrganismPos(), doc.getPmcId());
-
-    }
+//    public int insert(SolrDoc solrDoc) throws Exception {
+//
+//        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
+//        SolrDocDB doc=buildSolrDocDB(solrDoc);
+//        String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
+//                "NEXTVAL('SOLR_DOC_SEQ'), " +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," + "?," +
+//                "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?,"+ "?, NOW()" +
+//                ")";
+//
+//
+//        return   updateSolrPostgress(sql,
+//                doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
+//                doc.getBpTerm()	, doc.getChebiTerm()	, doc.getpDate()	, doc.getXcoTerm()	, doc.getChebiCount()	,
+//                doc.getRsTerm()	, doc.getMpTerm()	, doc.getRdoId()	, doc.getNboPos()	, doc.getGene()	,
+//                doc.getRsId()	, doc.getSoTerm()	, doc.getMpCount()	, doc.getVtCount()	, doc.getBpId()	,
+//                doc.getRgdObjCount()	, doc.getVtPos()	, doc.getpType()	, doc.getNboCount()	, doc.getXcoId()	,
+//                doc.getpYear()	, doc.getAuthors()	, doc.getXcoCount()	, doc.getRdoCount()	, doc.getTitle()	,
+//                doc.getNboTerm()	, doc.getVtTerm()	, doc.getHpPos()	, doc.getNboId()	, doc.getSoCount()	,
+//                doc.getHpTerm()	, doc.getSoId()	, doc.getRgdObjPos()	, doc.getXcoPos()	, doc.getRsPos()	,
+//                doc.getHpId()	, doc.getRdoPos()	, doc.getRsCount()	, doc.getRgdObjTerm()	, doc.get_abstract()	,
+//                doc.getPmid()	, doc.getMpCount()	, doc.getMpPos()	, doc.getHpCount()	, doc.getXdbId()	,
+//                doc.getRgdObjId()	, doc.getBpPos()	, doc.getGenePos()	, doc.getSoPos()	, doc.getRdoTerm()	,
+//                doc.getChebiId(), doc.getjDates(), doc.getCitation(), doc.getMeshTerms(), doc.getKeywords(),
+//                doc.getChemicals(), doc.getAffiliation(), doc.getIssn(), doc.getOrganismCommonName(), doc.getOrganismTerm(),
+//               doc.getOrganismNcbiId(), doc.getOrganismCount(), doc.getOrganismPos(), doc.getPmcId());
+//
+//    }
     public int update(SolrDoc solrDoc) throws Exception {
         SolrDocDB doc=buildSolrDocDB(solrDoc);
         String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date=NOW() " +
@@ -248,6 +348,88 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getOrganismNcbiId(),
                 doc.getOrganismCount(),
                 doc.getOrganismPos(),
+                doc.getPmcId());
+
+
+    }
+    /**
+     * Batch update existing PMID records in the database
+     * @param solrDocs List of SolrDoc objects to update
+     * @return number of records updated
+     * @throws Exception if database error occurs
+     */
+    public int updateBatch(List<SolrDoc> solrDocs) throws Exception {
+        if (solrDocs == null || solrDocs.isEmpty()) {
+            return 0;
+        }
+
+        // Build UPDATE SQL with all fields except SOLR_DOC_ID
+//        List<String> fields = getSolrDocFields();
+        List<String> fields = getSolrDocMissingFields();
+        // Remove last_update_date from fields list as we'll set it separately
+        List<String> updateFields = fields.stream()
+                .filter(f -> !f.equals("last_update_date"))
+                .collect(Collectors.toList());
+
+        String setClause = updateFields.stream()
+                .map(f -> f + " = ?")
+                .collect(Collectors.joining(", "));
+
+        String sql = "UPDATE SOLR_DOCS SET " + setClause + ", last_update_date = NOW() WHERE pmid = ?";
+
+        int totalUpdated = 0;
+        try (Connection connection = this.getPostgressConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            connection.setAutoCommit(false);
+
+            for (SolrDoc solrDoc : solrDocs) {
+                SolrDocDB doc = buildSolrDocDB(solrDoc);
+                List<Object> params = docMissingParams(doc);
+
+                // Set all field parameters
+                for (int i = 0; i < params.size(); i++) {
+                    Object value = params.get(i);
+                    int paramIndex = i + 1;
+                    if (value instanceof java.sql.Date) {
+                        preparedStatement.setDate(paramIndex, (java.sql.Date) value);
+                    } else if (value instanceof Integer) {
+                        preparedStatement.setInt(paramIndex, (Integer) value);
+                    } else {
+                        preparedStatement.setString(paramIndex, value != null ? value.toString() : null);
+                    }
+                }
+
+                // Set the WHERE clause parameter (pmid)
+                preparedStatement.setString(params.size() + 1, doc.getPmid());
+
+                preparedStatement.addBatch();
+            }
+
+            int[] numUpdates = preparedStatement.executeBatch();
+            for (int i = 0; i < numUpdates.length; i++) {
+                if (numUpdates[i] >= 0) {
+                    totalUpdated += numUpdates[i];
+                } else if (numUpdates[i] == -2) {
+                    // Statement.SUCCESS_NO_INFO - assume 1 row updated
+                    totalUpdated++;
+                    System.out.println("Update execution " + i + ": unknown number of rows updated");
+                }
+            }
+            connection.commit();
+            System.out.println("Batch update completed. Total records updated: " + totalUpdated);
+            return totalUpdated;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public int updateMissingFields(SolrDoc solrDoc) throws Exception {
+        SolrDocDB doc=buildSolrDocDB(solrDoc);
+        String sql= "UPDATE SOLR_DOCS set" + getSolrDocMissingFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date=NOW() " +
+                " where pmid=?";
+        return   updateSolrPostgress(sql,
+                docMissingParams(doc),
                 doc.getPmcId());
 
 
@@ -292,36 +474,209 @@ public class SolrDocsDAO extends AbstractDAO {
         newSolrDocDB.setpDate(pDate);
         return newSolrDocDB;
     }
+//    public List<String> getSolrDocFields(){
+//       List<String> fields= Arrays.asList(
+//               "gene_count", "mp_id", "doi_s", "chebi_pos", "vt_id",
+//                "bp_term", "chebi_term", "p_date", "xco_term", "chebi_count",
+//               "rs_term", "mp_term", "rdo_id", "nbo_pos", "gene",
+//                "rs_id", "so_term", "mp_count", "vt_count", "bp_id",
+//                "rgd_obj_count", "vt_pos", "p_type", "nbo_count", "xco_id",
+//                "p_year", "authors", "xco_count", "rdo_count", "title",
+//                "nbo_term", "vt_term", "hp_pos", "nbo_id", "so_count",
+//                "hp_term", "so_id", "rgd_obj_pos", "xco_pos", "rs_pos",
+//               "hp_id", "rdo_pos", "rs_count", "rgd_obj_term", "abstract",
+//                "pmid", "bp_count", "mp_pos", "hp_count", "xdb_id",
+//                "rgd_obj_id", "bp_pos", "gene_pos", "so_pos", "rdo_term",
+//                "chebi_id",
+//               "j_date_s",
+//               "citation",
+//               "mesh_terms",
+//               "keywords",
+//               "chemicals",
+//               "affiliation",
+//               "issn",
+//               "organism_common_name",
+//               "organism_term",
+//               "organism_ncbi_id",
+//               "organism_count",
+//               "organism_pos",
+//               "pmc_id"
+//        );
+//       return fields;
+//    }
     public List<String> getSolrDocFields(){
-       List<String> fields= Arrays.asList(
-               "gene_count", "mp_id", "doi_s", "chebi_pos", "vt_id",
-                "bp_term", "chebi_term", "p_date", "xco_term", "chebi_count",
-               "rs_term", "mp_term", "rdo_id", "nbo_pos", "gene",
-                "rs_id", "so_term", "mp_count", "vt_count", "bp_id",
-                "rgd_obj_count", "vt_pos", "p_type", "nbo_count", "xco_id",
-                "p_year", "authors", "xco_count", "rdo_count", "title",
-                "nbo_term", "vt_term", "hp_pos", "nbo_id", "so_count",
-                "hp_term", "so_id", "rgd_obj_pos", "xco_pos", "rs_pos",
-               "hp_id", "rdo_pos", "rs_count", "rgd_obj_term", "abstract",
-                "pmid", "bp_count", "mp_pos", "hp_count", "xdb_id",
-                "rgd_obj_id", "bp_pos", "gene_pos", "so_pos", "rdo_term",
-                "chebi_id",
-               "j_date_s",
-               "citation",
-               "mesh_terms",
-               "keywords",
-               "chemicals",
-               "affiliation",
-               "issn",
-               "organism_common_name",
-               "organism_term",
-               "organism_ncbi_id",
-               "organism_count",
-               "organism_pos",
-               "pmc_id"
-        );
-       return fields;
+        return getSolrDBFields();
     }
+    public List<String> getSolrDocMissingFields(){
+        return Arrays.asList(  "cc_count",
+                "cc_id",
+                "cc_term",
+                "cc_pos",
+                "mf_count",
+                "mf_id",
+                "mf_pos",
+                "mf_term",
+                "mt_id",
+                "mt_term",
+                "mt_pos",
+                "mt_count",
+                "p_source",
+                "zfa_id",
+                "zfa_term",
+                "zfa_count",
+                "zfa_pos",
+                "ma_id",
+                "ma_count",
+                "ma_pos",
+                "ma_term",
+                "mmo_id",
+                "mmo_count",
+                "mmo_pos",
+                "mmo_term",
+                "pw_id",
+                "pw_count",
+                "pw_pos",
+                "pw_term",
+                "cmo_id",
+                "cmo_count",
+                "cmo_pos",
+                "cmo_term",
+                "uberon_id",
+                "uberon_count",
+                "uberon_pos",
+                "uberon_term",
+                "cl_id",
+                "cl_count",
+                "cl_pos",
+                "cl_term",
+                "efo_id",
+                "efo_count",
+                "efo_term",
+                "efo_pos");
+    }
+
+    public static List<String> getSolrDBFields() {
+        return Arrays.asList(
+                "gene_count",
+                "mp_id",
+                "doi_s",
+                "chebi_pos",
+                "vt_id",
+                "bp_term",
+                "chebi_term",
+                "p_date",
+                "xco_term",
+                "chebi_count",
+                "rs_term",
+                "mp_term",
+                "rdo_id",
+                "nbo_pos",
+                "gene",
+                "rs_id",
+                "so_term",
+                "mp_count",
+                "vt_count",
+                "bp_id",
+                "rgd_obj_count",
+                "vt_pos",
+                "p_type",
+                "nbo_count",
+                "xco_id",
+                "p_year",
+                "xco_count",
+                "rdo_count",
+                "title",
+                "nbo_term",
+                "vt_term",
+                "hp_pos",
+                "nbo_id",
+                "so_count",
+                "hp_term",
+                "so_id",
+                "rgd_obj_pos",
+                "xco_pos",
+                "rs_pos",
+                "hp_id",
+                "rdo_pos",
+                "rs_count",
+                "rgd_obj_term",
+                "pmid",
+                "bp_count",
+                "mp_pos",
+                "hp_count",
+                "xdb_id",
+                "rgd_obj_id",
+                "bp_pos",
+                "gene_pos",
+                "so_pos",
+                "rdo_term",
+                "chebi_id",
+                "solr_doc_id",
+                "abstract",
+                "authors",
+                "j_date_s",
+                "citation",
+                "mesh_terms",
+                "keywords",
+                "chemicals",
+                "affiliation",
+                "issn",
+                "organism_common_name",
+                "organism_term",
+                "organism_ncbi_id",
+                "organism_count",
+                "organism_pos",
+                "pmc_id",
+                "cc_count",
+                "cc_id",
+                "cc_term",
+                "cc_pos",
+                "mf_count",
+                "mf_id",
+                "mf_pos",
+                "mf_term",
+                "mt_id",
+                "mt_term",
+                "mt_pos",
+                "mt_count",
+                "p_source",
+                "zfa_id",
+                "zfa_term",
+                "zfa_count",
+                "zfa_pos",
+                "ma_id",
+                "ma_count",
+                "ma_pos",
+                "ma_term",
+                "mmo_id",
+                "mmo_count",
+                "mmo_pos",
+                "mmo_term",
+                "pw_id",
+                "pw_count",
+                "pw_pos",
+                "pw_term",
+                "cmo_id",
+                "cmo_count",
+                "cmo_pos",
+                "cmo_term",
+                "uberon_id",
+                "uberon_count",
+                "uberon_pos",
+                "uberon_term",
+                "cl_id",
+                "cl_count",
+                "cl_pos",
+                "cl_term",
+                "efo_id",
+                "efo_count",
+                "efo_term",
+                "efo_pos",
+                "last_update_date"
+
+        );
+    }
+
     public List<SolrInputDocument> getSolrDocs() throws Exception {
         String sql="select * from solr_docs";
         SolrDocQuery query=new SolrDocQuery(this.getPostgressDataSource(), sql);
