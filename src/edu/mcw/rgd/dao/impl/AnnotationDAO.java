@@ -2014,18 +2014,23 @@ public class AnnotationDAO extends AbstractDAO {
         // NOTE: LOB fields (like NOTES) must come at the end of bind list, to avoid exception:
         // ORA-24816: Expanded non LONG bind data supplied after actual LONG or LOB column
 
-        String sql = "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, " +
-                "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?, " +
-                "relative_to=?, last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, " +
-                "annotation_extension=?, gene_product_form_id=?, notes=?, original_created_date=? " +
-                "WHERE full_annot_key=?";
+        String sql = """
+            UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?,
+              object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?,
+              last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?,
+              annotation_extension=?, gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?,
+              molecular_entity=?, alteration=?, alteration_location=?, variant_nomenclature=?
+            WHERE full_annot_key=?
+            """;
 
-        return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(),
-                annot.getDataSrc(), annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
-                annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getQualifier(),
-                annot.getRelativeTo(), annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
-                annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
-                annot.getGeneProductFormId(), annot.getNotes(), annot.getOriginalCreatedDate(), annot.getKey());
+        return update(sql, annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(), annot.getDataSrc(),
+            annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
+            annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getQualifier(),
+            annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
+            annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
+            annot.getGeneProductFormId(), annot.getNotes(), annot.getOriginalCreatedDate(), annot.getAssociatedWith(),
+            annot.getMolecularEntity(), annot.getAlteration(), annot.getAlterationLocation(), annot.getVariantNomenclature(),
+            annot.getKey());
     }
 
     /**
@@ -2041,21 +2046,28 @@ public class AnnotationDAO extends AbstractDAO {
         // NOTE: LOB fields (like NOTES) must come at the end of bind list, to avoid exception:
         // ORA-24816: Expanded non LONG bind data supplied after actual LONG or LOB column
 
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, " +
-                "object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?, " +
-                "relative_to=?, last_modified_date=SYSDATE, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, " +
-                "annotation_extension=?, gene_product_form_id=?, notes=?, original_created_date=? " +
-                "WHERE full_annot_key=?",
-                new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
-                        Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.INTEGER});
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), """
+            UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, object_symbol=?,
+              ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?,
+              last_modified_date=SYSDATE, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, annotation_extension=?,
+              gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?,
+              molecular_entity=?, alteration=?, alteration_location=?, variant_nomenclature=?
+            WHERE full_annot_key=?
+            """,
+            new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                    Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                    Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+                    Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR,
+                    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+                    Types.INTEGER});
 
         for (Annotation a : annots){
             su.update(a.getTerm(), a.getAnnotatedObjectRgdId(), a.getRgdObjectKey(), a.getDataSrc(), a.getObjectSymbol(),
                     a.getRefRgdId(), a.getEvidence(), a.getWithInfo(), a.getAspect(), a.getObjectName(), a.getQualifier(),
-                    a.getRelativeTo(), a.getTermAcc(), a.getCreatedBy(), a.getLastModifiedBy(), a.getXrefSource(),
-                    a.getAnnotationExtension(), a.getGeneProductFormId(), a.getNotes(), a.getOriginalCreatedDate(), a.getKey());
+                    a.getTermAcc(), a.getCreatedBy(), a.getLastModifiedBy(), a.getXrefSource(), a.getAnnotationExtension(),
+                    a.getGeneProductFormId(), a.getNotes(), a.getOriginalCreatedDate(), a.getAssociatedWith(),
+                    a.getMolecularEntity(), a.getAlteration(), a.getAlterationLocation(), a.getVariantNomenclature(),
+                    a.getKey());
         }
 
        return executeBatch(su);
@@ -2074,12 +2086,15 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int insertAnnotation(Annotation annot) throws Exception{
 
-        String sql = "BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
-                " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
-                " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
-                " xref_source, annotation_extension, gene_product_form_id, original_created_date, full_annot_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL) "+
-                "RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?; END;";
+        String sql = """
+                BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src,
+                  object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier,
+                  created_date, last_modified_date, term_acc, created_by, last_modified_by,
+                  xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
+                  molecular_entity, alteration, alteration_location, variant_nomenclature, full_annot_key)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL)
+                RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?;  END;
+                """;
 
         try( Connection conn = this.getConnection() ) {
             CallableStatement cs = conn.prepareCall(sql);
@@ -2095,38 +2110,46 @@ public class AnnotationDAO extends AbstractDAO {
             cs.setString(10, annot.getObjectName());
             cs.setString(11, annot.getNotes());
             cs.setString(12, annot.getQualifier());
-            cs.setString(13, annot.getRelativeTo());
-            cs.setString(14, annot.getTermAcc());
-            setInt(cs, 15, annot.getCreatedBy());
-            setInt(cs, 16, annot.getLastModifiedBy());
-            cs.setString(17, annot.getXrefSource());
-            cs.setString(18, annot.getAnnotationExtension());
-            cs.setString(19, annot.getGeneProductFormId());
-            setTimestamp(cs, 20, annot.getOriginalCreatedDate());
+            cs.setString(13, annot.getTermAcc());
+            setInt(cs, 14, annot.getCreatedBy());
+            setInt(cs, 15, annot.getLastModifiedBy());
+            cs.setString(16, annot.getXrefSource());
+            cs.setString(17, annot.getAnnotationExtension());
+            cs.setString(18, annot.getGeneProductFormId());
+            setTimestamp(cs, 19, annot.getOriginalCreatedDate());
+            cs.setString(20, annot.getAssociatedWith());
+            cs.setString(21, annot.getMolecularEntity());
+            cs.setString(22, annot.getAlteration());
+            cs.setString(23, annot.getAlterationLocation());
+            cs.setString(24, annot.getVariantNomenclature());
 
-            cs.registerOutParameter(21, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(22, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(23, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(25, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(26, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(27, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(21));
-            annot.setCreatedDate(cs.getTimestamp(22));
-            annot.setLastModifiedDate(cs.getTimestamp(23));
+            annot.setKey(cs.getInt(25));
+            annot.setCreatedDate(cs.getTimestamp(26));
+            annot.setLastModifiedDate(cs.getTimestamp(27));
         }
 
         return annot.getKey();
     }
 
     public int insertAnnotationsBatch(Collection<Annotation> annots) throws Exception {
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src, " +
-                " object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier, " +
-                        " relative_to, created_date, last_modified_date, term_acc, created_by, last_modified_by, " +
-                        " xref_source, annotation_extension, gene_product_form_id, original_created_date, full_annot_key) "+
-                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)",
-                new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
-                        Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.INTEGER});
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), """
+            INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src,
+              object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier,
+              created_date, last_modified_date, term_acc, created_by, last_modified_by,
+              xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
+              molecular_entity, alteration, alteration_location, variant_nomenclature, full_annot_key)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """,
+            new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR,
+                Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+                Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR,
+                Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER});
         su.compile();
         for (Annotation annot : annots){
             int fullAnnotKey = this.getNextKeyFromSequence("full_annot_seq");
@@ -2134,8 +2157,10 @@ public class AnnotationDAO extends AbstractDAO {
 
             su.update(annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(), annot.getDataSrc(), annot.getObjectSymbol(),
                     annot.getRefRgdId(), annot.getEvidence(), annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
-                    annot.getQualifier(), annot.getRelativeTo(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
-                    annot.getXrefSource(), annot.getAnnotationExtension(), annot.getGeneProductFormId(), annot.getOriginalCreatedDate(), annot.getKey());
+                    annot.getQualifier(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
+                    annot.getXrefSource(), annot.getAnnotationExtension(), annot.getGeneProductFormId(), annot.getOriginalCreatedDate(),
+                    annot.getAssociatedWith(), annot.getMolecularEntity(), annot.getAlteration(), annot.getAlterationLocation(),
+                    annot.getVariantNomenclature(), annot.getKey());
         }
         return executeBatch(su);
     }

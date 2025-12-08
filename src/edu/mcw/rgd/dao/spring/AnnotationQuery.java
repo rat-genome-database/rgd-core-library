@@ -38,7 +38,6 @@ public class AnnotationQuery extends MappingSqlQuery {
         }catch (Exception e) {
         }
         annot.setQualifier(rs.getString("qualifier"));
-        annot.setRelativeTo(rs.getString("relative_to"));
         annot.setEvidence(rs.getString("evidence"));
         annot.setCreatedDate(rs.getTimestamp("created_date"));
         annot.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
@@ -57,6 +56,12 @@ public class AnnotationQuery extends MappingSqlQuery {
         annot.setAnnotationExtension(rs.getString("annotation_extension"));
         annot.setGeneProductFormId(rs.getString("gene_product_form_id"));
         annot.setOriginalCreatedDate(rs.getTimestamp("original_created_date"));
+
+        annot.setAssociatedWith(rs.getString("associated_with"));
+        annot.setMolecularEntity(rs.getString("molecular_entity"));
+        annot.setAlteration(rs.getString("alteration"));
+        annot.setAlterationLocation(rs.getString("alteration_location"));
+        annot.setVariantNomenclature(rs.getString("variant_nomenclature"));
 
         return annot;
     }
