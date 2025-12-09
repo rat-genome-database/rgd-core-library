@@ -2,6 +2,7 @@ package edu.mcw.rgd.datamodel.ontology;
 
 import edu.mcw.rgd.datamodel.Dumpable;
 import edu.mcw.rgd.process.Dumper;
+import edu.mcw.rgd.process.Utils;
 
 import java.util.Date;
 
@@ -24,7 +25,6 @@ public class Annotation implements Cloneable, Dumpable {
     private String objectName;
     private String notes;
     private String qualifier;
-    private String relativeTo;
     private Date createdDate;
     private Date lastModifiedDate;
     private String termAcc;
@@ -35,6 +35,11 @@ public class Annotation implements Cloneable, Dumpable {
     private String annotationExtension;
     private String geneProductFormId;
     private Date originalCreatedDate;
+    private String associatedWith;
+    private String molecularEntity;
+    private String alteration;
+    private String alterationLocation;
+    private String variantNomenclature;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -145,14 +150,6 @@ public class Annotation implements Cloneable, Dumpable {
         this.qualifier = qualifier;
     }
 
-    public String getRelativeTo() {
-        return relativeTo;
-    }
-
-    public void setRelativeTo(String relativeTo) {
-        this.relativeTo = relativeTo;
-    }
-
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -233,6 +230,46 @@ public class Annotation implements Cloneable, Dumpable {
         this.originalCreatedDate = originalCreatedDate;
     }
 
+    public String getAssociatedWith() {
+        return associatedWith;
+    }
+
+    public void setAssociatedWith(String associatedWith) {
+        this.associatedWith = associatedWith;
+    }
+
+    public String getMolecularEntity() {
+        return molecularEntity;
+    }
+
+    public void setMolecularEntity(String molecularEntity) {
+        this.molecularEntity = molecularEntity;
+    }
+
+    public String getAlteration() {
+        return alteration;
+    }
+
+    public void setAlteration(String alteration) {
+        this.alteration = alteration;
+    }
+
+    public String getAlterationLocation() {
+        return alterationLocation;
+    }
+
+    public void setAlterationLocation(String alterationLocation) {
+        this.alterationLocation = alterationLocation;
+    }
+
+    public String getVariantNomenclature() {
+        return variantNomenclature;
+    }
+
+    public void setVariantNomenclature(String variantNomenclature) {
+        this.variantNomenclature = variantNomenclature;
+    }
+
     public String dump(String delimiter) {
 
         return new Dumper(delimiter, true, true)
@@ -255,11 +292,29 @@ public class Annotation implements Cloneable, Dumpable {
             .put("LAST_MOD_DATE", lastModifiedDate)
             .put("CREATED_BY", createdBy)
             .put("LAST_MOD_BY", lastModifiedBy)
-            .put("RELATIVE_TO", relativeTo)
             .put("SPECIES_TYPE_KEY", speciesTypeKey)
             .put("ANNOT_EXT", annotationExtension)
             .put("PRODUCT_ID", geneProductFormId)
             .put("ORIG_CREATED_DATE", originalCreatedDate)
+            .put("ASSOCIATED_WITH", associatedWith)
+            .put("MOLECULAR_ENTITY", molecularEntity)
+            .put("ALTERATION", alteration)
+            .put("ALTERATION_LOCATION", alterationLocation)
+            .put("VARIANT_NOMENCLATURE", variantNomenclature)
             .dump();
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        Annotation a = (Annotation) obj;
+        return Utils.intsAreEqual(annotatedObjectRgdId, a.getAnnotatedObjectRgdId()) && Utils.intsAreEqual(refRgdId, a.getRefRgdId()) && Utils.stringsAreEqual(termAcc,a.getTermAcc())
+                && Utils.stringsAreEqual(evidence, a.getEvidence()) && Utils.stringsAreEqual(withInfo, a.getWithInfo()) && Utils.stringsAreEqual(qualifier, a.getQualifier()) &&
+                Utils.stringsAreEqual(xrefSource, a.getXrefSource());
+    }
+
+    @Override
+    public int hashCode() {
+        return getAnnotatedObjectRgdId() ^ getRefRgdId() ^ Utils.defaultString(getTermAcc()).hashCode() ^ Utils.defaultString(getEvidence()).hashCode() ^
+                Utils.defaultString(getWithInfo()).hashCode() ^ Utils.defaultString(getQualifier()).hashCode() ^ Utils.defaultString(getXrefSource()).hashCode();
     }
 }
