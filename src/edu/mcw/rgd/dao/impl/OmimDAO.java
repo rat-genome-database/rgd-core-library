@@ -63,9 +63,11 @@ public class OmimDAO extends AbstractDAO {
     }
 
     public List<String> getPhenotypicSeriesIdsNotInRgd() throws Exception {
-        String sql = "SELECT phenotypic_series_number FROM omim_phenotypic_series "+
-                "MINUS "+
-                "SELECT synonym_name FROM ont_synonyms WHERE term_acc like 'DOID:%' AND synonym_name like 'OMIM:PS%'";
+        String sql = """
+            SELECT phenotypic_series_number FROM omim_phenotypic_series
+            MINUS
+            SELECT synonym_name FROM ont_synonyms WHERE term_acc like 'DOID:%' AND synonym_name like 'MIM:PS%'
+            """;
         return StringListQuery.execute(this, sql);
     }
 }
