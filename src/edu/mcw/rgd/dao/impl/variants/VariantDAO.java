@@ -697,4 +697,14 @@ public class VariantDAO extends AbstractDAO {
         }
         return executeBatch(su);
     }
+
+    public int insertVariantNotes(Collection<VariantNotes> notes) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "insert into VARIANT_NOTES (RGD_ID, NOTES) values (?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (VariantNotes n : notes){
+            su.update(n.getRgdId(), n.getNotes());
+        }
+        return executeBatch(su);
+    }
 }
