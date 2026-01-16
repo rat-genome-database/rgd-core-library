@@ -24,15 +24,15 @@ import java.util.List;
 
 public class IndexAdmin {
     public static final Logger log= LogManager.getLogger(IndexAdmin.class);
-    private RgdIndex rgdIndex;
+
 
 
     public void createIndex(String mappings, String type) throws Exception {
 
-        GetAliasesRequest aliasesRequest=new GetAliasesRequest(rgdIndex.getIndex());
+        GetAliasesRequest aliasesRequest=new GetAliasesRequest(RgdIndex.getIndex());
         boolean existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
         if(existsAlias) {
-            for (String index : rgdIndex.getIndices()) {
+            for (String index : RgdIndex.getIndices()) {
                 aliasesRequest.indices(index);
                 existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
                 if (!existsAlias) {
@@ -53,15 +53,15 @@ public class IndexAdmin {
 
             }
         }else{
-            GetIndexRequest request1=new GetIndexRequest(rgdIndex.getIndex()+"1");
+            GetIndexRequest request1=new GetIndexRequest(RgdIndex.getIndex()+"1");
             boolean indexExists=ClientInit.getClient().indices().exists(request1, RequestOptions.DEFAULT);
             if (indexExists) {   /**** delete index if exists ****/
 
-                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(rgdIndex.getIndex()+"1");
+                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(RgdIndex.getIndex()+"1");
                 ClientInit.getClient().indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-                log.info(rgdIndex.getIndex()+"1" + " deleted");
+                log.info(RgdIndex.getIndex()+"1" + " deleted");
             }
-            createNewIndex(rgdIndex.getIndex()+"1",mappings, type);
+            createNewIndex(RgdIndex.getIndex()+"1",mappings, type);
 
         }
 
@@ -76,6 +76,7 @@ public class IndexAdmin {
         if(_mappings!=null && !_mappings.equals("")){
             path+="data/"+_mappings+".json";
             mappings=new String(Files.readAllBytes(Paths.get(path)));
+          //  mappings= new String(Files.readAllBytes(Paths.get("resources/variant_mappings.json")));
         }
         log.info("CREATING NEW INDEX..." + index);
         int replicates=0;
@@ -110,17 +111,17 @@ public class IndexAdmin {
         RgdIndex.setNewAlias(index);
     }
     public int updateIndex() throws Exception {
-        if(rgdIndex.getIndex()!=null) {
-            log.info("Updating " + rgdIndex.getIndex() + "...");
-            GetIndexRequest request=new GetIndexRequest(rgdIndex.getIndex());
+        if(RgdIndex.getIndex()!=null) {
+            log.info("Updating " + RgdIndex.getIndex() + "...");
+            GetIndexRequest request=new GetIndexRequest(RgdIndex.getIndex());
             boolean indicesExists=ClientInit.getClient().indices().exists(request, RequestOptions.DEFAULT);
             if (indicesExists) {  /* CHECK IF INDEX NAME PROVIDED EXISTS*/
 
-                RgdIndex.setNewAlias(rgdIndex.getIndex());
+                RgdIndex.setNewAlias(RgdIndex.getIndex());
 
                 return 1;
             } else {
-                log.info("Cannot Update. " + rgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
+                log.info("Cannot Update. " + RgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
                 return 0;
             }
         }else {
@@ -130,34 +131,8 @@ public class IndexAdmin {
     }
 
 
-    public void setRgdIndex(RgdIndex rgdIndex) {
-        this.rgdIndex = rgdIndex;
-    }
-
-    public RgdIndex getRgdIndex() {
-        return rgdIndex;
-    }
 
 
-    public static void main(String[] args) throws IOException {
-        IndexAdmin admin= new IndexAdmin();
 
-        DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-        new XmlBeanDefinitionReader(bf).loadBeanDefinitions(new FileSystemResource("properties/AppConfigure.xml"));
 
-        admin.rgdIndex= (RgdIndex) bf.getBean("rgdIndex");
-        List<String> indices= new ArrayList<>();
-        admin.rgdIndex.setIndex("rgd_index_"+ "dev");
-        indices.add("rgd_index_"+"dev"+"1");
-        indices.add("rgd_index_"+"dev"+"2");
-        admin.rgdIndex.setIndices(indices);
-
-        try {
-            admin.createIndex("","");
-        } catch (Exception e) {
-            Utils.printStackTrace(e, log);
-        }
-
-        ClientInit.destroy();
-    }
 }

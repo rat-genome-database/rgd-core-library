@@ -2,6 +2,8 @@ package edu.mcw.rgd.services;
 
 import io.netty.util.internal.InternalThreadLocalMap;
 import org.apache.http.HttpHost;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.RestHighLevelClientBuilder;
@@ -14,13 +16,16 @@ import java.util.Properties;
 public class ClientInit {
     private static RestHighLevelClient client=null;
     private static ClientInit esClientFactory=null;
+    private static final Logger log = LogManager.getLogger(ClientInit.class);
     public static void init() throws UnknownHostException {
         if(esClientFactory==null){
             esClientFactory=new ClientInit();
-            System.out.println("Initializing Elasticsearch Client...");
+            log.info("Initializing Elasticsearch Client...");
             if(client==null){
-                System.out.println("CLIENT IS NULL, CREATING NEW CLIENT...");
+                log.info("CREATING NEW CLIENT...");
+                System.out.println("CREATING NEW CLIENT...");
                 client=getInstance();
+                log.info("Initialized elasticsearch client ...");
                 System.out.println("Initialized elasticsearch client ...");
             }
         }
@@ -51,17 +56,20 @@ public class ClientInit {
     }
 
     public static synchronized void destroy() throws IOException {
-        System.out.println("destroying Elasticsearch Client...");
+
 
         if(client!=null) {
+
             client.close();
             InternalThreadLocalMap.remove();
             client=null;
             esClientFactory=null;
-        }
+            System.out.println("destroyed Elasticsearch Client");
+        }else  System.out.println("Elasticsearch Client is null to destroy");
     }
     public static RestHighLevelClient getClient() throws UnknownHostException {
         if(client==null){
+            System.out.println("CLIENT IS NULL, INITIATING NEW CLIENT ....");
             init();
         }
         return client;
