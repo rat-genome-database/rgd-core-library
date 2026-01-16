@@ -30,11 +30,11 @@ public class RgdIndex {
         RgdIndex.index = index;
     }
 
-    public String getIndex() {
+    public static String getIndex() {
         return index;
     }
 
-    public  List<String> getIndices() {
+    public static List<String> getIndices() {
         return indices;
     }
 

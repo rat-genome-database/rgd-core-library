@@ -17,6 +17,11 @@ public class GeneExpressionRecord {
     private int curationStatus;
     private int speciesTypeKey;
     private Integer clinicalMeasurementId;
+    private String traitTerm;
+    private String measurementTerm;
+    private String experimentCondition;
+    private String conditionAccId;
+
 
     private List<GeneExpressionRecordValue> values;
     private List<Condition> conditions;
@@ -108,6 +113,37 @@ public class GeneExpressionRecord {
 
     public void setClinicalMeasurementId(Integer clinicalMeasurementId) {
         this.clinicalMeasurementId = clinicalMeasurementId;
+    }
+    public String getTraitTerm() {
+        return traitTerm;
+    }
+
+    public void setTraitTerm(String traitTerm) {
+        this.traitTerm = traitTerm;
+    }
+
+    public String getMeasurementTerm() {
+        return measurementTerm;
+    }
+
+    public void setMeasurementTerm(String measurementTerm) {
+        this.measurementTerm = measurementTerm;
+    }
+
+    public String getExperimentCondition() {
+        return experimentCondition;
+    }
+
+    public void setExperimentCondition(String experimentCondition) {
+        this.experimentCondition = experimentCondition;
+    }
+
+    public String getConditionAccId() {
+        return conditionAccId;
+    }
+
+    public void setConditionAccId(String conditionAccId) {
+        this.conditionAccId = conditionAccId;
     }
 
     @Override

@@ -613,104 +613,104 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
         return executeBatch(su);
     }
-    public List<ExpressionDataIndexObject> getNormalisedExpressionObjects(List<GeneExpression> records){
-        List<ExpressionDataIndexObject> objects=new ArrayList<>();
-         if(records!=null && records.size()>0) {
-
-
-             Set<String> strainAccIds=getStrainAccIds(records);
-             Set<String> tissueAccIds=getTissueAccIds(records);
-             Set<String> conditions=getConditions(records);
-            for(String sampleId:strainAccIds){
-                for(String tissueId:tissueAccIds){
-                    List<GeneExpression> filteredRecords = getFilteredRecords(sampleId, tissueId, records);
-                    if (filteredRecords.size() > 0) {
-                        if(conditions!=null && conditions.size()>0) {
-                            for (String condition : conditions) {
-                                ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, condition, filteredRecords);
-                                if(object!=null)
-                                    objects.add(object);
-
-                            }
-                        }else {
-                            ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, "", filteredRecords);
-                            if(object!=null)
-                            objects.add(object);
-                        }
-                    }
-
-                }}}
-         return objects;
-    }
-    public ExpressionDataIndexObject getExpressionIndexObject(String sampleId, String tissueId, String condition, List<GeneExpression> filteredRecords){
-        if(condition==null)
-            condition="";
-        DecimalFormat df=new DecimalFormat("#.####");
-        ExpressionDataIndexObject object = new ExpressionDataIndexObject();
-        object.setStrainAcc(sampleId);
-        try {
-            if (object.getStrainAcc() != null && !object.getStrainAcc().equals(""))
-                object.setStrainTerm(getTerm(object.getStrainAcc())+" "+ condition);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        object.setTissueAcc(tissueId);
-
-        try {
-            if (object.getTissueAcc() != null && !object.getTissueAcc().equals(""))
-                object.setTissueTerm(getTerm(object.getTissueAcc()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        List<Double> values = new ArrayList<>();
-        Set<String> level = new HashSet<>();
-        double valueSum = 0;
-        int conditionRecordsSize=0;
-        for (GeneExpression record : filteredRecords) {
-            String recordCondition=record.getGeneExpressionRecord().getExperimentCondition();
-            if(recordCondition==null) recordCondition="";
-            if(condition.equalsIgnoreCase(recordCondition)) {
-                conditionRecordsSize++;
-                Double val = record.getGeneExpressionRecordValue().getExpressionValue();
-                valueSum += val;
-                values.add(val);
-                level.add(record.getGeneExpressionRecordValue().getExpressionLevel());
-            }
-        }
-        double valueMean = Double.parseDouble(df.format(valueSum / conditionRecordsSize));
-        object.setExpressionLevel(level);
-        object.setExpressionValue(values);
-        object.setValueMean(valueMean);
-        if (valueMean > 0) {
-            object.setLogValue(Math.log(valueMean));
-           return object;
-        }
-return null;
-    }
-    Set<String> getStrainAccIds(List<GeneExpression> records){
-        return records.stream().map(r->r.getSample().getStrainAccId()).collect(Collectors.toSet());
-    }
-    Set<String> getTissueAccIds(List<GeneExpression> records){
-        return records.stream().map(r->r.getSample().getTissueAccId()).collect(Collectors.toSet());
-    }
-    Set<String> getConditions(List<GeneExpression> records){
-        return records.stream().map(r->r.getGeneExpressionRecord().getExperimentCondition()).collect(Collectors.toSet());
-    }
-    List<GeneExpression> getFilteredRecords(String strainAccId, String tissueAccId,List<GeneExpression> records){
-        List<GeneExpression> filteredRecs=new ArrayList<>();
-        for(GeneExpression rec:records){
-            if(rec.getSample()!=null && rec.getSample().getStrainAccId()!=null &&  rec.getSample().getTissueAccId()!=null &&
-                    rec.getSample().getStrainAccId().equalsIgnoreCase(strainAccId) && rec.getSample().getTissueAccId().equalsIgnoreCase(tissueAccId)){
-                filteredRecs.add(rec);
-            }
-        }
-        return filteredRecs;
-    }
-    String getTerm(String accId) throws Exception {
-
-        Term term = xdao.getTerm(accId);
-        return term.getTerm();
-
-    }
+//    public List<ExpressionDataIndexObject> getNormalisedExpressionObjects(List<GeneExpression> records){
+//        List<ExpressionDataIndexObject> objects=new ArrayList<>();
+//         if(records!=null && records.size()>0) {
+//
+//
+//             Set<String> strainAccIds=getStrainAccIds(records);
+//             Set<String> tissueAccIds=getTissueAccIds(records);
+//             Set<String> conditions=getConditions(records);
+//            for(String sampleId:strainAccIds){
+//                for(String tissueId:tissueAccIds){
+//                    List<GeneExpression> filteredRecords = getFilteredRecords(sampleId, tissueId, records);
+//                    if (filteredRecords.size() > 0) {
+//                        if(conditions!=null && conditions.size()>0) {
+//                            for (String condition : conditions) {
+//                                ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, condition, filteredRecords);
+//                                if(object!=null)
+//                                    objects.add(object);
+//
+//                            }
+//                        }else {
+//                            ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, "", filteredRecords);
+//                            if(object!=null)
+//                            objects.add(object);
+//                        }
+//                    }
+//
+//                }}}
+//         return objects;
+//    }
+//    public ExpressionDataIndexObject getExpressionIndexObject(String sampleId, String tissueId, String condition, List<GeneExpression> filteredRecords){
+//        if(condition==null)
+//            condition="";
+//        DecimalFormat df=new DecimalFormat("#.####");
+//        ExpressionDataIndexObject object = new ExpressionDataIndexObject();
+//        object.setStrainAcc(sampleId);
+//        try {
+//            if (object.getStrainAcc() != null && !object.getStrainAcc().equals(""))
+//                object.setStrainTerm(getTerm(object.getStrainAcc())+" "+ condition);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        object.setTissueAcc(tissueId);
+//
+//        try {
+//            if (object.getTissueAcc() != null && !object.getTissueAcc().equals(""))
+//                object.setTissueTerm(getTerm(object.getTissueAcc()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        List<Double> values = new ArrayList<>();
+//        Set<String> level = new HashSet<>();
+//        double valueSum = 0;
+//        int conditionRecordsSize=0;
+//        for (GeneExpression record : filteredRecords) {
+//            String recordCondition=record.getGeneExpressionRecord().getExperimentCondition();
+//            if(recordCondition==null) recordCondition="";
+//            if(condition.equalsIgnoreCase(recordCondition)) {
+//                conditionRecordsSize++;
+//                Double val = record.getGeneExpressionRecordValue().getExpressionValue();
+//                valueSum += val;
+//                values.add(val);
+//                level.add(record.getGeneExpressionRecordValue().getExpressionLevel());
+//            }
+//        }
+//        double valueMean = Double.parseDouble(df.format(valueSum / conditionRecordsSize));
+//        object.setExpressionLevel(level);
+//        object.setExpressionValue(values);
+//        object.setValueMean(valueMean);
+//        if (valueMean > 0) {
+//            object.setLogValue(Math.log(valueMean));
+//           return object;
+//        }
+//return null;
+//    }
+//    Set<String> getStrainAccIds(List<GeneExpression> records){
+//        return records.stream().map(r->r.getSample().getStrainAccId()).collect(Collectors.toSet());
+//    }
+//    Set<String> getTissueAccIds(List<GeneExpression> records){
+//        return records.stream().map(r->r.getSample().getTissueAccId()).collect(Collectors.toSet());
+//    }
+//    Set<String> getConditions(List<GeneExpression> records){
+//        return records.stream().map(r->r.getGeneExpressionRecord().getExperimentCondition()).collect(Collectors.toSet());
+//    }
+//    List<GeneExpression> getFilteredRecords(String strainAccId, String tissueAccId,List<GeneExpression> records){
+//        List<GeneExpression> filteredRecs=new ArrayList<>();
+//        for(GeneExpression rec:records){
+//            if(rec.getSample()!=null && rec.getSample().getStrainAccId()!=null &&  rec.getSample().getTissueAccId()!=null &&
+//                    rec.getSample().getStrainAccId().equalsIgnoreCase(strainAccId) && rec.getSample().getTissueAccId().equalsIgnoreCase(tissueAccId)){
+//                filteredRecs.add(rec);
+//            }
+//        }
+//        return filteredRecs;
+//    }
+//    String getTerm(String accId) throws Exception {
+//
+//        Term term = xdao.getTerm(accId);
+//        return term.getTerm();
+//
+//    }
 
 }
