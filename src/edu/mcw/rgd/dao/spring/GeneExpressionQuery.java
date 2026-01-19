@@ -10,127 +10,92 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GeneExpressionQuery extends MappingSqlQuery {
+public class GeneExpressionQuery extends MappingQuery<edu.mcw.rgd.datamodel.GeneExpression> {
 
     public GeneExpressionQuery(DataSource ds, String query) {
         super(ds, query);
     }
 
-    protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+    protected GeneExpression mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         GeneExpression ge = new GeneExpression();
+
+/* ======================
+   GeneExpressionRecord
+   ====================== */
         GeneExpressionRecord rec = new GeneExpressionRecord();
-        rec.setId(rs.getInt("gene_expression_exp_record_id"));
-        rec.setExperimentId(rs.getInt("experiment_id"));
-        rec.setSampleId(rs.getInt("sample_id"));
-        rec.setLastModifiedBy(rs.getString("last_modified_by"));
-        rec.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
-        rec.setCurationStatus(rs.getInt("curation_status"));
-        rec.setSpeciesTypeKey(rs.getInt("species_type_key"));
-        rec.setClinicalMeasurementId(rs.getInt("CLINICAL_MEASUREMENT_ID"));
-        try{
-            rec.setTraitTerm(rs.getString("trait_term"));
-        }catch (Exception ignored){}
-        try{
-            rec.setMeasurementTerm(rs.getString("measurement"));
-        }catch (Exception ignored){}
-        try{
-            rec.setExperimentCondition(rs.getString("condition"));
-        }catch (Exception ignored){}
-        try{
-            rec.setConditionAccId(rs.getString("condition_acc"));
-        }catch (Exception ignored){}
+        rec.setId(getIntOrZero(rs, "gene_expression_exp_record_id"));
+        rec.setExperimentId(getIntOrZero(rs, "experiment_id"));
+        rec.setSampleId(getIntOrZero(rs, "sample_id"));
+        rec.setLastModifiedBy(getString(rs, "last_modified_by"));
+       rec.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
+        rec.setCurationStatus(getIntOrZero(rs, "curation_status"));
+        rec.setSpeciesTypeKey(getIntOrZero(rs, "species_type_key"));
+        rec.setClinicalMeasurementId(getIntOrZero(rs, "CLINICAL_MEASUREMENT_ID"));
+        rec.setTraitTerm(getString(rs, "trait_term"));
+        rec.setMeasurementTerm(getString(rs, "measurement"));
+        rec.setExperimentCondition(getString(rs, "condition"));
+        rec.setConditionAccId(getString(rs, "condition_acc"));
+
         ge.setGeneExpressionRecord(rec);
 
+/* ======================
+   GeneExpressionRecordValue
+   ====================== */
         GeneExpressionRecordValue recV = new GeneExpressionRecordValue();
+        recV.setId(getIntOrZero(rs, "gene_expression_value_id"));
+        recV.setExpressedGeneSymbol(getString(rs, "gene_symbol"));
+        recV.setExpressedObjectRgdId(getIntOrZero(rs, "expressed_object_rgd_id"));
+        recV.setExpressionMeasurementAccId(getString(rs, "expression_measurement_ont_id"));
+        recV.setNotes(getString(rs, "expression_value_notes"));
+        recV.setGeneExpressionRecordId(getIntOrZero(rs, "gene_expression_exp_record_id"));
+        recV.setExpressionValue(getDoubleOrZero(rs, "expression_value"));
+        recV.setExpressionUnit(getString(rs, "expression_unit"));
+        recV.setMapKey(getIntOrZero(rs, "map_key"));
+        recV.setExpressionLevel(getString(rs, "expression_level"));
+        recV.setTpmValue(getDoubleOrZero(rs, "tpm_value"));
 
-        try{
-            recV.setId(rs.getInt("gene_expression_value_id"));
-        }catch (Exception ignored){}
-        try{
-        recV.setExpressedGeneSymbol(rs.getString("gene_symbol"));
-    }catch (Exception ignored){}
-  try{
-        recV.setExpressedObjectRgdId(rs.getInt("expressed_object_rgd_id"));
-}catch (Exception ignored){}
-  try{
-        }catch (Exception ignored){}
-        try{
-        recV.setExpressionMeasurementAccId(rs.getString("expression_measurement_ont_id"));
-        }catch (Exception ignored){}
-        try{
-        recV.setNotes(rs.getString("expression_value_notes"));
-        }catch (Exception ignored){}
-        try{
-        recV.setGeneExpressionRecordId(rs.getInt("gene_expression_exp_record_id"));
-        }catch (Exception ignored){}
-        try{
-        recV.setExpressionValue(rs.getDouble("expression_value"));
-        }catch (Exception ignored){}
-        try{
-        recV.setExpressionUnit(rs.getString("expression_unit"));
-        }catch (Exception ignored){}
-        try{
-        recV.setMapKey(rs.getInt("map_key"));
-        }catch (Exception ignored){}
-        try{
-        recV.setExpressionLevel(rs.getString("expression_level"));
-        }catch (Exception ignored){}
-
-        try{
-        recV.setTpmValue(rs.getDouble("tpm_value"));
-        }catch (Exception ignored){}
-        try{
-            if( rs.wasNull() ) {
-                recV.setTpmValue(null);
-            }
-        }catch (Exception ignored){}
-        try{
         ge.setGeneExpressionRecordValue(recV);
-        }catch (Exception ignored){}
 
+/* ======================
+   Sample
+   ====================== */
         Sample s = new Sample();
-        s.setId(rs.getInt("sample_id"));
-        s.setAgeDaysFromHighBound(rs.getDouble("age_days_from_dob_high_bound"));
-        s.setAgeDaysFromLowBound(rs.getDouble("age_days_from_dob_low_bound"));
-        s.setNumberOfAnimals(rs.getInt("number_of_animals"));
-        s.setNotes(rs.getString("sample_notes"));
-        s.setSex(rs.getString("sex"));
-        s.setStrainAccId(rs.getString("strain_ont_id"));
-        s.setTissueAccId(rs.getString("tissue_ont_id"));
-        s.setCellTypeAccId(rs.getString("cell_type_ont_id"));
-        s.setCellLineId(rs.getString("cell_line_id"));
-        s.setGeoSampleAcc(rs.getString("geo_sample_acc"));
-        s.setBioSampleId(rs.getString("biosample_id"));
-        s.setLifeStage(rs.getString("life_stage"));
-        s.setLastModifiedBy(rs.getString("last_modified_by"));
-        s.setCreatedBy(rs.getString("created_by"));
-        s.setCuratorNotes(rs.getString("CURATOR_NOTES"));
-        s.setCultureDur(rs.getInt("CULTURE_DUR_VALUE"));
-        s.setCultureDurUnit(rs.getString("CULTURE_DUR_UNIT"));
-        try {
-            s.setStrainTerm(rs.getString("strain_term"));
-        }catch (Exception ignored){}
-        try{
-            s.setTissueTerm(rs.getString("tissue_term"));
-        }catch (Exception ignored){}
+        s.setId(getIntOrZero(rs, "sample_id"));
+        s.setAgeDaysFromHighBound(getDoubleOrZero(rs, "age_days_from_dob_high_bound"));
+        s.setAgeDaysFromLowBound(getDoubleOrZero(rs, "age_days_from_dob_low_bound"));
+        s.setNumberOfAnimals(getIntOrZero(rs, "number_of_animals"));
+        s.setNotes(getString(rs, "sample_notes"));
+        s.setSex(getString(rs, "sex"));
+        s.setStrainAccId(getString(rs, "strain_ont_id"));
+        s.setTissueAccId(getString(rs, "tissue_ont_id"));
+        s.setCellTypeAccId(getString(rs, "cell_type_ont_id"));
+        s.setCellLineId(getString(rs, "cell_line_id"));
+        s.setGeoSampleAcc(getString(rs, "geo_sample_acc"));
+        s.setBioSampleId(getString(rs, "biosample_id"));
+        s.setLifeStage(getString(rs, "life_stage"));
+        s.setLastModifiedBy(getString(rs, "last_modified_by"));
+        s.setCreatedBy(getString(rs, "created_by"));
+        s.setCuratorNotes(getString(rs, "CURATOR_NOTES"));
+        s.setCultureDur(getIntOrZero(rs, "CULTURE_DUR_VALUE"));
+        s.setCultureDurUnit(getString(rs, "CULTURE_DUR_UNIT"));
+        s.setStrainTerm(getString(rs, "strain_term"));
+        s.setTissueTerm(getString(rs, "tissue_term"));
+        s.setComputedSex(getString(rs, "COMPUTED_SEX"));
 
-
-        s.setComputedSex(rs.getString("COMPUTED_SEX"));
         ge.setSample(s);
-        try {
-            ge.setRefRgdId(rs.getInt("REF_RGD_ID"));
-        }catch (Exception ignored){}
-        try {
-            ge.setStudyId(rs.getInt("STUDY_ID"));
-        }catch (Exception ignored){}
-        try {
-            ge.setStudySource(rs.getString("STUDY_SOURCE"));
-        }catch (Exception ignored){}
-        try {
-            ge.setGeoSeriesAcc(rs.getString("GEO_SERIES_ACC"));
-        }catch (Exception ignored){}
+
+/* ======================
+   Study / Reference
+   ====================== */
+        ge.setRefRgdId(getIntOrZero(rs, "REF_RGD_ID"));
+        ge.setStudyId(getIntOrZero(rs, "STUDY_ID"));
+        ge.setStudySource(getString(rs, "STUDY_SOURCE"));
+        ge.setGeoSeriesAcc(getString(rs, "GEO_SERIES_ACC"));
+
         return ge;
+
+
     }
 }
 

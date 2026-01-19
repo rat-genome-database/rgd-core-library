@@ -32,7 +32,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         r.setId(id);
 
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-            +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, last_modified_date) VALUES(?,?,?,?,?,?,?,SYSTIMESTAMP)";
+                +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, last_modified_date) VALUES(?,?,?,?,?,?,?,SYSTIMESTAMP)";
 
         update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
                 r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId());
@@ -57,8 +57,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
         v.setId(id);
 
         String sql = "INSERT INTO gene_expression_values (gene_expression_value_id, expressed_object_rgd_id"
-            +",expression_measurement_ont_id, expression_value_notes, gene_expression_exp_record_id"
-            +",expression_value, expression_unit, map_key) VALUES(?,?,?,?,?,?,?,?)";
+                +",expression_measurement_ont_id, expression_value_notes, gene_expression_exp_record_id"
+                +",expression_value, expression_unit, map_key) VALUES(?,?,?,?,?,?,?,?)";
 
         update(sql, id, v.getExpressedObjectRgdId(), v.getExpressionMeasurementAccId(), v.getNotes(),
                 v.getGeneExpressionRecordId(), v.getExpressionValue(), v.getExpressionUnit(), v.getMapKey());
@@ -76,7 +76,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
             int id = getNextKeyFromSequence("gene_expression_values_seq");
             v.setId(id);
             su.update(v.getId(),v.getExpressedObjectRgdId(),v.getExpressionMeasurementAccId(),v.getNotes(),v.getGeneExpressionRecordId(),
-            v.getExpressionValue(),v.getExpressionUnit(),v.getMapKey(),v.getExpressionLevel(),v.getTpmValue());
+                    v.getExpressionValue(),v.getExpressionUnit(),v.getMapKey(),v.getExpressionLevel(),v.getTpmValue());
         }
         return executeBatch(su);
     }
@@ -187,11 +187,11 @@ public class GeneExpressionDAO extends PhenominerDAO {
             return null;
         else {
             // load record values and conditions
-    //        for( GeneExpressionRecord record: records ) {
-                records.get(0).setValues( getGeneExpressionRecordValues(records.get(0).getId()) );
-                records.get(0).setConditions( getConditions(records.get(0).getId()) );
-                records.get(0).setMeasurementMethods( getMeasurementMethods(records.get(0).getId()) );
-    //        }
+            //        for( GeneExpressionRecord record: records ) {
+            records.get(0).setValues( getGeneExpressionRecordValues(records.get(0).getId()) );
+            records.get(0).setConditions( getConditions(records.get(0).getId()) );
+            records.get(0).setMeasurementMethods( getMeasurementMethods(records.get(0).getId()) );
+            //        }
 
             return records.get(0);
         }
@@ -353,7 +353,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = "select value_count FROM gene_expression_value_counts ge where ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
                 " and ge.expression_level=? and ge.term_acc = ?";
 
-       return getStringResultAdditive(query,rgdId,unit,level,termAcc);
+        return getStringResultAdditive(query,rgdId,unit,level,termAcc);
     }
     /**
      * For given  id, get all gene expression record
@@ -383,7 +383,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
     }
     public List<GeneExpression> getGeneExpressionObjectsByRgdIdUnit(int rgdId, String unit) throws Exception{
 
-                 String query= """
+        String query= """
                          select gr.*,s.*,e.*,st.*,ge.*,tissue.term as tissue_term, strain.term as strain_term, c.*,measurement.term as measurement,xcondition.term as condition  , xcondition.term_acc as condition_acc   \s
                                                   
                                                    from gene_expression_values ge\s
@@ -399,10 +399,41 @@ public class GeneExpressionDAO extends PhenominerDAO {
                          left outer join ont_terms strain on strain.term_acc=s.strain_ont_id
                          where ge.expressed_object_rgd_id=?
                          """
-                                ;
+                ;
 
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,rgdId);
+    }
+
+    public List<GeneExpression> getHighExpressionValuesByStudyId(int studyId, String level) throws Exception {
+        String sql= """
+                select gr.*,s.*, ge.*,g.* from study st inner join experiment e on e.study_id=st.study_id\s
+                                          left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id
+                                          left outer join sample s on s.sample_id=gr.sample_id\s
+                                          left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
+                                          left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id
+                                          where\s
+                                            st.study_id=? and
+                                           ge.expression_level =?
+                                         
+                """;
+        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),sql);
+        return execute(q,studyId, level);
+    }
+    public List<GeneExpression> getExpressionValuesByRecordIds(Set<Integer> recordIds) throws Exception {
+        String sql= """
+                select s.*,c.*, ge.*,g.*,xcondition.term as condition from study st inner join experiment e on e.study_id=st.study_id\s
+                                 left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id
+                                 left outer join sample s on s.sample_id=gr.sample_id\s
+                                 left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
+                                 left outer join ont_terms xcondition on xcondition.term_acc=c.exp_cond_ont_id
+                                 left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
+                                 left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id where
+                                ge.gene_expression_exp_record_id in (
+                """;
+        sql+=recordIds.stream().map(id->id+"").collect(Collectors.joining(","))+")";
+        GeneExpressionQuery query=new GeneExpressionQuery(this.getDataSource(), sql);
+        return query.execute();
     }
 
 
@@ -582,119 +613,104 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
         return executeBatch(su);
     }
-    public List<ExpressionDataIndexObject> getNormalisedExpressionObjects(List<GeneExpression> records){
-        List<ExpressionDataIndexObject> objects=new ArrayList<>();
-         if(records!=null && records.size()>0) {
-
-
-             Set<String> strainAccIds=getStrainAccIds(records);
-             Set<String> tissueAccIds=getTissueAccIds(records);
-             Set<String> conditions=getConditions(records);
-            for(String sampleId:strainAccIds){
-                for(String tissueId:tissueAccIds){
-                    List<GeneExpression> filteredRecords = getFilteredRecords(sampleId, tissueId, records);
-                    if (filteredRecords.size() > 0) {
-                        if(conditions!=null && conditions.size()>0) {
-                            for (String condition : conditions) {
-                                ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, condition, filteredRecords);
-                                if(object!=null)
-                                    objects.add(object);
-
-                            }
-                        }else {
-                            ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, "", filteredRecords);
-                            if(object!=null)
-                            objects.add(object);
-                        }
-                    }
-
-                }}}
-         return objects;
-    }
-    public ExpressionDataIndexObject getExpressionIndexObject(String sampleId, String tissueId, String condition, List<GeneExpression> filteredRecords){
-        if(condition==null)
-            condition="";
-        DecimalFormat df=new DecimalFormat("#.####");
-        ExpressionDataIndexObject object = new ExpressionDataIndexObject();
-        object.setStrainAcc(sampleId);
-        try {
-            if (object.getStrainAcc() != null && !object.getStrainAcc().equals(""))
-                object.setStrainTerm(getTerm(object.getStrainAcc())+" "+ condition);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        object.setTissueAcc(tissueId);
-
-        try {
-            if (object.getTissueAcc() != null && !object.getTissueAcc().equals(""))
-                object.setTissueTerm(getTerm(object.getTissueAcc()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        List<Double> values = new ArrayList<>();
-        Set<String> level = new HashSet<>();
-        double valueSum = 0;
-        int conditionRecordsSize=0;
-        for (GeneExpression record : filteredRecords) {
-            String recordCondition=record.getGeneExpressionRecord().getExperimentCondition();
-            if(recordCondition==null) recordCondition="";
-            if(condition.equalsIgnoreCase(recordCondition)) {
-                conditionRecordsSize++;
-                Double val = record.getGeneExpressionRecordValue().getExpressionValue();
-                valueSum += val;
-                values.add(val);
-                level.add(record.getGeneExpressionRecordValue().getExpressionLevel());
-            }
-        }
-        double valueMean = Double.parseDouble(df.format(valueSum / conditionRecordsSize));
-        object.setExpressionLevel(level);
-        object.setExpressionValue(values);
-        object.setValueMean(valueMean);
-        if (valueMean > 0) {
-            object.setLogValue(Math.log(valueMean));
-           return object;
-        }
-return null;
-    }
-    public List<GeneExpression> getHighExpressionValuesByStudyId(int studyId, String level) throws Exception {
-        String sql= """
-                select s.*,c.*, ge.*,g.*,xcondition.term as condition from study st inner join experiment e on e.study_id=st.study_id\s
-                                 left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id
-                                 left outer join sample s on s.sample_id=gr.sample_id\s
-                                 left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
-                                 left outer join ont_terms xcondition on xcondition.term_acc=c.exp_cond_ont_id
-                                 left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
-                                 left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id
-                                 where st.study_id=?
-                and ge.expression_level =?
-                """;
-        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),sql);
-        return execute(q,studyId, level);
-    }
-    Set<String> getStrainAccIds(List<GeneExpression> records){
-        return records.stream().map(r->r.getSample().getStrainAccId()).collect(Collectors.toSet());
-    }
-    Set<String> getTissueAccIds(List<GeneExpression> records){
-        return records.stream().map(r->r.getSample().getTissueAccId()).collect(Collectors.toSet());
-    }
-    Set<String> getConditions(List<GeneExpression> records){
-        return records.stream().map(r->r.getGeneExpressionRecord().getExperimentCondition()).collect(Collectors.toSet());
-    }
-    List<GeneExpression> getFilteredRecords(String strainAccId, String tissueAccId,List<GeneExpression> records){
-        List<GeneExpression> filteredRecs=new ArrayList<>();
-        for(GeneExpression rec:records){
-            if(rec.getSample()!=null && rec.getSample().getStrainAccId()!=null &&  rec.getSample().getTissueAccId()!=null &&
-                    rec.getSample().getStrainAccId().equalsIgnoreCase(strainAccId) && rec.getSample().getTissueAccId().equalsIgnoreCase(tissueAccId)){
-                filteredRecs.add(rec);
-            }
-        }
-        return filteredRecs;
-    }
-    String getTerm(String accId) throws Exception {
-
-        Term term = xdao.getTerm(accId);
-        return term.getTerm();
-
-    }
+//    public List<ExpressionDataIndexObject> getNormalisedExpressionObjects(List<GeneExpression> records){
+//        List<ExpressionDataIndexObject> objects=new ArrayList<>();
+//         if(records!=null && records.size()>0) {
+//
+//
+//             Set<String> strainAccIds=getStrainAccIds(records);
+//             Set<String> tissueAccIds=getTissueAccIds(records);
+//             Set<String> conditions=getConditions(records);
+//            for(String sampleId:strainAccIds){
+//                for(String tissueId:tissueAccIds){
+//                    List<GeneExpression> filteredRecords = getFilteredRecords(sampleId, tissueId, records);
+//                    if (filteredRecords.size() > 0) {
+//                        if(conditions!=null && conditions.size()>0) {
+//                            for (String condition : conditions) {
+//                                ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, condition, filteredRecords);
+//                                if(object!=null)
+//                                    objects.add(object);
+//
+//                            }
+//                        }else {
+//                            ExpressionDataIndexObject object=getExpressionIndexObject(sampleId, tissueId, "", filteredRecords);
+//                            if(object!=null)
+//                            objects.add(object);
+//                        }
+//                    }
+//
+//                }}}
+//         return objects;
+//    }
+//    public ExpressionDataIndexObject getExpressionIndexObject(String sampleId, String tissueId, String condition, List<GeneExpression> filteredRecords){
+//        if(condition==null)
+//            condition="";
+//        DecimalFormat df=new DecimalFormat("#.####");
+//        ExpressionDataIndexObject object = new ExpressionDataIndexObject();
+//        object.setStrainAcc(sampleId);
+//        try {
+//            if (object.getStrainAcc() != null && !object.getStrainAcc().equals(""))
+//                object.setStrainTerm(getTerm(object.getStrainAcc())+" "+ condition);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        object.setTissueAcc(tissueId);
+//
+//        try {
+//            if (object.getTissueAcc() != null && !object.getTissueAcc().equals(""))
+//                object.setTissueTerm(getTerm(object.getTissueAcc()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        List<Double> values = new ArrayList<>();
+//        Set<String> level = new HashSet<>();
+//        double valueSum = 0;
+//        int conditionRecordsSize=0;
+//        for (GeneExpression record : filteredRecords) {
+//            String recordCondition=record.getGeneExpressionRecord().getExperimentCondition();
+//            if(recordCondition==null) recordCondition="";
+//            if(condition.equalsIgnoreCase(recordCondition)) {
+//                conditionRecordsSize++;
+//                Double val = record.getGeneExpressionRecordValue().getExpressionValue();
+//                valueSum += val;
+//                values.add(val);
+//                level.add(record.getGeneExpressionRecordValue().getExpressionLevel());
+//            }
+//        }
+//        double valueMean = Double.parseDouble(df.format(valueSum / conditionRecordsSize));
+//        object.setExpressionLevel(level);
+//        object.setExpressionValue(values);
+//        object.setValueMean(valueMean);
+//        if (valueMean > 0) {
+//            object.setLogValue(Math.log(valueMean));
+//           return object;
+//        }
+//return null;
+//    }
+//    Set<String> getStrainAccIds(List<GeneExpression> records){
+//        return records.stream().map(r->r.getSample().getStrainAccId()).collect(Collectors.toSet());
+//    }
+//    Set<String> getTissueAccIds(List<GeneExpression> records){
+//        return records.stream().map(r->r.getSample().getTissueAccId()).collect(Collectors.toSet());
+//    }
+//    Set<String> getConditions(List<GeneExpression> records){
+//        return records.stream().map(r->r.getGeneExpressionRecord().getExperimentCondition()).collect(Collectors.toSet());
+//    }
+//    List<GeneExpression> getFilteredRecords(String strainAccId, String tissueAccId,List<GeneExpression> records){
+//        List<GeneExpression> filteredRecs=new ArrayList<>();
+//        for(GeneExpression rec:records){
+//            if(rec.getSample()!=null && rec.getSample().getStrainAccId()!=null &&  rec.getSample().getTissueAccId()!=null &&
+//                    rec.getSample().getStrainAccId().equalsIgnoreCase(strainAccId) && rec.getSample().getTissueAccId().equalsIgnoreCase(tissueAccId)){
+//                filteredRecs.add(rec);
+//            }
+//        }
+//        return filteredRecs;
+//    }
+//    String getTerm(String accId) throws Exception {
+//
+//        Term term = xdao.getTerm(accId);
+//        return term.getTerm();
+//
+//    }
 
 }
