@@ -656,6 +656,21 @@ public class GeneExpressionDAO extends PhenominerDAO {
         }
 return null;
     }
+    public List<GeneExpression> getHighExpressionValuesByStudyId(int studyId, String level) throws Exception {
+        String sql= """
+                select s.*,c.*, ge.*,g.*,xcondition.term as condition from study st inner join experiment e on e.study_id=st.study_id\s
+                                 left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id
+                                 left outer join sample s on s.sample_id=gr.sample_id\s
+                                 left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
+                                 left outer join ont_terms xcondition on xcondition.term_acc=c.exp_cond_ont_id
+                                 left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
+                                 left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id
+                                 where st.study_id=?
+                and ge.expression_level =?
+                """;
+        GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),sql);
+        return execute(q,studyId, level);
+    }
     Set<String> getStrainAccIds(List<GeneExpression> records){
         return records.stream().map(r->r.getSample().getStrainAccId()).collect(Collectors.toSet());
     }
