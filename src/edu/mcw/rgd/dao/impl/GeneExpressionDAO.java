@@ -2,6 +2,7 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.dao.spring.ontologyx.TermQuery;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.GeneExpression;
 import edu.mcw.rgd.datamodel.expression.ExpressionDataIndexObject;
@@ -420,20 +421,36 @@ public class GeneExpressionDAO extends PhenominerDAO {
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),sql);
         return execute(q,studyId, level);
     }
-    public List<GeneExpression> getExpressionValuesByRecordIds(Set<Integer> recordIds) throws Exception {
+    public List<GeneExpression> getExpressionHighValuesByRecordIds(Set<Integer> recordIds) throws Exception {
         String sql= """
-                select s.*,c.*, ge.*,g.*,xcondition.term as condition from study st inner join experiment e on e.study_id=st.study_id\s
-                                 left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id
-                                 left outer join sample s on s.sample_id=gr.sample_id\s
-                                 left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
-                                 left outer join ont_terms xcondition on xcondition.term_acc=c.exp_cond_ont_id
-                                 left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
-                                 left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id where
+                select   ge.*,gr.*,s.*,e.*,st.*,g.*,tissue.term as tissue_term, strain.term as strain_term, trait.term as trait_term ,g.gene_symbol,measurement.term as measurement 
+                from study st inner join experiment e on e.study_id=st.study_id\s
+                                                                                                   
+               left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id 
+               left outer join sample s on s.sample_id=gr.sample_id\s
+               left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id
+               left outer join gene_expression_values ge on ge.gene_expression_exp_record_id=gr.gene_expression_exp_record_id\s
+               left outer join genes g on g.rgd_id = ge.expressed_object_rgd_id
+                                                                                                     
+              left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id
+               left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id
+              left outer join ont_terms strain on strain.term_acc=s.strain_ont_id
+              left outer join ont_terms trait on trait.term_acc=e.trait_ont_id                                                                                     
+                                 where  ge.expression_level =? and
                                 ge.gene_expression_exp_record_id in (
                 """;
         sql+=recordIds.stream().map(id->id+"").collect(Collectors.joining(","))+")";
         GeneExpressionQuery query=new GeneExpressionQuery(this.getDataSource(), sql);
-        return query.execute();
+        return execute(query, "high");
+    }
+    public List<Condition> getExpressionConditionsByRecordId(int recordId) throws Exception {
+        String sql= """
+                select c.*,xcondition.* from experiment_condition c
+                 left outer join ont_terms xcondition on xcondition.term_acc=c.exp_cond_ont_id where gene_expression_exp_record_id =?
+                """;
+
+       ConditionQuery query=new ConditionQuery(this.getDataSource(), sql);
+        return execute(query, recordId);
     }
 
 
