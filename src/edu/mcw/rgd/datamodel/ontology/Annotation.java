@@ -35,6 +35,7 @@ public class Annotation implements Cloneable, Dumpable {
     private String annotationExtension;
     private String geneProductFormId;
     private Date originalCreatedDate;
+    private String qualifier2;
     private String associatedWith;
     private String molecularEntity;
     private String alteration;
@@ -228,6 +229,14 @@ public class Annotation implements Cloneable, Dumpable {
 
     public void setOriginalCreatedDate(Date originalCreatedDate) {
         this.originalCreatedDate = originalCreatedDate;
+    }
+
+    public String getQualifier2() {
+        return qualifier2;
+    }
+
+    public void setQualifier2(String qualifier2) {
+        this.qualifier2 = qualifier2;
     }
 
     public String getAssociatedWith() {
