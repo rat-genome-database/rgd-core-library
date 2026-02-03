@@ -488,19 +488,25 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
     public List<GeneExpression> getExpressionMetaDataByStudyId(int studyId) throws Exception{
 
-        String query="select  gr.*,s.*,e.*,st.*,tissue.term as tissue_term, strain.term as strain_term, c.*,measurement.term as measurement,xcondition.term as condition" +
-                "  , xcondition.term_acc as condition_acc " +
-                "   from study st inner join experiment e on e.study_id=st.study_id" +
-                "   left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id" +
-                "   left outer join sample s on s.sample_id=gr.sample_id " +
-                "   left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id" +
-                "   left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id" +
-                "   left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id" +
-                "   left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id" +
-                "   left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id" +
-                "   left outer join ont_terms strain on strain.term_acc=s.strain_ont_id" +
-
-                " where   st.study_id=? "
+        String query= """
+                select  gr.*,s.*,e.*,st.*,tissue.term as tissue_term, strain.term as strain_term,
+                 c.*,measurement.term as measurement,xcondition.term as condition  ,
+                xcondition.term_acc as condition_acc   \s
+                from study st inner join experiment e on e.study_id=st.study_id  \s
+                left outer join  gene_expression_exp_record gr on gr.experiment_id=e.experiment_id \s
+                 left outer join sample s on s.sample_id=gr.sample_id \s
+                 LEFT JOIN RNA_SEQ rs ON rs.SAMPLE_ACCESSION_ID = s.GEO_SAMPLE_ACC \s
+                 left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id  \s
+                 left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id \s
+                  left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id \s
+                   left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id  \s
+                   left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id  \s
+                   left outer join ont_terms strain on strain.term_acc=s.strain_ont_id\s
+                   where   st.study_id=?
+                    AND (rs.CURATION_STATUS IS NULL OR rs.CURATION_STATUS != 'futureCuration')
+                    AND gr.CURATION_STATUS=35  AND st.geo_series_acc=rs.geo_accession_id
+                ORDER BY s.GEO_SAMPLE_ACC, c.EXP_COND_ORDINALITY ASC
+                """
                 ;
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,studyId);
