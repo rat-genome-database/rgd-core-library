@@ -129,6 +129,16 @@ public class OntologyXDAO extends AbstractDAO {
         return terms.get(0);
     }
 
+    public Term getTermLikeNameAndAccPrefix(String term, String prefix) throws Exception{
+        String sql = "SELECT * FROM ont_terms WHERE term like ? and term_acc like ?";
+        term = term+"%";
+        prefix = prefix.toUpperCase()+"%";
+        List<Term> terms = executeTermQuery(sql, term, prefix);
+        if (terms.isEmpty())
+            return null;
+        return terms.get(0);
+    }
+
     /**
      * get active terms matching given synonym; match could be exact or partial;
      * exact match is when synonym-to-match matches the whole term synonym name;

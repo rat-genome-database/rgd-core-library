@@ -126,8 +126,11 @@ public class MapDAO extends AbstractDAO {
      */
     public List<Map> getMaps(int speciesTypeKey) throws Exception {
 
-        String sql = "select m.*, i.species_type_key from rgd_ids i, maps m " +
-                     "where i.rgd_id = m.rgd_id and i.object_key=10 and i.object_status = 'ACTIVE' and i.species_type_key=? AND m.source='NCBI'";
+        String sql = """
+             SELECT m.*, i.species_type_key FROM rgd_ids i, maps m
+             WHERE i.rgd_id = m.rgd_id AND i.object_key=10 AND i.object_status = 'ACTIVE'
+                AND i.species_type_key=? AND m.source='NCBI'
+             """;
         return executeMapQuery(sql, speciesTypeKey);
     }
 

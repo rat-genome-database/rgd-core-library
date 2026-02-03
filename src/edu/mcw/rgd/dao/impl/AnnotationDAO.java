@@ -53,73 +53,83 @@ public class AnnotationDAO extends AbstractDAO {
 
     /**
      * get annotation by a list of values that comprise unique key:
-     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
-     * @param annot Annotation object with the following fields set: TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
+     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
+     * @param annot Annotation object with the following fields set:
+     *              TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
      * @return Annotation object or null if invalid key
      * @throws Exception on spring framework dao failure
      */
     public Annotation getAnnotation(Annotation annot) throws Exception {
 
-        String query = "SELECT * FROM full_annot WHERE "
-                // fields that are never null
-                +"term_acc=? AND annotated_object_rgd_id=? AND evidence=? AND "
-                // fields that could be null
-                +"NVL(ref_rgd_id,0) = NVL(?,0) AND "
-                +"NVL(with_info,'*') = NVL(?,'*') AND "
-                +"NVL(qualifier,'*') = NVL(?,'*') AND "
-                +"NVL(xref_source,'*') = NVL(?,'*')";
+        String query = """
+            SELECT * FROM full_annot
+            WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
+             AND NVL(ref_rgd_id,0) = NVL(?,0)
+             AND NVL(with_info,'*') = NVL(?,'*')
+             AND NVL(qualifier,'*') = NVL(?,'*')
+             AND NVL(xref_source,'*') = NVL(?,'*')
+             AND NVL(qualifier2,'*') = NVL(?,'*')
+             AND NVL(associated_with,'*') = NVL(?,'*')
+            """;
 
         List<Annotation> list = executeAnnotationQuery(query, annot.getTermAcc(), annot.getAnnotatedObjectRgdId(),
-                annot.getEvidence(), annot.getRefRgdId(), annot.getWithInfo(), annot.getQualifier(), annot.getXrefSource());
+                annot.getEvidence(), annot.getRefRgdId(), annot.getWithInfo(), annot.getQualifier(), annot.getXrefSource(),
+                annot.getQualifier2(), annot.getAssociatedWith());
         return list.isEmpty() ? null : list.get(0);
     }
 
     /**
      * get annotation notes given a list of values that comprise unique key:
-     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
-     * @param annot Annotation object with the following fields set: TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
+     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
+     * @param annot Annotation object with the following fields set:
+     *              TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
      * @return Annotation object with annot_key and notes field set, or null if invalid key
      * @throws Exception on spring framework dao failure
      */
     public IntStringMapQuery.MapPair getAnnotationNotes(Annotation annot) throws Exception {
 
-        String query = "SELECT a.full_annot_key,notes FROM full_annot a WHERE "
-                // fields that are never null
-                +"term_acc=? AND annotated_object_rgd_id=? AND evidence=? AND "
-                // fields that could be null
-                +"NVL(ref_rgd_id,0) = NVL(?,0) AND "
-                +"NVL(with_info,'*') = NVL(?,'*') AND "
-                +"NVL(qualifier,'*') = NVL(?,'*') AND "
-                +"NVL(xref_source,'*') = NVL(?,'*')";
+        String query = """
+            SELECT a.full_annot_key,notes FROM full_annot a
+            WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
+             AND NVL(ref_rgd_id,0) = NVL(?,0)
+             AND NVL(with_info,'*') = NVL(?,'*')
+             AND NVL(qualifier,'*') = NVL(?,'*')
+             AND NVL(xref_source,'*') = NVL(?,'*')
+             AND NVL(qualifier2,'*') = NVL(?,'*')
+             AND NVL(associated_with,'*') = NVL(?,'*')
+            """;
 
         List<IntStringMapQuery.MapPair> results = IntStringMapQuery.execute(this, query, annot.getTermAcc(),
                 annot.getAnnotatedObjectRgdId(), annot.getEvidence(), annot.getRefRgdId(), annot.getWithInfo(),
-                annot.getQualifier(), annot.getXrefSource());
+                annot.getQualifier(), annot.getXrefSource(), annot.getQualifier2(), annot.getAssociatedWith());
         return results.isEmpty() ? null : results.get(0);
     }
 
     /**
      * get annotation key by a list of values that comprise unique key:
-     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
-     * @param annot Annotation object with the following fields set: TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE
+     * TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
+     * @param annot Annotation object with the following fields set:
+     *             TERM_ACC+ANNOTATED_OBJECT_RGD_ID+REF_RGD_ID+EVIDENCE+WITH_INFO+QUALIFIER+XREF_SOURCE+QUALIFIER2+ASSOCIATED_WITH
      * @return value of annotation key or 0 if there is no such annotation
      * @throws Exception on spring framework dao failure
      */
     public int getAnnotationKey(Annotation annot) throws Exception {
 
-        String query = "SELECT full_annot_key FROM full_annot WHERE "
-                // fields that are never null
-                +"term_acc=? AND annotated_object_rgd_id=? AND evidence=? AND "
-                // fields that could be null
-                +"NVL(ref_rgd_id,0) = NVL(?,0) AND "
-                +"NVL(with_info,'*') = NVL(?,'*') AND "
-                +"NVL(qualifier,'*') = NVL(?,'*') AND "
-                +"NVL(xref_source,'*') = NVL(?,'*')";
+        String query = """
+            SELECT full_annot_key FROM full_annot
+            WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
+             AND NVL(ref_rgd_id,0) = NVL(?,0)
+             AND NVL(with_info,'*') = NVL(?,'*')
+             AND NVL(qualifier,'*') = NVL(?,'*')
+             AND NVL(xref_source,'*') = NVL(?,'*')
+             AND NVL(qualifier2,'*') = NVL(?,'*')
+             AND NVL(associated_with,'*') = NVL(?,'*')
+            """;
 
-        IntListQuery q = new IntListQuery(this.getDataSource(), query);
+        List<Integer> list = IntListQuery.execute(this, query, annot.getTermAcc(), annot.getAnnotatedObjectRgdId(),
+            annot.getEvidence(), annot.getRefRgdId(), annot.getWithInfo(), annot.getQualifier(), annot.getXrefSource(),
+            annot.getQualifier2(), annot.getAssociatedWith());
 
-        List<Integer> list = execute(q, annot.getTermAcc(), annot.getAnnotatedObjectRgdId(), annot.getEvidence(),
-            annot.getRefRgdId(), annot.getWithInfo(), annot.getQualifier(), annot.getXrefSource());
         return list.isEmpty() ? 0 : list.get(0);
     }
 
@@ -222,41 +232,6 @@ public class AnnotationDAO extends AbstractDAO {
                 "ORDER BY term,qualifier";
         return executeAnnotationQuery(query, termAcc);
     }
-
-    /* unused -- to be removed?
-    public List<Annotation> getAnnotationList(List<String> termAccs, List<Integer> objectRgdIds, int objectKey) throws Exception {
-        String query = "select distinct fa.full_annot_key, fa.term, fa.annotated_object_rgd_id, fa.rgd_object_key, fa.data_src, fa.object_symbol, fa.ref_rgd_id, fa.evidence, fa.with_info, fa.aspect, fa.object_name \n" +
-                 ",fa.qualifier, fa.relative_to, fa.created_date, fa.last_modified_date, fa.term_acc, fa.created_by, fa.last_modified_by, fa.xref_source " +
-                " from full_annot_index fai, full_annot fa " +
-                 " where fai.full_annot_key = fa.full_annot_key ";
-
-        if (objectRgdIds.size()==0 && termAccs.size()==0) {
-            throw new Exception("Gene and term lists can not be 0 length");
-        }
-
-        if (objectRgdIds.size() > 0) {
-            query += " and annotated_object_rgd_id in ( ";
-            query += Utils.concatenate(objectRgdIds, ",");
-            query += ") ";
-        }
-
-        if (termAccs.size() > 0) {
-            query += " and fai.term_acc in (";
-            query += Utils.buildInPhraseQuoted(termAccs);
-            query += ")";
-        }
-
-
-        query += " and rgd_object_key=" + objectKey;
-        query += "  order by term, object_symbol ";
-
-        AnnotationQuery q = new AnnotationQuery(this.getDataSource(), query);
-        q.compile();
-
-        return q.execute();
-
-    }
-*/
 
     public List<Annotation> getAnnotationByEvidence(int annotatedObjectRGDId, String termAcc, int createdBy, String evidence) throws Exception {
         String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? and term_acc=? and created_by=? and evidence=?";
@@ -2017,7 +1992,7 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = """
             UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?,
               object_symbol=?, ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?,
-              last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?,
+              last_modified_date=?, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, qualifier2=?,
               annotation_extension=?, gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?,
               molecular_entity=?, alteration=?, alteration_location=?, variant_nomenclature=?
             WHERE full_annot_key=?
@@ -2027,7 +2002,7 @@ public class AnnotationDAO extends AbstractDAO {
             annot.getObjectSymbol(), annot.getRefRgdId(), annot.getEvidence(),
             annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getQualifier(),
             annot.getLastModifiedDate(), annot.getTermAcc(), annot.getCreatedBy(),
-            annot.getLastModifiedBy(), annot.getXrefSource(), annot.getAnnotationExtension(),
+            annot.getLastModifiedBy(), annot.getXrefSource(), annot.getQualifier2(), annot.getAnnotationExtension(),
             annot.getGeneProductFormId(), annot.getNotes(), annot.getOriginalCreatedDate(), annot.getAssociatedWith(),
             annot.getMolecularEntity(), annot.getAlteration(), annot.getAlterationLocation(), annot.getVariantNomenclature(),
             annot.getKey());
@@ -2050,24 +2025,24 @@ public class AnnotationDAO extends AbstractDAO {
             UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, object_symbol=?,
               ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?,
               last_modified_date=SYSDATE, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, annotation_extension=?,
-              gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?,
+              gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?, qualifier2=?,
               molecular_entity=?, alteration=?, alteration_location=?, variant_nomenclature=?
             WHERE full_annot_key=?
             """,
             new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
                     Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                     Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
-                    Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR,
+                    Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR,
                     Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                     Types.INTEGER});
 
         for (Annotation a : annots){
             su.update(a.getTerm(), a.getAnnotatedObjectRgdId(), a.getRgdObjectKey(), a.getDataSrc(), a.getObjectSymbol(),
-                    a.getRefRgdId(), a.getEvidence(), a.getWithInfo(), a.getAspect(), a.getObjectName(), a.getQualifier(),
-                    a.getTermAcc(), a.getCreatedBy(), a.getLastModifiedBy(), a.getXrefSource(), a.getAnnotationExtension(),
-                    a.getGeneProductFormId(), a.getNotes(), a.getOriginalCreatedDate(), a.getAssociatedWith(),
-                    a.getMolecularEntity(), a.getAlteration(), a.getAlterationLocation(), a.getVariantNomenclature(),
-                    a.getKey());
+                a.getRefRgdId(), a.getEvidence(), a.getWithInfo(), a.getAspect(), a.getObjectName(), a.getQualifier(),
+                a.getTermAcc(), a.getCreatedBy(), a.getLastModifiedBy(), a.getXrefSource(), a.getAnnotationExtension(),
+                a.getGeneProductFormId(), a.getNotes(), a.getOriginalCreatedDate(), a.getAssociatedWith(), a.getQualifier2(),
+                a.getMolecularEntity(), a.getAlteration(), a.getAlterationLocation(), a.getVariantNomenclature(),
+                a.getKey());
         }
 
        return executeBatch(su);
@@ -2091,8 +2066,8 @@ public class AnnotationDAO extends AbstractDAO {
                   object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier,
                   created_date, last_modified_date, term_acc, created_by, last_modified_by,
                   xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
-                  molecular_entity, alteration, alteration_location, variant_nomenclature, full_annot_key)
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL)
+                  molecular_entity, alteration, alteration_location, variant_nomenclature, qualifier2, full_annot_key)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL)
                 RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?;  END;
                 """;
 
@@ -2122,16 +2097,17 @@ public class AnnotationDAO extends AbstractDAO {
             cs.setString(22, annot.getAlteration());
             cs.setString(23, annot.getAlterationLocation());
             cs.setString(24, annot.getVariantNomenclature());
+            cs.setString(25, annot.getQualifier2());
 
-            cs.registerOutParameter(25, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(26, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(27, Types.TIMESTAMP); // last_modified_date
+            cs.registerOutParameter(26, Types.INTEGER); // full_annot_key
+            cs.registerOutParameter(27, Types.TIMESTAMP); // created_date
+            cs.registerOutParameter(28, Types.TIMESTAMP); // last_modified_date
 
             cs.execute();
 
-            annot.setKey(cs.getInt(25));
-            annot.setCreatedDate(cs.getTimestamp(26));
-            annot.setLastModifiedDate(cs.getTimestamp(27));
+            annot.setKey(cs.getInt(26));
+            annot.setCreatedDate(cs.getTimestamp(27));
+            annot.setLastModifiedDate(cs.getTimestamp(28));
         }
 
         return annot.getKey();
@@ -2143,24 +2119,24 @@ public class AnnotationDAO extends AbstractDAO {
               object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier,
               created_date, last_modified_date, term_acc, created_by, last_modified_by,
               xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
-              molecular_entity, alteration, alteration_location, variant_nomenclature, full_annot_key)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?)
+              molecular_entity, alteration, alteration_location, variant_nomenclature, qualifier2, full_annot_key)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR,
                 Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
                 Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR,
-                Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER});
+                Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER});
         su.compile();
         for (Annotation annot : annots){
             int fullAnnotKey = this.getNextKeyFromSequence("full_annot_seq");
             annot.setKey(fullAnnotKey);
 
             su.update(annot.getTerm(), annot.getAnnotatedObjectRgdId(), annot.getRgdObjectKey(), annot.getDataSrc(), annot.getObjectSymbol(),
-                    annot.getRefRgdId(), annot.getEvidence(), annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
-                    annot.getQualifier(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
-                    annot.getXrefSource(), annot.getAnnotationExtension(), annot.getGeneProductFormId(), annot.getOriginalCreatedDate(),
-                    annot.getAssociatedWith(), annot.getMolecularEntity(), annot.getAlteration(), annot.getAlterationLocation(),
-                    annot.getVariantNomenclature(), annot.getKey());
+                annot.getRefRgdId(), annot.getEvidence(), annot.getWithInfo(), annot.getAspect(), annot.getObjectName(), annot.getNotes(),
+                annot.getQualifier(), annot.getTermAcc(), annot.getCreatedBy(), annot.getLastModifiedBy(),
+                annot.getXrefSource(), annot.getAnnotationExtension(), annot.getGeneProductFormId(), annot.getOriginalCreatedDate(),
+                annot.getAssociatedWith(), annot.getMolecularEntity(), annot.getAlteration(), annot.getAlterationLocation(),
+                annot.getVariantNomenclature(), annot.getQualifier2(), annot.getKey());
         }
         return executeBatch(su);
     }
