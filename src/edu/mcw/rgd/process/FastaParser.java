@@ -33,8 +33,8 @@ public class FastaParser {
 
         String chrDir;
         switch(mapKey) {
-            case 17: chrDir=dir+"hs37"; break;
-            case 38: chrDir=dir+"hs38"; break;
+            case 17: chrDir=dir+"GRCh37.p13"; break;
+            case 38: chrDir=dir+"GRCh38.p14"; break;
             case 18: chrDir=dir+"mm37"; break;
             case 35: chrDir=dir+"mm38"; break;
             case 239: chrDir=dir+"mm39"; break;
