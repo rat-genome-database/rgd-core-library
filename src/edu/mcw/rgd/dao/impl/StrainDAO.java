@@ -23,8 +23,11 @@ public class StrainDAO extends AbstractDAO {
      * @throws Exception when something really bad happens in spring framework
      */
     public List<Strain> getActiveStrains() throws Exception {
-        String query = "select s.*, r.SPECIES_TYPE_KEY from strains s, RGD_IDS r " +
-                "where r.OBJECT_STATUS='ACTIVE' and r.RGD_ID=s.RGD_ID";
+        String query = """
+            SELECT s.*, r.species_type_key
+            FROM strains s, rgd_ids r
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id
+            """;
         return executeStrainQuery(query);
     }
 
