@@ -257,6 +257,33 @@ public class PhenominerDAO extends AbstractDAO {
         return null;
     }
 
+    public int getGeoStudyCount(String species, String status) throws Exception {
+        String query = "SELECT COUNT(DISTINCT geo_accession_id) FROM rna_seq " +
+                "WHERE sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ?";
+        return getCount(query, species + "%", status);
+    }
+
+    public LinkedHashMap<String,GeoRecord> getGeoStudiesPaged(String species, String status, int offset, int pageSize) throws Exception {
+        String query = "SELECT * FROM rna_seq WHERE geo_accession_id IN (" +
+                "SELECT geo_accession_id FROM (" +
+                "SELECT DISTINCT geo_accession_id, MIN(pubmed_id) AS pm FROM rna_seq " +
+                "WHERE sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ? " +
+                "GROUP BY geo_accession_id ORDER BY pm, geo_accession_id DESC" +
+                ") OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" +
+                ") ORDER BY pubmed_id, geo_accession_id DESC";
+
+        GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
+        List<GeoRecord> result = execute(q, species + "%", status, offset, pageSize);
+        LinkedHashMap<String,GeoRecord> r = new LinkedHashMap<>();
+        if(result != null) {
+            for(GeoRecord s : result) {
+                r.put(s.getGeoAccessionId(), s);
+            }
+            return r;
+        }
+        return null;
+    }
+
     public void updateGeoStudyStatus(String gse,String status,String species) throws Exception{
 
         String query = "UPDATE rna_seq SET curation_status = ? WHERE geo_accession_id =? and sample_organism like ? ";
