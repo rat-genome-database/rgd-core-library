@@ -22,6 +22,7 @@ public class Map implements Identifiable, ObjectWithName, Speciated {
     private String refSeqAssemblyAcc; // GCF_xxxx
     private String refSeqAssemblyName;
     private String source;
+    private String genBankAssemblyAcc; // GCA_xxxx
 
     public String getDbsnpVersion() {
         return dbsnpVersion;
@@ -153,5 +154,13 @@ public class Map implements Identifiable, ObjectWithName, Speciated {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getGenBankAssemblyAcc() {
+        return genBankAssemblyAcc;
+    }
+
+    public void setGenBankAssemblyAcc(String genBankAssemblyAcc) {
+        this.genBankAssemblyAcc = genBankAssemblyAcc;
     }
 }
