@@ -1,11 +1,13 @@
 package edu.mcw.rgd.datamodel;
 
+import edu.mcw.rgd.process.Dumper;
+
 /**
  * Bean class for a gene family.
  * <p>
- * Data corresponds to the family table.
+ * Data corresponds to the hgnc_families table.
  */
-public class HgncFamily {
+public class HgncFamily implements Dumpable {
 
     private int familyId;
     private String abbreviation;
@@ -96,5 +98,21 @@ public class HgncFamily {
 
     public void setTypicalGene(String typicalGene) {
         this.typicalGene = typicalGene;
+    }
+
+    public String dump(String delimiter) {
+
+        return new Dumper(delimiter)
+            .put("FAMILY_ID", getFamilyId())
+            .put("ABBREVIATION", getAbbreviation())
+            .put("NAME", getName())
+            .put("EXTERNAL_NOTE", getExternalNote())
+            .put("PUBMED_IDS", getPubmedIds())
+            .put("DESC_COMMENT", getDescComment())
+            .put("DESC_LABEL", getDescLabel())
+            .put("DESC_SOURCE", getDescSource())
+            .put("DESC_GO", getDescGo())
+            .put("TYPICAL_GENE", getTypicalGene())
+            .dump();
     }
 }
