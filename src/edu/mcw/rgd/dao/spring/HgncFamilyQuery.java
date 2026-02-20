@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Returns a row from the hgnc_family table.
+ * Returns a row from the hgnc_families table.
  */
 public class HgncFamilyQuery extends MappingSqlQuery {
 
