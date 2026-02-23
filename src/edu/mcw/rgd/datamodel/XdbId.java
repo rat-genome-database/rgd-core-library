@@ -39,6 +39,7 @@ public class XdbId implements Identifiable, Dumpable {
     static public final int XDB_KEY_GENEBANKPROT = 7;
     static public final int XDB_KEY_GERMONLINE = 18;
     static public final int XDB_KEY_HGNC = 21;
+    static public final int XDB_KEY_HGNC_GENE_FAMILY = 167;
     static public final int XDB_KEY_HOMOLOGENE = 22;
     static public final int XDB_KEY_HPRD = 24;
     static public final int XDB_KEY_IMAGECLONE = 40;
