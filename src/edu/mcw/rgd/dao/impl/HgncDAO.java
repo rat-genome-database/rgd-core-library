@@ -3,6 +3,7 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.HgncFamilyQuery;
 import edu.mcw.rgd.dao.spring.IntListQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.HgncFamily;
 
 import java.util.List;
@@ -49,6 +50,11 @@ public class HgncDAO extends AbstractDAO {
     public int deleteFamily(int familyId) throws Exception {
         String sql = "DELETE FROM hgnc_families WHERE family_id=?";
         return update(sql, familyId);
+    }
+
+    public List<String> getHgncIdsForFamily(int familyId) throws Exception {
+        String sql = "SELECT hgnc_id FROM hgnc_family_to_genes WHERE family_id=? ORDER BY hgnc_id";
+        return StringListQuery.execute(this, sql, familyId);
     }
 
     public List<Integer> getGeneRgdIdsForFamily(int familyId) throws Exception {
