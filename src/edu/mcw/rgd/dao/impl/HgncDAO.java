@@ -49,4 +49,14 @@ public class HgncDAO extends AbstractDAO {
         String sql = "DELETE FROM hgnc_families WHERE family_id=?";
         return update(sql, familyId);
     }
+
+    public List<HgncFamily> getGeneFamiliesByRgdId(int rgdId) throws Exception {
+        String sql = """
+            SELECT f.* FROM hgnc_families f
+            JOIN hgnc_family_to_genes ftg ON f.family_id = ftg.family_id
+            WHERE ftg.rgd_id = ?
+            ORDER BY f.name
+            """;
+        return HgncFamilyQuery.execute(this, sql, rgdId);
+    }
 }
