@@ -1,6 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.spring.IntListQuery;
 import edu.mcw.rgd.dao.spring.SampleQuery;
 import edu.mcw.rgd.datamodel.Sample;
 import edu.mcw.rgd.process.Utils;
@@ -172,5 +173,12 @@ public class SampleDAO extends JdbcBaseDAO {
         q.compile();
         List<Sample> samples = q.execute(strainRgdId,mapKey);
         return samples.isEmpty() ? null : samples;
+    }
+
+    public List<Integer> getVariantMapKeys() throws Exception {
+        String sql = "SELECT DISTINCT map_key FROM patient";
+        IntListQuery q = new IntListQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.compile();
+        return q.execute();
     }
 }
