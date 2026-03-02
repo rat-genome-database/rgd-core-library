@@ -515,7 +515,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
                                                                                                         AND st.geo_series_acc=rs.geo_accession_id
                 """;
         IntListQuery studyQuery=new IntListQuery(this.getDataSource(), query);
-        return execute(studyQuery, "RNA-SEQ");
+        return studyQuery.execute();
 
     }
 
