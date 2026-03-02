@@ -482,6 +482,25 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return execute(studyQuery, "RNA-SEQ");
 
     }
+    public List<Integer> getGeneExpressionStudiesIds() throws Exception {
+        String query= """
+                SELECT distinct st.study_id
+                                                                                                       FROM STUDY st
+                                                                                                      JOIN EXPERIMENT e ON st.STUDY_ID = e.STUDY_ID
+                                                                                                      JOIN GENE_EXPRESSION_EXP_RECORD ger ON e.EXPERIMENT_ID = ger.EXPERIMENT_ID
+                                                                                                      JOIN SAMPLE s ON ger.SAMPLE_ID = s.SAMPLE_ID
+                                                                                                      LEFT JOIN EXPERIMENT_CONDITION ec ON ger.GENE_EXPRESSION_EXP_RECORD_ID = ec.GENE_EXPRESSION_EXP_RECORD_ID
+                                                                                                      LEFT JOIN RNA_SEQ rs ON rs.SAMPLE_ACCESSION_ID = s.GEO_SAMPLE_ACC
+                                                                                                   
+                                                                                                      WHERE
+                                                                                                        (rs.CURATION_STATUS IS NULL OR rs.CURATION_STATUS != 'futureCuration')
+                                                                                                        AND ger.CURATION_STATUS=35
+                                                                                                        AND st.geo_series_acc=rs.geo_accession_id
+                """;
+        IntListQuery studyQuery=new IntListQuery(this.getDataSource(), query);
+        return execute(studyQuery, "RNA-SEQ");
+
+    }
 
     public List<GeneExpression> getExpressionMetaDataByStudyId(int studyId) throws Exception{
 
