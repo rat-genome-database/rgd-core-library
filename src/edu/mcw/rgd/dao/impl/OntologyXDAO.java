@@ -1149,6 +1149,19 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     /**
+     * get obsolete GO term synonyms created by RGD (alt_id synonyms for GO terms with source 'RGD')
+     * @return list of TermSynonym objects sorted by created_date
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<TermSynonym> getObsoleteGoTermSynonyms() throws Exception {
+        String sql = "SELECT s.* FROM ont_synonyms s "+
+                "WHERE s.term_acc LIKE 'GO:%' AND s.source='RGD' AND s.synonym_type='alt_id' "+
+                "ORDER BY s.created_date DESC";
+        TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), sql);
+        return execute(q);
+    }
+
+    /**
      * insert new synonym for given term
      * @param synonym OntTermSynonym object to be inserted
      * @return synonym key of newly inserted synonym
