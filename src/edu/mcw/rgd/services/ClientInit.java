@@ -14,92 +14,77 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 public class ClientInit {
-    private static RestHighLevelClient client=null;
-    private static ClientInit esClientFactory=null;
+    private static volatile RestHighLevelClient client = null;
     private static final Logger log = LogManager.getLogger(ClientInit.class);
-    public static void init() throws UnknownHostException {
-        if(esClientFactory==null){
-            esClientFactory=new ClientInit();
+
+    private static final int ES_PORT = 9200;
+    private static final String ES_SCHEME = "http";
+    private static final String PROPERTIES_PATH = "/data/properties/elasticsearchProps.properties";
+
+    public static synchronized void init() throws UnknownHostException {
+        if (client == null) {
             log.info("Initializing Elasticsearch Client...");
-            if(client==null){
-                log.info("CREATING NEW CLIENT...");
-                System.out.println("CREATING NEW CLIENT...");
-                client=getInstance();
-                log.info("Initialized elasticsearch client ...");
-                System.out.println("Initialized elasticsearch client ...");
-            }
+            client = createClient();
+            log.info("Initialized Elasticsearch Client");
         }
-
     }
-    private static RestHighLevelClient getInstance() throws UnknownHostException {
 
-        if(RgdContext.isProduction() || RgdContext.isPipelines()) {
+    private static RestHighLevelClient createClient() throws UnknownHostException {
+        if (RgdContext.isProduction() || RgdContext.isPipelines()) {
             Properties props = getProperties();
+            if (props.isEmpty()) {
+                throw new RuntimeException("Failed to load Elasticsearch properties from " + PROPERTIES_PATH);
+            }
             return new RestHighLevelClientBuilder(
                     RestClient.builder(
-                            new HttpHost((String) props.get("HOST1"), 9200, "http"),
-                            new HttpHost((String) props.get("HOST2"), 9200, "http"),
-                            new HttpHost((String) props.get("HOST3"), 9200, "http"),
-                            new HttpHost((String) props.get("HOST4"), 9200, "http"),
-                            new HttpHost((String) props.get("HOST5"), 9200, "http")
-
+                            new HttpHost((String) props.get("HOST1"), ES_PORT, ES_SCHEME),
+                            new HttpHost((String) props.get("HOST2"), ES_PORT, ES_SCHEME),
+                            new HttpHost((String) props.get("HOST3"), ES_PORT, ES_SCHEME),
+                            new HttpHost((String) props.get("HOST4"), ES_PORT, ES_SCHEME),
+                            new HttpHost((String) props.get("HOST5"), ES_PORT, ES_SCHEME)
+                    ).build()).setApiCompatibilityMode(true).build();
+        } else {
+            return new RestHighLevelClientBuilder(
+                    RestClient.builder(
+                            new HttpHost("travis.rgd.mcw.edu", ES_PORT, ES_SCHEME)
                     ).build()).setApiCompatibilityMode(true).build();
         }
-        else
-            return new RestHighLevelClientBuilder(
-                    RestClient.builder(
-                            new HttpHost("travis.rgd.mcw.edu", 9200, "http")
-                    ).build()).setApiCompatibilityMode(true).build();
     }
+
     public static void setClient(RestHighLevelClient client) {
         ClientInit.client = client;
     }
 
     public static synchronized void destroy() throws IOException {
-
-
-        if(client!=null) {
-
+        if (client != null) {
             client.close();
             InternalThreadLocalMap.remove();
-            client=null;
-            esClientFactory=null;
-            System.out.println("destroyed Elasticsearch Client");
-        }else  System.out.println("Elasticsearch Client is null to destroy");
+            client = null;
+            log.info("Destroyed Elasticsearch Client");
+        } else {
+            log.info("Elasticsearch Client is null, nothing to destroy");
+        }
     }
-    public static RestHighLevelClient getClient() throws UnknownHostException {
-        if(client==null){
-            System.out.println("CLIENT IS NULL, INITIATING NEW CLIENT ....");
+
+    public static synchronized RestHighLevelClient getClient() throws UnknownHostException {
+        if (client == null) {
+            log.info("Client is null, initiating new client...");
             init();
         }
         return client;
     }
 
-
-    static Properties getProperties(){
-        Properties props= new Properties();
-        FileInputStream fis=null;
-
-
-        try{
-
-            fis=new FileInputStream("/data/properties/elasticsearchProps.properties");
+    static Properties getProperties() {
+        Properties props = new Properties();
+        try (FileInputStream fis = new FileInputStream(PROPERTIES_PATH)) {
             props.load(fis);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        try {
-            if (fis != null) {
-                fis.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("Failed to load Elasticsearch properties from " + PROPERTIES_PATH, e);
         }
         return props;
     }
-    public static void main(String args[]) throws IOException {
 
+    public static void main(String[] args) throws IOException {
         ClientInit.init();
         ClientInit.destroy();
     }
