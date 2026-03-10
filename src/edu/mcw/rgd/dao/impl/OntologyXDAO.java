@@ -585,10 +585,11 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public boolean isDescendantOf(String termAcc, String ancestorTermAcc) throws Exception {
 
-        String sql = "SELECT COUNT(parent_term_acc) FROM ont_dag \n"+
-                "WHERE parent_term_acc=? \n"+
-                "START WITH child_term_acc=? \n"+
-                "CONNECT BY PRIOR parent_term_acc=child_term_acc";
+        String sql = """
+            SELECT COUNT(parent_term_acc) FROM ont_dag
+            WHERE parent_term_acc=?
+            START WITH child_term_acc=?
+            CONNECT BY PRIOR parent_term_acc=child_term_acc""";
 
         return getCount(sql, ancestorTermAcc, termAcc)!=0;
     }
@@ -1123,6 +1124,7 @@ public class OntologyXDAO extends AbstractDAO {
         TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(),sql);
         return execute(q);
     }
+    
     /**
      * get list of all synonyms for given term
      * @param termAcc term accession id
@@ -1131,8 +1133,7 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public List<TermSynonym> getTermSynonyms(String termAcc) throws Exception {
         String sql = "SELECT s.* FROM ont_synonyms s WHERE term_acc=?";
-        TermSynonymQuery q = new TermSynonymQuery(this.getDataSource(), sql);
-        return execute(q, termAcc);
+        return TermSynonymQuery.execute(this, sql, termAcc);
     }
 
     /**

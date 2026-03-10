@@ -1,11 +1,13 @@
 package edu.mcw.rgd.dao.spring.ontologyx;
 
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,5 +35,10 @@ public class TermSynonymQuery extends MappingSqlQuery {
         syn.setLastModifiedDate(rs.getTimestamp("last_modified_date"));
 
         return syn;
+    }
+
+    public static List<TermSynonym> execute(AbstractDAO dao, String sql, Object... params) throws Exception {
+        TermSynonymQuery q = new TermSynonymQuery(dao.getDataSource(), sql);
+        return dao.execute(q, params);
     }
 }
