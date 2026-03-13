@@ -49,6 +49,9 @@ public class AminoAcidVariantMapper implements RowMapper<AminoAcidVariant> {
         try{
         aav.setDnaPosition(rs.getInt("full_ref_nuc_pos"));
         }catch (Exception e){}
+        try{
+            aav.setFrameshift(rs.getString("FRAMESHIFT"));
+        }catch (Exception e){}
         return aav;
     }
 }
