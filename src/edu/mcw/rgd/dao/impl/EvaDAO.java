@@ -3,6 +3,8 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.EvaQuery;
 import edu.mcw.rgd.datamodel.Eva;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.Types;
@@ -24,6 +26,12 @@ public class EvaDAO extends AbstractDAO{
         String query  = "SELECT * FROM eva where map_key=? AND chromosome=?";
         Eva test = new Eva();
         return EvaQuery.execute(this, query, mapKey, chromosome);
+    }
+
+    public void streamEvaObjectsFromMapKeyAndChromosome(int mapKey, String chromosome, RowCallbackHandler handler) throws Exception {
+        String query = "SELECT * FROM eva WHERE map_key=? AND chromosome=? ORDER BY pos";
+        JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
+        jt.query(query, handler, mapKey, chromosome);
     }
     public int deleteEva(int EvaKey) throws Exception{
         String sql = "DELETE FROM EVA WHERE EVA_ID=?";
