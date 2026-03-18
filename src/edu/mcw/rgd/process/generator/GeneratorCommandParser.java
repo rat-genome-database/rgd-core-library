@@ -84,34 +84,83 @@ public class GeneratorCommandParser {
             String lst = command.substring(4);
             String[] genes = lst.split("\\[");
 
-            //List symbols=null;
-
             List geneList = new ArrayList();
             for (int k=0; k<genes.length; k++) {
                 geneList.add(genes[k]);
             }
 
+            if (oKey == 5) {
+                try {
+                    StrainDAO sdao = new StrainDAO();
+                    for (Object symbolObj : geneList) {
+                        String sym = symbolObj.toString().trim();
+                        if (sym.isEmpty()) continue;
+                        // Always do wildcard match so "SHR" finds SHR, SHR/NCrl, etc.
+                        List<Strain> matched = sdao.getActiveStrainsBySymbolPattern(sym, speciesType);
+                        for (Strain s : matched) {
+                            allGenes.add(s);
+                        }
+                        if (matched.isEmpty()) {
+                            objectMapperLog.add("No strains matched: " + sym);
+                        }
+                    }
+                } catch (Exception e) {
+                    messages.put(command, e.getMessage());
+                }
+            } else {
+                try {
+                    ObjectMapper om = new ObjectMapper();
+                    om.mapSymbols(geneList, speciesType);
+
+                    objectMapperLog = om.getLog();
+
+                    List<Gene> mappedGenes = om.getMapped();
+                    Iterator it = mappedGenes.iterator();
+
+                    while (it.hasNext()) {
+                        Object o = it.next();
+                        if (o instanceof Gene) {
+                            Gene g = (Gene) o;
+                            allGenes.add(g);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    messages.put(command, e.getMessage());
+                }
+            }
+
+        }else if (command.toLowerCase().startsWith("ids")) {
+            String idList = command.substring(4);
+            String[] ids = idList.split("\\[");
             try {
-
-                ObjectMapper om = new ObjectMapper();
-                om.mapSymbols(geneList, speciesType);
-
-                objectMapperLog = om.getLog();
-
-                List<Gene> mappedGenes = om.getMapped();
-                Iterator it = mappedGenes.iterator();
-
-                while (it.hasNext()) {
-                    Object o = it.next();
-                    if (o instanceof Gene) {
-                        Gene g = (Gene) o;
-                        allGenes.add(g);
+                GeneDAO gdao2 = new GeneDAO();
+                QTLDAO qdao2 = new QTLDAO();
+                StrainDAO sdao2 = new StrainDAO();
+                for (String idStr : ids) {
+                    String id = idStr.trim();
+                    if (id.isEmpty()) continue;
+                    try {
+                        int rgdId = Integer.parseInt(id);
+                        if (oKey == 1) {
+                            Gene g = gdao2.getGene(rgdId);
+                            if (g != null) allGenes.add(g);
+                            else objectMapperLog.add("Gene not found for RGD ID: " + id);
+                        } else if (oKey == 6) {
+                            QTL q = qdao2.getQTL(rgdId);
+                            if (q != null) allGenes.add(q);
+                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
+                        } else if (oKey == 5) {
+                            Strain s = sdao2.getStrain(rgdId);
+                            if (s != null) allGenes.add(s);
+                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        objectMapperLog.add("Invalid RGD ID: " + id);
                     }
                 }
-
-            }catch (Exception e) {
-                messages.put(command,e.getMessage());
-
+            } catch (Exception e) {
+                messages.put(command, e.getMessage());
             }
 
         }else if (command.toLowerCase().startsWith("qtl")) {
@@ -259,7 +308,22 @@ public class GeneratorCommandParser {
 
             }}
             if(oKey==5){
-                allGenes.addAll(objectList);
+                try {
+                    StrainDAO sdao = new StrainDAO();
+                    for (Object symbolObj : objectList) {
+                        String sym = symbolObj.toString().trim();
+                        if (sym.isEmpty()) continue;
+                        List<Strain> matched = sdao.getActiveStrainsBySymbolPattern(sym, speciesType);
+                        for (Strain s : matched) {
+                            allGenes.add(s.getSymbol());
+                        }
+                        if (matched.isEmpty()) {
+                            objectMapperLog.add("No strains matched: " + sym);
+                        }
+                    }
+                } catch (Exception e) {
+                    messages.put(command, e.getMessage());
+                }
             }
       /*    List symbols=null;
             String lst = command.substring(4);
@@ -293,6 +357,39 @@ public class GeneratorCommandParser {
                 messages.put(command,e.getMessage());
 
             }*/
+
+        }else if (command.toLowerCase().startsWith("ids")) {
+            String idList = command.substring(4);
+            String[] ids = idList.split("\\[");
+            try {
+                GeneDAO gdao3 = new GeneDAO();
+                QTLDAO qdao3 = new QTLDAO();
+                StrainDAO sdao3 = new StrainDAO();
+                for (String idStr : ids) {
+                    String id = idStr.trim();
+                    if (id.isEmpty()) continue;
+                    try {
+                        int rgdId = Integer.parseInt(id);
+                        if (oKey == 1) {
+                            Gene g = gdao3.getGene(rgdId);
+                            if (g != null) allGenes.add(g.getSymbol());
+                            else objectMapperLog.add("Gene not found for RGD ID: " + id);
+                        } else if (oKey == 6) {
+                            QTL q = qdao3.getQTL(rgdId);
+                            if (q != null) allGenes.add(q.getSymbol());
+                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
+                        } else if (oKey == 5) {
+                            Strain s = sdao3.getStrain(rgdId);
+                            if (s != null) allGenes.add(s.getSymbol());
+                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        objectMapperLog.add("Invalid RGD ID: " + id);
+                    }
+                }
+            } catch (Exception e) {
+                messages.put(command, e.getMessage());
+            }
 
         }else if (command.toLowerCase().startsWith("qtl")) {
             try {

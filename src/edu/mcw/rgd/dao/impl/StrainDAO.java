@@ -181,6 +181,25 @@ public class StrainDAO extends AbstractDAO {
         return strains.size()==0 ? null : strains.get(0);
     }
 
+    /**
+     * get active strains matching a symbol pattern using wildcard (LIKE) matching;
+     * user wildcards (* or %) are converted to SQL % wildcards
+     * @param symbolPattern strain symbol pattern (e.g. "SHR*" or "F344*")
+     * @param speciesTypeKey species type key
+     * @return list of matching Strain objects
+     * @throws Exception when something really bad happens in spring framework
+     */
+    public List<Strain> getActiveStrainsBySymbolPattern(String symbolPattern, int speciesTypeKey) throws Exception {
+        String pattern = symbolPattern.toLowerCase().replace('*', '%');
+        if (!pattern.contains("%")) {
+            pattern = "%" + pattern + "%";
+        }
+        String query = "SELECT s.*, r.species_type_key FROM strains s, rgd_ids r " +
+                "WHERE r.rgd_id=s.rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=? " +
+                "AND s.strain_symbol_lc LIKE ? ORDER BY s.strain_symbol";
+        return executeStrainQuery(query, speciesTypeKey, pattern);
+    }
+
     public Strain getActiveStrainByAlias(String alias, int species) throws Exception{
         String query = "SELECT s.*, r.species_type_key from strains s, RGD_IDS r, ALIASES a where a.ALIAS_VALUE_LC=lower(?) and a.RGD_ID=s.RGD_ID and r.OBJECT_STATUS='ACTIVE' and s.RGD_ID=r.RGD_ID and r.SPECIES_TYPE_KEY=?";
         StrainQuery q = new StrainQuery(getDataSource(),query);
