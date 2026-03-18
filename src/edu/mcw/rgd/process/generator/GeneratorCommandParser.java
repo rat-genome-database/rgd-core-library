@@ -134,29 +134,57 @@ public class GeneratorCommandParser {
             String idList = command.substring(4);
             String[] ids = idList.split("\\[");
             try {
-                GeneDAO gdao2 = new GeneDAO();
-                QTLDAO qdao2 = new QTLDAO();
-                StrainDAO sdao2 = new StrainDAO();
-                for (String idStr : ids) {
-                    String id = idStr.trim();
-                    if (id.isEmpty()) continue;
-                    try {
-                        int rgdId = Integer.parseInt(id);
-                        if (oKey == 1) {
-                            Gene g = gdao2.getGene(rgdId);
-                            if (g != null) allGenes.add(g);
-                            else objectMapperLog.add("Gene not found for RGD ID: " + id);
-                        } else if (oKey == 6) {
-                            QTL q = qdao2.getQTL(rgdId);
-                            if (q != null) allGenes.add(q);
-                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
-                        } else if (oKey == 5) {
-                            Strain s = sdao2.getStrain(rgdId);
-                            if (s != null) allGenes.add(s);
-                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                if (oKey == 1) {
+                    GeneDAO gdao2 = new GeneDAO();
+                    List<Integer> rgdIds = new ArrayList<>();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (!id.isEmpty()) {
+                            try { rgdIds.add(Integer.parseInt(id)); }
+                            catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
                         }
-                    } catch (NumberFormatException nfe) {
-                        objectMapperLog.add("Invalid RGD ID: " + id);
+                    }
+                    List<MappedGene> mapped = gdao2.getActiveMappedGenesByIds(mapKey, rgdIds);
+                    for (MappedGene mg : mapped) {
+                        allGenes.add(mg.getGene());
+                    }
+                    if (mapped.size() < rgdIds.size()) {
+                        List<Integer> foundIds = new ArrayList<>();
+                        for (MappedGene mg : mapped) foundIds.add(mg.getGene().getRgdId());
+                        for (int rid : rgdIds) {
+                            if (!foundIds.contains(rid))
+                                objectMapperLog.add("Gene RGD:" + rid + " not found on assembly " + MapManager.getInstance().getMap(mapKey).getName());
+                        }
+                    }
+                } else if (oKey == 6) {
+                    QTLDAO qdao2 = new QTLDAO();
+                    MapDAO mdao2 = new MapDAO();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (id.isEmpty()) continue;
+                        try {
+                            int rgdId = Integer.parseInt(id);
+                            QTL q = qdao2.getQTL(rgdId);
+                            if (q != null && q.getSpeciesTypeKey() == speciesType) {
+                                List<MapData> mdList = mdao2.getMapData(rgdId, mapKey);
+                                if (!mdList.isEmpty()) allGenes.add(q);
+                                else objectMapperLog.add("QTL RGD:" + id + " not mapped on assembly " + MapManager.getInstance().getMap(mapKey).getName());
+                            } else if (q != null) objectMapperLog.add("RGD:" + id + " (" + q.getSymbol() + ") is not a " + SpeciesType.getCommonName(speciesType) + " QTL");
+                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
+                        } catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
+                    }
+                } else if (oKey == 5) {
+                    StrainDAO sdao2 = new StrainDAO();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (id.isEmpty()) continue;
+                        try {
+                            int rgdId = Integer.parseInt(id);
+                            Strain s = sdao2.getStrain(rgdId);
+                            if (s != null && s.getSpeciesTypeKey() == speciesType) allGenes.add(s);
+                            else if (s != null) objectMapperLog.add("RGD:" + id + " (" + s.getSymbol() + ") is not a " + SpeciesType.getCommonName(speciesType) + " strain");
+                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                        } catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
                     }
                 }
             } catch (Exception e) {
@@ -362,29 +390,57 @@ public class GeneratorCommandParser {
             String idList = command.substring(4);
             String[] ids = idList.split("\\[");
             try {
-                GeneDAO gdao3 = new GeneDAO();
-                QTLDAO qdao3 = new QTLDAO();
-                StrainDAO sdao3 = new StrainDAO();
-                for (String idStr : ids) {
-                    String id = idStr.trim();
-                    if (id.isEmpty()) continue;
-                    try {
-                        int rgdId = Integer.parseInt(id);
-                        if (oKey == 1) {
-                            Gene g = gdao3.getGene(rgdId);
-                            if (g != null) allGenes.add(g.getSymbol());
-                            else objectMapperLog.add("Gene not found for RGD ID: " + id);
-                        } else if (oKey == 6) {
-                            QTL q = qdao3.getQTL(rgdId);
-                            if (q != null) allGenes.add(q.getSymbol());
-                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
-                        } else if (oKey == 5) {
-                            Strain s = sdao3.getStrain(rgdId);
-                            if (s != null) allGenes.add(s.getSymbol());
-                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                if (oKey == 1) {
+                    GeneDAO gdao3 = new GeneDAO();
+                    List<Integer> rgdIds = new ArrayList<>();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (!id.isEmpty()) {
+                            try { rgdIds.add(Integer.parseInt(id)); }
+                            catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
                         }
-                    } catch (NumberFormatException nfe) {
-                        objectMapperLog.add("Invalid RGD ID: " + id);
+                    }
+                    List<MappedGene> mapped = gdao3.getActiveMappedGenesByIds(mapKey, rgdIds);
+                    for (MappedGene mg : mapped) {
+                        allGenes.add(mg.getGene().getSymbol());
+                    }
+                    if (mapped.size() < rgdIds.size()) {
+                        List<Integer> foundIds = new ArrayList<>();
+                        for (MappedGene mg : mapped) foundIds.add(mg.getGene().getRgdId());
+                        for (int rid : rgdIds) {
+                            if (!foundIds.contains(rid))
+                                objectMapperLog.add("Gene RGD:" + rid + " not found on assembly " + MapManager.getInstance().getMap(mapKey).getName());
+                        }
+                    }
+                } else if (oKey == 6) {
+                    QTLDAO qdao3 = new QTLDAO();
+                    MapDAO mdao3 = new MapDAO();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (id.isEmpty()) continue;
+                        try {
+                            int rgdId = Integer.parseInt(id);
+                            QTL q = qdao3.getQTL(rgdId);
+                            if (q != null && q.getSpeciesTypeKey() == speciesType) {
+                                List<MapData> mdList = mdao3.getMapData(rgdId, mapKey);
+                                if (!mdList.isEmpty()) allGenes.add(q.getSymbol());
+                                else objectMapperLog.add("QTL RGD:" + id + " not mapped on assembly " + MapManager.getInstance().getMap(mapKey).getName());
+                            } else if (q != null) objectMapperLog.add("RGD:" + id + " (" + q.getSymbol() + ") is not a " + SpeciesType.getCommonName(speciesType) + " QTL");
+                            else objectMapperLog.add("QTL not found for RGD ID: " + id);
+                        } catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
+                    }
+                } else if (oKey == 5) {
+                    StrainDAO sdao3 = new StrainDAO();
+                    for (String idStr : ids) {
+                        String id = idStr.trim();
+                        if (id.isEmpty()) continue;
+                        try {
+                            int rgdId = Integer.parseInt(id);
+                            Strain s = sdao3.getStrain(rgdId);
+                            if (s != null && s.getSpeciesTypeKey() == speciesType) allGenes.add(s.getSymbol());
+                            else if (s != null) objectMapperLog.add("RGD:" + id + " (" + s.getSymbol() + ") is not a " + SpeciesType.getCommonName(speciesType) + " strain");
+                            else objectMapperLog.add("Strain not found for RGD ID: " + id);
+                        } catch (NumberFormatException nfe) { objectMapperLog.add("Invalid RGD ID: " + id); }
                     }
                 }
             } catch (Exception e) {
