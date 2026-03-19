@@ -8,35 +8,38 @@ public class RgdIndex {
     private static String newAlias;
     private static List<String> indices;
 
-    public static String getIndex() {
-        return index;
+    public RgdIndex() {
     }
 
-    public static void setIndex(String index) {
-        RgdIndex.index = index;
-    }
-
-    public static String getOldAlias() {
+    public String getOldAlias() {
         return oldAlias;
     }
 
-    public static void setOldAlias(String oldAlias) {
+    public void setOldAlias(String oldAlias) {
         RgdIndex.oldAlias = oldAlias;
     }
 
-    public static String getNewAlias() {
+    public String getNewAlias() {
         return newAlias;
     }
 
-    public static void setNewAlias(String newAlias) {
+    public void setNewAlias(String newAlias) {
         RgdIndex.newAlias = newAlias;
     }
 
-    public static List<String> getIndices() {
+    public void setIndex(String index) {
+        RgdIndex.index = index;
+    }
+
+    public String getIndex() {
+        return index;
+    }
+
+    public List<String> getIndices() {
         return indices;
     }
 
-    public static void setIndices(List<String> indices) {
+    public void setIndices(List<String> indices) {
         RgdIndex.indices = indices;
     }
 }
