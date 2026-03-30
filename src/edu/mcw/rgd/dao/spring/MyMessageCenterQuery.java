@@ -31,13 +31,14 @@ public class MyMessageCenterQuery extends MappingSqlQuery {
 
         StringBuffer str = new StringBuffer();
         String strng;
-        BufferedReader bufferRead = new BufferedReader(c.getCharacterStream());
-        try {
+        try (BufferedReader bufferRead = new BufferedReader(c.getCharacterStream())) {
 
             while ((strng = bufferRead.readLine()) != null)
                 str.append(strng);
+        }catch(SQLException e) {
+            throw e;
         }catch(Exception e) {
-            throw new SQLException("couldnt read clob");
+            throw new SQLException("couldnt read clob", e);
         }
 
         mcm.setMessage(str.toString());

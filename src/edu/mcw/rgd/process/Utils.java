@@ -515,18 +515,20 @@ public class Utils {
         List<String> columns = new ArrayList<>();
         try {
 
-            PreparedStatement stmt = conn.prepareStatement(query);
-            if( params!=null ) {
-                for( int i=0; i<params.length; i++ ) {
-                    stmt.setString(i+1, params[i]);
+            try( PreparedStatement stmt = conn.prepareStatement(query) ) {
+                if( params!=null ) {
+                    for( int i=0; i<params.length; i++ ) {
+                        stmt.setString(i+1, params[i]);
+                    }
                 }
-            }
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int columnCount = rs.getMetaData().getColumnCount();
-                for( int i=1; i<=columnCount; i++ )
-                    columns.add(rs.getString(i));
+                try( ResultSet rs = stmt.executeQuery() ) {
+                    if (rs.next()) {
+                        int columnCount = rs.getMetaData().getColumnCount();
+                        for( int i=1; i<=columnCount; i++ )
+                            columns.add(rs.getString(i));
+                    }
+                }
             }
 
         } finally {
@@ -555,38 +557,40 @@ public class Utils {
         List<List<String>> rows = new ArrayList<>();
         try {
 
-            PreparedStatement stmt = conn.prepareStatement(query);
-            if( params!=null ) {
-                for( int i=0; i<params.length; i++ ) {
-                    stmt.setString(i+1, params[i]);
-                }
-            }
-
-            ResultSet rs = stmt.executeQuery();
-            int columnCount = rs.getMetaData().getColumnCount();
-            List<String> prevRow = null;
-            while (rs.next()) {
-                // read row: all columns
-                List<String> currRow = new ArrayList<>();
-                for( int i=1; i<=columnCount; i++ ) {
-                    currRow.add(rs.getString(i));
-                }
-
-                // if this a first row, add it to 'rows'
-                if( prevRow==null ) {
-                    rows.add(currRow);
-                }
-                else {
-                    // if this is not first row, compare it with the previous
-                    // if they are the same, add it to 'rows', if they are different, stop processing
-                    if( comparator==null || comparator.compare(currRow, prevRow)==0 ) {
-                        // rows the same
-                        rows.add(currRow);
+            try( PreparedStatement stmt = conn.prepareStatement(query) ) {
+                if( params!=null ) {
+                    for( int i=0; i<params.length; i++ ) {
+                        stmt.setString(i+1, params[i]);
                     }
-                    else // rows different -- stop processing
-                        break;
                 }
-                prevRow = currRow;
+
+                try( ResultSet rs = stmt.executeQuery() ) {
+                    int columnCount = rs.getMetaData().getColumnCount();
+                    List<String> prevRow = null;
+                    while (rs.next()) {
+                        // read row: all columns
+                        List<String> currRow = new ArrayList<>();
+                        for( int i=1; i<=columnCount; i++ ) {
+                            currRow.add(rs.getString(i));
+                        }
+
+                        // if this a first row, add it to 'rows'
+                        if( prevRow==null ) {
+                            rows.add(currRow);
+                        }
+                        else {
+                            // if this is not first row, compare it with the previous
+                            // if they are the same, add it to 'rows', if they are different, stop processing
+                            if( comparator==null || comparator.compare(currRow, prevRow)==0 ) {
+                                // rows the same
+                                rows.add(currRow);
+                            }
+                            else // rows different -- stop processing
+                                break;
+                        }
+                        prevRow = currRow;
+                    }
+                }
             }
 
         } finally {
