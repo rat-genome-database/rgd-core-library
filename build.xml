@@ -1,6 +1,6 @@
 <project name="rgdcore" default="build" basedir=".">
 
-    <property name="svn.head.revision" value="11173"/>
+<!--    <property name="svn.head.revision" value="11173"/>-->
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="classes"/>
     <property name="lib.dir" value="lib"/>
@@ -63,7 +63,7 @@
             <attribute name="Built-By" value="${user.name}"/>
             <attribute name="Built-Date" value="${TODAY}"/>
             <attribute name="Class-Path" value="${mf.classpath}"/>
-            <attribute name="RGD-Svn-Revision" value="${svn.head.revision}"/>
+<!--            <attribute name="RGD-Svn-Revision" value="${svn.head.revision}"/>-->
             <attribute name="App-Version" value="rgdcore_${version}"/>
         </manifest>
 
