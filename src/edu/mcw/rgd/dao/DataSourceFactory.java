@@ -103,6 +103,15 @@ public class DataSourceFactory {
     }
 
     /**
+     * Returns a DataSource object for RGD RAG database
+     * @return DataSource object
+     * @throws Exception
+     */
+    public DataSource getRgdRagDataSource() throws Exception{
+        return getDataSource("rgdRag");
+    }
+
+    /**
      * Returns a DataSource object for skynet database
      * @return DataSource object
      * @throws Exception
