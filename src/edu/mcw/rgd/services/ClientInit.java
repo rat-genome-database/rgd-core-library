@@ -5,6 +5,7 @@ import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.RestHighLevelClientBuilder;
 
@@ -20,6 +21,8 @@ public class ClientInit {
     private static final int ES_PORT = 9200;
     private static final String ES_SCHEME = "http";
     private static final String PROPERTIES_PATH = "/data/properties/elasticsearchProps.properties";
+    private static final int CONNECT_TIMEOUT_MS = 5_000;
+    private static final int SOCKET_TIMEOUT_MS = 120_000;
 
     public static synchronized void init() throws UnknownHostException {
         if (client == null) {
@@ -30,25 +33,31 @@ public class ClientInit {
     }
 
     private static RestHighLevelClient createClient() throws UnknownHostException {
+        RestClientBuilder builder;
         if (RgdContext.isProduction() || RgdContext.isPipelines()) {
             Properties props = getProperties();
             if (props.isEmpty()) {
                 throw new RuntimeException("Failed to load Elasticsearch properties from " + PROPERTIES_PATH);
             }
-            return new RestHighLevelClientBuilder(
-                    RestClient.builder(
-                            new HttpHost((String) props.get("HOST1"), ES_PORT, ES_SCHEME),
-                            new HttpHost((String) props.get("HOST2"), ES_PORT, ES_SCHEME),
-                            new HttpHost((String) props.get("HOST3"), ES_PORT, ES_SCHEME),
-                            new HttpHost((String) props.get("HOST4"), ES_PORT, ES_SCHEME),
-                            new HttpHost((String) props.get("HOST5"), ES_PORT, ES_SCHEME)
-                    ).build()).setApiCompatibilityMode(true).build();
+            builder = RestClient.builder(
+                    new HttpHost((String) props.get("HOST1"), ES_PORT, ES_SCHEME),
+                    new HttpHost((String) props.get("HOST2"), ES_PORT, ES_SCHEME),
+                    new HttpHost((String) props.get("HOST3"), ES_PORT, ES_SCHEME),
+                    new HttpHost((String) props.get("HOST4"), ES_PORT, ES_SCHEME),
+                    new HttpHost((String) props.get("HOST5"), ES_PORT, ES_SCHEME)
+            );
         } else {
-            return new RestHighLevelClientBuilder(
-                    RestClient.builder(
-                            new HttpHost("travis.rgd.mcw.edu", ES_PORT, ES_SCHEME)
-                    ).build()).setApiCompatibilityMode(true).build();
+            builder = RestClient.builder(
+                    new HttpHost("travis.rgd.mcw.edu", ES_PORT, ES_SCHEME)
+            );
         }
+        builder.setRequestConfigCallback(requestConfigBuilder ->
+                requestConfigBuilder
+                        .setConnectTimeout(CONNECT_TIMEOUT_MS)
+                        .setSocketTimeout(SOCKET_TIMEOUT_MS)
+        );
+        return new RestHighLevelClientBuilder(builder.build())
+                .setApiCompatibilityMode(true).build();
     }
 
     public static void setClient(RestHighLevelClient client) {
