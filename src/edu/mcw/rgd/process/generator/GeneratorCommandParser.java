@@ -95,12 +95,10 @@ public class GeneratorCommandParser {
                     for (Object symbolObj : geneList) {
                         String sym = symbolObj.toString().trim();
                         if (sym.isEmpty()) continue;
-                        // Always do wildcard match so "SHR" finds SHR, SHR/NCrl, etc.
-                        List<Strain> matched = sdao.getActiveStrainsBySymbolPattern(sym, speciesType);
-                        for (Strain s : matched) {
-                            allGenes.add(s);
-                        }
-                        if (matched.isEmpty()) {
+                        Strain matched = sdao.getActiveStrainByTaglessSymbol(sym, speciesType);
+                        if (matched != null) {
+                            allGenes.add(matched);
+                        } else {
                             objectMapperLog.add("No strains matched: " + sym);
                         }
                     }
@@ -341,11 +339,10 @@ public class GeneratorCommandParser {
                     for (Object symbolObj : objectList) {
                         String sym = symbolObj.toString().trim();
                         if (sym.isEmpty()) continue;
-                        List<Strain> matched = sdao.getActiveStrainsBySymbolPattern(sym, speciesType);
-                        for (Strain s : matched) {
-                            allGenes.add(s.getSymbol());
-                        }
-                        if (matched.isEmpty()) {
+                        Strain matched = sdao.getActiveStrainByTaglessSymbol(sym, speciesType);
+                        if (matched != null) {
+                            allGenes.add(matched.getSymbol());
+                        } else {
                             objectMapperLog.add("No strains matched: " + sym);
                         }
                     }
