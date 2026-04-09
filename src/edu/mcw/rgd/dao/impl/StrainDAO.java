@@ -65,6 +65,16 @@ public class StrainDAO extends AbstractDAO {
         return strains.get(0).getRgdId();
     }
 
+    public Strain getActiveStrainByTaglessSymbol(String taglessSymbol, int speciesTypeKey) throws Exception {
+        String sql = "SELECT s.*, r.species_type_key FROM strains s, rgd_ids r " +
+                "WHERE r.rgd_id=s.rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=? " +
+                "AND s.tagless_strain_symbol=?";
+        List<Strain> strains = executeStrainQuery(sql, speciesTypeKey, taglessSymbol);
+        if (strains.isEmpty())
+            return null;
+        return strains.get(0);
+    }
+
     public List<Strain> getActiveStrainsSortedBySymbol(String chr, long startPos, long stopPos, int mapKey) throws Exception {
         String query = "SELECT g.*, r.species_type_key \n" +
                 "FROM strains g, rgd_ids r, maps_data md \n" +
