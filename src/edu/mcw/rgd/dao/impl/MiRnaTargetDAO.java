@@ -18,10 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 5/4/15
- * Time: 2:30 PM
+ * @author mtutaj
+ * @since 5/4/15
  * <P>
  * API to access data in MIRNA_TARGETS table
  */
@@ -35,8 +33,10 @@ public class MiRnaTargetDAO extends AbstractDAO {
      */
     public List<MiRnaTarget> getTargets(int miRnaRgdId) throws Exception {
 
-        String sql = "SELECT m.* FROM mirna_targets m " +
-                     "WHERE mirna_rgd_id=?";
+        String sql = """
+            SELECT m.* FROM mirna_targets m
+            WHERE mirna_rgd_id=?
+            """;
         MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
         return execute(q, miRnaRgdId);
     }
@@ -54,8 +54,10 @@ public class MiRnaTargetDAO extends AbstractDAO {
         if( targetType==null ) {
             return getTargets(miRnaRgdId);
         } else {
-            String sql = "SELECT m.* FROM mirna_targets m " +
-                         "WHERE mirna_rgd_id=? AND target_type=?";
+            String sql = """
+                SELECT m.* FROM mirna_targets m
+                WHERE mirna_rgd_id=? AND target_type=?
+                """;
             MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
             return execute(q, miRnaRgdId, targetType);
         }
@@ -63,42 +65,52 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public List<Gene> getTargetGenes(String targetType, int speciesTypeKey) throws Exception {
 
-        String sql = "SELECT g.* FROM genes g "+
-                "WHERE rgd_id IN(SELECT gene_rgd_id FROM mirna_targets m,rgd_ids r " +
-                "WHERE target_type=? AND gene_rgd_id=r.rgd_id AND r.species_type_key=?)";
+        String sql = """
+            SELECT g.* FROM genes g
+            WHERE rgd_id IN(SELECT gene_rgd_id FROM mirna_targets m,rgd_ids r
+                            WHERE target_type=? AND gene_rgd_id=r.rgd_id AND r.species_type_key=?)
+            """;
         GeneQuery q = new GeneQuery(this.getDataSource(), sql);
         return execute(q, targetType, speciesTypeKey);
     }
 
     public List<Gene> getMiRnaGenes(String targetType, int speciesTypeKey) throws Exception {
 
-        String sql = "SELECT g.* FROM genes g "+
-                "WHERE rgd_id IN(SELECT mirna_rgd_id FROM mirna_targets m,rgd_ids r " +
-                     "WHERE target_type=? AND mirna_rgd_id=r.rgd_id AND r.species_type_key=?)";
+        String sql = """
+            SELECT g.* FROM genes g
+            WHERE rgd_id IN(SELECT mirna_rgd_id FROM mirna_targets m,rgd_ids r
+                            WHERE target_type=? AND mirna_rgd_id=r.rgd_id AND r.species_type_key=?)
+            """;
         GeneQuery q = new GeneQuery(this.getDataSource(), sql);
         return execute(q, targetType, speciesTypeKey);
     }
 
     public List<MiRnaTarget> getMiRnaGenes(int geneRgdId) throws Exception {
 
-        String sql = "SELECT m.* FROM mirna_targets m " +
-                     "WHERE gene_rgd_id=?";
+        String sql = """
+            SELECT m.* FROM mirna_targets m
+            WHERE gene_rgd_id=?
+            """;
         MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
         return execute(q, geneRgdId);
     }
 
     public List<MiRnaTarget> getMiRnaGenes(int geneRgdId, String targetType) throws Exception {
 
-        String sql = "SELECT m.* FROM mirna_targets m " +
-                "WHERE gene_rgd_id=? AND target_type=?";
+        String sql = """
+            SELECT m.* FROM mirna_targets m
+            WHERE gene_rgd_id=? AND target_type=?
+            """;
         MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
         return execute(q, geneRgdId, targetType);
     }
 
     public List<MiRnaTarget> getData(int geneRgdId, int miRnaRgdId, String targetType) throws Exception {
 
-        String sql = "SELECT m.* FROM mirna_targets m " +
-                     "WHERE gene_rgd_id=? AND mirna_rgd_id=? AND target_type=?";
+        String sql = """
+            SELECT m.* FROM mirna_targets m
+            WHERE gene_rgd_id=? AND mirna_rgd_id=? AND target_type=?
+            """;
         MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
         return execute(q, geneRgdId, miRnaRgdId, targetType);
     }
@@ -111,8 +123,10 @@ public class MiRnaTargetDAO extends AbstractDAO {
      * @throws Exception
      */
     public Map<Integer, String> getSymbolsForMiRnaTargets(int miRnaRgdId, String targetType) throws Exception {
-        String sql = "SELECT DISTINCT g.rgd_id,g.gene_symbol FROM genes g,mirna_targets t\n" +
-                "WHERE gene_rgd_id=g.rgd_id AND mirna_rgd_id=? and target_type=?";
+        String sql = """
+            SELECT DISTINCT g.rgd_id,g.gene_symbol FROM genes g,mirna_targets t
+            WHERE gene_rgd_id=g.rgd_id AND mirna_rgd_id=? and target_type=?
+            """;
         StringMapQuery q = new StringMapQuery(this.getDataSource(), sql);
 
         Map<Integer, String> results = new HashMap<>();
@@ -124,25 +138,31 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public int getCountOfData(int speciesTypeKey) throws Exception {
 
-        String sql = "SELECT COUNT(0) FROM mirna_targets m "+
-            "WHERE EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)";
+        String sql = """
+            SELECT COUNT(0) FROM mirna_targets m
+            WHERE EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)
+            """;
         return getCount(sql, speciesTypeKey);
     }
 
     public List<MiRnaTarget> getDataModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
-        String sql = "SELECT m.* FROM mirna_targets m " +
-                     "WHERE modified_date<? "+
-                     "AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)";
+        String sql = """
+            SELECT m.* FROM mirna_targets m
+            WHERE modified_date<?
+              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)
+            """;
         MiRnaTargetQuery q = new MiRnaTargetQuery(this.getDataSource(), sql);
         return execute(q, cutOffDate, speciesTypeKey);
     }
 
     public int deleteDataModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
-        String sql = "DELETE FROM mirna_targets m WHERE modified_date<? "+
-                " AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)"+
-                " AND ROWNUM<10000";
+        String sql = """
+            DELETE FROM mirna_targets m WHERE modified_date<?
+              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)
+              AND ROWNUM<10000
+            """;
         int totalRowsAffected = 0, rowsAffected;
         do {
             rowsAffected = update(sql, cutOffDate, speciesTypeKey);
@@ -161,8 +181,8 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int updateModifiedDate(List<Integer> keys) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "UPDATE mirna_targets SET modified_date=SYSDATE WHERE mirna_target_key=?",
-                new int[]{Types.INTEGER});
+            "UPDATE mirna_targets SET modified_date=SYSDATE WHERE mirna_target_key=?",
+            new int[]{Types.INTEGER});
         su.compile();
 
         for( Integer key: keys ) {
@@ -173,12 +193,15 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public int insert(List<MiRnaTarget> list) throws Exception {
 
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO mirna_targets "+
-            "(mirna_target_key,gene_rgd_id,mirna_rgd_id,target_type,mirna_symbol,method_name,"+
-            " result_type,data_type,support_type,pmid,created_date,modified_date,transcript_acc,"+
-            " transcript_biotype,isoform,amplification,utr_start,utr_end,target_site,score,"+
-            " normalized_score,energy) "+
-            "VALUES(mirna_targets_seq.NEXTVAL,?,?,?,?,?, ?,?,?,?,SYSDATE,SYSDATE,?, ?,?,?,?,?,?,?, ?,?)",
+        String sql = """
+            INSERT INTO mirna_targets
+            (mirna_target_key,gene_rgd_id,mirna_rgd_id,target_type,mirna_symbol,method_name,
+             result_type,data_type,support_type,pmid,created_date,modified_date,transcript_acc,
+             transcript_biotype,isoform,amplification,utr_start,utr_end,target_site,score,
+             normalized_score,energy)
+            VALUES(mirna_targets_seq.NEXTVAL,?,?,?,?,?, ?,?,?,?,SYSDATE,SYSDATE,?, ?,?,?,?,?,?,?, ?,?)
+            """;
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                     Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                     Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.DOUBLE,
@@ -208,8 +231,8 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int updateStatsModifiedDate(List<Integer> keys) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "UPDATE mirna_target_stats SET last_modified_date=SYSDATE WHERE mirna_stat_key=?",
-                new int[]{Types.INTEGER});
+            "UPDATE mirna_target_stats SET last_modified_date=SYSDATE WHERE mirna_stat_key=?",
+            new int[]{Types.INTEGER});
         su.compile();
 
         for( Integer key: keys ) {
@@ -221,8 +244,8 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int deleteStats(List<Integer> keys) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "DELETE FROM mirna_target_stats WHERE mirna_stat_key=?",
-                new int[]{Types.INTEGER});
+            "DELETE FROM mirna_target_stats WHERE mirna_stat_key=?",
+            new int[]{Types.INTEGER});
         su.compile();
 
         for( Integer key: keys ) {
@@ -233,9 +256,12 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public int insertStats(Collection<MiRnaTargetStat> list) throws Exception {
 
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "INSERT INTO mirna_target_stats "+
-                "(mirna_stat_key,rgd_id,stat_name,stat_value,created_date,last_modified_date)"+
-                "VALUES(mirna_target_stats_seq.NEXTVAL,?,?,?,SYSDATE,SYSDATE)",
+        String sql = """
+            INSERT INTO mirna_target_stats
+            (mirna_stat_key,rgd_id,stat_name,stat_value,created_date,last_modified_date)
+            VALUES(mirna_target_stats_seq.NEXTVAL,?,?,?,SYSDATE,SYSDATE)
+            """;
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
         su.compile();
 
@@ -247,9 +273,12 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public int updateStats(Collection<MiRnaTargetStat> list) throws Exception {
 
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "UPDATE mirna_target_stats "+
-                "SET stat_value=?,last_modified_date=SYSDATE "+
-                "WHERE mirna_stat_key=?",
+        String sql = """
+            UPDATE mirna_target_stats
+            SET stat_value=?,last_modified_date=SYSDATE
+            WHERE mirna_stat_key=?
+            """;
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.VARCHAR, Types.INTEGER});
         su.compile();
 
@@ -261,17 +290,21 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public List<MiRnaTargetStat> getStatsModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
-        String sql = "SELECT s.* FROM mirna_target_stats s WHERE last_modified_date<? "+
-                "AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)";
+        String sql = """
+            SELECT s.* FROM mirna_target_stats s WHERE last_modified_date<?
+              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)
+            """;
         MiRnaTargetStatQuery q = new MiRnaTargetStatQuery(this.getDataSource(), sql);
         return execute(q, cutOffDate, speciesTypeKey);
     }
 
     public int deleteStatsModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
-        String sql = "DELETE FROM mirna_target_stats s WHERE last_modified_date<? "+
-                " AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)"+
-                " AND ROWNUM<10000";
+        String sql = """
+            DELETE FROM mirna_target_stats s WHERE last_modified_date<?
+              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)
+              AND ROWNUM<10000
+            """;
         int totalRowsAffected = 0, rowsAffected;
         do {
             rowsAffected = update(sql, cutOffDate, speciesTypeKey);
