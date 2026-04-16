@@ -1,5 +1,6 @@
 package edu.mcw.rgd.test;
 
+import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.impl.*;
 
 import edu.mcw.rgd.datamodel.*;
@@ -9,6 +10,8 @@ import edu.mcw.rgd.datamodel.pheno.Record;
 import junit.framework.TestCase;
 
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +30,18 @@ public class GeneDAOTest extends TestCase {
     public void testAll() throws Exception {
 
         RGDManagementDAO rdao = new RGDManagementDAO();
+        ReportLoadStatusDAO reportLoadStatusDAO = new ReportLoadStatusDAO();
+        DataSource reedDs = DataSourceFactory.getInstance().getDataSource("reed");
+        ChatbotDAOs.Gene geneDAO = new ChatbotDAOs.Gene(reedDs);
+        List<Gene>gene = geneDAO.getActiveGenes(3);
+        Connection conn = reedDs.getConnection();
+        System.out.println("Reed connected: " + conn.getMetaData().getURL());
+        conn.close();
+        List<ReportLoadStatus> rep = reportLoadStatusDAO.getByTypeAndSpecies("gene",3);
+        Reference ref = new ReferenceDAO().getReferenceByRgdId(640030560);
+        List<Integer>variantMapKeys = new SampleDAO().getVariantMapKeys();
+        List<XdbId> pmIds= new XdbIdDAO().getXdbIdsByRgdId(2,640030560);
         RgdId id = rdao.createRgdId(RgdId.OBJECT_KEY_GENES, "ACTIVE", 3);
-
         Gene s = new Gene();
         s.setName("---");
         s.setSymbol("---");

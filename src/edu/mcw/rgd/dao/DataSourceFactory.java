@@ -1,7 +1,6 @@
 package edu.mcw.rgd.dao;
 
 import edu.mcw.rgd.dao.spring.XmlBeanFactoryManager;
-import edu.mcw.rgd.services.RgdContext;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -157,34 +156,20 @@ public class DataSourceFactory {
     }
 
     /**
-     * Returns Oracle DataSource for the chatbot.
-     * On dev (hansen), connects to reed (stage) via jdbc/reed JNDI.
-     * On all other environments, uses the default Oracle datasource (jdbc/rgd2).
+     * Returns the reed (stage) Oracle DataSource via jdbc/reed JNDI (or reedDataSource XML bean).
      * @return DataSource object
      * @throws Exception
      */
     public DataSource getChatbotOracleDataSource() throws Exception {
-        try {
-            if (RgdContext.isDev()) {
-                return getDataSource("reed");
-            }
-        } catch (Exception ignored) {}
-        return getDataSource();
+        return getDataSource("reed");
     }
 
     /**
-     * Returns CarpeNovo DataSource for the chatbot.
-     * On dev (hansen), connects to reed CarpeNovo via jdbc/reedcarpe JNDI.
-     * On all other environments, uses the default CarpeNovo datasource (jdbc/carpe).
+     * Returns the reed (stage) CarpeNovo DataSource via jdbc/reedcarpe JNDI.
      * @return DataSource object
      * @throws Exception
      */
     public DataSource getChatbotCarpeDataSource() throws Exception {
-        try {
-            if (RgdContext.isDev()) {
-                return getDataSource("reedcarpe");
-            }
-        } catch (Exception ignored) {}
-        return getCarpeNovoDataSource();
+        return getDataSource("reedcarpe");
     }
 }
