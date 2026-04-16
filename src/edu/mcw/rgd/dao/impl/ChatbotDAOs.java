@@ -43,6 +43,24 @@ public class ChatbotDAOs {
                     "ORDER BY g.gene_symbol_lc";
             return executeGeneQuery(sql, speciesKey, mapKey);
         }
+
+        /** Count of active genes for a species (matches {@link GeneDAO#getActiveGenes(int)}). */
+        public int countActiveGenes(int speciesKey) throws Exception {
+            String sql = "SELECT COUNT(*) FROM genes g, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
+                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND r.rgd_id=g.rgd_id";
+            return getCount(sql, speciesKey);
+        }
+
+        /** Count of active genes for a species on a specific assembly (matches {@link #getActiveGenesByMapKey}). */
+        public int countActiveGenesByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT COUNT(DISTINCT g.rgd_id) FROM genes g, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
+                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=?";
+            return getCount(sql, speciesKey, mapKey);
+        }
     }
 
     // ----------------------------------------------------------------- QTL
@@ -66,6 +84,21 @@ public class ChatbotDAOs {
                     "ORDER BY q.qtl_symbol";
             return executeQtlQuery(sql, speciesKey, mapKey);
         }
+
+        /** Count of active QTLs for a species (matches {@link QTLDAO#getActiveQTLs(int)}). */
+        public int countActiveQTLs(int speciesKey) throws Exception {
+            String sql = "SELECT COUNT(*) FROM qtls q, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id AND r.species_type_key=?";
+            return getCount(sql, speciesKey);
+        }
+
+        /** Count of active QTLs for a species on a specific assembly (matches {@link #getActiveQTLsByMapKey}). */
+        public int countActiveQTLsByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT COUNT(DISTINCT q.rgd_id) FROM qtls q, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id AND r.species_type_key=? " +
+                    "AND md.rgd_id=q.rgd_id AND md.map_key=?";
+            return getCount(sql, speciesKey, mapKey);
+        }
     }
 
     // --------------------------------------------------------------- Strain
@@ -79,6 +112,13 @@ public class ChatbotDAOs {
         @Override
         public DataSource getDataSource() {
             return dataSource;
+        }
+
+        /** Count of active strains (matches {@link StrainDAO#getActiveStrains()}). */
+        public int countActiveStrains() throws Exception {
+            String sql = "SELECT COUNT(*) FROM strains s, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id";
+            return getCount(sql);
         }
     }
 
@@ -103,6 +143,21 @@ public class ChatbotDAOs {
                     "ORDER BY s.rgd_name";
             return executeSSLPQuery(sql, speciesKey, mapKey);
         }
+
+        /** Count of active SSLPs for a species (matches {@link SSLPDAO#getActiveSSLPs(int)}). */
+        public int countActiveSSLPs(int speciesKey) throws Exception {
+            String sql = "SELECT COUNT(*) FROM sslps s, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=?";
+            return getCount(sql, speciesKey);
+        }
+
+        /** Count of active SSLPs for a species on a specific assembly (matches {@link #getActiveSSLPsByMapKey}). */
+        public int countActiveSSLPsByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT COUNT(DISTINCT s.rgd_id) FROM sslps s, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=? " +
+                    "AND md.rgd_id=s.rgd_id AND md.map_key=?";
+            return getCount(sql, speciesKey, mapKey);
+        }
     }
 
     // ------------------------------------------------------------ Reference
@@ -117,6 +172,13 @@ public class ChatbotDAOs {
         public DataSource getDataSource() {
             return dataSource;
         }
+
+        /** Count of active references (matches {@link ReferenceDAO#getActiveReferences()}). */
+        public int countActiveReferences() throws Exception {
+            String sql = "SELECT COUNT(*) FROM references ref, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND ref.rgd_id=r.rgd_id";
+            return getCount(sql);
+        }
     }
 
     // -------------------------------------------------------------- Project
@@ -130,6 +192,12 @@ public class ChatbotDAOs {
         @Override
         public DataSource getDataSource() {
             return dataSource;
+        }
+
+        /** Count of all projects (matches {@link ProjectDAO#getAllProjects()}). */
+        public int countAllProjects() throws Exception {
+            String sql = "SELECT COUNT(*) FROM projects";
+            return getCount(sql);
         }
     }
 
