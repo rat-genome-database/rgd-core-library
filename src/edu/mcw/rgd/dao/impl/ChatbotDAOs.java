@@ -67,7 +67,7 @@ public class ChatbotDAOs {
                     "FROM genes g, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
                     "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
-                    "AND g.rgd_id=r.rgd_id ORDER BY g.gene_symbol_lc";
+                    "AND g.rgd_id=r.rgd_id ORDER BY g.gene_symbol";
             return IntStringMapQuery.execute(this, sql, speciesKey);
         }
 
@@ -78,7 +78,7 @@ public class ChatbotDAOs {
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
                     "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
                     "AND g.rgd_id=r.rgd_id AND md.rgd_id=r.rgd_id AND md.map_key=? " +
-                    "ORDER BY g.gene_symbol_lc";
+                    "ORDER BY g.gene_symbol";
             return IntStringMapQuery.execute(this, sql, speciesKey, mapKey);
         }
     }
