@@ -24,6 +24,7 @@ public class AminoAcidVariant {
     String dnaSequence="";
     int aaPosition=-1;
     int dnaPosition=-1;
+    String frameshift;
 
 
     public int getAaPosition() {
@@ -157,5 +158,13 @@ public class AminoAcidVariant {
 
     public void setTripletError(String tripletError) {
         this.tripletError = tripletError;
+    }
+
+    public void setFrameshift(String frameshift) {
+        this.frameshift = frameshift;
+    }
+
+    public String getFrameshift() {
+        return frameshift;
     }
 }
