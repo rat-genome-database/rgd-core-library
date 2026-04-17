@@ -94,4 +94,12 @@ public class ReportLoadStatusDAO extends AbstractDAO {
         List<ReportLoadStatus> results = execute(q, reportType, speciesKey);
         return results.isEmpty() ? null : results.get(0);
     }
+
+    /** Returns any record with pending/processing status, or null if no active batch. */
+    public ReportLoadStatus getActiveBatchInfo() throws Exception {
+        String sql = "SELECT * FROM report_load_status WHERE status IN ('pending', 'processing') LIMIT 1";
+        ReportLoadStatusQuery q = new ReportLoadStatusQuery(this.getDataSource(), sql);
+        List<ReportLoadStatus> results = execute(q);
+        return results.isEmpty() ? null : results.get(0);
+    }
 }
