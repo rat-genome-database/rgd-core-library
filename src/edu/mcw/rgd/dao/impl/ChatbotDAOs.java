@@ -1,5 +1,7 @@
 package edu.mcw.rgd.dao.impl;
 
+import edu.mcw.rgd.dao.spring.IntStringMapQuery;
+
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -44,22 +46,40 @@ public class ChatbotDAOs {
             return executeGeneQuery(sql, speciesKey, mapKey);
         }
 
-        /** Count of active genes for a species (matches {@link GeneDAO#getActiveGenes(int)}). */
+        /** Fast count of active genes for a species (no maps_data join). */
         public int countActiveGenes(int speciesKey) throws Exception {
-            String sql = "SELECT COUNT(*) FROM genes g, rgd_ids r " +
-                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
-                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
-                    "AND r.rgd_id=g.rgd_id";
+            String sql = "SELECT COUNT(*) FROM rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=1";
             return getCount(sql, speciesKey);
         }
 
-        /** Count of active genes for a species on a specific assembly (matches {@link #getActiveGenesByMapKey}). */
+        /** Fast count of active genes for a species on a specific assembly (2-table, no NVL). */
         public int countActiveGenesByMapKey(int speciesKey, int mapKey) throws Exception {
-            String sql = "SELECT COUNT(DISTINCT g.rgd_id) FROM genes g, rgd_ids r, maps_data md " +
+            String sql = "SELECT COUNT(DISTINCT md.rgd_id) FROM maps_data md, rgd_ids r " +
+                    "WHERE md.map_key=? AND md.rgd_id=r.rgd_id " +
+                    "AND r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=1";
+            return getCount(sql, mapKey, speciesKey);
+        }
+
+        /** Lightweight ID+symbol fetch for a species (no assembly filter). */
+        public List<IntStringMapQuery.MapPair> getActiveGeneIds(int speciesKey) throws Exception {
+            String sql = "SELECT DISTINCT g.rgd_id, g.gene_symbol " +
+                    "FROM genes g, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
                     "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
-                    "AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=?";
-            return getCount(sql, speciesKey, mapKey);
+                    "AND g.rgd_id=r.rgd_id ORDER BY g.gene_symbol_lc";
+            return IntStringMapQuery.execute(this, sql, speciesKey);
+        }
+
+        /** Lightweight ID+symbol fetch for a species on a specific assembly. */
+        public List<IntStringMapQuery.MapPair> getActiveGeneIdsByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT DISTINCT g.rgd_id, g.gene_symbol " +
+                    "FROM genes g, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
+                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND g.rgd_id=r.rgd_id AND md.rgd_id=r.rgd_id AND md.map_key=? " +
+                    "ORDER BY g.gene_symbol_lc";
+            return IntStringMapQuery.execute(this, sql, speciesKey, mapKey);
         }
     }
 
@@ -85,19 +105,38 @@ public class ChatbotDAOs {
             return executeQtlQuery(sql, speciesKey, mapKey);
         }
 
-        /** Count of active QTLs for a species (matches {@link QTLDAO#getActiveQTLs(int)}). */
+        /** Fast count of active QTLs for a species (no maps_data join). */
         public int countActiveQTLs(int speciesKey) throws Exception {
-            String sql = "SELECT COUNT(*) FROM qtls q, rgd_ids r " +
-                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id AND r.species_type_key=?";
+            String sql = "SELECT COUNT(*) FROM rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=6";
             return getCount(sql, speciesKey);
         }
 
-        /** Count of active QTLs for a species on a specific assembly (matches {@link #getActiveQTLsByMapKey}). */
+        /** Fast count of active QTLs for a species on a specific assembly (2-table). */
         public int countActiveQTLsByMapKey(int speciesKey, int mapKey) throws Exception {
-            String sql = "SELECT COUNT(DISTINCT q.rgd_id) FROM qtls q, rgd_ids r, maps_data md " +
+            String sql = "SELECT COUNT(DISTINCT md.rgd_id) FROM maps_data md, rgd_ids r " +
+                    "WHERE md.map_key=? AND md.rgd_id=r.rgd_id " +
+                    "AND r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=6";
+            return getCount(sql, mapKey, speciesKey);
+        }
+
+        /** Lightweight ID+symbol fetch for a species (no assembly filter). */
+        public List<IntStringMapQuery.MapPair> getActiveQTLIds(int speciesKey) throws Exception {
+            String sql = "SELECT DISTINCT q.rgd_id, q.qtl_symbol " +
+                    "FROM qtls q, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id AND r.species_type_key=? " +
-                    "AND md.rgd_id=q.rgd_id AND md.map_key=?";
-            return getCount(sql, speciesKey, mapKey);
+                    "ORDER BY q.qtl_symbol";
+            return IntStringMapQuery.execute(this, sql, speciesKey);
+        }
+
+        /** Lightweight ID+symbol fetch for a species on a specific assembly. */
+        public List<IntStringMapQuery.MapPair> getActiveQTLIdsByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT DISTINCT q.rgd_id, q.qtl_symbol " +
+                    "FROM qtls q, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=q.rgd_id AND r.species_type_key=? " +
+                    "AND md.rgd_id=q.rgd_id AND md.map_key=? " +
+                    "ORDER BY q.qtl_symbol";
+            return IntStringMapQuery.execute(this, sql, speciesKey, mapKey);
         }
     }
 
@@ -119,6 +158,15 @@ public class ChatbotDAOs {
             String sql = "SELECT COUNT(*) FROM strains s, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id";
             return getCount(sql);
+        }
+
+        /** Lightweight ID+symbol fetch for active strains. */
+        public List<IntStringMapQuery.MapPair> getActiveStrainIds() throws Exception {
+            String sql = "SELECT s.rgd_id, s.strain_symbol " +
+                    "FROM strains s, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id " +
+                    "ORDER BY s.strain_symbol";
+            return IntStringMapQuery.execute(this, sql);
         }
     }
 
@@ -144,19 +192,38 @@ public class ChatbotDAOs {
             return executeSSLPQuery(sql, speciesKey, mapKey);
         }
 
-        /** Count of active SSLPs for a species (matches {@link SSLPDAO#getActiveSSLPs(int)}). */
+        /** Fast count of active SSLPs for a species (no maps_data join). */
         public int countActiveSSLPs(int speciesKey) throws Exception {
-            String sql = "SELECT COUNT(*) FROM sslps s, rgd_ids r " +
-                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=?";
+            String sql = "SELECT COUNT(*) FROM rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=3";
             return getCount(sql, speciesKey);
         }
 
-        /** Count of active SSLPs for a species on a specific assembly (matches {@link #getActiveSSLPsByMapKey}). */
+        /** Fast count of active SSLPs for a species on a specific assembly (2-table). */
         public int countActiveSSLPsByMapKey(int speciesKey, int mapKey) throws Exception {
-            String sql = "SELECT COUNT(DISTINCT s.rgd_id) FROM sslps s, rgd_ids r, maps_data md " +
+            String sql = "SELECT COUNT(DISTINCT md.rgd_id) FROM maps_data md, rgd_ids r " +
+                    "WHERE md.map_key=? AND md.rgd_id=r.rgd_id " +
+                    "AND r.object_status='ACTIVE' AND r.species_type_key=? AND r.object_key=3";
+            return getCount(sql, mapKey, speciesKey);
+        }
+
+        /** Lightweight ID+name fetch for a species (no assembly filter). */
+        public List<IntStringMapQuery.MapPair> getActiveSSLPIds(int speciesKey) throws Exception {
+            String sql = "SELECT DISTINCT s.rgd_id, s.rgd_name " +
+                    "FROM sslps s, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=? " +
-                    "AND md.rgd_id=s.rgd_id AND md.map_key=?";
-            return getCount(sql, speciesKey, mapKey);
+                    "ORDER BY s.rgd_name";
+            return IntStringMapQuery.execute(this, sql, speciesKey);
+        }
+
+        /** Lightweight ID+name fetch for a species on a specific assembly. */
+        public List<IntStringMapQuery.MapPair> getActiveSSLPIdsByMapKey(int speciesKey, int mapKey) throws Exception {
+            String sql = "SELECT DISTINCT s.rgd_id, s.rgd_name " +
+                    "FROM sslps s, rgd_ids r, maps_data md " +
+                    "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=? " +
+                    "AND md.rgd_id=s.rgd_id AND md.map_key=? " +
+                    "ORDER BY s.rgd_name";
+            return IntStringMapQuery.execute(this, sql, speciesKey, mapKey);
         }
     }
 
@@ -179,6 +246,15 @@ public class ChatbotDAOs {
                     "WHERE r.object_status='ACTIVE' AND ref.rgd_id=r.rgd_id";
             return getCount(sql);
         }
+
+        /** Lightweight ID+title fetch for active references. */
+        public List<IntStringMapQuery.MapPair> getActiveReferenceIds() throws Exception {
+            String sql = "SELECT ref.rgd_id, ref.title " +
+                    "FROM references ref, rgd_ids r " +
+                    "WHERE r.object_status='ACTIVE' AND ref.rgd_id=r.rgd_id " +
+                    "ORDER BY ref.rgd_id";
+            return IntStringMapQuery.execute(this, sql);
+        }
     }
 
     // -------------------------------------------------------------- Project
@@ -198,6 +274,14 @@ public class ChatbotDAOs {
         public int countAllProjects() throws Exception {
             String sql = "SELECT COUNT(*) FROM projects";
             return getCount(sql);
+        }
+
+        /** Lightweight ID+name fetch for all projects. */
+        public List<IntStringMapQuery.MapPair> getAllProjectIds() throws Exception {
+            String sql = "SELECT p.rgd_id, p.name " +
+                    "FROM projects p " +
+                    "ORDER BY p.name";
+            return IntStringMapQuery.execute(this, sql);
         }
     }
 
