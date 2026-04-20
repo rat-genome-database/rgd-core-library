@@ -28,7 +28,7 @@ public class ReportLoadStatusDAO extends AbstractDAO {
     }
 
     public List<ReportLoadStatus> getPendingByTypeAndSpecies(String reportType, int speciesKey) throws Exception {
-        String sql = "SELECT * FROM report_load_status WHERE report_type=? AND species_key=? AND status='pending' ORDER BY report_load_status_id";
+        String sql = "SELECT * FROM report_load_status WHERE report_type=? AND species_key=? AND status IN ('pending','processing') ORDER BY report_load_status_id";
         ReportLoadStatusQuery q = new ReportLoadStatusQuery(this.getDataSource(), sql);
         return execute(q, reportType, speciesKey);
     }
