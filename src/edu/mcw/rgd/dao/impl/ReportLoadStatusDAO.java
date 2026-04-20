@@ -33,6 +33,12 @@ public class ReportLoadStatusDAO extends AbstractDAO {
         return execute(q, reportType, speciesKey);
     }
 
+    public List<ReportLoadStatus> getPendingByTypeSpeciesAndMapKey(String reportType, int speciesKey, int mapKey) throws Exception {
+        String sql = "SELECT * FROM report_load_status WHERE report_type=? AND species_key=? AND map_key=? AND status IN ('pending','processing') ORDER BY report_load_status_id";
+        ReportLoadStatusQuery q = new ReportLoadStatusQuery(this.getDataSource(), sql);
+        return execute(q, reportType, speciesKey, mapKey);
+    }
+
     public List<Integer> getCompletedRgdIds(String reportType) throws Exception {
         String sql = "SELECT rgd_id FROM report_load_status WHERE report_type=? AND status='completed'";
         return IntListQuery.execute(this, sql, reportType);
@@ -43,9 +49,19 @@ public class ReportLoadStatusDAO extends AbstractDAO {
         return getCount(sql, reportType, speciesKey, status);
     }
 
+    public int getCountByStatusAndMapKey(String reportType, int speciesKey, int mapKey, String status) throws Exception {
+        String sql = "SELECT COUNT(*) FROM report_load_status WHERE report_type=? AND species_key=? AND map_key=? AND status=?";
+        return getCount(sql, reportType, speciesKey, mapKey, status);
+    }
+
     public int getTotalCount(String reportType, int speciesKey) throws Exception {
         String sql = "SELECT COUNT(*) FROM report_load_status WHERE report_type=? AND species_key=?";
         return getCount(sql, reportType, speciesKey);
+    }
+
+    public int getTotalCountByMapKey(String reportType, int speciesKey, int mapKey) throws Exception {
+        String sql = "SELECT COUNT(*) FROM report_load_status WHERE report_type=? AND species_key=? AND map_key=?";
+        return getCount(sql, reportType, speciesKey, mapKey);
     }
 
     public void insert(ReportLoadStatus r) throws Exception {
