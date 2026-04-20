@@ -88,10 +88,12 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getActiveOrthologs(int rgdId) throws Exception{
 
-        String query = "SELECT g.*, r.species_type_key "+
-                "FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=? "+
-                "ORDER BY r.species_type_key ";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=?
+            ORDER BY r.species_type_key
+            """;
         return executeGeneQuery(query, rgdId);
     }
 
@@ -104,9 +106,11 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getActiveOrthologs(int rgdId, List<Integer> speciesTypeKeys) throws Exception{
 
-        String query = "SELECT g.*, r.species_type_key "+
-                "FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=? ";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=?
+            """;
 
         if (speciesTypeKeys.size() > 0) {
             query += " AND r.species_type_key in ( ";
@@ -136,12 +140,13 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getActiveOrthologs(List<Integer> rgdIds, int speciesTypeKey) throws Exception{
 
-        String query = "SELECT g.*, r.species_type_key "+
-            " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-            " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( "+
-            Utils.buildInPhrase(rgdIds)+
-            ")  AND r.species_type_key=? " +
-            " ORDER BY r.species_type_key ";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in (%s)
+            AND r.species_type_key=?
+            ORDER BY r.species_type_key
+            """.formatted(Utils.buildInPhrase(rgdIds));
 
         return executeGeneQuery(query, speciesTypeKey);
     }
@@ -155,12 +160,13 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getActiveOrthologs(List<Integer> rgdIds) throws Exception{
 
-        String query = "SELECT g.*, r.species_type_key "+
-            " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-            " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in ( "+
-            Utils.buildInPhrase(rgdIds)+
-            ")  AND r.species_type_key in (1,2,3) " +
-            " ORDER BY r.species_type_key ";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id in (%s)
+            AND r.species_type_key in (1,2,3)
+            ORDER BY r.species_type_key
+            """.formatted(Utils.buildInPhrase(rgdIds));
 
         return executeGeneQuery(query);
     }
@@ -176,22 +182,27 @@ public class GeneDAO extends AbstractDAO {
      */
     public List<Gene> getAgrOrthologs(int rgdId) throws Exception{
 
-        String query = "SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,"+
-                "a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,g.gene_source,"+
-                "g.ncbi_annot_status,r.species_type_key,g.ensembl_gene_symbol,g.ensembl_gene_type,g.ensembl_full_name,g.nomen_source " +
-                "FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x " +
-                "WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id " +
-                " AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63";
+        String query = """
+            SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,
+                a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,g.gene_source,
+                g.ncbi_annot_status,r.species_type_key,g.ensembl_gene_symbol,g.ensembl_gene_type,g.ensembl_full_name,g.nomen_source
+            FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x
+            WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id
+                AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63
+            ORDER BY r.species_type_key
+            """;
         return executeGeneQuery(query, rgdId);
     }
 
     public List<Gene> getActiveOrthologs(int rgdId, int speciesTypeKey) throws Exception{
 
-        String query = "SELECT g.*, r.species_type_key "+
-                " FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l "+
-                " WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=? "+
-                "  AND r.species_type_key=? " +
-                " ORDER BY r.species_type_key ";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM genes g, rgd_ids r, genetogene_rgd_id_rlt l
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND l.dest_rgd_id=g.rgd_id AND l.src_rgd_id=?
+                AND r.species_type_key=?
+            ORDER BY r.species_type_key
+            """;
         return executeGeneQuery(query, rgdId, speciesTypeKey);
     }
 
