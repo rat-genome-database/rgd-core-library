@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jdepons
- * Date: May 19, 2008
- * Time: 1:31:52 PM
+ * @author jdepons
+ * @since May 19, 2008
  */
 public class SslpsAlleleDAO extends AbstractDAO {
 
@@ -24,9 +22,12 @@ public class SslpsAlleleDAO extends AbstractDAO {
      * @throws Exception thrown on database error
      */
     public List<SslpsAllele> getSslpsAlleleByKey(int sslpKey) throws Exception {
-        String query = "SELECT s.strain_symbol,s.rgd_id,size1,size2,sa.notes,sa.allele_key,sa.sslp_key," +
-                "sa.strain_key FROM SSLPS_ALLELES sa,strains s WHERE SA.STRAIN_KEY=s.STRAIN_KEY AND SA.SSLP_KEY=? "+
-                "ORDER BY s.strain_symbol_lc";
+        String query = """
+            SELECT s.strain_symbol, s.rgd_id, size1, size2, sa.notes, sa.allele_key, sa.sslp_key, sa.strain_key
+            FROM sslps_alleles sa, strains s
+            WHERE sa.strain_key=s.strain_key AND sa.sslp_key=?
+            ORDER BY s.strain_symbol_lc
+            """;
 
         SSLPSAlleleQuery q = new SSLPSAlleleQuery(this.getDataSource(), query);
         return execute(q, sslpKey);
@@ -52,10 +53,12 @@ public class SslpsAlleleDAO extends AbstractDAO {
      */
     public int insertAlleles(List<SslpsAllele> alleleList) throws Exception {
 
-        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "INSERT INTO SSLPS_ALLELES (ALLELE_KEY,SIZE1,SIZE2,SSLP_KEY, STRAIN_KEY, NOTES)"+
-                "SELECT SSLPS_ALLELES_SEQ.NEXTVAL,?,?,?,?,? FROM dual "+
-                "WHERE NOT EXISTS (SELECT 1 FROM SSLPS_ALLELES WHERE sslp_key=? AND strain_key=?)",
+        String sql = """
+            INSERT INTO sslps_alleles (allele_key, size1, size2, sslp_key, strain_key, notes)
+            SELECT sslps_alleles_seq.NEXTVAL, ?, ?, ?, ?, ? FROM dual
+            WHERE NOT EXISTS (SELECT 1 FROM sslps_alleles WHERE sslp_key=? AND strain_key=?)
+            """;
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                         Types.INTEGER, Types.INTEGER});
         su.compile();
