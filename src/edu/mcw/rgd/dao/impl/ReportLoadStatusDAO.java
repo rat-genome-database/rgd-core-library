@@ -111,6 +111,19 @@ public class ReportLoadStatusDAO extends AbstractDAO {
         return results.isEmpty() ? null : results.get(0);
     }
 
+    public int resetFailed(String reportType, int speciesKey, int mapKey) throws Exception {
+        String sql;
+        if (mapKey > 0) {
+            sql = "UPDATE report_load_status SET status='pending', error_message=NULL, updated_at=? " +
+                    "WHERE report_type=? AND species_key=? AND map_key=? AND status='failed'";
+            return update(sql, new Timestamp(System.currentTimeMillis()), reportType, speciesKey, mapKey);
+        } else {
+            sql = "UPDATE report_load_status SET status='pending', error_message=NULL, updated_at=? " +
+                    "WHERE report_type=? AND species_key=? AND status='failed'";
+            return update(sql, new Timestamp(System.currentTimeMillis()), reportType, speciesKey);
+        }
+    }
+
     /** Returns any record with pending/processing status, or null if no active batch. */
     public ReportLoadStatus getActiveBatchInfo() throws Exception {
         String sql = "SELECT * FROM report_load_status WHERE status IN ('pending', 'processing') LIMIT 1";
