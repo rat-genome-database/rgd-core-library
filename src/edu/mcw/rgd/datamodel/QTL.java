@@ -30,6 +30,8 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
     private String mostSignificantCmoTerm;
     private Integer speciesTypeKey;
     private String peakRsId;
+    private String flank1RsId;
+    private String flank2RsId;
     private Double pValueMlog;
 
     public Integer getKey() {
@@ -198,5 +200,25 @@ public class QTL implements Identifiable, Speciated, ObjectWithName, ObjectWithS
 
     public void setpValueMlog(Double pValueMlog) {
         this.pValueMlog = pValueMlog;
+    }
+
+    public String getFlank1RsId() {
+        return flank1RsId;
+    }
+
+    public void setFlank1RsId(String flank1RsId) {
+        this.flank1RsId = flank1RsId;
+    }
+
+    public String getFlank2RsId() {
+        return flank2RsId;
+    }
+
+    public void setFlank2RsId(String flank2RsId) {
+        this.flank2RsId = flank2RsId;
+    }
+
+    public boolean hasPeakFlankRgdID(){
+        return ((peakRgdId!=null && peakRgdId!=0) || (flank1RgdId!=null && flank1RgdId!=0) || (flank2RgdId!=null && flank2RgdId!=0));
     }
 }
