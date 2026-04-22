@@ -9,7 +9,9 @@ import edu.mcw.rgd.datamodel.DocumentEmbeddingSummary;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DocumentEmbeddingDAO extends AbstractDAO {
 
@@ -83,5 +85,11 @@ public class DocumentEmbeddingDAO extends AbstractDAO {
         String sql = "SELECT chunk FROM document_embeddings WHERE file_name = ? ORDER BY id";
         StringListQuery query = new StringListQuery(this.getDataSource(), sql);
         return execute(query, fileName);
+    }
+
+    public Set<String> getEmbeddedFileNames() throws Exception {
+        String sql = "SELECT DISTINCT file_name FROM document_embeddings";
+        StringListQuery query = new StringListQuery(this.getDataSource(), sql);
+        return new HashSet<>(execute(query));
     }
 }
