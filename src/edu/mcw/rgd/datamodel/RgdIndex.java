@@ -8,6 +8,8 @@ public class RgdIndex {
     private static String newAlias;
     private static List<String> indices;
 
+    public RgdIndex() {
+    }
 
     public static String getOldAlias() {
         return oldAlias;
@@ -25,8 +27,7 @@ public class RgdIndex {
         RgdIndex.newAlias = newAlias;
     }
 
-
-    public void setIndex(String index) {
+    public static void setIndex(String index) {
         RgdIndex.index = index;
     }
 
@@ -38,7 +39,7 @@ public class RgdIndex {
         return indices;
     }
 
-    public void setIndices(List<String> indices) {
+    public static void setIndices(List<String> indices) {
         RgdIndex.indices = indices;
     }
 }
