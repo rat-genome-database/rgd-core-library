@@ -9,6 +9,15 @@ public class GViewerIndex {
     private String objectType;
     private String term;
     private String termAcc;
+    private int mapKey;
+
+    public int getMapKey() {
+        return mapKey;
+    }
+
+    public void setMapKey(int mapKey) {
+        this.mapKey = mapKey;
+    }
 
     public int getAnnotatedObjectRgdId() {
         return annotatedObjectRgdId;
