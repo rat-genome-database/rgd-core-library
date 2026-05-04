@@ -56,6 +56,9 @@ public class DataSourceFactory {
     public DataSource getDataSource() throws Exception{
         return getDataSource(""); // get default data source
     }
+    public DataSource getPostgressDataSource() throws Exception{
+        return getDataSource("solrPostgress"); // get default data source
+    }
 
     /**
      * Returns a DataSource object for specific domain RGD database on that server
@@ -100,6 +103,15 @@ public class DataSourceFactory {
     }
 
     /**
+     * Returns a DataSource object for RGD RAG database
+     * @return DataSource object
+     * @throws Exception
+     */
+    public DataSource getRgdRagDataSource() throws Exception{
+        return getDataSource("rgdRag");
+    }
+
+    /**
      * Returns a DataSource object for skynet database
      * @return DataSource object
      * @throws Exception
@@ -141,5 +153,23 @@ public class DataSourceFactory {
      */
     public DataSource getEnsemblDataSource() throws Exception{
         return getDataSource("Ensembl");
+    }
+
+    /**
+     * Returns the reed (stage) Oracle DataSource via jdbc/reed JNDI (or reedDataSource XML bean).
+     * @return DataSource object
+     * @throws Exception
+     */
+    public DataSource getChatbotOracleDataSource() throws Exception {
+        return getDataSource("reed");
+    }
+
+    /**
+     * Returns the reed (stage) CarpeNovo DataSource via jdbc/reedcarpe JNDI.
+     * @return DataSource object
+     * @throws Exception
+     */
+    public DataSource getChatbotCarpeDataSource() throws Exception {
+        return getDataSource("reedcarpe");
     }
 }
