@@ -10,6 +10,15 @@ public class GViewerIndex {
     private String term;
     private String termAcc;
     private int mapKey;
+    private int speciesTypeKey;
+
+    public int getSpeciesTypeKey() {
+        return speciesTypeKey;
+    }
+
+    public void setSpeciesTypeKey(int speciesTypeKey) {
+        this.speciesTypeKey = speciesTypeKey;
+    }
 
     public int getMapKey() {
         return mapKey;
