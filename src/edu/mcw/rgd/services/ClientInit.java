@@ -1,13 +1,15 @@
 package edu.mcw.rgd.services;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import io.netty.util.internal.InternalThreadLocalMap;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.RestHighLevelClientBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +17,9 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 public class ClientInit {
-    private static volatile RestHighLevelClient client = null;
+    private static volatile ElasticsearchClient client = null;
+    private static volatile ElasticsearchTransport transport = null;
+    private static volatile RestClient restClient = null;
     private static final Logger log = LogManager.getLogger(ClientInit.class);
 
     private static final int ES_PORT = 9200;
@@ -32,7 +36,7 @@ public class ClientInit {
         }
     }
 
-    private static RestHighLevelClient createClient() throws UnknownHostException {
+    private static ElasticsearchClient createClient() throws UnknownHostException {
         RestClientBuilder builder;
         if (RgdContext.isProduction() || RgdContext.isPipelines()) {
             Properties props = getProperties();
@@ -48,7 +52,7 @@ public class ClientInit {
             );
         } else {
             builder = RestClient.builder(
-                    new HttpHost("travis.rgd.mcw.edu", ES_PORT, ES_SCHEME)
+                    new HttpHost("localhost", ES_PORT, ES_SCHEME)
             );
         }
         builder.setRequestConfigCallback(requestConfigBuilder ->
@@ -56,18 +60,21 @@ public class ClientInit {
                         .setConnectTimeout(CONNECT_TIMEOUT_MS)
                         .setSocketTimeout(SOCKET_TIMEOUT_MS)
         );
-        return new RestHighLevelClientBuilder(builder.build())
-                .setApiCompatibilityMode(true).build();
+        restClient = builder.build();
+        transport = new RestClientTransport(restClient, new JacksonJsonpMapper(JacksonConfiguration.MAPPER));
+        return new ElasticsearchClient(transport);
     }
 
-    public static void setClient(RestHighLevelClient client) {
+    public static void setClient(ElasticsearchClient client) {
         ClientInit.client = client;
     }
 
     public static synchronized void destroy() throws IOException {
-        if (client != null) {
-            client.close();
+        if (transport != null) {
+            transport.close();
             InternalThreadLocalMap.remove();
+            transport = null;
+            restClient = null;
             client = null;
             log.info("Destroyed Elasticsearch Client");
         } else {
@@ -75,7 +82,7 @@ public class ClientInit {
         }
     }
 
-    public static synchronized RestHighLevelClient getClient() throws UnknownHostException {
+    public static synchronized ElasticsearchClient getClient() throws UnknownHostException {
         if (client == null) {
             log.info("Client is null, initiating new client...");
             init();
