@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import io.netty.util.internal.InternalThreadLocalMap;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +52,7 @@ public class ClientInit {
         } else {
             builder = RestClient.builder(
                     new HttpHost("localhost", ES_PORT, ES_SCHEME)
+
             );
         }
         builder.setRequestConfigCallback(requestConfigBuilder ->
@@ -72,7 +72,6 @@ public class ClientInit {
     public static synchronized void destroy() throws IOException {
         if (transport != null) {
             transport.close();
-            InternalThreadLocalMap.remove();
             transport = null;
             restClient = null;
             client = null;
