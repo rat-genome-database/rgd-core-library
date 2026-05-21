@@ -105,6 +105,22 @@ public class GeneratorCommandParser {
                 } catch (Exception e) {
                     messages.put(command, e.getMessage());
                 }
+            } else if (oKey == 6) {
+                try {
+                    QTLDAO qdao = new QTLDAO();
+                    for (Object symbolObj : geneList) {
+                        String sym = symbolObj.toString().trim();
+                        if (sym.isEmpty()) continue;
+                        QTL matched = qdao.getQTLBySymbol(sym, speciesType);
+                        if (matched != null) {
+                            allGenes.add(matched);
+                        } else {
+                            objectMapperLog.add("No QTLs matched: " + sym);
+                        }
+                    }
+                } catch (Exception e) {
+                    messages.put(command, e.getMessage());
+                }
             } else {
                 try {
                     ObjectMapper om = new ObjectMapper();
@@ -344,6 +360,23 @@ public class GeneratorCommandParser {
                             allGenes.add(matched.getSymbol());
                         } else {
                             objectMapperLog.add("No strains matched: " + sym);
+                        }
+                    }
+                } catch (Exception e) {
+                    messages.put(command, e.getMessage());
+                }
+            }
+            if(oKey==6){
+                try {
+                    QTLDAO qdao = new QTLDAO();
+                    for (Object symbolObj : objectList) {
+                        String sym = symbolObj.toString().trim();
+                        if (sym.isEmpty()) continue;
+                        QTL matched = qdao.getQTLBySymbol(sym, speciesType);
+                        if (matched != null) {
+                            allGenes.add(matched.getSymbol());
+                        } else {
+                            objectMapperLog.add("No QTLs matched: " + sym);
                         }
                     }
                 } catch (Exception e) {
