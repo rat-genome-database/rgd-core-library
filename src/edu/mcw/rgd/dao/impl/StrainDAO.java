@@ -76,21 +76,25 @@ public class StrainDAO extends AbstractDAO {
     }
 
     public List<Strain> getActiveStrainsSortedBySymbol(String chr, long startPos, long stopPos, int mapKey) throws Exception {
-        String query = "SELECT g.*, r.species_type_key \n" +
-                "FROM strains g, rgd_ids r, maps_data md \n" +
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
-                " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? " +
-                " order by g.strain_symbol";
+        String query = """
+            SELECT g.*, r.species_type_key
+            FROM strains g, rgd_ids r, maps_data md
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id
+              AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=?
+            ORDER BY g.strain_symbol
+            """;
 
         return executeStrainQuery(query, chr, stopPos, startPos, mapKey);
     }
 
     public List<MappedStrain> getActiveMappedStrainPositions(String chr, long startPos, long stopPos, int mapKey) throws Exception{
-        String query = "SELECT s.*,r.species_type_key, s.strain_symbol as symbol,  md.* \n" +
-                "FROM Strains s, rgd_ids r, maps_data md \n" +
-                "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND md.rgd_id=s.rgd_id \n" +
-                "AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? \n" +
-                "ORDER BY md.start_pos";
+        String query = """
+            SELECT s.*, r.species_type_key, s.strain_symbol AS symbol, md.*
+            FROM strains s, rgd_ids r, maps_data md
+            WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND md.rgd_id=s.rgd_id
+              AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=?
+            ORDER BY md.start_pos
+            """;
         return MappedStrainQuery.run(this, query, chr, stopPos, startPos, mapKey);
     }
 
@@ -127,12 +131,14 @@ public class StrainDAO extends AbstractDAO {
      */
     public List<Strain> getMappedStrains(int mapKey) throws Exception{
 
-        String query = "SELECT s.*,r.species_type_key \n" +
-                "FROM strains s, rgd_ids r \n" +
-                "WHERE EXISTS (\n" +
-                "    SELECT 1 FROM maps_data m WHERE m.rgd_id=s.rgd_id AND m.map_key=?\n" +
-                ") \n" +
-                "AND s.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
+        String query = """
+            SELECT s.*, r.species_type_key
+            FROM strains s, rgd_ids r
+            WHERE EXISTS (
+                SELECT 1 FROM maps_data m WHERE m.rgd_id=s.rgd_id AND m.map_key=?
+            )
+              AND s.rgd_id=r.rgd_id AND r.object_status='ACTIVE'
+            """;
         return executeStrainQuery(query, mapKey);
     }
 
