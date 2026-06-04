@@ -2,8 +2,10 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.spring.*;
+import edu.mcw.rgd.dao.spring.gviewer.GViewerIndexQuery;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.annotation.Enrichment;
+import edu.mcw.rgd.datamodel.annotation.GViewerIndex;
 import edu.mcw.rgd.datamodel.annotation.OntologyEnrichment;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Relation;
@@ -2221,4 +2223,29 @@ public class AnnotationDAO extends AbstractDAO {
         }
     }
 
+    public List<GViewerIndex> getALLAnnotationsForGViewerIndex() throws Exception {
+        String sql= """
+                SELECT DISTINCT m.chromosome,m.start_pos,m.stop_pos,z.rgd_id,z.object_symbol,z.object_type , z.term,z.term_acc
+                FROM maps_data m,(
+                SELECT annotated_object_rgd_id rgd_id,NVL(object_symbol,object_name) object_symbol,DECODE(rgd_object_key,1,'gene',6,'qtl','strain') object_type, t.term , t.term_acc
+                FROM full_annot a,ont_terms t
+                WHERE rgd_object_key IN(1,5,6)
+                 AND a.term_acc=t.term_acc AND t.is_obsolete=0\s
+                 AND EXISTS(SELECT 1 FROM ont_term_stats2 s WHERE s.term_acc=t.term_acc AND stat_name='annotated_object_count' AND with_children>0)\s
+                 AND a.term_acc in (
+                    SELECT child_term_acc FROM ont_dag\s
+                    START WITH child_term_acc IN(
+                      SELECT term_acc FROM ont_terms t
+                      WHERE (
+                              t.ont_id in ('CC','MF','BP','RDO','PW','NBO','MP','CMO','MMO','XCO','VT','CHEBI','RS'))
+                    ) CONNECT BY PRIOR child_term_acc=parent_term_acc
+                )
+                )z
+                WHERE z.rgd_id=m.rgd_id AND m.map_key=380
+                ORDER BY z.object_type,z.object_symbol
+                 """;
+        GViewerIndexQuery query=new GViewerIndexQuery(this.getDataSource(), sql);
+        return query.execute();
+
+    }
 }

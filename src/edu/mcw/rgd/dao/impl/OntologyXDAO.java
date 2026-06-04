@@ -1673,8 +1673,20 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public List<String> getOntologyQualifiers() throws Exception {
 
-        String query = "SELECT ont_qualifier_name FROM ontology_qualifier";
+        String query = "SELECT DISTINCT ont_qualifier_name FROM ontology_qualifier";
         return StringListQuery.execute(this, query);
+    }
+
+    /**
+     * get list of unique ontology qualifier names for a given object key
+     * @param objectKey object key (see RgdId.OBJECT_KEY_xxx constants)
+     * @return list of unique ontology qualifier names for the given object key
+     * @throws Exception if something wrong happens in spring framework
+     */
+    public List<String> getOntologyQualifiers(int objectKey) throws Exception {
+
+        String query = "SELECT DISTINCT ont_qualifier_name FROM ontology_qualifier WHERE object_key=?";
+        return StringListQuery.execute(this, query, objectKey);
     }
 
     /**
@@ -1684,10 +1696,12 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public List<String> getSynonymTypes(String ontId) throws Exception {
 
-        String query = "SELECT synonym_type FROM ont_synonyms s,ont_terms t\n" +
-                "WHERE s.term_acc=t.term_acc AND ont_id=?\n" +
-                "GROUP BY synonym_type\n" +
-                "ORDER BY COUNT(*) DESC\n";
+        String query = """
+            SELECT synonym_type FROM ont_synonyms s,ont_terms t
+            WHERE s.term_acc=t.term_acc AND ont_id=?
+            GROUP BY synonym_type
+            ORDER BY COUNT(*) DESC
+            """;
         return StringListQuery.execute(this, query, ontId);
     }
 
@@ -1741,8 +1755,9 @@ public class OntologyXDAO extends AbstractDAO {
         return execute(q, params);
     }
     public List<Term> getParentTerm(String termAcc) throws Exception {
-        String sql="select * from ont_terms where term_acc in (\n" +
-                "select parent_term_acc from ont_dag where child_term_acc=?)";
+        String sql = """
+            SELECT * FROM ont_terms WHERE term_acc IN (
+            SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=?)""";
         TermQuery q=new TermQuery(this.getDataSource(), sql);
         return execute(q, termAcc);
     }

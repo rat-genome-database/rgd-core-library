@@ -23,46 +23,64 @@ public class SolrDocsDAO extends AbstractDAO {
     ObjectMapper mapper=new ObjectMapper();
     Gson gson=new Gson();
     public int addBatch(List<SolrDoc> solrDocs) throws Exception {
-        String fields="SOLR_DOC_ID, "+getSolrDocFields().stream().collect(Collectors.joining(", "))+", last_update_date";
-        String sql= "INSERT INTO SOLR_DOCS ("+ fields+") VALUES (" +
-                "NEXTVAL('SOLR_DOC_SEQ'), " ;
-        sql+=getSolrDocFields().stream().map(f->"?").collect(Collectors.joining(","));
-        sql+=", NOW())";
-        try(Connection connection=this.getPostgressConnection();
-            PreparedStatement preparedStatement=connection.prepareStatement(sql)){
-            connection.setAutoCommit(false);
-
-            for(SolrDoc solrDoc:solrDocs) {
-                SolrDocDB doc = buildSolrDocDB(solrDoc);
-                List<Object> params=docParams(doc);
-                for(int i=0;i<params.size();i++){
-                    Object value=params.get(i);
-                    int paramIndex=i+1;
-                    if(value instanceof java.sql.Date){
-                        preparedStatement.setDate(paramIndex, (java.sql.Date) value);
-                    }else if(value instanceof Integer){
-                        preparedStatement.setInt(paramIndex, (Integer) value);
-                    }else{
-                        preparedStatement.setString(paramIndex, value!=null? value.toString():null);
-                    }
-                }
-                 preparedStatement.addBatch();
-
-            }
-            int [] numUpdates=preparedStatement.executeBatch();
-            for(int i=0; i<numUpdates.length;i++){
-                if(numUpdates[i]==-2)
-                System.out.println("Execution "+ i+ ": unknown number of rows updated");
-//                else
-                  //  System.out.println("Execution " + i+ " successful: "+ numUpdates[i]+" rows updated");
-            }
-            connection.commit();
-           return 0;
-        }catch (Exception e){
-            e.printStackTrace();
+        if (solrDocs == null || solrDocs.isEmpty()) {
+            return 0;
         }
 
-        return 0;
+        List<String> insertFields = getSolrDocFields().stream()
+                .filter(f -> !f.equalsIgnoreCase("solr_doc_id")
+                          && !f.equalsIgnoreCase("last_update_date"))
+                .collect(Collectors.toList());
+
+        String columns = "SOLR_DOC_ID, " + String.join(", ", insertFields) + ", last_update_date";
+        String placeholders = insertFields.stream().map(f -> "?").collect(Collectors.joining(", "));
+        String sql = "INSERT INTO SOLR_DOCS (" + columns + ") VALUES ("
+                   + "NEXTVAL('SOLR_DOC_SEQ'), " + placeholders + ", NOW())";
+
+        int totalInserted = 0;
+        Connection connection = null;
+        try {
+            connection = this.getPostgressConnection();
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                for (SolrDoc solrDoc : solrDocs) {
+                    SolrDocDB doc = buildSolrDocDB(solrDoc);
+                    List<Object> params = docParams(doc);
+                    for (int i = 0; i < params.size(); i++) {
+                        Object value = params.get(i);
+                        int paramIndex = i + 1;
+                        if (value instanceof java.sql.Date) {
+                            preparedStatement.setDate(paramIndex, (java.sql.Date) value);
+                        } else if (value instanceof Integer) {
+                            preparedStatement.setInt(paramIndex, (Integer) value);
+                        } else {
+                            preparedStatement.setString(paramIndex, value != null ? value.toString() : null);
+                        }
+                    }
+                    preparedStatement.addBatch();
+                }
+                int[] numUpdates = preparedStatement.executeBatch();
+                for (int i = 0; i < numUpdates.length; i++) {
+                    if (numUpdates[i] >= 0) {
+                        totalInserted += numUpdates[i];
+                    } else if (numUpdates[i] == PreparedStatement.SUCCESS_NO_INFO) {
+                        totalInserted++;
+                        System.out.println("Execution " + i + ": unknown number of rows updated");
+                    }
+                }
+                connection.commit();
+            }
+            return totalInserted;
+        } catch (Exception e) {
+            if (connection != null) {
+                try { connection.rollback(); } catch (Exception ignore) {}
+            }
+            throw e;
+        } finally {
+            if (connection != null) {
+                try { connection.close(); } catch (Exception ignore) {}
+            }
+        }
     }
     public List<Object> docParams(SolrDocDB doc){
         return Arrays.asList(
@@ -120,7 +138,6 @@ public class SolrDocsDAO extends AbstractDAO {
                 doc.getSoPos(),
                 doc.getRdoTerm(),
                 doc.getChebiId(),
-                doc.getSolrDocId(),
                 doc.get_abstract(),
                 doc.getAuthors(),
                 doc.getjDates(),
@@ -444,11 +461,19 @@ public class SolrDocsDAO extends AbstractDAO {
             List<String> values=docMap.get(key);
             if(docMap.get(key)!=null) {
                 if (key.equalsIgnoreCase("pDate")) {
-                    String dateString=values.get(0);
-                    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date date=simpleDateFormat.parse(dateString);
-                    pDate=new java.sql.Date(date.getTime());
-
+                    if (values != null && !values.isEmpty()) {
+                        String dateString = values.get(0);
+                        if (dateString != null && !dateString.trim().isEmpty()) {
+                            try {
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                java.util.Date date = simpleDateFormat.parse(dateString.trim());
+                                pDate = new java.sql.Date(date.getTime());
+                            } catch (ParseException e) {
+                                System.err.println("Unparseable pDate: " + dateString);
+                                pDate = null;
+                            }
+                        }
+                    }
                 } else {
                     try {
                         if (values.size() > 1) {
