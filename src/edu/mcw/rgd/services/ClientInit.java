@@ -51,7 +51,7 @@ public class ClientInit {
             );
         } else {
             builder = RestClient.builder(
-                    new HttpHost("localhost", ES_PORT, ES_SCHEME)
+                    new HttpHost("travis.rgd.mcw.edu", ES_PORT, ES_SCHEME)
 
             );
         }
