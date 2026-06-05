@@ -95,7 +95,7 @@ public class GeneratorCommandParser {
                     for (Object symbolObj : geneList) {
                         String sym = symbolObj.toString().trim();
                         if (sym.isEmpty()) continue;
-                        Strain matched = sdao.getActiveStrainByTaglessSymbol(sym, speciesType);
+                        Strain matched = sdao.getActiveStrainBySymbolForUserInput(sym, speciesType);
                         if (matched != null) {
                             allGenes.add(matched);
                         } else {
@@ -355,7 +355,7 @@ public class GeneratorCommandParser {
                     for (Object symbolObj : objectList) {
                         String sym = symbolObj.toString().trim();
                         if (sym.isEmpty()) continue;
-                        Strain matched = sdao.getActiveStrainByTaglessSymbol(sym, speciesType);
+                        Strain matched = sdao.getActiveStrainBySymbolForUserInput(sym, speciesType);
                         if (matched != null) {
                             allGenes.add(matched.getSymbol());
                         } else {
