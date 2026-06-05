@@ -75,6 +75,27 @@ public class StrainDAO extends AbstractDAO {
         return strains.get(0);
     }
 
+    /**
+     * Look up an active strain from user-entered text. Strips HTML tags from
+     * the input (so the displayed/exported form like "SHR.WKY-(&lt;i&gt;D12Rat1&lt;/i&gt;)/Tja"
+     * works) and matches case-insensitively against the tagless strain symbol.
+     * @param userInput user-entered strain symbol (may contain HTML tags)
+     * @param speciesTypeKey species type key
+     * @return matching Strain, or null if none
+     */
+    public Strain getActiveStrainBySymbolForUserInput(String userInput, int speciesTypeKey) throws Exception {
+        if (userInput == null) return null;
+        String stripped = userInput.replaceAll("<[^>]*>", "").trim();
+        if (stripped.isEmpty()) return null;
+        String sql = "SELECT s.*, r.species_type_key FROM strains s, rgd_ids r " +
+                "WHERE r.rgd_id=s.rgd_id AND r.object_status='ACTIVE' AND r.species_type_key=? " +
+                "AND LOWER(s.tagless_strain_symbol)=LOWER(?)";
+        List<Strain> strains = executeStrainQuery(sql, speciesTypeKey, stripped);
+        if (strains.isEmpty())
+            return null;
+        return strains.get(0);
+    }
+
     public List<Strain> getActiveStrainsSortedBySymbol(String chr, long startPos, long stopPos, int mapKey) throws Exception {
         String query = """
             SELECT g.*, r.species_type_key
