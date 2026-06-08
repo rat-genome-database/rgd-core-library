@@ -55,40 +55,41 @@ public class PrimerDAO extends AbstractDAO{
                 " AND vf.seq_region_end<=?\n";
 
         logger.debug(sql+", Chr"+posChr+":"+posStart+".."+posStop);
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, posChr);
-        ps.setInt(2, posStart);
-        ps.setInt(3, posStop);
 
-        try{
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                EnsemblVariation ev = new EnsemblVariation();
-                ev.setVarName(rs.getString("variation_name"));
-                ev.setVid(rs.getString("variation_id"));
-                ev.setConsequenceType(rs.getString("consequence_types"));
-                ev.setvSeq_region_id(rs.getString("seq_region_id"));
-                ev.setvChr(rs.getString("name"));
-                int start = Integer.parseInt(rs.getString("seq_region_start"));
-                int end = Integer.parseInt(rs.getString("seq_region_end"));
-                String strand = rs.getString("seq_region_strand");
-                if(g.geteGStrand().equalsIgnoreCase("-1") && (start>end) && (strand.equals("1"))){
-                    ev.setVstart(end);
-                    ev.setVstop(start);
-                    ev.setvStrand(g.geteGStrand());
-                }else if(g.geteGStrand().equalsIgnoreCase("1") && (start<end) && (strand.equals("1"))){
-                    ev.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
-                    ev.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
-                    ev.setvStrand(g.geteGStrand());
-                }else{
-                    ev.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
-                    ev.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
-                    ev.setvStrand(rs.getString("seq_region_strand"));
+        try( PreparedStatement ps = conn.prepareStatement(sql) ){
+            ps.setString(1, posChr);
+            ps.setInt(2, posStart);
+            ps.setInt(3, posStop);
+
+            try( ResultSet rs = ps.executeQuery() ){
+                while (rs.next()) {
+                    EnsemblVariation ev = new EnsemblVariation();
+                    ev.setVarName(rs.getString("variation_name"));
+                    ev.setVid(rs.getString("variation_id"));
+                    ev.setConsequenceType(rs.getString("consequence_types"));
+                    ev.setvSeq_region_id(rs.getString("seq_region_id"));
+                    ev.setvChr(rs.getString("name"));
+                    int start = Integer.parseInt(rs.getString("seq_region_start"));
+                    int end = Integer.parseInt(rs.getString("seq_region_end"));
+                    String strand = rs.getString("seq_region_strand");
+                    if(g.geteGStrand().equalsIgnoreCase("-1") && (start>end) && (strand.equals("1"))){
+                        ev.setVstart(end);
+                        ev.setVstop(start);
+                        ev.setvStrand(g.geteGStrand());
+                    }else if(g.geteGStrand().equalsIgnoreCase("1") && (start<end) && (strand.equals("1"))){
+                        ev.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
+                        ev.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
+                        ev.setvStrand(g.geteGStrand());
+                    }else{
+                        ev.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
+                        ev.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
+                        ev.setvStrand(rs.getString("seq_region_strand"));
+                    }
+                    ev.setAlleleString(rs.getString("allele_string"));
+                    ev.setvSource(rs.getString("source_id"));
+
+                    acc.add(ev);
                 }
-                ev.setAlleleString(rs.getString("allele_string"));
-                ev.setvSource(rs.getString("source_id"));
-
-                acc.add(ev);
             }
 
         }catch (Exception excecutionException){
@@ -132,24 +133,24 @@ public class PrimerDAO extends AbstractDAO{
             "AND fv.variation_id IS NULL";
 
         logger.debug(sql);
-        PreparedStatement ps = conn.prepareStatement(sql);
 
-        try{
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                EnsemblVariation bufferEv = new EnsemblVariation();
-                bufferEv.setVarName(rs.getString("variation_name"));
-                bufferEv.setVid(rs.getString("variation_id"));
-                bufferEv.setConsequenceType(rs.getString("consequence_types"));
-                bufferEv.setvSeq_region_id(rs.getString("seq_region_id"));
-                bufferEv.setvChr(rs.getString("name"));
-                bufferEv.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
-                bufferEv.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
-                bufferEv.setvStrand(rs.getString("seq_region_strand"));
-                bufferEv.setAlleleString(rs.getString("allele_string"));
-                bufferEv.setvSource(rs.getString("source_id"));
+        try( PreparedStatement ps = conn.prepareStatement(sql) ){
+            try( ResultSet rs = ps.executeQuery() ){
+                while (rs.next()) {
+                    EnsemblVariation bufferEv = new EnsemblVariation();
+                    bufferEv.setVarName(rs.getString("variation_name"));
+                    bufferEv.setVid(rs.getString("variation_id"));
+                    bufferEv.setConsequenceType(rs.getString("consequence_types"));
+                    bufferEv.setvSeq_region_id(rs.getString("seq_region_id"));
+                    bufferEv.setvChr(rs.getString("name"));
+                    bufferEv.setVstart(Integer.parseInt(rs.getString("seq_region_start")));
+                    bufferEv.setVstop(Integer.parseInt(rs.getString("seq_region_end")));
+                    bufferEv.setvStrand(rs.getString("seq_region_strand"));
+                    bufferEv.setAlleleString(rs.getString("allele_string"));
+                    bufferEv.setvSource(rs.getString("source_id"));
 
-                acc.add(bufferEv);
+                    acc.add(bufferEv);
+                }
             }
 
         }catch (Exception excecutionException){
@@ -187,22 +188,22 @@ public class PrimerDAO extends AbstractDAO{
                     "using (exon_id) \n" +
                     "where et.transcript_id=?";
 
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try( PreparedStatement ps = conn.prepareStatement(sql) ){
             ps.setString(1, etObj.getEnsTranscriptId());
 
-        try{
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                EnsemblExon ex = new EnsemblExon();
-                ex.setEnsExonId(rs.getString("exon_id"));
-                ex.setExonNumber(rs.getString("rank"));
-                ex.setEnsExonStart(rs.getInt("seq_region_start"));
-                ex.setEnsExonStop(rs.getInt("seq_region_end"));
-                ex.setEnsExonStrand(rs.getString("seq_region_strand"));
-                ex.setEnsExonName(rs.getString("stable_id"));
-                ex.setEnsExonPhase(rs.getString("phase"));
-                ex.setExonParentTranscriptAccId(etObj.getEnsTranscriptName());
-                accEx.add(ex);
+            try( ResultSet rs = ps.executeQuery() ){
+                while (rs.next()){
+                    EnsemblExon ex = new EnsemblExon();
+                    ex.setEnsExonId(rs.getString("exon_id"));
+                    ex.setExonNumber(rs.getString("rank"));
+                    ex.setEnsExonStart(rs.getInt("seq_region_start"));
+                    ex.setEnsExonStop(rs.getInt("seq_region_end"));
+                    ex.setEnsExonStrand(rs.getString("seq_region_strand"));
+                    ex.setEnsExonName(rs.getString("stable_id"));
+                    ex.setEnsExonPhase(rs.getString("phase"));
+                    ex.setExonParentTranscriptAccId(etObj.getEnsTranscriptName());
+                    accEx.add(ex);
+                }
             }
 
         }catch (Exception excecutionException){
@@ -243,22 +244,22 @@ public class PrimerDAO extends AbstractDAO{
                     "t.gene_id=?";
 
             logger.debug(sql);
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try( PreparedStatement ps = conn.prepareStatement(sql) ){
             ps.setString(1, eg.getGeneId());
-        try{
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                EnsemblTranscript et = new EnsemblTranscript();
-                et.setEnsGeneId(rs.getString("gene_id"));
-                et.setEnsTranscriptId(rs.getString("transcript_id"));
-                et.setEnsTranscriptName(rs.getString("stable_id"));
-                et.setTrChr(rs.getString("seq_region_id"));
-                et.setTrStart(rs.getInt("seq_region_start"));
-                et.setTrStop(rs.getInt("seq_region_end"));
-                et.setCcdsId(rs.getString("dbprimary_acc"));
-                acc.add(et);
+            try( ResultSet rs = ps.executeQuery() ){
+                while (rs.next()) {
+                    EnsemblTranscript et = new EnsemblTranscript();
+                    et.setEnsGeneId(rs.getString("gene_id"));
+                    et.setEnsTranscriptId(rs.getString("transcript_id"));
+                    et.setEnsTranscriptName(rs.getString("stable_id"));
+                    et.setTrChr(rs.getString("seq_region_id"));
+                    et.setTrStart(rs.getInt("seq_region_start"));
+                    et.setTrStop(rs.getInt("seq_region_end"));
+                    et.setCcdsId(rs.getString("dbprimary_acc"));
+                    acc.add(et);
 
-                logger.debug("   "+et.getEnsTranscriptId()+" "+et.getEnsTranscriptName());
+                    logger.debug("   "+et.getEnsTranscriptId()+" "+et.getEnsTranscriptName());
+                }
             }
 
         }catch (Exception excecutionException){
@@ -295,20 +296,20 @@ public class PrimerDAO extends AbstractDAO{
                     "where g.stable_id=?";
 
             logger.debug(sql);
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try( PreparedStatement ps = conn.prepareStatement(sql) ){
             ps.setString(1, ensId);
-        try{
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                eg.setGeneId(rs.getString("gene_id"));
-                eg.setEnsGeneId(rs.getString("stable_id"));
-                eg.setEnsGeneSymbol(rs.getString("stable_id"));
-                eg.setEnsGeneName(rs.getString("description"));
-                eg.setSeqRegionId(rs.getString("seq_region_id"));
-                eg.setEgChr(rs.getString("name"));
-                eg.seteGStart(Integer.parseInt(rs.getString("seq_region_start")));
-                eg.setEgStop(Integer.parseInt(rs.getString("seq_region_end")));
-                eg.seteGStrand(rs.getString("seq_region_strand"));
+            try( ResultSet rs = ps.executeQuery() ){
+                while (rs.next()) {
+                    eg.setGeneId(rs.getString("gene_id"));
+                    eg.setEnsGeneId(rs.getString("stable_id"));
+                    eg.setEnsGeneSymbol(rs.getString("stable_id"));
+                    eg.setEnsGeneName(rs.getString("description"));
+                    eg.setSeqRegionId(rs.getString("seq_region_id"));
+                    eg.setEgChr(rs.getString("name"));
+                    eg.seteGStart(Integer.parseInt(rs.getString("seq_region_start")));
+                    eg.setEgStop(Integer.parseInt(rs.getString("seq_region_end")));
+                    eg.seteGStrand(rs.getString("seq_region_strand"));
+                }
             }
 
         }catch (Exception excecutionException){

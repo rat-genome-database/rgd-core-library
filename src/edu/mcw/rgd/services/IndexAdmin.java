@@ -25,18 +25,19 @@ import java.util.List;
 public class IndexAdmin {
     public static final Logger log= LogManager.getLogger(IndexAdmin.class);
 
+    private RgdIndex rgdIndex = new RgdIndex();
 
 
     public void createIndex(String mappings, String type) throws Exception {
 
-        GetAliasesRequest aliasesRequest=new GetAliasesRequest(RgdIndex.getIndex());
+        GetAliasesRequest aliasesRequest=new GetAliasesRequest(rgdIndex.getIndex());
         boolean existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
         if(existsAlias) {
-            for (String index : RgdIndex.getIndices()) {
+            for (String index : rgdIndex.getIndices()) {
                 aliasesRequest.indices(index);
                 existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
                 if (!existsAlias) {
-                    RgdIndex.setNewAlias(index);
+                    rgdIndex.setNewAlias(index);
                     GetIndexRequest request1 = new GetIndexRequest(index);
                     boolean indexExists = ClientInit.getClient().indices().exists(request1, RequestOptions.DEFAULT);
 
@@ -48,20 +49,20 @@ public class IndexAdmin {
                     }
                     createNewIndex(index, mappings, type);
                 }else {
-                    RgdIndex.setOldAlias(index);
+                    rgdIndex.setOldAlias(index);
                 }
 
             }
         }else{
-            GetIndexRequest request1=new GetIndexRequest(RgdIndex.getIndex()+"1");
+            GetIndexRequest request1=new GetIndexRequest(rgdIndex.getIndex()+"1");
             boolean indexExists=ClientInit.getClient().indices().exists(request1, RequestOptions.DEFAULT);
             if (indexExists) {   /**** delete index if exists ****/
 
-                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(RgdIndex.getIndex()+"1");
+                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(rgdIndex.getIndex()+"1");
                 ClientInit.getClient().indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-                log.info(RgdIndex.getIndex()+"1" + " deleted");
+                log.info(rgdIndex.getIndex()+"1" + " deleted");
             }
-            createNewIndex(RgdIndex.getIndex()+"1",mappings, type);
+            createNewIndex(rgdIndex.getIndex()+"1",mappings, type);
 
         }
 
@@ -108,20 +109,20 @@ public class IndexAdmin {
 
         log.info(index + " created on  " + new Date());
 
-        RgdIndex.setNewAlias(index);
+        rgdIndex.setNewAlias(index);
     }
     public int updateIndex() throws Exception {
-        if(RgdIndex.getIndex()!=null) {
-            log.info("Updating " + RgdIndex.getIndex() + "...");
-            GetIndexRequest request=new GetIndexRequest(RgdIndex.getIndex());
+        if(rgdIndex.getIndex()!=null) {
+            log.info("Updating " + rgdIndex.getIndex() + "...");
+            GetIndexRequest request=new GetIndexRequest(rgdIndex.getIndex());
             boolean indicesExists=ClientInit.getClient().indices().exists(request, RequestOptions.DEFAULT);
             if (indicesExists) {  /* CHECK IF INDEX NAME PROVIDED EXISTS*/
 
-                RgdIndex.setNewAlias(RgdIndex.getIndex());
+                rgdIndex.setNewAlias(rgdIndex.getIndex());
 
                 return 1;
             } else {
-                log.info("Cannot Update. " + RgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
+                log.info("Cannot Update. " + rgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
                 return 0;
             }
         }else {
@@ -129,8 +130,6 @@ public class IndexAdmin {
             return 0;
         }
     }
-
-
 
 
 

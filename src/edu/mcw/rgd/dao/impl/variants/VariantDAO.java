@@ -666,4 +666,45 @@ public class VariantDAO extends AbstractDAO {
         }
         return executeBatch(su);
     }
+
+    public VariantNotes getVariantNotes(int rgdId) throws Exception{
+        String sql = "SELECT * FROM VARIANT_NOTES WHERE RGD_ID=?";
+        VariantNotesQuery q = new VariantNotesQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        List<VariantNotes> notes = q.execute(rgdId);
+        if (notes.isEmpty())
+            return null;
+        return notes.get(0);
+    }
+
+    public int deleteVariantNotesBatch(List<Integer> rgdIds) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getCarpeNovoDataSource(),
+                "delete from VARIANT_NOTES where rgd_id=?", new int[] {Types.INTEGER});
+        su.compile();
+        for (Integer rgdId : rgdIds){
+            su.update(rgdId);
+        }
+        return executeBatch(su);
+    }
+
+    public int updateVariantNotes(Collection<VariantNotes> notes) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
+                "update VARIANT_NOTES set NOTES=? where RGD_ID=?",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (VariantNotes vn : notes){
+            su.update(vn.getNotes(), vn.getRgdId());
+        }
+        return executeBatch(su);
+    }
+
+    public int insertVariantNotes(Collection<VariantNotes> notes) throws Exception{
+        BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), "insert into VARIANT_NOTES (RGD_ID, NOTES) values (?,?)",
+                new int[]{Types.INTEGER, Types.VARCHAR});
+        su.compile();
+        for (VariantNotes n : notes){
+            su.update(n.getRgdId(), n.getNotes());
+        }
+        return executeBatch(su);
+    }
 }

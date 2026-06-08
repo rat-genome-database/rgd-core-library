@@ -10,7 +10,7 @@ public class IndexDocument {
         byte[] json = new byte[0];
         try {
             json = JacksonConfiguration.MAPPER.writeValueAsBytes(document);
-            BulkIndexProcessor.bulkProcessor.add(new IndexRequest(RgdIndex.getNewAlias()).source(json, XContentType.JSON));
+            BulkIndexProcessor.bulkProcessor.add(new IndexRequest(new RgdIndex().getNewAlias()).source(json, XContentType.JSON));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

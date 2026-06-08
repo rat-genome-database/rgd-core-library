@@ -204,4 +204,5 @@ public class Sample {
     public void setCellTypeTerm(String cellTypeTerm) {
         this.cellTypeTerm = cellTypeTerm;
     }
+
 }

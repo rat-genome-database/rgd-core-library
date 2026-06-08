@@ -22,7 +22,7 @@ public class Link {
     private static String QTL = "/rgdweb/report/qtl/main.html?id=";
     private static String REF= "/rgdweb/report/reference/main.html?id=";
     private static String STRAIN = "/rgdweb/report/strain/main.html?id=";
-    private static String VARIANT = "/rgdweb/report/variant/main.html?id=";
+    private static String VARIANT = "/rgdweb/report/variants/main.html?id=";
     private static String CELLLINE = "/rgdweb/report/cellline/main.html?id=";
     private static String RGDVARIANT = "/rgdweb/report/rgdvariant/main.html?id=";
     private static String ONTOLOGY_VIEW = "/rgdweb/ontology/view.html?acc_id=";
