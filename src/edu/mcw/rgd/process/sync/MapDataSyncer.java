@@ -2,11 +2,12 @@ package edu.mcw.rgd.process.sync;
 
 import edu.mcw.rgd.datamodel.MapData;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
- * Created by IntelliJ IDEA.
  * User: mtutaj
  * Date: 4/19/12
- * Time: 2:33 PM
  * <p>
  *    Synchronizes positions between incoming data and data in RGD.
  *    New positions are added, updated or deleted if needed.
@@ -41,6 +42,10 @@ public class MapDataSyncer extends RgdObjectSyncer {
         return md.getMapKey().toString();
     }
 
+    // immutable -> thread-safe formatter for the ', updated at ...' notes stamp
+    private static final DateTimeFormatter UPDATED_AT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String UPDATED_AT_MARKER = ", updated at ";
+
     @Override
     public boolean cloneObjectForIndelOptimization(Object to, Object from) {
         MapData mdTo = (MapData) to;
@@ -48,7 +53,18 @@ public class MapDataSyncer extends RgdObjectSyncer {
 
         mdTo.setRgdId(mdFrom.getRgdId());
         mdTo.setKey(mdFrom.getKey());
-        mdTo.setNotes(mdFrom.getNotes()+", updated at "+new java.util.Date());
+
+        // replace any previous ', updated at ...' stamp(s) with a single fresh one;
+        // the old code appended a stamp on every run, growing NOTES until it overflowed its column
+        String notes = mdFrom.getNotes();
+        if( notes==null ) {
+            notes = "";
+        }
+        int markerPos = notes.indexOf(UPDATED_AT_MARKER);
+        if( markerPos>=0 ) {
+            notes = notes.substring(0, markerPos);
+        }
+        mdTo.setNotes(notes + UPDATED_AT_MARKER + LocalDateTime.now().format(UPDATED_AT_FORMAT));
 
         return true;
     }
