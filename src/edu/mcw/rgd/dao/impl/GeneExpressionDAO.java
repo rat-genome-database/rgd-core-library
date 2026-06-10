@@ -114,6 +114,62 @@ public class GeneExpressionDAO extends PhenominerDAO {
     }
 
     /**
+     * Returns the distinct studies that have gene expression values for any of the
+     * supplied expressed-object RGD IDs on the given map (assembly).
+     * Studies with no matching expression values are excluded.
+     * <p>
+     * Note: Oracle limits IN-list expressions to 1000; if more IDs are passed,
+     * only the first 999 are used.
+     *
+     * @param expressedObjectRgdIds list of expressed-object RGD IDs (typically gene RGD IDs)
+     * @param mapKey assembly map key to restrict gene_expression_values.map_key
+     * @return list of Study objects (empty if rgdId list is empty or no matches)
+     */
+    public List<Study> getStudiesWithExpressionForObjects(List<Integer> expressedObjectRgdIds, int mapKey) throws Exception {
+        if (expressedObjectRgdIds == null || expressedObjectRgdIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        if (expressedObjectRgdIds.size() > 1000) {
+            expressedObjectRgdIds = expressedObjectRgdIds.subList(0, 999);
+        }
+        StringBuilder ids = new StringBuilder();
+        for (int i = 0; i < expressedObjectRgdIds.size(); i++) {
+            if (i > 0) ids.append(',');
+            ids.append(expressedObjectRgdIds.get(i).intValue());
+        }
+        String query = "SELECT * FROM study st WHERE EXISTS ("
+                + "SELECT 1 FROM experiment e, gene_expression_exp_record ger, gene_expression_values gev "
+                + "WHERE e.study_id = st.study_id "
+                + "AND ger.experiment_id = e.experiment_id "
+                + "AND gev.gene_expression_exp_record_id = ger.gene_expression_exp_record_id "
+                + "AND gev.map_key = ? "
+                + "AND gev.expressed_object_rgd_id IN (" + ids + ")"
+                + ") ORDER BY st.study_id DESC";
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        return execute(q, mapKey);
+    }
+
+    /**
+     * Returns the distinct studies that have any gene_expression_values for the
+     * given map (assembly). Studies with no expression data on this assembly
+     * are excluded.
+     *
+     * @param mapKey assembly map key to restrict gene_expression_values.map_key
+     * @return list of Study objects (empty if no matches)
+     */
+    public List<Study> getStudiesWithExpressionForMap(int mapKey) throws Exception {
+        String query = "SELECT * FROM study st WHERE EXISTS ("
+                + "SELECT 1 FROM experiment e, gene_expression_exp_record ger, gene_expression_values gev "
+                + "WHERE e.study_id = st.study_id "
+                + "AND ger.experiment_id = e.experiment_id "
+                + "AND gev.gene_expression_exp_record_id = ger.gene_expression_exp_record_id "
+                + "AND gev.map_key = ?"
+                + ") ORDER BY st.study_id DESC";
+        StudyQuery q = new StudyQuery(this.getDataSource(), query);
+        return execute(q, mapKey);
+    }
+
+    /**
      * Returns a list of conditions based on a gene expression record id
      * @param geneExpressionRecordId gene expression experiment record id
      * @return list of Condition objects; could be empty

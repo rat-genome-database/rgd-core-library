@@ -21,6 +21,7 @@ public class GeneExpressionRecord {
     private String measurementTerm;
     private String experimentCondition;
     private String conditionAccId;
+    private boolean studyControl;
 
 
     private List<GeneExpressionRecordValue> values;
@@ -156,5 +157,13 @@ public class GeneExpressionRecord {
     @Override
     public int hashCode() {
         return experimentId ^ sampleId ^ Utils.defaultString(lastModifiedBy).hashCode() ^ lastModifiedDate.hashCode() ^ curationStatus ^ speciesTypeKey ^ clinicalMeasurementId;
+    }
+
+    public boolean getStudyControl() {
+        return studyControl;
+    }
+
+    public void setStudyControl(boolean studyControl) {
+        this.studyControl = studyControl;
     }
 }
