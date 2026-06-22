@@ -18,6 +18,7 @@ public class GeneExpressionRecord {
     private int speciesTypeKey;
     private Integer clinicalMeasurementId;
     private String traitTerm;
+    private String traitOntId;
     private String measurementTerm;
     private String experimentCondition;
     private String conditionAccId;
@@ -27,6 +28,14 @@ public class GeneExpressionRecord {
     private List<GeneExpressionRecordValue> values;
     private List<Condition> conditions;
     private List<MeasurementMethod> measurementMethods;
+
+    public String getTraitOntId() {
+        return traitOntId;
+    }
+
+    public void setTraitOntId(String traitOntId) {
+        this.traitOntId = traitOntId;
+    }
 
     public int getId() {
         return id;

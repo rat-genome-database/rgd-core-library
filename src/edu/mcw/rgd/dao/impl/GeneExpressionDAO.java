@@ -456,21 +456,22 @@ public class GeneExpressionDAO extends PhenominerDAO {
     public List<GeneExpression> getGeneExpressionObjectsByRgdIdUnit(int rgdId, String unit) throws Exception{
 
         String query= """
-                         select gr.*,s.*,e.*,st.*,ge.*,tissue.term as tissue_term, strain.term as strain_term, c.*,measurement.term as measurement,xcondition.term as condition  , xcondition.term_acc as condition_acc   \s
-                                                  
-                                                   from gene_expression_values ge\s
-                                                   left outer join  gene_expression_exp_record gr on gr.gene_expression_exp_record_id=ge.gene_expression_exp_record_id
-                                                 left outer join experiment e  on gr.experiment_id=e.experiment_id
-                                                 left outer join  study st  on st.study_id=e.study_id
-                         left outer join sample s on s.sample_id=gr.sample_id
-                         left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
-                         left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id
-                         left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id
-                         left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id
-                         left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id
-                         left outer join ont_terms strain on strain.term_acc=s.strain_ont_id
-                         where ge.expressed_object_rgd_id=?
-                         """
+                select gr.*,s.*,e.*,st.*,ge.*,tissue.term as tissue_term, strain.term as strain_term, c.*,measurement.term as measurement,xcondition.term as condition  , xcondition.term_acc as condition_acc   \s
+                                    , trait.term as trait     
+                                          from gene_expression_values ge\s
+                                          left outer join  gene_expression_exp_record gr on gr.gene_expression_exp_record_id=ge.gene_expression_exp_record_id
+                                        left outer join experiment e  on gr.experiment_id=e.experiment_id
+                                        left outer join  study st  on st.study_id=e.study_id
+                left outer join sample s on s.sample_id=gr.sample_id
+                left outer join experiment_condition c on c.gene_expression_exp_record_id =gr.gene_expression_exp_record_id
+                left outer join clinical_measurement m on m.clinical_measurement_id=gr.clinical_measurement_id
+                left outer join ont_terms xCondition on xCondition.term_acc=c.exp_cond_ont_id
+                left outer join ont_terms measurement on measurement.term_acc=m.clinical_measurement_ont_id
+                left outer join ont_terms tissue on tissue.term_acc=s.tissue_ont_id
+                left outer join ont_terms strain on strain.term_acc=s.strain_ont_id
+                 left outer join ont_terms trait on trait.term_acc=e.trait_ont_id
+                where ge.expressed_object_rgd_id=?
+                """
                 ;
 
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
