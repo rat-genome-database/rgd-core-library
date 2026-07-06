@@ -1,137 +1,110 @@
 package edu.mcw.rgd.services;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import edu.mcw.rgd.datamodel.RgdIndex;
-import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.xcontent.XContentType;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.core.io.FileSystemResource;
 
-import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class IndexAdmin {
-    public static final Logger log= LogManager.getLogger(IndexAdmin.class);
-
-    private RgdIndex rgdIndex = new RgdIndex();
-
+    public static final Logger log = LogManager.getLogger(IndexAdmin.class);
 
     public void createIndex(String mappings, String type) throws Exception {
+        ElasticsearchClient client = ClientInit.getClient();
+        String aliasName = RgdIndex.getIndex();
 
-        GetAliasesRequest aliasesRequest=new GetAliasesRequest(rgdIndex.getIndex());
-        boolean existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
-        if(existsAlias) {
-            for (String index : rgdIndex.getIndices()) {
-                aliasesRequest.indices(index);
-                existsAlias = ClientInit.getClient().indices().existsAlias(aliasesRequest, RequestOptions.DEFAULT);
-                if (!existsAlias) {
-                    rgdIndex.setNewAlias(index);
-                    GetIndexRequest request1 = new GetIndexRequest(index);
-                    boolean indexExists = ClientInit.getClient().indices().exists(request1, RequestOptions.DEFAULT);
-
-                    if (indexExists) {   /**** delete index if exists ****/
-
-                        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-                        ClientInit.getClient().indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+        boolean existsAlias = client.indices().existsAlias(b -> b.name(aliasName)).value();
+        if (existsAlias) {
+            for (String index : RgdIndex.getIndices()) {
+                boolean indexHasAlias = client.indices()
+                        .existsAlias(b -> b.name(aliasName).index(index))
+                        .value();
+                if (!indexHasAlias) {
+                    RgdIndex.setNewAlias(index);
+                    boolean indexExists = client.indices().exists(b -> b.index(index)).value();
+                    if (indexExists) {
+                        client.indices().delete(b -> b.index(index));
                         log.info(index + " deleted");
                     }
                     createNewIndex(index, mappings, type);
-                }else {
-                    rgdIndex.setOldAlias(index);
+                } else {
+                    RgdIndex.setOldAlias(index);
                 }
-
             }
-        }else{
-            GetIndexRequest request1=new GetIndexRequest(rgdIndex.getIndex()+"1");
-            boolean indexExists=ClientInit.getClient().indices().exists(request1, RequestOptions.DEFAULT);
-            if (indexExists) {   /**** delete index if exists ****/
-
-                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(rgdIndex.getIndex()+"1");
-                ClientInit.getClient().indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-                log.info(rgdIndex.getIndex()+"1" + " deleted");
+        } else {
+            String firstIndex = aliasName + "1";
+            boolean indexExists = client.indices().exists(b -> b.index(firstIndex)).value();
+            if (indexExists) {
+                client.indices().delete(b -> b.index(firstIndex));
+                log.info(firstIndex + " deleted");
             }
-            createNewIndex(rgdIndex.getIndex()+"1",mappings, type);
-
+            createNewIndex(firstIndex, mappings, type);
         }
-
-
-
     }
 
     public void createNewIndex(String index, String _mappings, String type) throws Exception {
-
-        String path="";
-        String mappings=null;
-        if(_mappings!=null && !_mappings.equals("")){
-            path+="data/"+_mappings+".json";
-            mappings=new String(Files.readAllBytes(Paths.get(path)));
-          //  mappings= new String(Files.readAllBytes(Paths.get("resources/variant_mappings.json")));
+        String mappings = null;
+        if (_mappings != null && !_mappings.isEmpty()) {
+            String path = "data/" + _mappings + ".json";
+            mappings = new String(Files.readAllBytes(Paths.get(path)));
         }
         log.info("CREATING NEW INDEX..." + index);
-        int replicates=0;
-        int shards=5;
-//        if(!index.contains("dev") && !index.contains("test")){
-        if(RgdContext.isProduction() || RgdContext.isPipelines()){
-            replicates=1;
+        int replicates = 0;
+        int shards = 1;
+        if (RgdContext.isProduction() || RgdContext.isPipelines()) {
+            replicates = 1;
         }
-        String analyzers=null;
+        String analyzers = null;
         try {
-          analyzers=  new String(Files.readAllBytes(Paths.get("data/analyzers.json")));
-        }catch (Exception ignored){}
-
-        /********* create index, put mappings and analyzers ****/
-        CreateIndexRequest request=new CreateIndexRequest(index);
-        if(analyzers!=null) {
-            request.settings(Settings.builder()
-                    .put("index.number_of_shards", shards)
-                    .put("index.number_of_replicas", replicates)
-                    .loadFromSource(analyzers, XContentType.JSON));
-        }else{
-            request.settings(Settings.builder()
-                    .put("index.number_of_shards", shards)
-                    .put("index.number_of_replicas", replicates));
+            analyzers = new String(Files.readAllBytes(Paths.get("data/analyzers.json")));
+        } catch (Exception ignored) {
         }
-        if(mappings!=null)
-        request.mapping(mappings, XContentType.JSON);
-        org.elasticsearch.client.indices.CreateIndexResponse createIndexResponse = ClientInit.getClient().indices().create(request, RequestOptions.DEFAULT);
 
-        log.info(index + " created on  " + new Date());
+        final String finalMappings = mappings;
+        final String finalAnalyzers = analyzers;
+        final String finalShards = String.valueOf(shards);
+        final String finalReplicates = String.valueOf(replicates);
 
-        rgdIndex.setNewAlias(index);
+        CreateIndexResponse response = ClientInit.getClient().indices().create(c -> {
+            c.index(index);
+            c.settings(s -> {
+                if (finalAnalyzers != null) {
+                    s.withJson(new StringReader(finalAnalyzers));
+                }
+                s.numberOfShards(finalShards);
+                s.numberOfReplicas(finalReplicates);
+                return s;
+            });
+            if (finalMappings != null) {
+                c.mappings(m -> m.withJson(new StringReader(finalMappings)));
+            }
+            return c;
+        });
+
+        log.info(index + " created on " + new Date());
+        RgdIndex.setNewAlias(index);
     }
+
     public int updateIndex() throws Exception {
-        if(rgdIndex.getIndex()!=null) {
-            log.info("Updating " + rgdIndex.getIndex() + "...");
-            GetIndexRequest request=new GetIndexRequest(rgdIndex.getIndex());
-            boolean indicesExists=ClientInit.getClient().indices().exists(request, RequestOptions.DEFAULT);
-            if (indicesExists) {  /* CHECK IF INDEX NAME PROVIDED EXISTS*/
-
-                rgdIndex.setNewAlias(rgdIndex.getIndex());
-
+        if (RgdIndex.getIndex() != null) {
+            log.info("Updating " + RgdIndex.getIndex() + "...");
+            boolean indicesExists = ClientInit.getClient().indices()
+                    .exists(b -> b.index(RgdIndex.getIndex())).value();
+            if (indicesExists) {
+                RgdIndex.setNewAlias(RgdIndex.getIndex());
                 return 1;
             } else {
-                log.info("Cannot Update. " + rgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
+                log.info("Cannot Update. " + RgdIndex.getIndex() + " does not exists. Use REINDEX option to create index");
                 return 0;
             }
-        }else {
+        } else {
             log.info("INDEX cannot be null");
             return 0;
         }
     }
-
-
-
-
 }
