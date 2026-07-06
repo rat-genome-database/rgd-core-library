@@ -543,14 +543,35 @@ public class GeneDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public List<Gene> getActiveGenes(int speciesKey) throws Exception {
-        String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
-                "WHERE r.object_status='ACTIVE' "+
-                " AND r.species_type_key=? "+
-                " AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') "+
-                " AND r.rgd_id=g.rgd_id "+
-                "ORDER BY g.gene_symbol_lc";
+        String query = """
+            SELECT g.*, r.species_type_key FROM genes g, rgd_ids r
+            WHERE r.object_status='ACTIVE'
+              AND r.species_type_key=?
+              AND NVL(gene_type_lc,'*') NOT IN ('splice','allele')
+              AND r.rgd_id=g.rgd_id
+            ORDER BY g.gene_symbol_lc
+            """;
 
         return GeneQuery.execute(this, query, speciesKey);
+    }
+
+    /**
+     * Returns (gene RGD id, gene symbol) pairs for all active genes of given species.
+     * Results do not contain splices or alleles.
+     * @param speciesTypeKey species type key
+     * @return list of MapPair objects: gene RGD id (keyValue) and gene symbol (stringValue)
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<IntStringMapQuery.MapPair> getSymbolForActiveGenes(int speciesTypeKey) throws Exception {
+        String query = """
+            SELECT g.rgd_id, g.gene_symbol FROM genes g, rgd_ids r
+            WHERE r.object_status='ACTIVE'
+              AND r.species_type_key=?
+              AND NVL(gene_type_lc,'*') NOT IN ('splice','allele')
+              AND r.rgd_id=g.rgd_id
+            """;
+
+        return IntStringMapQuery.execute(this, query, speciesTypeKey);
     }
 
     /**
