@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class SolrDocsDAO extends AbstractDAO {
     ObjectMapper mapper=new ObjectMapper();
     Gson gson=new Gson();
+
     public int addBatch(List<SolrDoc> solrDocs) throws Exception {
         if (solrDocs == null || solrDocs.isEmpty()) {
             return 0;
@@ -32,10 +33,11 @@ public class SolrDocsDAO extends AbstractDAO {
                           && !f.equalsIgnoreCase("last_update_date"))
                 .collect(Collectors.toList());
 
-        String columns = "SOLR_DOC_ID, " + String.join(", ", insertFields) + ", last_update_date";
+        String columns = "SOLR_DOC_ID, " + String.join(", ", insertFields) + ", last_update_date, last_update_date_by_aws";
         String placeholders = insertFields.stream().map(f -> "?").collect(Collectors.joining(", "));
+        // FIELD last_update_date is set to STATIC VALUE 2000-01-01 for AI pipeline processing.
         String sql = "INSERT INTO SOLR_DOCS (" + columns + ") VALUES ("
-                   + "NEXTVAL('SOLR_DOC_SEQ'), " + placeholders + ", NOW())";
+                   + "NEXTVAL('SOLR_DOC_SEQ'), " + placeholders + ", '2000-01-01', NOW())";
 
         int totalInserted = 0;
         Connection connection = null;
@@ -338,7 +340,7 @@ public class SolrDocsDAO extends AbstractDAO {
 //    }
     public int update(SolrDoc solrDoc) throws Exception {
         SolrDocDB doc=buildSolrDocDB(solrDoc);
-        String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date=NOW() " +
+        String sql= "UPDATE SOLR_DOCS set" + getSolrDocFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date='2000-01-01' " +
                 " where pmid=?";
         return   updateSolrPostgress(sql,
                 doc.getGeneCount()	, doc.getMpId()	, doc.getDoiS()	, doc.getChebiPos()	, doc.getVtId()	,
@@ -392,7 +394,7 @@ public class SolrDocsDAO extends AbstractDAO {
                 .map(f -> f + " = ?")
                 .collect(Collectors.joining(", "));
 
-        String sql = "UPDATE SOLR_DOCS SET " + setClause + ", last_update_date = NOW() WHERE pmid = ?";
+        String sql = "UPDATE SOLR_DOCS SET " + setClause + ", last_update_date = '2000-01-01' WHERE pmid = ?";
 
         int totalUpdated = 0;
         try (Connection connection = this.getPostgressConnection();
@@ -443,7 +445,7 @@ public class SolrDocsDAO extends AbstractDAO {
 
     public int updateMissingFields(SolrDoc solrDoc) throws Exception {
         SolrDocDB doc=buildSolrDocDB(solrDoc);
-        String sql= "UPDATE SOLR_DOCS set" + getSolrDocMissingFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date=NOW() " +
+        String sql= "UPDATE SOLR_DOCS set" + getSolrDocMissingFields().stream().collect(Collectors.joining("=?"))+"=?, set last_update_date='2000-01-01' " +
                 " where pmid=?";
         return   updateSolrPostgress(sql,
                 docMissingParams(doc),
