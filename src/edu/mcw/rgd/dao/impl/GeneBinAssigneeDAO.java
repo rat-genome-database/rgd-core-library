@@ -180,10 +180,21 @@ public class GeneBinAssigneeDAO extends AbstractDAO {
      * @throws Exception
      */
     public void createSession(String sessionId) throws Exception {
+        createSession(sessionId, TEMPLATE_SESSION);
+    }
+
+    /**
+     * Create a new binning session by copying the base bin definitions from an existing source session.
+     * Used when the hard-coded {@link #TEMPLATE_SESSION} is absent but another session exists to seed from.
+     * @param sessionId name of the new session
+     * @param fromSession existing session to copy the base bin definitions from
+     * @throws Exception
+     */
+    public void createSession(String sessionId, String fromSession) throws Exception {
         String sql = "INSERT INTO GENEBIN_ASSIGNEE (TERM_ACC, TERM, PARENT, SESSION_ID) " +
                 "SELECT TERM_ACC, TERM, PARENT, ? FROM GENEBIN_ASSIGNEE " +
                 "WHERE SESSION_ID=? AND TERM_ACC NOT LIKE '%(%)%'";
-        update(sql, sessionId, TEMPLATE_SESSION);
+        update(sql, sessionId, fromSession);
     }
 
     /**
