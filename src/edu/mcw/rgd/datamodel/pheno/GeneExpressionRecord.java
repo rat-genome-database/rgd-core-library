@@ -18,14 +18,24 @@ public class GeneExpressionRecord {
     private int speciesTypeKey;
     private Integer clinicalMeasurementId;
     private String traitTerm;
+    private String traitOntId;
     private String measurementTerm;
     private String experimentCondition;
     private String conditionAccId;
+    private boolean studyControl;
 
 
     private List<GeneExpressionRecordValue> values;
     private List<Condition> conditions;
     private List<MeasurementMethod> measurementMethods;
+
+    public String getTraitOntId() {
+        return traitOntId;
+    }
+
+    public void setTraitOntId(String traitOntId) {
+        this.traitOntId = traitOntId;
+    }
 
     public int getId() {
         return id;
@@ -156,5 +166,13 @@ public class GeneExpressionRecord {
     @Override
     public int hashCode() {
         return experimentId ^ sampleId ^ Utils.defaultString(lastModifiedBy).hashCode() ^ lastModifiedDate.hashCode() ^ curationStatus ^ speciesTypeKey ^ clinicalMeasurementId;
+    }
+
+    public boolean getStudyControl() {
+        return studyControl;
+    }
+
+    public void setStudyControl(boolean studyControl) {
+        this.studyControl = studyControl;
     }
 }
