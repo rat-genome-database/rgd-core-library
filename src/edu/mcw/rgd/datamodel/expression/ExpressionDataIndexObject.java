@@ -8,22 +8,104 @@ import java.util.Set;
 
 public class ExpressionDataIndexObject {
     private String geneSymbol;
-    private String geneRgdId;
+    private int geneRgdId;
     private String geneSymbolWithRgdId;
     private String sampleId;
     private String strainAcc;
     private String strainTerm;
     private String tissueAcc;
     private String tissueTerm;
-    private List<Double> expressionValue;
+    private double expressionValue;
     private double valueMean;
     private double logValue;
     private String expressionUnit;
-    private Set<String> expressionLevel;
+    private String expressionLevel;
     private String species;
     private String condition;
-    private List<MapInfo> mapDataList;
-    private Map<String, String> metaData;
+//    private List<MapInfo> mapDataList;
+//    private Map<String, String> metaData;
+    private String studyId;
+    private String geoSeriesAcc;
+    private String traitOntId;
+    private String lifeStage;
+    private String computedSex;
+    private String sex;
+    private String bioSampleId;
+    private String geoSampleAcc;
+    private int mapKey;
+
+
+    public int getMapKey() {
+        return mapKey;
+    }
+
+    public void setMapKey(int mapKey) {
+        this.mapKey = mapKey;
+    }
+
+    public String getStudyId() {
+        return studyId;
+    }
+
+    public void setStudyId(String studyId) {
+        this.studyId = studyId;
+    }
+
+    public String getGeoSeriesAcc() {
+        return geoSeriesAcc;
+    }
+
+    public void setGeoSeriesAcc(String geoSeriesAcc) {
+        this.geoSeriesAcc = geoSeriesAcc;
+    }
+
+    public String getTraitOntId() {
+        return traitOntId;
+    }
+
+    public void setTraitOntId(String traitOntId) {
+        this.traitOntId = traitOntId;
+    }
+
+    public String getLifeStage() {
+        return lifeStage;
+    }
+
+    public void setLifeStage(String lifeStage) {
+        this.lifeStage = lifeStage;
+    }
+
+    public String getComputedSex() {
+        return computedSex;
+    }
+
+    public void setComputedSex(String computedSex) {
+        this.computedSex = computedSex;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getBioSampleId() {
+        return bioSampleId;
+    }
+
+    public void setBioSampleId(String bioSampleId) {
+        this.bioSampleId = bioSampleId;
+    }
+
+    public String getGeoSampleAcc() {
+        return geoSampleAcc;
+    }
+
+    public void setGeoSampleAcc(String geoSampleAcc) {
+        this.geoSampleAcc = geoSampleAcc;
+    }
 
     public String getGeneSymbol() {
         return geneSymbol;
@@ -33,11 +115,11 @@ public class ExpressionDataIndexObject {
         this.geneSymbol = geneSymbol;
     }
 
-    public String getGeneRgdId() {
+    public int getGeneRgdId() {
         return geneRgdId;
     }
 
-    public void setGeneRgdId(String geneRgdId) {
+    public void setGeneRgdId(int geneRgdId) {
         this.geneRgdId = geneRgdId;
     }
 
@@ -89,13 +171,6 @@ public class ExpressionDataIndexObject {
         this.tissueTerm = tissueTerm;
     }
 
-    public List<Double> getExpressionValue() {
-        return expressionValue;
-    }
-
-    public void setExpressionValue(List<Double> expressionValue) {
-        this.expressionValue = expressionValue;
-    }
 
     public double getValueMean() {
         return valueMean;
@@ -121,11 +196,19 @@ public class ExpressionDataIndexObject {
         this.expressionUnit = expressionUnit;
     }
 
-    public Set<String> getExpressionLevel() {
+    public double getExpressionValue() {
+        return expressionValue;
+    }
+
+    public void setExpressionValue(double expressionValue) {
+        this.expressionValue = expressionValue;
+    }
+
+    public String getExpressionLevel() {
         return expressionLevel;
     }
 
-    public void setExpressionLevel(Set<String> expressionLevel) {
+    public void setExpressionLevel(String expressionLevel) {
         this.expressionLevel = expressionLevel;
     }
 
@@ -145,19 +228,19 @@ public class ExpressionDataIndexObject {
         this.condition = condition;
     }
 
-    public List<MapInfo> getMapDataList() {
-        return mapDataList;
-    }
-
-    public void setMapDataList(List<MapInfo> mapDataList) {
-        this.mapDataList = mapDataList;
-    }
-
-    public Map<String, String> getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(Map<String, String> metaData) {
-        this.metaData = metaData;
-    }
+//    public List<MapInfo> getMapDataList() {
+//        return mapDataList;
+//    }
+//
+//    public void setMapDataList(List<MapInfo> mapDataList) {
+//        this.mapDataList = mapDataList;
+//    }
+//
+//    public Map<String, String> getMetaData() {
+//        return metaData;
+//    }
+//
+//    public void setMetaData(Map<String, String> metaData) {
+//        this.metaData = metaData;
+//    }
 }
