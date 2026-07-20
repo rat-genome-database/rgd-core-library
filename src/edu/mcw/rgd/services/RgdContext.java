@@ -193,8 +193,8 @@ public class RgdContext {
 
 
         try{
-            fis=new FileInputStream("C:/Apps/github-oauth.properties");
-            //     fis=new FileInputStream("/data/properties/github-oauth.properties");
+
+            fis=new FileInputStream("/data/properties/github-oauth.properties");
             props.load(fis);
 
         }catch (Exception e){
