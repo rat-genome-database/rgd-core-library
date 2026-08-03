@@ -27,13 +27,30 @@ public class ExpressionDataIndexObject {
     private String studyId;
     private String geoSeriesAcc;
     private String traitOntId;
+    private String traitTerm;
     private String lifeStage;
     private String computedSex;
     private String sex;
     private String bioSampleId;
     private String geoSampleAcc;
     private int mapKey;
+    private int recordId;
 
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+
+    public String getTraitTerm() {
+        return traitTerm;
+    }
+
+    public void setTraitTerm(String traitTerm) {
+        this.traitTerm = traitTerm;
+    }
 
     public int getMapKey() {
         return mapKey;
