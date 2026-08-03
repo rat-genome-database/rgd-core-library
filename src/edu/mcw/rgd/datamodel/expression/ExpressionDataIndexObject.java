@@ -22,6 +22,7 @@ public class ExpressionDataIndexObject {
     private String expressionLevel;
     private String species;
     private String condition;
+    private String conditionTerm;
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
@@ -35,6 +36,14 @@ public class ExpressionDataIndexObject {
     private String geoSampleAcc;
     private int mapKey;
     private int recordId;
+
+    public String getConditionTerm() {
+        return conditionTerm;
+    }
+
+    public void setConditionTerm(String conditionTerm) {
+        this.conditionTerm = conditionTerm;
+    }
 
     public int getRecordId() {
         return recordId;
