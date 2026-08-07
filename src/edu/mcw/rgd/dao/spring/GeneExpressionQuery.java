@@ -32,7 +32,7 @@ public class GeneExpressionQuery extends MappingQuery<edu.mcw.rgd.datamodel.Gene
         rec.setCurationStatus(getIntOrZero(rs, "curation_status"));
         rec.setSpeciesTypeKey(getIntOrZero(rs, "species_type_key"));
         rec.setClinicalMeasurementId(getIntOrZero(rs, "CLINICAL_MEASUREMENT_ID"));
-        rec.setTraitOntId(rs.getString("trait_ont_id"));
+        rec.setTraitOntId(getString(rs, "trait_ont_id"));
         try {
          rec.setTraitTerm(getString(rs, "trait"));
         }catch (Exception ignore){}
