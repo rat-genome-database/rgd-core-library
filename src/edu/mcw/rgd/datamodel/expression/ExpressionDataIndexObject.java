@@ -36,6 +36,15 @@ public class ExpressionDataIndexObject {
     private String geoSampleAcc;
     private int mapKey;
     private int recordId;
+    private Set<String> parentTermAccIds;
+
+    public Set<String> getParentTermAccIds() {
+        return parentTermAccIds;
+    }
+
+    public void setParentTermAccIds(Set<String> parentTermAccIds) {
+        this.parentTermAccIds = parentTermAccIds;
+    }
 
     public String getConditionTerm() {
         return conditionTerm;
