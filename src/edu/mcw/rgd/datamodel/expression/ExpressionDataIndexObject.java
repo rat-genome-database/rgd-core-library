@@ -16,8 +16,8 @@ public class ExpressionDataIndexObject {
     private String tissueAcc;
     private String tissueTerm;
     private double expressionValue;
-    private double valueMean;
-    private double logValue;
+//    private double valueMean;
+//    private double logValue;
     private String expressionUnit;
     private String expressionLevel;
     private String species;
@@ -207,21 +207,21 @@ public class ExpressionDataIndexObject {
     }
 
 
-    public double getValueMean() {
-        return valueMean;
-    }
-
-    public void setValueMean(double valueMean) {
-        this.valueMean = valueMean;
-    }
-
-    public double getLogValue() {
-        return logValue;
-    }
-
-    public void setLogValue(double logValue) {
-        this.logValue = logValue;
-    }
+//    public double getValueMean() {
+//        return valueMean;
+//    }
+//
+//    public void setValueMean(double valueMean) {
+//        this.valueMean = valueMean;
+//    }
+//
+//    public double getLogValue() {
+//        return logValue;
+//    }
+//
+//    public void setLogValue(double logValue) {
+//        this.logValue = logValue;
+//    }
 
     public String getExpressionUnit() {
         return expressionUnit;
