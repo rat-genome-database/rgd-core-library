@@ -40,6 +40,8 @@ public class MapQuery extends MappingSqlQuery {
         map.setRefSeqAssemblyName(rs.getString("refseq_assembly_name"));
         map.setSource(rs.getString("source"));
         map.setGenBankAssemblyAcc(rs.getString("genbank_assembly_acc"));
+        map.setMapType(rs.getString("map_type"));
+        map.setStrainRgdId(rs.getInt("strain_rgd_id"));
 
         return map;
     }
