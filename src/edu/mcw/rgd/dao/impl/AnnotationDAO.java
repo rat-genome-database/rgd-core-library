@@ -940,8 +940,10 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesTypeKey, String aspect) throws Exception {
-        String sql = "SELECT a.* FROM full_annot a,rgd_ids r\n" +
-                "WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND aspect=? AND species_type_key=?";
+        String sql = """
+            SELECT a.* FROM full_annot a,rgd_ids r
+            WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND aspect=? AND species_type_key=?
+            """;
         return executeAnnotationQuery(sql, aspect, speciesTypeKey);
     }
 
@@ -2160,6 +2162,16 @@ public class AnnotationDAO extends AbstractDAO {
     public int reassignAnnotations(String termAccFrom, String termAccTo) throws Exception {
         String sql = "UPDATE full_annot SET term_acc=? WHERE term_acc=?";
         int annotCount = update(sql, termAccTo, termAccFrom);
+
+        // an annotation could already be indexed with both terms; reassigning the from-term row
+        // would then violate the unique constraint on (full_annot_key, term_acc),
+        // so drop such redundant rows first
+        sql = """
+            DELETE FROM full_annot_index
+             WHERE term_acc=?
+               AND full_annot_key IN (SELECT full_annot_key FROM full_annot_index WHERE term_acc=?)
+            """;
+        update(sql, termAccFrom, termAccTo);
 
         sql = "UPDATE full_annot_index SET term_acc=? WHERE term_acc=?";
         update(sql, termAccTo, termAccFrom);
