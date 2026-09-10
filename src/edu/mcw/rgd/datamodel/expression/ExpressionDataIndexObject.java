@@ -21,8 +21,8 @@ public class ExpressionDataIndexObject {
     private String expressionUnit;
     private String expressionLevel;
     private String species;
-    private String condition;
-    private String conditionTerm;
+    private Set<String> condition;
+    private Set<String> conditionTerm;
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
@@ -46,11 +46,19 @@ public class ExpressionDataIndexObject {
         this.parentTermAccIds = parentTermAccIds;
     }
 
-    public String getConditionTerm() {
+    public Set<String> getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Set<String> condition) {
+        this.condition = condition;
+    }
+
+    public Set<String> getConditionTerm() {
         return conditionTerm;
     }
 
-    public void setConditionTerm(String conditionTerm) {
+    public void setConditionTerm(Set<String> conditionTerm) {
         this.conditionTerm = conditionTerm;
     }
 
@@ -255,13 +263,7 @@ public class ExpressionDataIndexObject {
         this.species = species;
     }
 
-    public String getCondition() {
-        return condition;
-    }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
 
 //    public List<MapInfo> getMapDataList() {
 //        return mapDataList;
