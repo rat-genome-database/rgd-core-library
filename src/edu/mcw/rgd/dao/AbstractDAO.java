@@ -48,16 +48,6 @@ public class AbstractDAO implements DAO {
     }
 
     /**
-     * Returns an initialized DataSource
-     * @return DataSource object
-     * @throws Exception
-     */
-    public DataSource getSkygenDataSource() throws Exception{
-        return DataSourceFactory.getInstance().getDataSource("skygen");
-    }
-
-
-    /**
      * Return a data base connection object.
      * @return Connection object
      * @throws Exception

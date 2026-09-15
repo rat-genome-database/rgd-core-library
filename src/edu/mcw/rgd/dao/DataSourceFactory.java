@@ -112,15 +112,6 @@ public class DataSourceFactory {
     }
 
     /**
-     * Returns a DataSource object for skynet database
-     * @return DataSource object
-     * @throws Exception
-     */
-    public DataSource getSkynetDataSource() throws Exception{
-        return getDataSource("skygen");
-    }
-
-    /**
      * Returns a DataSource object for DSS database
      * @return DataSource object
      * @throws Exception
