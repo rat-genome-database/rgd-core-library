@@ -1,5 +1,6 @@
 package edu.mcw.rgd.datamodel.expression;
 
+import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.search.elasticsearch.MapInfo;
 
 import java.util.List;
@@ -21,8 +22,9 @@ public class ExpressionDataIndexObject {
     private String expressionUnit;
     private String expressionLevel;
     private String species;
-    private Set<String> condition;
-    private Set<String> conditionTerm;
+    private List<Term> conditions;
+//    private Set<String> condition;
+//    private Set<String> conditionTerm;
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
@@ -46,20 +48,29 @@ public class ExpressionDataIndexObject {
         this.parentTermAccIds = parentTermAccIds;
     }
 
-    public Set<String> getCondition() {
-        return condition;
+
+//    public Set<String> getCondition() {
+//        return condition;
+//    }
+//
+//    public void setCondition(Set<String> condition) {
+//        this.condition = condition;
+//    }
+//
+//    public Set<String> getConditionTerm() {
+//        return conditionTerm;
+//    }
+//
+//    public void setConditionTerm(Set<String> conditionTerm) {
+//        this.conditionTerm = conditionTerm;
+//    }
+
+    public List<Term> getConditions() {
+        return conditions;
     }
 
-    public void setCondition(Set<String> condition) {
-        this.condition = condition;
-    }
-
-    public Set<String> getConditionTerm() {
-        return conditionTerm;
-    }
-
-    public void setConditionTerm(Set<String> conditionTerm) {
-        this.conditionTerm = conditionTerm;
+    public void setConditions(List<Term> conditions) {
+        this.conditions = conditions;
     }
 
     public int getRecordId() {
