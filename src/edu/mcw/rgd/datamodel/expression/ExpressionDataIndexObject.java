@@ -1,5 +1,6 @@
 package edu.mcw.rgd.datamodel.expression;
 
+import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.search.elasticsearch.MapInfo;
 
 import java.util.List;
@@ -16,24 +17,77 @@ public class ExpressionDataIndexObject {
     private String tissueAcc;
     private String tissueTerm;
     private double expressionValue;
-    private double valueMean;
-    private double logValue;
+//    private double valueMean;
+//    private double logValue;
     private String expressionUnit;
     private String expressionLevel;
     private String species;
-    private String condition;
+    private List<Term> conditions;
+//    private Set<String> condition;
+//    private Set<String> conditionTerm;
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
     private String geoSeriesAcc;
     private String traitOntId;
+    private String traitTerm;
     private String lifeStage;
     private String computedSex;
     private String sex;
     private String bioSampleId;
     private String geoSampleAcc;
     private int mapKey;
+    private int recordId;
+    private Set<String> parentTermAccIds;
 
+    public Set<String> getParentTermAccIds() {
+        return parentTermAccIds;
+    }
+
+    public void setParentTermAccIds(Set<String> parentTermAccIds) {
+        this.parentTermAccIds = parentTermAccIds;
+    }
+
+
+//    public Set<String> getCondition() {
+//        return condition;
+//    }
+//
+//    public void setCondition(Set<String> condition) {
+//        this.condition = condition;
+//    }
+//
+//    public Set<String> getConditionTerm() {
+//        return conditionTerm;
+//    }
+//
+//    public void setConditionTerm(Set<String> conditionTerm) {
+//        this.conditionTerm = conditionTerm;
+//    }
+
+    public List<Term> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(List<Term> conditions) {
+        this.conditions = conditions;
+    }
+
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+
+    public String getTraitTerm() {
+        return traitTerm;
+    }
+
+    public void setTraitTerm(String traitTerm) {
+        this.traitTerm = traitTerm;
+    }
 
     public int getMapKey() {
         return mapKey;
@@ -172,21 +226,21 @@ public class ExpressionDataIndexObject {
     }
 
 
-    public double getValueMean() {
-        return valueMean;
-    }
-
-    public void setValueMean(double valueMean) {
-        this.valueMean = valueMean;
-    }
-
-    public double getLogValue() {
-        return logValue;
-    }
-
-    public void setLogValue(double logValue) {
-        this.logValue = logValue;
-    }
+//    public double getValueMean() {
+//        return valueMean;
+//    }
+//
+//    public void setValueMean(double valueMean) {
+//        this.valueMean = valueMean;
+//    }
+//
+//    public double getLogValue() {
+//        return logValue;
+//    }
+//
+//    public void setLogValue(double logValue) {
+//        this.logValue = logValue;
+//    }
 
     public String getExpressionUnit() {
         return expressionUnit;
@@ -220,13 +274,7 @@ public class ExpressionDataIndexObject {
         this.species = species;
     }
 
-    public String getCondition() {
-        return condition;
-    }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
 
 //    public List<MapInfo> getMapDataList() {
 //        return mapDataList;
