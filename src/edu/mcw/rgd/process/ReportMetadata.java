@@ -141,10 +141,28 @@ public final class ReportMetadata {
         if (open < 0) {
             return null;
         }
-        int close = first.indexOf(')', open);
+
+        // Walk to the paren that closes this one, not merely the next one: names nest, as in
+        // "Plsm2 (Polydactyly-luxate syndrome (PLS) morphotypes QTL 2)", where stopping at the
+        // first ')' would store the name truncated mid-phrase.
+        int depth = 0;
+        int close = -1;
+        for (int i = open; i < first.length(); i++) {
+            char c = first.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+                if (depth == 0) {
+                    close = i;
+                    break;
+                }
+            }
+        }
         if (close < 0) {
             return null;
         }
+
         String candidate = first.substring(open + 1, close).trim();
         if (candidate.isEmpty()) {
             return null;
