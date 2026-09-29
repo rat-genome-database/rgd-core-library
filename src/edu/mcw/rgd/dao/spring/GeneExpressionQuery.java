@@ -36,9 +36,6 @@ public class GeneExpressionQuery extends MappingQuery<edu.mcw.rgd.datamodel.Gene
         try {
          rec.setTraitTerm(getString(rs, "trait"));
         }catch (Exception ignore){}
-        rec.setMeasurementTerm(getString(rs, "measurement"));
-        rec.setExperimentCondition(getString(rs, "condition"));
-        rec.setConditionAccId(getString(rs, "condition_acc"));
 
         ge.setGeneExpressionRecord(rec);
 
@@ -49,7 +46,7 @@ public class GeneExpressionQuery extends MappingQuery<edu.mcw.rgd.datamodel.Gene
         recV.setId(getIntOrZero(rs, "gene_expression_value_id"));
         recV.setExpressedGeneSymbol(getString(rs, "gene_symbol"));
         recV.setExpressedObjectRgdId(getIntOrZero(rs, "expressed_object_rgd_id"));
-        recV.setExpressionMeasurementAccId(getString(rs, "expression_measurement_ont_id"));
+//        recV.setExpressionMeasurementAccId(getString(rs, "expression_measurement_ont_id"));
         recV.setNotes(getString(rs, "expression_value_notes"));
         recV.setGeneExpressionRecordId(getIntOrZero(rs, "gene_expression_exp_record_id"));
         recV.setExpressionValue(getDoubleOrZero(rs, "expression_value"));

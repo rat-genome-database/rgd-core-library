@@ -1,6 +1,9 @@
 package edu.mcw.rgd.datamodel.expression;
 
 import edu.mcw.rgd.datamodel.ontologyx.Term;
+import edu.mcw.rgd.datamodel.pheno.ClinicalMeasurement;
+import edu.mcw.rgd.datamodel.pheno.Condition;
+import edu.mcw.rgd.datamodel.pheno.MeasurementMethod;
 import edu.mcw.rgd.datamodel.search.elasticsearch.MapInfo;
 
 import java.util.List;
@@ -22,7 +25,8 @@ public class ExpressionDataIndexObject {
     private String expressionUnit;
     private String expressionLevel;
     private String species;
-    private List<Term> conditions;
+    private List<Condition> conditions;
+    private List<MeasurementMethod> measurementMethods;
 //    private Set<String> condition;
 //    private Set<String> conditionTerm;
 //    private List<MapInfo> mapDataList;
@@ -65,12 +69,21 @@ public class ExpressionDataIndexObject {
 //        this.conditionTerm = conditionTerm;
 //    }
 
-    public List<Term> getConditions() {
+
+    public List<Condition> getConditions() {
         return conditions;
     }
 
-    public void setConditions(List<Term> conditions) {
+    public void setConditions(List<Condition> conditions) {
         this.conditions = conditions;
+    }
+
+    public List<MeasurementMethod> getMeasurementMethods() {
+        return measurementMethods;
+    }
+
+    public void setMeasurementMethods(List<MeasurementMethod> measurementMethods) {
+        this.measurementMethods = measurementMethods;
     }
 
     public int getRecordId() {
