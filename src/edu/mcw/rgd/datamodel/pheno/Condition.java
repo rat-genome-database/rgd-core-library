@@ -152,6 +152,19 @@ public class Condition {
         }
         return conditionDescription;
     }
+    // Created by jthota for indexer
+//    public String getConditionDescriptionForExpressionMinerToolIndex() throws Exception {
+//        if( conditionDescription==null ) {
+//            conditionDescription = generateConditionDescriptionForExpressionMinerToolIndex();
+//        }
+//        return conditionDescription;
+//    }
+    // Created by jthota for indexer
+    public String getConditionTermForExpressionToolIndex() throws Exception {
+        OntologyXDAO xdao = new OntologyXDAO();
+
+        return xdao.getTerm(getOntologyId()).getTerm();
+    }
 
     public String generateConditionDescription() throws Exception {
         OntologyXDAO xdao = new OntologyXDAO();
