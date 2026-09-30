@@ -82,16 +82,41 @@ public final class ReportMetadata {
 
         Matcher m = DISPLAY_WITH_SPECIES.matcher(name);
         if (m.matches()) {
-            return new Identity(m.group(1), m.group(2).trim(), m.group(3).trim(),
+            return new Identity(m.group(1), stripMarkup(m.group(2)), m.group(3).trim(),
                     Long.parseLong(m.group(4)));
         }
 
         m = DISPLAY_NO_SPECIES.matcher(name);
         if (m.matches()) {
-            return new Identity(m.group(1), m.group(2).trim(), null,
+            return new Identity(m.group(1), stripMarkup(m.group(2)), null,
                     Long.parseLong(m.group(3)));
         }
         return null;
+    }
+
+    /**
+     * Strip presentation markup so a symbol is stored as the symbol, not as its rendering.
+     *
+     * <p>Strain names reach us carrying superscript and italic markup in two different
+     * notations — {@code LH-<i>C17h6orf52<sup>em1Aek</sup></i>} and
+     * {@code LH-Chr 17^[LN]-C17h6orf52^[em2Mcwi]} — while the symbol a person writes, and
+     * searches for, is {@code LH-C17h6orf52em1Aek}. Storing the rendering meant exact lookup
+     * could never match what was typed.</p>
+     *
+     * <p>It also settles a worse problem: the same strain is generated under both notations,
+     * so which markup ended up in {@code report_object} depended on which file happened to be
+     * processed last. Both now reduce to the same text, making the stored symbol
+     * deterministic. Only strains carry this markup; gene and QTL symbols pass through
+     * untouched.</p>
+     */
+    static String stripMarkup(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        return raw.replaceAll("<[^>]*>", "")
+                  .replaceAll("[\\^\\[\\]]", "")
+                  .replaceAll("\\s+", " ")
+                  .trim();
     }
 
     /**
@@ -163,8 +188,8 @@ public final class ReportMetadata {
             return null;
         }
 
-        String candidate = first.substring(open + 1, close).trim();
-        if (candidate.isEmpty()) {
+        String candidate = stripMarkup(first.substring(open + 1, close));
+        if (candidate == null || candidate.isEmpty()) {
             return null;
         }
         if (species != null && candidate.equalsIgnoreCase(species)) {
