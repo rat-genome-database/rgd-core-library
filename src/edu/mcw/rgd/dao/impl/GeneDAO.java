@@ -25,9 +25,9 @@ public class GeneDAO extends AbstractDAO {
 
     public List<Gene> getAnnotatedGenes(String accId) throws Exception{
 
-        String query = "SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
+        String query = "SELECT * FROM (SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
             " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id "+
-            " AND object_status='ACTIVE' and rgd_object_key=1  and r.rgd_id=g.rgd_id order by upper(g.gene_symbol)";
+            " AND object_status='ACTIVE' and rgd_object_key=1  and r.rgd_id=g.rgd_id) t order by upper(t.gene_symbol)";
 
         return executeGeneQuery(query, accId);
     }
@@ -37,10 +37,10 @@ public class GeneDAO extends AbstractDAO {
         String speciesInClause = "("+Utils.buildInPhrase(speciesTypeKeys)+")";
         String evidenceInClause = Utils.buildInPhraseQuoted(evidenceCodes);
 
-        String query = "SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
+        String query = "SELECT * FROM (SELECT distinct g.*, r.species_type_key FROM full_annot a,rgd_ids r, genes g " +
                 " WHERE term_acc=? AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key IN " + speciesInClause;
         query += " AND object_status='ACTIVE' and rgd_object_key=1 " +
-                " AND evidence in (" + evidenceInClause + ") AND r.rgd_id=g.rgd_id ORDER BY upper(g.gene_symbol)";
+                " AND evidence in (" + evidenceInClause + ") AND r.rgd_id=g.rgd_id) t ORDER BY upper(t.gene_symbol)";
 
         return executeGeneQuery(query, accId);
     }
@@ -186,9 +186,11 @@ public class GeneDAO extends AbstractDAO {
             SELECT g.gene_key,g.gene_symbol,g.full_name,x.acc_id gene_desc,g.agr_desc,g.merged_desc,
                 a.methods_matched notes,g.rgd_id,g.gene_type_lc,g.nomen_review_date,g.refseq_status,g.gene_source,
                 g.ncbi_annot_status,r.species_type_key,g.ensembl_gene_symbol,g.ensembl_gene_type,g.ensembl_full_name,g.nomen_source
-            FROM agr_orthologs a, genes g, rgd_ids r, rgd_acc_xdb x
-            WHERE a.gene_rgd_id_1=? AND a.gene_rgd_id_2=g.rgd_id AND g.rgd_id=r.rgd_id
-                AND confidence='stringent' AND x.rgd_id(+) = g.rgd_id AND x.xdb_key(+) = 63
+            FROM agr_orthologs a
+                JOIN genes g ON a.gene_rgd_id_2=g.rgd_id
+                JOIN rgd_ids r ON g.rgd_id=r.rgd_id
+                LEFT JOIN rgd_acc_xdb x ON x.rgd_id = g.rgd_id AND x.xdb_key = 63
+            WHERE a.gene_rgd_id_1=? AND confidence='stringent'
             ORDER BY r.species_type_key
             """;
         return executeGeneQuery(query, rgdId);
@@ -284,7 +286,7 @@ public class GeneDAO extends AbstractDAO {
 
         String query = "select g.*, r.SPECIES_TYPE_KEY from GENES g, RGD_IDS r " +
                 "WHERE r.object_status='ACTIVE' AND r.species_type_key=? "+
-                " AND NVL(gene_type_lc,'*') NOT IN('splice','allele') "+
+                " AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') "+
                 " AND r.rgd_id=g.rgd_id AND (g.gene_symbol_lc LIKE '%" + keyword + "%' OR g.full_name_lc LIKE '%" + keyword + "%')";
         return GeneQuery.execute(this, query, speciesKey);
     }
@@ -295,7 +297,7 @@ public class GeneDAO extends AbstractDAO {
                 "FROM genes g, rgd_ids r, maps_data md \n" +
                 "WHERE r.object_status='ACTIVE' AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id \n"+
                 " AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=? " +
-                " AND NVL(gene_type_lc,'*') NOT IN('splice','allele') "+
+                " AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') "+
                 " order by g.gene_symbol";
 
         return GeneQuery.execute(this, query, chr, stopPos, startPos, mapKey);
@@ -547,7 +549,7 @@ public class GeneDAO extends AbstractDAO {
             SELECT g.*, r.species_type_key FROM genes g, rgd_ids r
             WHERE r.object_status='ACTIVE'
               AND r.species_type_key=?
-              AND NVL(gene_type_lc,'*') NOT IN ('splice','allele')
+              AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele')
               AND r.rgd_id=g.rgd_id
             ORDER BY g.gene_symbol_lc
             """;
@@ -567,7 +569,7 @@ public class GeneDAO extends AbstractDAO {
             SELECT g.rgd_id, g.gene_symbol FROM genes g, rgd_ids r
             WHERE r.object_status='ACTIVE'
               AND r.species_type_key=?
-              AND NVL(gene_type_lc,'*') NOT IN ('splice','allele')
+              AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele')
               AND r.rgd_id=g.rgd_id
             """;
 
@@ -585,7 +587,7 @@ public class GeneDAO extends AbstractDAO {
 
         String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
                 "WHERE r.object_status='ACTIVE' AND r.species_type_key=? "+
-                "AND NVL(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.gene_symbol_lc=LOWER(?)";
+                "AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.gene_symbol_lc=LOWER(?)";
 
         return GeneQuery.execute(this, query, speciesKey, symbol);
     }
@@ -594,7 +596,7 @@ public class GeneDAO extends AbstractDAO {
 
         String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
                 "WHERE r.object_status='ACTIVE' AND r.species_type_key=? "+
-                "AND NVL(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.ensembl_gene_symbol=?";
+                "AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') AND r.rgd_id=g.rgd_id AND g.ensembl_gene_symbol=?";
 
         return GeneQuery.execute(this, query, speciesKey, symbol);
     }
@@ -623,7 +625,7 @@ public class GeneDAO extends AbstractDAO {
 
         String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
                 "WHERE r.object_status='ACTIVE' "+
-                " AND NVL(gene_type_lc,'*') NOT IN('splice','allele') "+
+                " AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') "+
                 " AND r.rgd_id=g.rgd_id";
 
         return GeneQuery.execute(this, query);
@@ -886,7 +888,7 @@ public class GeneDAO extends AbstractDAO {
     public int getActiveGeneCount(int speciesKey, java.util.Date fromNomenclatureReview, java.util.Date toNomenclatureReview) throws Exception {
 
         String query = "SELECT COUNT(*) FROM genes g, rgd_ids r " +
-        "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') " +
+        "WHERE r.object_status='ACTIVE' AND r.species_type_key=? AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') " +
         " AND (g.nomen_review_date BETWEEN ? AND ? OR g.nomen_review_date IS NULL) "+
         " AND r.rgd_id=g.rgd_id AND r.object_key=1";
 
@@ -905,7 +907,7 @@ public class GeneDAO extends AbstractDAO {
     public List<Gene> getActiveGenes(int speciesKey, java.util.Date fromNomenclatureReview, java.util.Date toNomenclatureReview) throws Exception {
 
         String query = "SELECT g.*, r.species_type_key FROM genes g, rgd_ids r " +
-            "WHERE r.object_status='ACTIVE' and r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') " +
+            "WHERE r.object_status='ACTIVE' and r.species_type_key=? AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') " +
             " AND (g.nomen_review_date BETWEEN ? AND ? OR g.nomen_review_date IS NULL) "+
             " AND r.rgd_id=g.rgd_id AND r.object_key=1 ORDER BY g.gene_symbol_lc";
 
@@ -1252,7 +1254,7 @@ public class GeneDAO extends AbstractDAO {
             return null;
 
         String query = "SELECT * FROM genes g, rgd_ids r "+
-                "WHERE g.gene_symbol_lc like ? AND g.rgd_id=r.rgd_id AND r.species_type_key=? AND NVL(gene_type_lc,'*') NOT IN('splice','allele') "+
+                "WHERE g.gene_symbol_lc like ? AND g.rgd_id=r.rgd_id AND r.species_type_key=? AND COALESCE(gene_type_lc,'*') NOT IN('splice','allele') "+
                 "ORDER BY r.object_status"; // active genes are returned first
 
         return GeneQuery.execute(this, query, (geneSymbol.trim().toLowerCase())+'%', speciesKey);
