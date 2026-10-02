@@ -10,7 +10,7 @@ import edu.mcw.rgd.datamodel.SearchLog;
 public class SearchLogDAO extends AbstractDAO {
 
     public int insert(SearchLog log) throws Exception {
-        String query= "INSERT INTO SEARCH_LOG(SEARCH_TERM, CATEGORY, RESULTS, SEARCH_DATE) VALUES(?,?,?,SYSDATE)";
+        String query= "INSERT INTO SEARCH_LOG(SEARCH_TERM, CATEGORY, RESULTS, SEARCH_DATE) VALUES(?,?,?,LOCALTIMESTAMP(0))";
         return update(query, log.getSearchTerm(),log.getCategory(), log.getResults());
     }
 }
