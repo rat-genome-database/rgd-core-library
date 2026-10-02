@@ -70,20 +70,16 @@ public class PipelineLogDAO extends AbstractDAO {
 
         if( pipelineKey!=0 ) {
             // return pipeline logs for given pipeline
-            String query = "select * from ("+
-                    "select PIPELINE_KEY,PIPELINE_LOG_KEY,RUN_START_TIME,RUN_END_TIME,SUCCESS_IND,RUN_MODE "+
-                    "from PIPELINE_LOGS where PIPELINE_KEY=? order by PIPELINE_LOG_KEY desc"+
-                    ") where rownum<=?";
+            String query = "select PIPELINE_KEY,PIPELINE_LOG_KEY,RUN_START_TIME,RUN_END_TIME,SUCCESS_IND,RUN_MODE "+
+                    "from PIPELINE_LOGS where PIPELINE_KEY=? order by PIPELINE_LOG_KEY desc limit ?";
 
             PipelineLogQuery pq = new PipelineLogQuery(this.getDataSource(), query, null);
             return execute(pq, pipelineKey, retMax);
         }
         else {
             // return all pipeline logs
-            String query = "select * from ("+
-                "select PIPELINE_KEY,PIPELINE_LOG_KEY,RUN_START_TIME,RUN_END_TIME,SUCCESS_IND,RUN_MODE "+
-                "from PIPELINE_LOGS order by PIPELINE_LOG_KEY desc"+
-                ") where rownum<=?";
+            String query = "select PIPELINE_KEY,PIPELINE_LOG_KEY,RUN_START_TIME,RUN_END_TIME,SUCCESS_IND,RUN_MODE "+
+                "from PIPELINE_LOGS order by PIPELINE_LOG_KEY desc limit ?";
 
             PipelineLogQuery pq = new PipelineLogQuery(this.getDataSource(), query, null);
             return execute(pq, retMax);
@@ -247,7 +243,7 @@ public class PipelineLogDAO extends AbstractDAO {
         String query = "select PIPELINE_LOG_PROPERTY_KEY,PIPELINE_LOG_KEY,PIPELINE_LOG_PROPERTYTYPES_KEY,EVENT_NOTES,EVENT_VALUE,EVENT_RECORD_NO,EVENT_TIMESTAMP,EVENT_XML from PIPELINE_LOG_PROPERTIES ";
         query += "where (PIPELINE_LOG_KEY,EVENT_RECORD_NO) in(";
         query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO from(";
-        query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO,ROWNUM rn from PIPELINE_LOG_PROPERTIES where PIPELINE_LOG_KEY=? and EVENT_RECORD_NO>0 and PIPELINE_LOG_PROPERTYTYPES_KEY=?)";
+        query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO,row_number() over (order by EVENT_RECORD_NO, PIPELINE_LOG_PROPERTY_KEY) rn from PIPELINE_LOG_PROPERTIES where PIPELINE_LOG_KEY=? and EVENT_RECORD_NO>0 and PIPELINE_LOG_PROPERTYTYPES_KEY=?)";
         query += "where rn between ? AND ?)";
 
         PipelineLogPropQuery pq = new PipelineLogPropQuery(this.getDataSource(), query, plog);
@@ -276,7 +272,7 @@ public class PipelineLogDAO extends AbstractDAO {
         String query = "select PIPELINE_LOG_PROPERTY_KEY,PIPELINE_LOG_KEY,PIPELINE_LOG_PROPERTYTYPES_KEY,EVENT_NOTES,EVENT_VALUE,EVENT_RECORD_NO,EVENT_TIMESTAMP,EVENT_XML from PIPELINE_LOG_PROPERTIES ";
         query += "where (PIPELINE_LOG_KEY,EVENT_RECORD_NO) in(";
         query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO from(";
-        query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO,ROWNUM rn from PIPELINE_LOG_PROPERTIES where PIPELINE_LOG_KEY=? and EVENT_RECORD_NO>0 and PIPELINE_LOG_PROPERTYTYPES_KEY=? AND EVENT_VALUE=?)";
+        query += "select PIPELINE_LOG_KEY,EVENT_RECORD_NO,row_number() over (order by EVENT_RECORD_NO, PIPELINE_LOG_PROPERTY_KEY) rn from PIPELINE_LOG_PROPERTIES where PIPELINE_LOG_KEY=? and EVENT_RECORD_NO>0 and PIPELINE_LOG_PROPERTYTYPES_KEY=? AND EVENT_VALUE=?)";
         query += "where rn between ? AND ?)";
 
         PipelineLogPropQuery pq = new PipelineLogPropQuery(this.getDataSource(), query, plog);
@@ -304,7 +300,7 @@ public class PipelineLogDAO extends AbstractDAO {
         String query = "select PIPELINE_LOG_PROPERTY_KEY,PIPELINE_LOG_KEY,PIPELINE_LOG_PROPERTYTYPES_KEY,EVENT_NOTES,EVENT_VALUE,EVENT_RECORD_NO,EVENT_TIMESTAMP,EVENT_XML from PIPELINE_LOG_PROPERTIES "+
             "where (PIPELINE_LOG_KEY,EVENT_RECORD_NO) in("+
             "select PIPELINE_LOG_KEY,EVENT_RECORD_NO from("+
-            "SELECT pipeline_log_key,pipeline_log_record_no event_record_no,ROWNUM rn FROM pipeline_log_flags l,pipeline_flags f WHERE pipeline_log_key=? and pipeline_flag_symbol=? and f.pipeline_flag_id=l.pipeline_flag_id)"+
+            "SELECT pipeline_log_key,pipeline_log_record_no event_record_no,row_number() over (order by l.pipeline_log_record_no) rn FROM pipeline_log_flags l,pipeline_flags f WHERE pipeline_log_key=? and pipeline_flag_symbol=? and f.pipeline_flag_id=l.pipeline_flag_id)"+
             "where rn between ? AND ?)";
 
         PipelineLogPropQuery q = new PipelineLogPropQuery(this.getDataSource(), query, plog);
@@ -346,7 +342,7 @@ public class PipelineLogDAO extends AbstractDAO {
         int pipelineLogKey = getNextKeyFromSequence("PIPELINE_LOGS_SEQ");
 
         // start new pipeline log
-        String query = "INSERT INTO pipeline_logs (PIPELINE_KEY, PIPELINE_LOG_KEY, RUN_START_TIME, RUN_END_TIME, SUCCESS_IND, RUN_MODE) VALUES(?,?,SYSDATE,null,'N',?)";
+        String query = "INSERT INTO pipeline_logs (PIPELINE_KEY, PIPELINE_LOG_KEY, RUN_START_TIME, RUN_END_TIME, SUCCESS_IND, RUN_MODE) VALUES(?,?,LOCALTIMESTAMP(0),null,'N',?)";
         update(query, pipeline.getPipelineKey(), pipelineLogKey, runMode);
         
         // create pipeline log object
@@ -360,7 +356,7 @@ public class PipelineLogDAO extends AbstractDAO {
     public void stopPipeline(PipelineLog log, boolean success) throws Exception  {
 
         // update pipeline log setting RUN_END_TIME and STATUS
-        String query = "update PIPELINE_LOGS set RUN_END_TIME=SYSDATE, SUCCESS_IND=? where PIPELINE_LOG_KEY=?";
+        String query = "update PIPELINE_LOGS set RUN_END_TIME=LOCALTIMESTAMP(0), SUCCESS_IND=? where PIPELINE_LOG_KEY=?";
         update(query, success?"Y":"N", log.getPipelineLogKey());
 
         // since pipeline log is stopped, clear the log key
@@ -387,7 +383,7 @@ public class PipelineLogDAO extends AbstractDAO {
         // insert a message of given type into pipeline_log
         String query = "insert into PIPELINE_LOG_PROPERTIES "+
                 "(PIPELINE_LOG_KEY, PIPELINE_LOG_PROPERTYTYPES_KEY, EVENT_TIMESTAMP, EVENT_NOTES, EVENT_VALUE, EVENT_XML, PIPELINE_LOG_PROPERTY_KEY) "+
-                "VALUES(?,?,SYSDATE,?,?,?,PIPELINE_LOG_PROPERTIES_SEQ.NEXTVAL)";
+                "VALUES(?,?,LOCALTIMESTAMP(0),?,?,?,nextval('PIPELINE_LOG_PROPERTIES_SEQ'))";
         update(query, log.getPipelineLogKey(), msgtype, message, value, clob);
     }
 
@@ -401,7 +397,7 @@ public class PipelineLogDAO extends AbstractDAO {
         String query = "insert into PIPELINE_LOG_PROPERTIES "+
                 "(PIPELINE_LOG_KEY, PIPELINE_LOG_PROPERTYTYPES_KEY, EVENT_TIMESTAMP, EVENT_NOTES, EVENT_VALUE,"+
                 " EVENT_RECORD_NO, EVENT_XML, PIPELINE_LOG_PROPERTY_KEY) "+
-                "VALUES(?,?,?,?,?,?,?,PIPELINE_LOG_PROPERTIES_SEQ.NEXTVAL)";
+                "VALUES(?,?,?,?,?,?,?,nextval('PIPELINE_LOG_PROPERTIES_SEQ'))";
 
         BatchSqlUpdate su = new BatchSqlUpdate(getDataSource(), query,
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
@@ -435,7 +431,7 @@ public class PipelineLogDAO extends AbstractDAO {
         String query = "insert into PIPELINE_LOG_PROPERTIES "+
                 "(PIPELINE_LOG_KEY, PIPELINE_LOG_PROPERTYTYPES_KEY, EVENT_TIMESTAMP, EVENT_NOTES, EVENT_VALUE,"+
                 " EVENT_RECORD_NO, EVENT_XML, PIPELINE_LOG_PROPERTY_KEY) "+
-                "VALUES(?,?,?,?,?,?,?,PIPELINE_LOG_PROPERTIES_SEQ.NEXTVAL)";
+                "VALUES(?,?,?,?,?,?,?,nextval('PIPELINE_LOG_PROPERTIES_SEQ'))";
 
         // info field cannot be longer than 4000 characters!
         String info = logProp.getInfo();

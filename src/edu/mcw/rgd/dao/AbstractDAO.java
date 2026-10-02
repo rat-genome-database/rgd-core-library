@@ -83,7 +83,7 @@ public class AbstractDAO implements DAO {
      */
     public int getNextKeyFromSequence(String seqName) throws Exception {
 
-        String query = "SELECT " + seqName + ".nextval from dual";
+        String query = "SELECT nextval('" + seqName + "')";
         return getCount(query);
     }
 
