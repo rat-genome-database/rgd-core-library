@@ -55,7 +55,7 @@ public class IndexAdmin {
         }
         log.info("CREATING NEW INDEX..." + index);
         int replicates = 0;
-        int shards = 1;
+        int shards = 7;
         if (RgdContext.isProduction() || RgdContext.isPipelines()) {
             replicates = 1;
         }
