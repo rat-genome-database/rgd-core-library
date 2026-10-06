@@ -21,9 +21,24 @@ import java.util.Set;
 
 public class DocumentEmbeddingDAO extends AbstractDAO {
 
+    /** null means the default rgdRag datasource. */
+    private final DataSource dataSource;
+
+    public DocumentEmbeddingDAO() {
+        this(null);
+    }
+
+    /**
+     * Run every query against the given datasource instead of rgdRag, e.g. one whose
+     * currentSchema points at another embedding model's copy of document_embeddings.
+     */
+    public DocumentEmbeddingDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public DataSource getDataSource() throws Exception {
-        return DataSourceFactory.getInstance().getRgdRagDataSource();
+        return dataSource != null ? dataSource : DataSourceFactory.getInstance().getRgdRagDataSource();
     }
 
     public List<DocumentEmbeddingSummary> getFileSummaries() throws Exception {
