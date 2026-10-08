@@ -66,9 +66,13 @@ public class NomenclatureDAO extends AbstractDAO {
                 "nomen_status_type,description,event_date,notes,original_rgd_id," +
                 "previous_symbol,previous_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
+        // ref_key is a BIGINT column: bind it as Long (Postgres does not implicitly convert a VARCHAR bind)
+        String refKeyStr = event.getRefKey();
+        Long refKey = refKeyStr==null || refKeyStr.trim().isEmpty() ? null : Long.valueOf(refKeyStr.trim());
+
         event.setNomenEventKey(this.getNextKey("nomen_events", "nomen_event_key"));
         update(sql, event.getNomenEventKey(), event.getRgdId(), event.getSymbol(), event.getName(),
-                event.getRefKey(), event.getNomenStatusType(), event.getDesc(), event.getEventDate(),
+                refKey, event.getNomenStatusType(), event.getDesc(), event.getEventDate(),
                 event.getNotes(), event.getOriginalRGDId(), event.getPreviousSymbol(), event.getPreviousName());
     }
 
