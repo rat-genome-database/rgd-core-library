@@ -55,7 +55,7 @@ public class SearchDAO extends AbstractDAO {
      */
     public int deleteFromIndex(String objectType, String dataType, int batchSize) throws Exception {
 
-        String sql = "DELETE FROM rgd_index WHERE object_type=? AND data_type=? AND ROWNUM <= ?";
+        String sql = "DELETE FROM rgd_index WHERE ctid IN (SELECT ctid FROM rgd_index WHERE object_type=? AND data_type=? FETCH FIRST ? ROWS ONLY)";
         int rowsTotal = 0;
         for( ;; ) {
             int rowsAffected = update(sql, objectType, dataType, batchSize);
@@ -122,7 +122,7 @@ public class SearchDAO extends AbstractDAO {
         if( negated!=null ) {
             for(String term: negated) {
                 if (k > 0) {
-                    sql.append("\nminus ");
+                    sql.append("\nexcept ");
                 }
 
                 sql.append(" \nselect rgd_id from rgd_index where keyword_lc like '");
@@ -151,7 +151,7 @@ public class SearchDAO extends AbstractDAO {
 
         try(Connection conn = this.getConnection()) {
 
-            String sql = "select unique(rgd_id), object_type, species_type_key " +
+            String sql = "select distinct rgd_id, object_type, species_type_key " +
                          "from rgd_index where rgd_id in ( " + this.buildSubSelect(sb.getRequired(), sb.getNegated(), sb.getOptional()) + "\n) ";
             if( sb.isChinchilla() ) {
                 // in chinchilla mode, skip mouse and rat
@@ -215,9 +215,9 @@ public class SearchDAO extends AbstractDAO {
 
         try(Connection conn =  this.getConnection()) {
 
-            String sql = "SELECT UNIQUE(rgd_id), object_type, species_type_key " +
+            String sql = "SELECT DISTINCT rgd_id, object_type, species_type_key " +
                         "FROM rgd_index WHERE rgd_id IN(" + this.buildSubSelect(sb.getRequired(), sb.getNegated(), sb.getOptional()) + "\n) "+
-                        "AND INSTR(rgd_id,':')>0"; // only ontologies have colon in the rgd id, like 'CHEBI:0012345'
+                        "AND rgd_id LIKE '%:%'"; // only ontologies have colon in the rgd id, like 'CHEBI:0012345'
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -391,16 +391,16 @@ public class SearchDAO extends AbstractDAO {
     }
 
     public List<IndexRow> findCitation(String term) throws Exception{
-        String sql = "SELECT DISTINCT ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, " +
-                "ri.rank, r.citation as keyword_lc from rgd_index ri, references r " +
-                "WHERE ri.keyword_lc like ? and ri.data_type='citation' and ri.species_type_key=3 and r.rgd_id=ri.rgd_id order by abs(ri.rgd_id) desc";
+        String sql = "SELECT * FROM (SELECT DISTINCT ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, " +
+                "ri.rank, r.citation as keyword_lc from rgd_index ri, \"references\" r " +
+                "WHERE ri.keyword_lc like ? and ri.data_type='citation' and ri.species_type_key=3 and r.rgd_id=CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
         RgdIndexQuery q = new RgdIndexQuery(this.getDataSource(), sql);
         return execute(q, term);
     }
 
     // note: used by popups in curation edit tool
     public List<IndexRow> findSymbol(String symbol) throws Exception{
-        String sql = "SELECT DISTINCT * FROM rgd_index WHERE keyword_lc LIKE ? AND data_type='symbol' ORDER BY ABS(rgd_id) DESC";
+        String sql = "SELECT * FROM (SELECT DISTINCT * FROM rgd_index WHERE keyword_lc LIKE ? AND data_type='symbol') t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
         RgdIndexQuery q = new RgdIndexQuery(this.getDataSource(), sql);
         return execute(q, symbol+"%");
     }
@@ -412,9 +412,9 @@ public class SearchDAO extends AbstractDAO {
             return findSymbol(symbol);
         }
 
-        String sql = "SELECT DISTINCT * FROM rgd_index "+
-                "WHERE (keyword_lc LIKE ? OR rgd_id=?) AND data_type='symbol' AND species_type_key=? "+
-                "ORDER BY ABS(rgd_id) DESC";
+        String sql = "SELECT * FROM (SELECT DISTINCT * FROM rgd_index "+
+                "WHERE (keyword_lc LIKE ? OR rgd_id=?) AND data_type='symbol' AND species_type_key=?) t "+
+                "ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
         RgdIndexQuery q = new RgdIndexQuery(this.getDataSource(), sql);
         return execute(q, symbol+"%", symbol, speciesTypeKey);
     }
@@ -430,39 +430,39 @@ public class SearchDAO extends AbstractDAO {
 
         switch (objectType) {
             case "STRAINS":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, s.strain_symbol_lc as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, s.strain_symbol_lc as keyword_lc "
                         + "FROM rgd_index ri, strains s "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and s.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and s.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "GENES":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, g.gene_symbol_lc as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, g.gene_symbol_lc as keyword_lc "
                         + "FROM rgd_index ri, genes g "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "QTLS":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, q.qtl_symbol_lc as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, q.qtl_symbol_lc as keyword_lc "
                         + "FROM rgd_index ri, qtls q "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and q.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and q.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "REFERENCES":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, r.citation as keyword_lc "
-                        + "FROM rgd_index ri, references r "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='citation' and ri.species_type_key=? and r.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, r.citation as keyword_lc "
+                        + "FROM rgd_index ri, \"references\" r "
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='citation' and ri.species_type_key=? and r.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "SSLPS":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, s.rgd_name_lc as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, s.rgd_name_lc as keyword_lc "
                         + "FROM rgd_index ri, sslps s "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and s.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and s.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "PROMOTERS":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, LOWER(ge.symbol) as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, LOWER(ge.symbol) as keyword_lc "
                         + "FROM rgd_index ri, genomic_elements ge "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             case "VARIANTS":
-                sql = "SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, LOWER(v.name) as keyword_lc "
+                sql = "SELECT * FROM (SELECT distinct ri.rgd_id, ri.object_type, ri.data_type, ri.species_type_key, ri.rank, LOWER(v.name) as keyword_lc "
                         + "FROM rgd_index ri, variants v "
-                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = ri.rgd_id order by abs(ri.rgd_id) desc";
+                        + "WHERE ri.keyword_lc like ? and ri.data_type='symbol' and ri.species_type_key=? and g.rgd_id = CAST(ri.rgd_id AS INTEGER)) t ORDER BY ABS(CAST(t.rgd_id AS INTEGER)) DESC";
                 break;
             default:
                 System.out.println("ERROR: findSymbol(,,): unsupported object type: " + objectType);
