@@ -48,11 +48,12 @@ public class SampleDAO extends JdbcBaseDAO {
         return runSamplesQuery(query, mapKey);
     }
     public List<Sample> getLimitedSamplesByPopulation(int mapKey, String population, int limit) {
-        String query = "SELECT * FROM sample "+
+        String query = "SELECT * FROM sample WHERE sample_id IN("+
+                "SELECT sample_id FROM (SELECT sample_id, row_number() OVER (ORDER BY sample_id) AS rn FROM sample "+
                 "WHERE patient_id IN(SELECT patient_id FROM patient WHERE map_key=?) "+
                 " and (analysis_name != 'CDR' and analysis_name != 'CDS') " +
                 " and analysis_name like '"+ population+"%'" +
-                " and ROWNUM < ? "+
+                ") t WHERE rn < ? ) "+
                 " ORDER BY analysis_name "
                ;
         SampleQuery q = new SampleQuery(this.getDataSource(), query);
@@ -164,7 +165,7 @@ public class SampleDAO extends JdbcBaseDAO {
     }
 
     public List<Sample> getSamplesByStrainRgdIdAndMapKey(int strainRgdId,int mapKey) throws Exception{
-        String sql = "SELECT * FROM sample WHERE strain_rgd_id IN ? AND map_key=?";
+        String sql = "SELECT * FROM sample WHERE strain_rgd_id IN (?) AND map_key=?";
 //        SampleQuery q = new SampleQuery(this.getDataSource(), sql);
         SampleQuery q = new SampleQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
 
