@@ -78,7 +78,7 @@ public class SSLPDAO extends AbstractDAO {
 
         String query = "SELECT s.*, r.species_type_key FROM sslps s, rgd_ids r \n" +
                 "WHERE r.object_status='ACTIVE' AND r.rgd_id=s.rgd_id AND r.species_type_key=?\n" +
-                "  AND regexp_like(rgd_name_lc,'^rs[0-9]+$')";
+                "  AND rgd_name_lc ~ '^rs[0-9]+$'";
 
         return executeSSLPQuery(query, speciesTypeKey);
     }
