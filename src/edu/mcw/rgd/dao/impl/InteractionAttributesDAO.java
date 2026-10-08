@@ -21,7 +21,7 @@ public class InteractionAttributesDAO extends AbstractDAO {
     public int insert(InteractionAttribute a) throws Exception{
         String sql = "insert into interaction_attributes "+
                 "(attribute_key, interaction_key, attribute_name, attribute_value, created_date, last_modified_date) "+
-                "select ?,?,?,?,SYSDATE, SYSDATE from dual "+
+                "select ?,?,?,?,LOCALTIMESTAMP(0), LOCALTIMESTAMP(0) "+
                 "where not exists (select interaction_key, attribute_name, attribute_value from interaction_attributes "+
                                   "where  interaction_key=? and attribute_name=? and attribute_value=?) "+
                 "and exists (select interaction_key from interactions where interaction_key=?)";
@@ -30,12 +30,12 @@ public class InteractionAttributesDAO extends AbstractDAO {
     }
 
     public int updateLastModifiedDate(int attributeKey) throws Exception{
-        String sql = "UPDATE interaction_attributes SET last_modified_date=SYSDATE WHERE attribute_key=?";
+        String sql = "UPDATE interaction_attributes SET last_modified_date=LOCALTIMESTAMP(0) WHERE attribute_key=?";
         return update(sql, attributeKey);
     }
 
     public int updateLastModifiedDate(List<Integer> attributeKeys) throws Exception{
-        String sql = "UPDATE interaction_attributes SET last_modified_date=SYSDATE WHERE attribute_key=?";
+        String sql = "UPDATE interaction_attributes SET last_modified_date=LOCALTIMESTAMP(0) WHERE attribute_key=?";
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql, new int[]{Types.INTEGER});
         su.compile();
@@ -80,7 +80,7 @@ public class InteractionAttributesDAO extends AbstractDAO {
     }
 
     public int deleteUnmodifiedAttributes(Date cutoffDate) throws Exception{
-        String sql = "DELETE interaction_attributes WHERE last_modified_date < ?";
+        String sql = "DELETE FROM interaction_attributes WHERE last_modified_date < ?";
         return update(sql, cutoffDate);
     }
 
