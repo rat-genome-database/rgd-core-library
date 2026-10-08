@@ -40,7 +40,7 @@ public class ChatbotDAOs {
         public List<edu.mcw.rgd.datamodel.Gene> getActiveGenesByMapKey(int speciesKey, int mapKey) throws Exception {
             String sql = "SELECT DISTINCT g.*, r.species_type_key FROM genes g, rgd_ids r, maps_data md " +
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
-                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele') " +
                     "AND r.rgd_id=g.rgd_id AND md.rgd_id=g.rgd_id AND md.map_key=? " +
                     "ORDER BY g.gene_symbol_lc";
             return executeGeneQuery(sql, speciesKey, mapKey);
@@ -66,7 +66,7 @@ public class ChatbotDAOs {
             String sql = "SELECT DISTINCT g.rgd_id, g.gene_symbol " +
                     "FROM genes g, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
-                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele') " +
                     "AND g.rgd_id=r.rgd_id ORDER BY g.gene_symbol";
             return IntStringMapQuery.execute(this, sql, speciesKey);
         }
@@ -76,7 +76,7 @@ public class ChatbotDAOs {
             String sql = "SELECT DISTINCT g.rgd_id, g.gene_symbol " +
                     "FROM genes g, rgd_ids r, maps_data md " +
                     "WHERE r.object_status='ACTIVE' AND r.species_type_key=? " +
-                    "AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
+                    "AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele') " +
                     "AND g.rgd_id=r.rgd_id AND md.rgd_id=r.rgd_id AND md.map_key=? " +
                     "ORDER BY g.gene_symbol";
             return IntStringMapQuery.execute(this, sql, speciesKey, mapKey);
@@ -242,7 +242,7 @@ public class ChatbotDAOs {
 
         /** Count of active references (matches {@link ReferenceDAO#getActiveReferences()}). */
         public int countActiveReferences() throws Exception {
-            String sql = "SELECT COUNT(*) FROM references ref, rgd_ids r " +
+            String sql = "SELECT COUNT(*) FROM \"references\" ref, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND ref.rgd_id=r.rgd_id";
             return getCount(sql);
         }
@@ -250,7 +250,7 @@ public class ChatbotDAOs {
         /** Lightweight ID+title fetch for active references. */
         public List<IntStringMapQuery.MapPair> getActiveReferenceIds() throws Exception {
             String sql = "SELECT ref.rgd_id, ref.title " +
-                    "FROM references ref, rgd_ids r " +
+                    "FROM \"references\" ref, rgd_ids r " +
                     "WHERE r.object_status='ACTIVE' AND ref.rgd_id=r.rgd_id " +
                     "ORDER BY ref.rgd_id";
             return IntStringMapQuery.execute(this, sql);
