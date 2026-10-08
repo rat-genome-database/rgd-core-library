@@ -24,7 +24,7 @@ public class InteractionsDAO  extends AbstractDAO{
      */
     public int insert(Interaction pi) throws Exception{
         String sql = "insert into interactions(interaction_key, rgd_id_1, rgd_id_2, interaction_type, created_date, last_modified_date) "+
-                "SELECT ?,?,?,?,SYSDATE,SYSDATE FROM dual "+
+                "SELECT ?,?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0) "+
                 "WHERE NOT EXISTS (select  rgd_id_1, rgd_id_2, interaction_type from interactions where rgd_id_1=? and rgd_id_2=? and interaction_type=?)";
         return update(sql, pi.getInteractionKey(),pi.getRgdId1(), pi.getRgdId2(), pi.getInteractionType(),pi.getRgdId1(), pi.getRgdId2(), pi.getInteractionType());
     }
@@ -49,7 +49,7 @@ public class InteractionsDAO  extends AbstractDAO{
      * @throws Exception
      */
     public int deleteUnmodifiedInteractions(int key) throws Exception{
-        String sql = "delete interactions  where interaction_key= ?";
+        String sql = "delete from interactions  where interaction_key= ?";
         return update(sql, key);
     }
 
@@ -60,7 +60,7 @@ public class InteractionsDAO  extends AbstractDAO{
     }
 
     public int updateLastModifiedDate(int interactionKey) throws Exception{
-        String sql = "update interactions set last_modified_date = SYSDATE  where interaction_key=?";
+        String sql = "update interactions set last_modified_date = LOCALTIMESTAMP(0)  where interaction_key=?";
         return update(sql, interactionKey);
     }
 
