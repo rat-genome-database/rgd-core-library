@@ -55,7 +55,7 @@ public class SslpsAlleleDAO extends AbstractDAO {
 
         String sql = """
             INSERT INTO sslps_alleles (allele_key, size1, size2, sslp_key, strain_key, notes)
-            SELECT sslps_alleles_seq.NEXTVAL, ?, ?, ?, ?, ? FROM dual
+            SELECT nextval('sslps_alleles_seq'), ?, ?, ?, ?, ?
             WHERE NOT EXISTS (SELECT 1 FROM sslps_alleles WHERE sslp_key=? AND strain_key=?)
             """;
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
