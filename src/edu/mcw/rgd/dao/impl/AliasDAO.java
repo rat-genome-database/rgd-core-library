@@ -147,7 +147,7 @@ public class AliasDAO extends AbstractDAO {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
                 "INSERT INTO aliases (alias_key, alias_type_name_lc, alias_value, alias_value_lc, notes, rgd_id) " +
-                "SELECT ?,LOWER(?),?,LOWER(?),?,? FROM dual "+
+                "SELECT ?,LOWER(?),?,LOWER(?),?,? "+
                 "WHERE NOT EXISTS (SELECT 1 FROM aliases "+
                         " WHERE rgd_id=? AND alias_value=? AND alias_type_name_lc=LOWER(?))",
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
