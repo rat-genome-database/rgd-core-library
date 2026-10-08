@@ -158,9 +158,11 @@ public class PathwayDAO extends AbstractDAO {
         "SELECT * FROM pathway w \n"+
         "WHERE term_acc IN(\n"+
         " SELECT s.term_acc FROM (\n"+
-                "SELECT d.child_term_acc FROM ont_dag d\n"+
-                "START WITH parent_term_acc=?\n"+
-                "CONNECT BY PRIOR child_term_acc=parent_term_acc\n"+
+                "WITH RECURSIVE dag(child_term_acc) AS (\n"+
+                " SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n"+
+                " UNION\n"+
+                " SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc\n"+
+                ") SELECT child_term_acc FROM dag\n"+
         " )d, ont_term_stats2 s\n"+
         " WHERE d.child_term_acc=s.term_acc AND stat_name='diagram_count' AND with_children=0\n"+
         ")";
@@ -221,9 +223,11 @@ public class PathwayDAO extends AbstractDAO {
 
         String sql = "SELECT COUNT(*) FROM pathway "+
                 "WHERE term_acc IN("+
-                "  SELECT child_term_acc FROM ont_dag "+
-                "  START WITH parent_term_acc=? "+
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc "+
+                "  WITH RECURSIVE dag(child_term_acc) AS ( "+
+                "   SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=? "+
+                "   UNION "+
+                "   SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc "+
+                "  ) SELECT child_term_acc FROM dag "+
                 ")";
         return getCount(sql, termAcc);
     }
