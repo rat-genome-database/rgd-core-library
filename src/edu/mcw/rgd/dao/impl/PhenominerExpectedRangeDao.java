@@ -63,7 +63,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
     }*/
 
     public int insert(PhenominerExpectedRange range) throws Exception {
-        String sql = "insert into PHENOMINER_EXPECTED_RANGE(EXPECTED_RANGE_ID , EXPECTED_RANGE_NAME ,CLINICAL_MEASUREMENT_ONT_ID ,STRAIN_GROUP_ID ,AGE_DAYS_FROM_DOB_LOW_BOUND ,AGE_DAYS_FROM_DOB_HIGH_BOUND ,SEX , TRAIT_ONT_ID,  RANGE_UNITS, RANGE_VALUE ,RANGE_LOW ,RANGE_HIGH ,RANGE_SD, created_date, last_modified_date) values(?,?,?,?,?,?,?,?,?,?,?,?,?, SYSDATE, SYSDATE)";
+        String sql = "insert into PHENOMINER_EXPECTED_RANGE(EXPECTED_RANGE_ID , EXPECTED_RANGE_NAME ,CLINICAL_MEASUREMENT_ONT_ID ,STRAIN_GROUP_ID ,AGE_DAYS_FROM_DOB_LOW_BOUND ,AGE_DAYS_FROM_DOB_HIGH_BOUND ,SEX , TRAIT_ONT_ID,  RANGE_UNITS, RANGE_VALUE ,RANGE_LOW ,RANGE_HIGH ,RANGE_SD, created_date, last_modified_date) values(?,?,?,?,?,?,?,?,?,?,?,?,?, LOCALTIMESTAMP(0), LOCALTIMESTAMP(0))";
         if(range.getStrainGroupName().contains("NormalStrain")){
             return this.update(sql, new Object[]{Integer.valueOf(range.getExpectedRangeId()), range.getStrainGroupName()+"_"+range.getSex() , range.getClinicalMeasurementOntId(), Integer.valueOf(range.getStrainGroupId()), Integer.valueOf(range.getAgeLowBound()), Integer.valueOf(range.getAgeHighBound()), range.getSex(), range.getTraitOntId(), range.getUnits(), Double.valueOf(range.getRangeValue()), Double.valueOf(range.getRangeLow()), Double.valueOf(range.getRangeHigh()), Double.valueOf(range.getRangeSD())});
         }else
@@ -76,8 +76,8 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         return execute(q, phenotypeAccId);
     }
     public List<PhenominerExpectedRange> getExpectedRangeOfMixedAndAll(String phenotype, int strainGroupId, String ageLow, String ageHigh, String sex) throws Exception {
-        String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=? and AGE_DAYS_FROM_DOB_HIGH_BOUND=?  and clinical_measurement_ont_id=? and sex=?" +
-                "and expected_range_name like '%Mixed%'";
+        String sql="select * from phenominer_expected_range where strain_group_id=? and AGE_DAYS_FROM_DOB_LOW_BOUND=CAST(? AS NUMERIC) and AGE_DAYS_FROM_DOB_HIGH_BOUND=CAST(? AS NUMERIC)  and clinical_measurement_ont_id=? and sex=?" +
+                " and expected_range_name like '%Mixed%'";
         PhenominerExpectedRangeQuery query= new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
         return execute(query, new Object[]{strainGroupId, ageLow, ageHigh, phenotype, sex});
     }
@@ -88,7 +88,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
     }
 
     public int insertExpectedRangeExperiment(int expectedRangeId, int experimentRecordId) throws Exception {
-        String sql="insert into PHENOMINER_RANGE_EXP_REC(expected_range_id, experiment_record_id, created_date, last_modified_date) values("+expectedRangeId+", "+experimentRecordId+", SYSDATE, SYSDATE)";
+        String sql="insert into PHENOMINER_RANGE_EXP_REC(expected_range_id, experiment_record_id, created_date, last_modified_date) values("+expectedRangeId+", "+experimentRecordId+", LOCALTIMESTAMP(0), LOCALTIMESTAMP(0))";
         return this.update(sql);
     }
     public List<Integer> getExperimentRecordIds(int expectedRangeId) throws Exception {
@@ -260,7 +260,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     }
     public List<String> getDistinctPhenotypesByTrait(String strainGoupId, String traitOntId) throws Exception {
-        String sql="select distinct(clinical_measurement_ont_id) from phenominer_expected_range where strain_group_id=? " ;
+        String sql="select distinct(clinical_measurement_ont_id) from phenominer_expected_range where strain_group_id=CAST(? AS NUMERIC) " ;
         if(traitOntId!=null) {
             if(!traitOntId.equalsIgnoreCase("pga"))
                 sql+=   " and expected_range_id in (" +
@@ -442,7 +442,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
         return ids.size() > 0?((Integer)ids.get(0)).intValue():0;
     }
     public int updateExpectedRange(PhenominerExpectedRange range, int expectedRangeId) throws Exception {
-        String sql="update phenominer_expected_range set RANGE_VALUE=?, RANGE_LOW=?, RANGE_HIGH=?, RANGE_SD=?, last_modified_date=SYSDATE "+
+        String sql="update phenominer_expected_range set RANGE_VALUE=?, RANGE_LOW=?, RANGE_HIGH=?, RANGE_SD=?, last_modified_date=LOCALTIMESTAMP(0) "+
                 "where expected_range_id=?";
         return update(sql, range.getRangeValue(), range.getRangeLow(), range.getRangeHigh(), range.getRangeSD(), expectedRangeId);
 
