@@ -246,7 +246,7 @@ public class GenomicElementDAO extends AbstractDAO {
         String sql = "INSERT INTO expression_data "+
                 "(rgd_id, tissue, transcripts, chip_seq_read_density, experiment_methods, regulation, tissue_term_acc," +
                 "strain_term_acc, source, notes, expression_data_key) "+
-                "VALUES(?,?,?,?,?,?,?,?,?,?,expression_data_seq.nextval)";
+                "VALUES(?,?,?,?,?,?,?,?,?,?,nextval('expression_data_seq'))";
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
             new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
