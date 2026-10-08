@@ -16,7 +16,7 @@ import java.util.List;
 public class ReferenceDAO extends AbstractDAO {
 
     public List<Reference> getActiveReferences() throws Exception {
-        String query = "SELECT ref.*, r.species_type_key FROM references ref, rgd_ids r " +
+        String query = "SELECT ref.*, r.species_type_key FROM \"references\" ref, rgd_ids r " +
                 "where r.OBJECT_STATUS='ACTIVE' and ref.RGD_ID=r.RGD_ID";
         return executeRefQuery(query);
     }
@@ -30,9 +30,9 @@ public class ReferenceDAO extends AbstractDAO {
 
     public List<Reference> getActiveReferences(String keywords, String author, int year) throws Exception {
 
-        String query = "SELECT r.*, i.species_type_key FROM references r, rgd_ids i " +
+        String query = "SELECT r.*, i.species_type_key FROM \"references\" r, rgd_ids i " +
                 "WHERE r.rgd_id=i.rgd_id AND r.ref_key IN ( " +
-                "SELECT distinct(r.ref_key) FROM references r, rgd_ref_author k, rgd_ids rgd, authors a " +
+                "SELECT distinct(r.ref_key) FROM \"references\" r, rgd_ref_author k, rgd_ids rgd, authors a " +
                 "where r.ref_key=k.ref_key and k.author_key=a.author_key and r.rgd_id=rgd.rgd_id ";
 
         try {
@@ -87,7 +87,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public Reference getReferenceByRgdId(int rgdId) throws Exception {
 
-        String query = "SELECT ref.*, r.species_type_key FROM references ref, rgd_ids r "+
+        String query = "SELECT ref.*, r.species_type_key FROM \"references\" ref, rgd_ids r "+
                 "WHERE r.rgd_id=ref.rgd_id AND r.rgd_id=?";
 
         List<Reference> refs = executeRefQuery(query, rgdId);
@@ -102,7 +102,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public Reference getReferenceByDOI(String doi) throws Exception {
 
-        String query = "SELECT ref.*, r.species_type_key FROM references ref, rgd_ids r WHERE r.rgd_id=ref.rgd_id AND ref.DOI=?";
+        String query = "SELECT ref.*, r.species_type_key FROM \"references\" ref, rgd_ids r WHERE r.rgd_id=ref.rgd_id AND ref.DOI=?";
 
         List<Reference> refs = executeRefQuery(query, doi);
         return refs.isEmpty() ? null : refs.get(0);
@@ -116,7 +116,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public int getReferenceRgdIdByDOI(String doi) throws Exception {
 
-        String query = "SELECT r.rgd_id FROM references r WHERE r.DOI=?";
+        String query = "SELECT r.rgd_id FROM \"references\" r WHERE r.DOI=?";
         List<Integer> refRgdIds = IntListQuery.execute(this, query, doi);
         return refRgdIds.isEmpty() ? 0 : refRgdIds.get(0);
     }
@@ -131,7 +131,7 @@ public class ReferenceDAO extends AbstractDAO {
     public Reference getReferenceByPubmedId(String pmid) throws Exception {
 
         String query = "SELECT ref.*, r.species_type_key \n" +
-                "FROM references ref, rgd_acc_xdb x, rgd_ids r \n" +
+                "FROM \"references\" ref, rgd_acc_xdb x, rgd_ids r \n" +
                 "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
                 " AND x.rgd_id=ref.rgd_id AND x.acc_id=?\n" +
                 " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
@@ -149,7 +149,7 @@ public class ReferenceDAO extends AbstractDAO {
     public int getReferenceRgdIdByPubmedId(String pmid) throws Exception {
 
         String query = "SELECT MAX(ref.rgd_id) \n" +
-            "FROM references ref, rgd_acc_xdb x, rgd_ids r \n" +
+            "FROM \"references\" ref, rgd_acc_xdb x, rgd_ids r \n" +
             "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
             " AND x.rgd_id=ref.rgd_id AND x.acc_id=?\n" +
             " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'";
@@ -192,7 +192,7 @@ public class ReferenceDAO extends AbstractDAO {
     public List<Reference> getReferencesForObject(int rgdId) throws Exception {
 
         String query = "SELECT ref.*, r.species_type_key "+
-                "FROM references ref, rgd_ids r, rgd_ref_rgd_id rid "+
+                "FROM \"references\" ref, rgd_ids r, rgd_ref_rgd_id rid "+
                 "WHERE r.rgd_id=ref.rgd_id AND rid.ref_key=ref.ref_key AND rid.RGD_ID=?";
 
         return executeRefQuery(query, rgdId);
@@ -207,7 +207,7 @@ public class ReferenceDAO extends AbstractDAO {
     public int getReferenceCountForObject(int rgdId) throws Exception {
 
         String query = "SELECT COUNT(ref.rgd_id) "+
-                "FROM references ref, rgd_ids r, rgd_ref_rgd_id rid "+
+                "FROM \"references\" ref, rgd_ids r, rgd_ref_rgd_id rid "+
                 "WHERE r.rgd_id=ref.rgd_id AND rid.ref_key=ref.ref_key AND rid.rgd_id=?";
         return getCount(query, rgdId);
     }
@@ -221,7 +221,7 @@ public class ReferenceDAO extends AbstractDAO {
     public List<Integer> getReferenceRgdIdsForObject(int rgdId) throws Exception {
 
         String query = "SELECT ref.rgd_id "+
-                "FROM references ref, rgd_ids r, rgd_ref_rgd_id rid "+
+                "FROM \"references\" ref, rgd_ids r, rgd_ref_rgd_id rid "+
                 "WHERE r.rgd_id=ref.rgd_id AND rid.ref_key=ref.ref_key AND rid.rgd_id=?";
 
         return IntListQuery.execute(this, query, rgdId);
@@ -235,7 +235,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public Reference getReferenceByKey(int key) throws Exception {
 
-        String query = "SELECT ref.*, r.species_type_key FROM references ref, rgd_ids r "+
+        String query = "SELECT ref.*, r.species_type_key FROM \"references\" ref, rgd_ids r "+
                 "WHERE r.rgd_id=ref.rgd_id AND ref.ref_key=?";
 
         List<Reference> refs = executeRefQuery(query, key);
@@ -254,7 +254,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public int getReferenceRgdIdByKey(int refKey) throws Exception {
 
-        String query = "SELECT rgd_id FROM references WHERE ref_key=?";
+        String query = "SELECT rgd_id FROM \"references\" WHERE ref_key=?";
         List<Integer> refRgdIds = IntListQuery.execute(this, query, refKey);
         return refRgdIds.isEmpty() ? 0 : refRgdIds.get(0);
     }
@@ -267,7 +267,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public List<Reference> getReferencesByKeyList(List<Integer> keys) throws Exception {
 
-        String query = "SELECT ref.*, r.species_type_key FROM references ref, rgd_ids r "+
+        String query = "SELECT ref.*, r.species_type_key FROM \"references\" ref, rgd_ids r "+
                 "WHERE r.rgd_id=ref.rgd_id AND ref.ref_key IN("+ Utils.concatenate(keys,",")+")";
         return executeRefQuery(query);
     }
@@ -293,7 +293,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public int updateReference(Reference ref) throws Exception{
 
-        String sql = "update References set REF_KEY=?, TITLE=?, EDITORS=?, " +
+        String sql = "update \"references\" set REF_KEY=?, TITLE=?, EDITORS=?, " +
                 "PUBLICATION=?, VOLUME=?, ISSUE=?, PAGES=?, PUB_STATUS=?, PUB_DATE=?, NOTES=?, REFERENCE_TYPE=?, CITATION=?, " +
                 "ABSTRACT=?, PUBLISHER=?, PUBLISHER_CITY=?, URL_WEB_REFERENCE=?, DOI=? where RGD_ID=?";
 
@@ -308,7 +308,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public int insertReference(Reference ref) throws Exception{
 
-        String sql = "INSERT INTO references (REF_KEY, TITLE, EDITORS, " +
+        String sql = "INSERT INTO \"references\" (REF_KEY, TITLE, EDITORS, " +
                 "PUBLICATION, VOLUME, ISSUE, PAGES, PUB_STATUS, PUB_DATE, NOTES, REFERENCE_TYPE, CITATION, " +
                 "ABSTRACT, PUBLISHER, PUBLISHER_CITY, URL_WEB_REFERENCE, DOI, RGD_ID) values " +
                 "(?,?,?, ?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?)";
@@ -343,7 +343,7 @@ public class ReferenceDAO extends AbstractDAO {
      * @throws Exception
      */
     public List<Reference> getAllReferencesByReferenceType(String referenceType) throws Exception {
-        String query = "select r.*, s.species_type_key from REFERENCES r, rgd_ids s where r.REFERENCE_TYPE=? and r.rgd_id=s.rgd_id";
+        String query = "select r.*, s.species_type_key from \"references\" r, rgd_ids s where r.REFERENCE_TYPE=? and r.rgd_id=s.rgd_id";
         return executeRefQuery(query, referenceType);
     }
 
@@ -357,10 +357,10 @@ public class ReferenceDAO extends AbstractDAO {
     public Author findAuthor(Author auth) throws Exception{
 
         String sql = "SELECT * FROM authors "+
-                "WHERE NVL(author_lname,'*')=NVL(?,'*')"+
-                " AND NVL(author_fname,'*')=NVL(?,'*')"+
-                " AND NVL(author_suffix,'*')=NVL(?,'*')"+
-                " AND NVL(author_iname,'*')=NVL(?,'*')";
+                "WHERE COALESCE(NULLIF(author_lname,''),'*')=COALESCE(NULLIF(?,''),'*')"+
+                " AND COALESCE(NULLIF(author_fname,''),'*')=COALESCE(NULLIF(?,''),'*')"+
+                " AND COALESCE(NULLIF(author_suffix,''),'*')=COALESCE(NULLIF(?,''),'*')"+
+                " AND COALESCE(NULLIF(author_iname,''),'*')=COALESCE(NULLIF(?,''),'*')";
 
         AuthorQuery q = new AuthorQuery(this.getDataSource(), sql);
         List<Author> authors = execute(q, auth.getLastName(), auth.getFirstName(), auth.getSuffix(), auth.getInitials());
@@ -415,7 +415,7 @@ public class ReferenceDAO extends AbstractDAO {
      */
     public int insertRefAuthorAssociation(int refKey, int authorKey, int authorOrder) throws Exception{
         String sql =
-                "INSERT INTO rgd_ref_author (ref_key, author_key, author_order) SELECT ?,?,? FROM dual "+
+                "INSERT INTO rgd_ref_author (ref_key, author_key, author_order) SELECT ?,?,? "+
                         "WHERE NOT EXISTS (SELECT 1 FROM rgd_ref_author WHERE ref_key=? AND author_key=? AND author_order=?)";
         return update(sql, refKey, authorKey, authorOrder, refKey, authorKey, authorOrder);
     }
