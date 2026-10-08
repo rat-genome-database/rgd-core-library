@@ -33,7 +33,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
         r.setId(id);
 
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-                +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, study_control, last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
+                +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, study_control, last_modified_date) VALUES(?,?,?,?,?,?,?,?,LOCALTIMESTAMP)";
         char studyCtrl = r.getStudyControl()?'Y':'N';
         update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
                 r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(),studyCtrl);
@@ -42,7 +42,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
     public void updateGeneExpressionRecord(GeneExpressionRecord r) throws Exception {
         String sql = "update gene_expression_exp_record set experiment_id=?, sample_id=?, last_modified_by=?, curation_status=?," +
-                "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, STUDY_CONTROL=?, last_modified_date = SYSTIMESTAMP where gene_expression_exp_record_id=?";
+                "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, STUDY_CONTROL=?, last_modified_date = LOCALTIMESTAMP where gene_expression_exp_record_id=?";
         char studyCtrl = r.getStudyControl()?'Y':'N';
         update(sql, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
                 r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(), studyCtrl, r.getId());
@@ -118,9 +118,6 @@ public class GeneExpressionDAO extends PhenominerDAO {
      * Returns the distinct studies that have gene expression values for any of the
      * supplied expressed-object RGD IDs on the given map (assembly).
      * Studies with no matching expression values are excluded.
-     * <p>
-     * Note: Oracle limits IN-list expressions to 1000; if more IDs are passed,
-     * only the first 999 are used.
      *
      * @param expressedObjectRgdIds list of expressed-object RGD IDs (typically gene RGD IDs)
      * @param mapKey assembly map key to restrict gene_expression_values.map_key
@@ -129,9 +126,6 @@ public class GeneExpressionDAO extends PhenominerDAO {
     public List<Study> getStudiesWithExpressionForObjects(List<Integer> expressedObjectRgdIds, int mapKey) throws Exception {
         if (expressedObjectRgdIds == null || expressedObjectRgdIds.isEmpty()) {
             return Collections.emptyList();
-        }
-        if (expressedObjectRgdIds.size() > 1000) {
-            expressedObjectRgdIds = expressedObjectRgdIds.subList(0, 999);
         }
         StringBuilder ids = new StringBuilder();
         for (int i = 0; i < expressedObjectRgdIds.size(); i++) {
@@ -350,8 +344,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
      */
     public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneBySlim(int rgdId,String unit,String level,String termAcc) throws Exception {
         String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
-                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
-                " CONNECT BY PRIOR child_term_acc=parent_term_acc ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
+                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?" +
+                " UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
                 " and ge.expression_level=? order by ge.gene_expression_exp_record_id";
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
@@ -364,8 +358,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
      */
     public List<GeneExpressionRecordValue> getGeneExprRecordValuesForGeneByTermRgdIdUnit(int rgdId,String unit,String termAcc) throws Exception {
         String query = "select ge.* FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
-                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
-                " CONNECT BY PRIOR child_term_acc=parent_term_acc ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
+                " join sample s on s.sample_id = gr.sample_id join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?" +
+                " UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d ) AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?" +
                 " order by ge.gene_expression_exp_record_id";
 
         GeneExpressionRecordValueQuery q = new GeneExpressionRecordValueQuery(getDataSource(), query);
@@ -376,8 +370,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String sql ="select * from gene_expression_exp_record where gene_expression_exp_record_id in (" +
                 " select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id" +
                 " join sample s on s.sample_id = gr.sample_id" +
-                " join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?" +
-                " CONNECT BY PRIOR child_term_acc=parent_term_acc )" +
+                " join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?" +
+                " UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d )" +
                 " AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit =?)";
         GeneExpressionRecordQuery q = new GeneExpressionRecordQuery(getDataSource(),sql);
         return execute(q,termAcc, rgdId, unit);
@@ -391,14 +385,13 @@ public class GeneExpressionDAO extends PhenominerDAO {
                                 select distinct(experiment_id) from gene_expression_exp_record where gene_expression_exp_record_id in (
                                         select ge.gene_expression_exp_record_id FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
                                         join sample s on s.sample_id = gr.sample_id
-                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc= ?
-                                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc= ?
+                                        UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d )
                                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id = ? and ge.expression_unit = ?
                                 )
                         ) AND er.sample_id=s.sample_id
                         AND e.experiment_id = er.experiment_id
-                        AND st.study_id=e.study_id
-                        ORDER BY er.gene_expression_exp_record_id DESC""";
+                        AND st.study_id=e.study_id""";
         return getCount(sql,termAcc,rgdId,unit);
     }
 
@@ -433,10 +426,10 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = """
                 select ge.*,gr.*,s.*, st.study_id, st.ref_rgd_id, st.GEO_SERIES_ACC from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t
                         where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
-                        t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?
-                            CONNECT BY PRIOR child_term_acc = parent_term_acc
+                        t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?
+                            UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d
                             UNION
-                            SELECT ? FROM dual )
+                            SELECT ? )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ? and gr.experiment_id=e.experiment_id and e.study_id=st.study_id order by ge.map_key desc""";
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,termAcc, termAcc,rgdId,unit);
@@ -446,8 +439,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = """
                 select ge.*,gr.*,s.*, st.study_id, st.ref_rgd_id, st.GEO_SERIES_ACC from gene_expression_values ge, gene_expression_exp_record gr, sample s, experiment e, study st, ont_terms t
                         where ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id and s.sample_id = gr.sample_id and t.term_acc = s.tissue_ont_id and
-                        t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?
-                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?
+                        UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit = ? and gr.experiment_id=e.experiment_id and e.study_id=st.study_id order by ge.map_key desc""";
         GeneExpressionQuery q = new GeneExpressionQuery(getDataSource(),query);
         return execute(q,termAcc,rgdId,unit);
@@ -638,10 +631,10 @@ public class GeneExpressionDAO extends PhenominerDAO {
                 select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
                         join sample s on s.sample_id = gr.sample_id
                         join ont_terms t on t.term_acc = s.tissue_ont_id where
-                        t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?
-                            CONNECT BY PRIOR child_term_acc = parent_term_acc
+                        t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?
+                            UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d
                             UNION
-                            SELECT ? FROM dual )
+                            SELECT ? )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
         return getCount(query, termAcc, termAcc, rgdId, unit);
     }
@@ -649,8 +642,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = """
                 select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
                         join sample s on s.sample_id = gr.sample_id
-                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
-                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\s
+                        UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=?""";
         return getCount(query, termAcc, rgdId, unit);
     }
@@ -659,8 +652,8 @@ public class GeneExpressionDAO extends PhenominerDAO {
         String query = """
                 select count(*) FROM gene_expression_values ge join gene_expression_exp_record gr on ge.gene_expression_exp_record_id = gr.gene_expression_exp_record_id
                         join sample s on s.sample_id = gr.sample_id
-                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(SELECT child_term_acc FROM ont_dag START WITH parent_term_acc=?\s
-                        CONNECT BY PRIOR child_term_acc=parent_term_acc )
+                        join ont_terms t on t.term_acc = s.tissue_ont_id where  t.term_acc IN(WITH RECURSIVE d(child_term_acc) AS (SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\s
+                        UNION SELECT od.child_term_acc FROM ont_dag od JOIN d ON od.parent_term_acc=d.child_term_acc) SELECT child_term_acc FROM d )
                         AND t.is_obsolete=0 and ge.expressed_object_rgd_id=? and ge.expression_unit=? and ge.expression_level=?""";
         return getCount(query, termAcc, rgdId, unit, level);
     }
@@ -697,7 +690,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
     public int insertGeneExpressionValueCountBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
-                "insert into gene_expression_value_counts (VALUE_COUNT, EXPRESSED_OBJECT_RGD_ID, TERM_ACC, EXPRESSION_UNIT, EXPRESSION_LEVEL, LAST_MODIFIED_DATE) values (?,?,?,?,?,SYSDATE)",
+                "insert into gene_expression_value_counts (VALUE_COUNT, EXPRESSED_OBJECT_RGD_ID, TERM_ACC, EXPRESSION_UNIT, EXPRESSION_LEVEL, LAST_MODIFIED_DATE) values (?,?,?,?,?,LOCALTIMESTAMP(0))",
                 new int[]{Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
         for (GeneExpressionValueCount vc : valueCounts){
             su.update(vc.getValueCnt(),vc.getExpressedRgdId(),vc.getTermAcc(),vc.getUnit(),vc.getLevel());
@@ -707,7 +700,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
 
     public int UpdateGeneExpressionValueCountBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
-                "UPDATE gene_expression_value_counts set VALUE_COUNT=?, LAST_MODIFIED_DATE=SYSDATE "+
+                "UPDATE gene_expression_value_counts set VALUE_COUNT=?, LAST_MODIFIED_DATE=LOCALTIMESTAMP(0) "+
                         "where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=? ",
                 new int[]{Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
         for (GeneExpressionValueCount vc : valueCounts){
@@ -717,7 +710,7 @@ public class GeneExpressionDAO extends PhenominerDAO {
     }
     public int UpdateGeneExpressionValueLastModifiedBatch(List<GeneExpressionValueCount> valueCounts) throws Exception{
         BatchSqlUpdate su = new BatchSqlUpdate(DataSourceFactory.getInstance().getDataSource(),
-                "UPDATE gene_expression_value_counts set LAST_MODIFIED_DATE=SYSDATE "+
+                "UPDATE gene_expression_value_counts set LAST_MODIFIED_DATE=LOCALTIMESTAMP(0) "+
                         "where EXPRESSED_OBJECT_RGD_ID=? and TERM_ACC=? and EXPRESSION_UNIT=? and EXPRESSION_LEVEL=? ",
                 new int[]{Types.INTEGER,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR});
         for (GeneExpressionValueCount vc : valueCounts){
