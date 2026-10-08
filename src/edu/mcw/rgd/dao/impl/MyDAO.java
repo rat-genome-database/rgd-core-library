@@ -514,7 +514,7 @@ public class MyDAO extends AbstractDAO {
         su.declareParameter(new SqlParameter(Types.VARCHAR)); // last modified date
         su.declareParameter(new SqlParameter(Types.VARCHAR)); // last modified date
         su.declareParameter(new SqlParameter(Types.TIMESTAMP)); // study_type
-        su.declareParameter(new SqlParameter(Types.CLOB)); // study_url
+        su.declareParameter(new SqlParameter(Types.VARCHAR)); // message (text column; PgJDBC does not implement setClob(int,Reader,long))
 
         su.compile();
 
