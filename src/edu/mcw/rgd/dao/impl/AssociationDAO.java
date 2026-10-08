@@ -83,7 +83,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String getRelQTLString =
             "select id.species_type_key, t.QTL_REL_DESC, ref.rgd_id REFRGDID,q1.RGD_ID QTLRGDID, q1.QTL_SYMBOL" +
-            " from related_qtls r, qtls q, QTL_REL_TYPES t, references ref, qtls q1, RGD_IDS id" +
+            " from related_qtls r, qtls q, QTL_REL_TYPES t, \"references\" ref, qtls q1, RGD_IDS id" +
             " where (" +
             " (r.qtl_key1=q.qtl_key OR r.qtl_key2=q.qtl_key)" +
             " and r.qtl_rel_type_key = t.qtl_rel_type_key" +
@@ -430,7 +430,7 @@ public class AssociationDAO extends AbstractDAO {
      */
     public List<Integer> getObjectsAssociatedWithReference(int refRgdId) throws Exception {
 
-        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, references rf "+
+        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, \"references\" rf "+
                 "WHERE rf.rgd_id=? AND rf.ref_key=r.ref_key AND rs.rgd_id=r.rgd_id AND rs.object_status='ACTIVE'";
 
         return IntListQuery.execute(this, query, refRgdId);
@@ -446,7 +446,7 @@ public class AssociationDAO extends AbstractDAO {
      */
     public List<Integer> getObjectsAssociatedWithReference(int refRgdId, int objectKey) throws Exception {
 
-        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, references rf "+
+        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, \"references\" rf "+
                 "WHERE rf.rgd_id=? AND rf.ref_key=r.ref_key AND rs.rgd_id=r.rgd_id AND rs.object_status='ACTIVE' AND rs.object_key=?";
 
         return IntListQuery.execute(this, query, refRgdId, objectKey);
@@ -466,7 +466,7 @@ public class AssociationDAO extends AbstractDAO {
         if( speciesTypeKey==0 )
             return getObjectsAssociatedWithReference(refRgdId, objectKey);
 
-        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, references rf "+
+        String query = "SELECT r.rgd_id FROM rgd_ref_rgd_id r, rgd_ids rs, \"references\" rf "+
                 "WHERE rf.rgd_id=? AND rf.ref_key=r.ref_key AND rs.rgd_id=r.rgd_id AND rs.object_status='ACTIVE' "+
                 "AND rs.object_key=? AND rs.species_type_key=?";
 
@@ -484,7 +484,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String sql =
         "SELECT rs.species_type_key,rs.object_status,rs.object_key,v.* "+
-        "FROM rgd_ref_rgd_id r, rgd_ids rs, references rf,genomic_elements_view v "+
+        "FROM rgd_ref_rgd_id r, rgd_ids rs, \"references\" rf,genomic_elements_view v "+
         "WHERE rf.rgd_id=? "+
         "AND rf.ref_key=r.ref_key AND rs.rgd_id=r.rgd_id AND rs.object_status='ACTIVE' "+
         "AND rs.rgd_id=v.rgd_id ";
@@ -533,7 +533,7 @@ public class AssociationDAO extends AbstractDAO {
      */
     public int insertReferenceAssociationByKey(int refKey, int objectRgdId) throws Exception{
 
-        String sql = "INSERT INTO rgd_ref_rgd_id (ref_key, rgd_id) SELECT ?,? FROM dual "+
+        String sql = "INSERT INTO rgd_ref_rgd_id (ref_key, rgd_id) SELECT ?,? "+
                 "WHERE NOT EXISTS (SELECT 1 FROM rgd_ref_rgd_id WHERE ref_key=? AND rgd_id=?)";
 
         return update(sql, refKey, objectRgdId, refKey, objectRgdId);
@@ -611,7 +611,7 @@ public class AssociationDAO extends AbstractDAO {
      */
     public int associateGeneWithSslp(int geneKey, int sslpKey, String srcPipeline) throws Exception{
 
-        String sql = "INSERT INTO rgd_gene_sslp (gene_key, sslp_key, src_pipeline) SELECT ?,?,? FROM dual "+
+        String sql = "INSERT INTO rgd_gene_sslp (gene_key, sslp_key, src_pipeline) SELECT ?,?,? "+
                 "WHERE NOT EXISTS (SELECT 1 FROM rgd_gene_sslp WHERE gene_key=? AND sslp_key=? AND src_pipeline=?)";
         return update(sql, geneKey, sslpKey, srcPipeline, geneKey, sslpKey, srcPipeline);
     }
@@ -660,7 +660,7 @@ public class AssociationDAO extends AbstractDAO {
 
         String sql = "INSERT INTO rgd_associations (assoc_key, assoc_type, assoc_subtype, master_rgd_id, detail_rgd_id," +
                             "creation_date, src_pipeline) " +
-                "SELECT ?,?,?,?,?,SYSDATE,? FROM dual " +
+                "SELECT ?,?,?,?,?,LOCALTIMESTAMP(0),? " +
                 "WHERE NOT EXISTS(SELECT 1 FROM rgd_associations WHERE assoc_type=? AND master_rgd_id=? AND detail_rgd_id=?)";
 
         assoc.setAssocKey(this.getNextKeyFromSequence("rgd_associations_seq"));
