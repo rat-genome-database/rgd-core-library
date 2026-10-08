@@ -329,7 +329,7 @@ public class StrainDAO extends AbstractDAO {
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1,strainId);
         stmt.setString(2,type);
-        stmt.setBlob(3,data);
+        stmt.setBinaryStream(3,data);
         stmt.setString(4,contentType);
         stmt.setString(5,fileName);
         stmt.setString(6,login);
@@ -339,10 +339,10 @@ public class StrainDAO extends AbstractDAO {
     }
     public void updateStrainAttachment(int strainId,String type,InputStream data,String contentType,String fileName,String login) throws Exception{
 
-        String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ?,last_modified_date = sysdate where strain_id = ? and file_type= ? ";
+        String sql = "update strain_files set file_data =?,content_type=?,file_name=?,modified_by = ?,last_modified_date = LOCALTIMESTAMP(0) where strain_id = ? and file_type= ? ";
         Connection conn = this.getDataSource().getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setBlob(1,data);
+        stmt.setBinaryStream(1,data);
         stmt.setString(2,contentType);
         stmt.setString(3,fileName);
         stmt.setString(4,login);
@@ -369,8 +369,8 @@ public class StrainDAO extends AbstractDAO {
         stmt.setString(2,type);
         rs = stmt.executeQuery();
         while (rs.next()) {
-            Blob data = rs.getBlob("file_data");
-            return data;
+            byte[] bytes = rs.getBytes("file_data");
+            return bytes==null ? null : new javax.sql.rowset.serial.SerialBlob(bytes);
         }
         rs.close();
         stmt.close();
