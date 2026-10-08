@@ -30,7 +30,7 @@ public class SubmittedStrainAvailablityDAO extends AbstractDAO {
     }
 
     public int delete(int submitted_strain_key) throws Exception{
-        String sql= "delete submitted_strain_availability where submitted_strain_key=?";
+        String sql= "delete from submitted_strain_availability where submitted_strain_key=?";
         return update(sql, submitted_strain_key);
     }
 }
