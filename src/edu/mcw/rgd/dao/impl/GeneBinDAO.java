@@ -55,7 +55,7 @@ public class GeneBinDAO extends AbstractDAO {
      */
     public int insertGeneInBin(int rgdId, String geneSymbol, String term, String termAcc, String childTermAcc, String sessionId) throws Exception {
         if(!this.existsGene(rgdId, geneSymbol, sessionId)){
-            String INSERT_GENE = "insert into GENEBIN(RGD_ID, GENE_SYMBOL, TERM, TERM_ACC, CHILD_TERM_ACC, SESSION_ID) values (?,?,?,?,?,?)";
+            String INSERT_GENE = "insert into GENEBIN(RGD_ID, GENE_SYMBOL, TERM, TERM_ACC, CHILD_TERM_ACC, SESSION_ID) values (?,?,?,?,NULLIF(?, ''),?)";
             return update(INSERT_GENE, rgdId, geneSymbol, term, termAcc, childTermAcc, sessionId);
         }
         return 0;
