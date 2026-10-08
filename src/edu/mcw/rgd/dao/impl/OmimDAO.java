@@ -27,12 +27,12 @@ public class OmimDAO extends AbstractDAO {
     }
 
     public void insertOmim( Omim omim ) throws Exception {
-        String sql = "INSERT INTO omim (mim_number,phenotype,created_date,status,mim_type,last_modified_date) VALUES(?,?,SYSDATE,?,?,SYSDATE)";
+        String sql = "INSERT INTO omim (mim_number,phenotype,created_date,status,mim_type,last_modified_date) VALUES(?,?,LOCALTIMESTAMP(0),?,?,LOCALTIMESTAMP(0))";
         update(sql, omim.getMimNumber(), omim.getPhenotype(), omim.getStatus(), omim.getMimType());
     }
 
     public void updateOmim( Omim omim ) throws Exception {
-        String sql = "UPDATE omim SET phenotype=?,status=?,mim_type=?,last_modified_date=SYSDATE WHERE mim_number=?";
+        String sql = "UPDATE omim SET phenotype=?,status=?,mim_type=?,last_modified_date=LOCALTIMESTAMP(0) WHERE mim_number=?";
         update(sql, omim.getPhenotype(), omim.getStatus(), omim.getMimType(), omim.getMimNumber());
     }
 
@@ -65,7 +65,7 @@ public class OmimDAO extends AbstractDAO {
     public List<String> getPhenotypicSeriesIdsNotInRgd() throws Exception {
         String sql = """
             SELECT phenotypic_series_number FROM omim_phenotypic_series
-            MINUS
+            EXCEPT
             SELECT synonym_name FROM ont_synonyms WHERE term_acc like 'DOID:%' AND synonym_name like 'MIM:PS%'
             """;
         return StringListQuery.execute(this, sql);
