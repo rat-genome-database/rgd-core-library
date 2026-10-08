@@ -83,7 +83,7 @@ public class RGDUserDAO extends AbstractDAO {
     public RGDUser insertRGDUser() throws Exception {
 
         //get the sequence
-        String query = "select rgd_user_seq.NEXTVAL from dual";
+        String query = "select nextval('rgd_user_seq')";
         JdbcTemplate jt = new JdbcTemplate(getDataSource());
         int userKey = jt.queryForObject(query,Integer.class);
 
@@ -98,7 +98,7 @@ public class RGDUserDAO extends AbstractDAO {
 
     public int insertRGDUserList(int userId, int objectType, int mapKey, String listName, List<Integer> rgdIds) throws Exception {
 
-        String query = "select rgd_user_list_seq.NEXTVAL from dual";
+        String query = "select nextval('rgd_user_list_seq')";
         JdbcTemplate jt = new JdbcTemplate(getDataSource());
         int userListKey = jt.queryForObject(query,Integer.class);
 
