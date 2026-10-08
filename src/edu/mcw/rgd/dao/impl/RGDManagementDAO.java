@@ -39,7 +39,7 @@ public class RGDManagementDAO extends AbstractDAO {
     }
 
     private void changeStatus(Identifiable obj, String status) throws Exception {
-        String sql = "UPDATE rgd_ids SET object_status=?, last_modified_date=SYSDATE WHERE rgd_id=?";
+        String sql = "UPDATE rgd_ids SET object_status=?, last_modified_date=LOCALTIMESTAMP(0) WHERE rgd_id=?";
         update(sql, status, obj.getRgdId());
     }
 
@@ -53,7 +53,7 @@ public class RGDManagementDAO extends AbstractDAO {
      */
     public void recordIdHistory(int fromRgdId, int toRgdId) throws Exception {
 
-        String sql = "INSERT INTO rgd_id_history (history_key, old_rgd_id, new_rgd_id, last_modified_date, created_date) VALUES (?,?,?,SYSDATE,SYSDATE)";
+        String sql = "INSERT INTO rgd_id_history (history_key, old_rgd_id, new_rgd_id, last_modified_date, created_date) VALUES (?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0))";
         update(sql, getNextKey("rgd_id_history", "history_key"), fromRgdId, toRgdId);
     }
 
@@ -77,7 +77,11 @@ public class RGDManagementDAO extends AbstractDAO {
      */
     public List<Integer> getOldRgdIds(int rgdId) throws Exception {
 
-        String sql = "SELECT DISTINCT old_rgd_id FROM rgd_id_history START WITH new_rgd_id=? CONNECT BY PRIOR old_rgd_id=new_rgd_id";
+        String sql = "WITH RECURSIVE h AS ("+
+                " SELECT old_rgd_id, new_rgd_id FROM rgd_id_history WHERE new_rgd_id=?"+
+                " UNION"+
+                " SELECT r.old_rgd_id, r.new_rgd_id FROM rgd_id_history r JOIN h ON r.new_rgd_id=h.old_rgd_id"+
+                ") SELECT DISTINCT old_rgd_id FROM h";
         return IntListQuery.execute(this, sql, rgdId);
     }
 
@@ -367,7 +371,7 @@ public class RGDManagementDAO extends AbstractDAO {
      * @throws Exception when unexpected error in spring framework occurs
      */
     public void updateLastModifiedDate(int rgdId) throws Exception {
-        String sql = "update rgd_ids set last_modified_date=SYSDATE where rgd_id=?";
+        String sql = "update rgd_ids set last_modified_date=LOCALTIMESTAMP(0) where rgd_id=?";
         update(sql, rgdId);
     }
 
