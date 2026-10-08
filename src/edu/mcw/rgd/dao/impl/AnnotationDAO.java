@@ -66,12 +66,12 @@ public class AnnotationDAO extends AbstractDAO {
         String query = """
             SELECT * FROM full_annot
             WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
-             AND NVL(ref_rgd_id,0) = NVL(?,0)
-             AND NVL(with_info,'*') = NVL(?,'*')
-             AND NVL(qualifier,'*') = NVL(?,'*')
-             AND NVL(xref_source,'*') = NVL(?,'*')
-             AND NVL(qualifier2,'*') = NVL(?,'*')
-             AND NVL(associated_with,'*') = NVL(?,'*')
+             AND COALESCE(ref_rgd_id,0) = COALESCE(?,0)
+             AND COALESCE(with_info,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier,'*') = COALESCE(?,'*')
+             AND COALESCE(xref_source,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier2,'*') = COALESCE(?,'*')
+             AND COALESCE(associated_with,'*') = COALESCE(?,'*')
             """;
 
         List<Annotation> list = executeAnnotationQuery(query, annot.getTermAcc(), annot.getAnnotatedObjectRgdId(),
@@ -93,12 +93,12 @@ public class AnnotationDAO extends AbstractDAO {
         String query = """
             SELECT a.full_annot_key,notes FROM full_annot a
             WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
-             AND NVL(ref_rgd_id,0) = NVL(?,0)
-             AND NVL(with_info,'*') = NVL(?,'*')
-             AND NVL(qualifier,'*') = NVL(?,'*')
-             AND NVL(xref_source,'*') = NVL(?,'*')
-             AND NVL(qualifier2,'*') = NVL(?,'*')
-             AND NVL(associated_with,'*') = NVL(?,'*')
+             AND COALESCE(ref_rgd_id,0) = COALESCE(?,0)
+             AND COALESCE(with_info,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier,'*') = COALESCE(?,'*')
+             AND COALESCE(xref_source,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier2,'*') = COALESCE(?,'*')
+             AND COALESCE(associated_with,'*') = COALESCE(?,'*')
             """;
 
         List<IntStringMapQuery.MapPair> results = IntStringMapQuery.execute(this, query, annot.getTermAcc(),
@@ -120,12 +120,12 @@ public class AnnotationDAO extends AbstractDAO {
         String query = """
             SELECT full_annot_key FROM full_annot
             WHERE term_acc=? AND annotated_object_rgd_id=? AND evidence=?
-             AND NVL(ref_rgd_id,0) = NVL(?,0)
-             AND NVL(with_info,'*') = NVL(?,'*')
-             AND NVL(qualifier,'*') = NVL(?,'*')
-             AND NVL(xref_source,'*') = NVL(?,'*')
-             AND NVL(qualifier2,'*') = NVL(?,'*')
-             AND NVL(associated_with,'*') = NVL(?,'*')
+             AND COALESCE(ref_rgd_id,0) = COALESCE(?,0)
+             AND COALESCE(with_info,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier,'*') = COALESCE(?,'*')
+             AND COALESCE(xref_source,'*') = COALESCE(?,'*')
+             AND COALESCE(qualifier2,'*') = COALESCE(?,'*')
+             AND COALESCE(associated_with,'*') = COALESCE(?,'*')
             """;
 
         List<Integer> list = IntListQuery.execute(this, query, annot.getTermAcc(), annot.getAnnotatedObjectRgdId(),
@@ -209,9 +209,11 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getChildAnnotations(int rgdId, String termAcc) throws Exception {
         String query = "SELECT a.* FROM full_annot a\n" +
                 "WHERE a.annotated_object_rgd_id=? AND term_acc IN(\n" +
-                "  SELECT child_term_acc FROM ont_dag\n" +
-                "  START WITH parent_term_acc=?\n" +
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc\n" +
+                "  WITH RECURSIVE d(acc) AS (\n" +
+                "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                "    UNION\n" +
+                "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                "  ) SELECT acc FROM d\n" +
                 ")\n" +
                 "ORDER BY term,qualifier";
         return executeAnnotationQuery(query, rgdId, termAcc);
@@ -226,11 +228,13 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getChildAnnotations(String termAcc) throws Exception {
         String query = "SELECT a.* FROM full_annot a\n" +
-                "WHERE term_acc IN(\n" +
-                "  SELECT child_term_acc FROM ont_dag\n" +
-                "  START WITH parent_term_acc=?\n" +
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc\n" +
-                ")\n" +
+                "WHERE term_acc = ANY(ARRAY(\n" +
+                "  WITH RECURSIVE d(acc) AS (\n" +
+                "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                "    UNION\n" +
+                "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                "  ) SELECT acc FROM d\n" +
+                "))\n" +
                 "ORDER BY term,qualifier";
         return executeAnnotationQuery(query, termAcc);
     }
@@ -343,7 +347,7 @@ public class AnnotationDAO extends AbstractDAO {
     }
 
     public int updateLastModified(int annotatedObjectRGDID, String evidence, String termAcc, int createdBy, String xrefSource) throws Exception{
-        String sql = "UPDATE full_annot SET last_modified_date=SYSDATE " +
+        String sql = "UPDATE full_annot SET last_modified_date=LOCALTIMESTAMP(0) " +
                 "WHERE annotated_object_rgd_id=? AND evidence=? AND term_acc=? AND created_by=? ";
 
         if (xrefSource == null) {
@@ -363,7 +367,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int updateLastModified(int fullAnnotKey) throws Exception{
 
-        String sql = "UPDATE full_annot SET last_modified_date=SYSDATE WHERE full_annot_key=?";
+        String sql = "UPDATE full_annot SET last_modified_date=LOCALTIMESTAMP(0) WHERE full_annot_key=?";
         return update(sql, fullAnnotKey);
     }
 
@@ -376,7 +380,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int updateLastModified(int fullAnnotKey, int lastModifiedBy) throws Exception{
 
-        String sql = "UPDATE full_annot SET last_modified_date=SYSDATE, last_modified_by=? WHERE full_annot_key=?";
+        String sql = "UPDATE full_annot SET last_modified_date=LOCALTIMESTAMP(0), last_modified_by=? WHERE full_annot_key=?";
         return update(sql, lastModifiedBy, fullAnnotKey);
     }
 
@@ -392,7 +396,7 @@ public class AnnotationDAO extends AbstractDAO {
             return 0;
         }
 
-        String sql = "UPDATE full_annot SET last_modified_date=SYSDATE " +
+        String sql = "UPDATE full_annot SET last_modified_date=LOCALTIMESTAMP(0) " +
                 "WHERE full_annot_key IN (" + Utils.buildInPhrase(fullAnnotKeys)+ " )";
         return update(sql);
     }
@@ -409,7 +413,7 @@ public class AnnotationDAO extends AbstractDAO {
             return 0;
         }
 
-        String sql = "UPDATE full_annot SET created_date=SYSDATE,last_modified_date=SYSDATE " +
+        String sql = "UPDATE full_annot SET created_date=LOCALTIMESTAMP(0),last_modified_date=LOCALTIMESTAMP(0) " +
                 "WHERE full_annot_key IN (" + Utils.buildInPhrase(fullAnnotKeys)+ " )";
         return update(sql);
     }
@@ -545,7 +549,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int deleteAnnotations(int createdBy, Date dt) throws Exception{
 
-        String sql = "DELETE FROM full_annot WHERE created_by=? AND last_modified_date<? AND ROWNUM<10000";
+        String sql = "DELETE FROM full_annot WHERE full_annot_key IN (SELECT full_annot_key FROM full_annot WHERE created_by=? AND last_modified_date<? FETCH FIRST 9999 ROWS ONLY)";
         int totalRowsAffected = 0, rowsAffected;
         do {
             rowsAffected = update(sql, createdBy, dt);
@@ -565,7 +569,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n"+
-                "FROM full_annot a,rgd_ids r, references ref \n"+
+                "FROM full_annot a,rgd_ids r, \"references\" ref \n"+
                 "WHERE ref_rgd_id=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
                 "AND a.ref_rgd_id=ref.rgd_id \n" +
@@ -577,7 +581,7 @@ public class AnnotationDAO extends AbstractDAO {
         List<Integer> refRgdIds = new ProjectDAO().getReferenceRgdIdsForProject(projectRgdId);
         String refRgdIdsStr = Utils.buildInPhrase(refRgdIds);
         String query = "SELECT a.*, r.species_type_key \n" +
-                "FROM full_annot a, rgd_ids r, references ref \n" +
+                "FROM full_annot a, rgd_ids r, \"references\" ref \n" +
                 "WHERE a.ref_rgd_id IN ("+ refRgdIdsStr + ") \n" +
                 "AND a.annotated_object_rgd_id = r.rgd_id \n" +
                 "AND a.ref_rgd_id = ref.rgd_id \n" +
@@ -597,7 +601,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReferenceSource(int refRgdId, String src) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n"+
-                "FROM full_annot a,rgd_ids r, references ref \n"+
+                "FROM full_annot a,rgd_ids r, \"references\" ref \n"+
                 "WHERE ref_rgd_id=? \n" +
                 "AND a.data_src=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
@@ -673,7 +677,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
-                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
+                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, \"references\" ref \n" +
                 "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "AND a.annotated_object_rgd_id=r.rgd_id \n" +
@@ -694,7 +698,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, String src) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
-                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
+                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, \"references\" ref \n" +
                 "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "AND a.data_src=? \n" +
@@ -716,7 +720,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, int objKey) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
-                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, references ref \n" +
+                "FROM full_annot a,rgd_ids r, ONTOLOGIES o, \"references\" ref \n" +
                 "WHERE a.ref_rgd_id=? \n" +
                 "and a.ASPECT=? \n" +
                 "and a.RGD_OBJECT_KEY=? \n" +
@@ -740,7 +744,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsByReference(int refRgdId, String aspect, int objKey, String src) throws Exception {
         String query = "SELECT a.*,r.species_type_key \n" +
-                "FROM full_annot a,rgd_ids r, ontologies o, references ref \n" +
+                "FROM full_annot a,rgd_ids r, ontologies o, \"references\" ref \n" +
                 "WHERE a.ref_rgd_id=? \n" +
                 "AND a.aspect=? \n" +
                 "and a.RGD_OBJECT_KEY=? \n" +
@@ -764,12 +768,12 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotationsWithMissingReferenceHardLinks(String refType) throws Exception {
 
-        String query = "SELECT a.* FROM full_annot a,references f\n" +
+        String query = "SELECT a.* FROM full_annot a,\"references\" f\n" +
                 "WHERE a.ref_rgd_id=f.rgd_id AND (f.ref_key,a.annotated_object_rgd_id) IN(\n" +
-                "SELECT f.ref_key,a.annotated_object_rgd_id rgd_id FROM full_annot a,references f,rgd_ids r\n" +
+                "SELECT f.ref_key,a.annotated_object_rgd_id rgd_id FROM full_annot a,\"references\" f,rgd_ids r\n" +
                 "WHERE a.ref_rgd_id=f.rgd_id AND r.rgd_id=f.rgd_id AND r.object_status='ACTIVE'\n" +
                 " AND f.reference_type=?\n" +
-                "MINUS\n" +
+                "EXCEPT\n" +
                 "SELECT rr.ref_key,rr.rgd_id FROM rgd_ref_rgd_id rr\n" +
                 ")\n";
         return executeAnnotationQuery(query, refType);
@@ -1038,26 +1042,26 @@ public class AnnotationDAO extends AbstractDAO {
                 // annotations for any species
                 String query = "SELECT a.*\n" +
                         " FROM full_annot a,rgd_ids r\n" +
-                        "WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND term_acc IN(\n" +
-                        "  select ? from dual\n" +
-                        "  union all\n" +
-                        "  select distinct child_term_acc from ont_dag\n" +
-                        "  start with parent_term_acc=?\n" +
-                        "  connect by prior child_term_acc=parent_term_acc\n" +
-                        ")";
+                        "WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND term_acc = ANY(ARRAY(\n" +
+                        "  WITH RECURSIVE d(acc) AS (\n" +
+                        "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                        "    UNION\n" +
+                        "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                        "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                        "))";
 
                 return executeAnnotationQuery(query, accId, accId);
             }
             else {
                 String query = "SELECT a.*\n" +
                         " FROM full_annot a,rgd_ids r\n" +
-                        "where term_acc in(\n" +
-                        "  select ? from dual\n" +
-                        "  union all\n" +
-                        "  select distinct child_term_acc from ont_dag\n" +
-                        "  start with parent_term_acc=?\n" +
-                        "  connect by prior child_term_acc=parent_term_acc\n" +
-                        ") AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key=? AND object_status='ACTIVE'";
+                        "where term_acc = ANY(ARRAY(\n" +
+                        "  WITH RECURSIVE d(acc) AS (\n" +
+                        "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                        "    UNION\n" +
+                        "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                        "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                        ")) AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key=? AND object_status='ACTIVE'";
 
                 return executeAnnotationQuery(query, accId, accId, speciesTypeKey);
             }
@@ -1084,14 +1088,14 @@ public class AnnotationDAO extends AbstractDAO {
                 // annotations for any species
                 String query = "SELECT * FROM full_annot,rgd_ids "+
                         "WHERE term_acc=? AND annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' and object_key=?"+
-                        " AND ROWNUM<=?";
+                        " ORDER BY full_annot_key FETCH FIRST ? ROWS ONLY";
                 return executeAnnotationQuery(query, accId, objectKey, maxRows);
             }
             else {
                 // annotations for specific species
                 String query = "select a.* from full_annot a,rgd_ids r where term_acc=? "+
                         "and annotated_object_rgd_id=r.rgd_id and r.species_type_key=? AND object_status='ACTIVE' and object_key=?"+
-                        " AND ROWNUM<=?";
+                        " ORDER BY a.full_annot_key FETCH FIRST ? ROWS ONLY";
                 return executeAnnotationQuery(query, accId, speciesTypeKey, objectKey, maxRows);
             }
         }
@@ -1283,13 +1287,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "select count(1)\n" +
                     " from full_annot a,rgd_ids r\n" +
-                    "where term_acc in(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE'";
+                    "where term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE'";
 
             return getCount(query, accId, accId, speciesTypeKey);
         }
@@ -1316,13 +1320,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "select count(1)\n" +
                     " from full_annot a,rgd_ids r\n" +
-                    "where term_acc in(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND object_status='ACTIVE'";
+                    "where term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND object_status='ACTIVE'";
 
             return getCount(query, accId, accId);
         }
@@ -1350,13 +1354,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "select count(1)\n" +
                     " from full_annot a,rgd_ids r\n" +
-                    "where term_acc in(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
+                    "where term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
 
             return getCount(query, accId, accId, speciesTypeKey, objectTypeKey);
         }
@@ -1547,13 +1551,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "select distinct(rgd_id)\n" +
                     " from full_annot a,rgd_ids r\n" +
-                    "where term_acc in(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
+                    "where term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
             return IntListQuery.execute(this, query, accId, accId, speciesTypeKey, objectTypeKey);
         }
     }
@@ -1562,13 +1566,13 @@ public class AnnotationDAO extends AbstractDAO {
 
         String query = "SELECT rgd_id,term_acc\n" +
                 " FROM full_annot a,rgd_ids r\n" +
-                "WHERE term_acc IN(\n" +
-                "  select ? from dual\n" +
-                "  union all\n" +
-                "  select distinct child_term_acc from ont_dag\n" +
-                "  start with parent_term_acc=?\n" +
-                "  connect by prior child_term_acc=parent_term_acc\n" +
-                ") AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key=? AND object_status='ACTIVE'";
+                "WHERE term_acc = ANY(ARRAY(\n" +
+                "  WITH RECURSIVE d(acc) AS (\n" +
+                "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                "    UNION\n" +
+                "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                ")) AND annotated_object_rgd_id=r.rgd_id AND r.species_type_key=? AND object_status='ACTIVE'";
 
         return IntStringMapQuery.execute(this, query, accId, accId, speciesTypeKey);
     }
@@ -1583,13 +1587,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "SELECT DISTINCT rgd_id, object_symbol\n" +
                     " FROM full_annot a,rgd_ids r\n" +
-                    "WHERE term_acc IN(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
+                    "WHERE term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND species_type_key=? AND object_status='ACTIVE' and object_key=?";
             return StringMapQuery.execute(this, query, accId, accId, speciesTypeKey, objectTypeKey);
         }
     }
@@ -1607,10 +1611,12 @@ public class AnnotationDAO extends AbstractDAO {
                 "WHERE term_acc IN(\n" +
                 "        SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=(SELECT root_term_acc FROM ontologies WHERE aspect=?)\n" +
                 ") AND EXISTS (\n" +
-                "SELECT 1 FROM( SELECT parent_term_acc FROM ont_dag\n" +
-                "            START WITH child_term_acc IN\n" +
-                "            (SELECT term_acc FROM full_annot WHERE aspect=? AND annotated_object_rgd_id=?)\n" +
-                "            CONNECT BY PRIOR parent_term_acc=child_term_acc\n" +
+                "SELECT 1 FROM( WITH RECURSIVE anc(parent_term_acc) AS (\n" +
+                "              SELECT parent_term_acc FROM ont_dag WHERE child_term_acc IN\n" +
+                "              (SELECT term_acc FROM full_annot WHERE aspect=? AND annotated_object_rgd_id=?)\n" +
+                "              UNION\n" +
+                "              SELECT o.parent_term_acc FROM ont_dag o JOIN anc ON o.child_term_acc=anc.parent_term_acc\n" +
+                "            ) SELECT parent_term_acc FROM anc\n" +
                 ") WHERE parent_term_acc=term_acc\n" +
                 ")\n";
         return StringMapQuery.execute(this, query, aspect, aspect, rgdId);
@@ -1631,10 +1637,12 @@ public class AnnotationDAO extends AbstractDAO {
                 "        SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=(SELECT root_term_acc FROM ontologies WHERE aspect=?)\n" +
                 "  )\n"+
                 ") AND EXISTS (\n" +
-                "SELECT 1 FROM( SELECT parent_term_acc FROM ont_dag\n" +
-                "            START WITH child_term_acc IN\n" +
-                "            (SELECT term_acc FROM full_annot WHERE aspect=? AND annotated_object_rgd_id=?)\n" +
-                "            CONNECT BY PRIOR parent_term_acc=child_term_acc\n" +
+                "SELECT 1 FROM( WITH RECURSIVE anc(parent_term_acc) AS (\n" +
+                "              SELECT parent_term_acc FROM ont_dag WHERE child_term_acc IN\n" +
+                "              (SELECT term_acc FROM full_annot WHERE aspect=? AND annotated_object_rgd_id=?)\n" +
+                "              UNION\n" +
+                "              SELECT o.parent_term_acc FROM ont_dag o JOIN anc ON o.child_term_acc=anc.parent_term_acc\n" +
+                "            ) SELECT parent_term_acc FROM anc\n" +
                 ") WHERE parent_term_acc=term_acc\n" +
                 ")\n";
         return StringMapQuery.execute(this, query, aspect, aspect, rgdId);
@@ -1652,13 +1660,13 @@ public class AnnotationDAO extends AbstractDAO {
         else {
             String query = "select count(distinct(rgd_id))\n" +
                     " from full_annot a,rgd_ids r\n" +
-                    "where term_acc in(\n" +
-                    "  select ? from dual\n" +
-                    "  union all\n" +
-                    "  select distinct child_term_acc from ont_dag\n" +
-                    "  start with parent_term_acc=?\n" +
-                    "  connect by prior child_term_acc=parent_term_acc\n" +
-                    ") AND annotated_object_rgd_id=rgd_id AND object_status='ACTIVE'";
+                    "where term_acc = ANY(ARRAY(\n" +
+                    "  WITH RECURSIVE d(acc) AS (\n" +
+                    "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
+                    "    UNION\n" +
+                    "    SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc\n" +
+                    "  ) SELECT CAST(? AS VARCHAR) UNION ALL SELECT acc FROM d\n" +
+                    ")) AND annotated_object_rgd_id=rgd_id AND object_status='ACTIVE'";
 
             return getCount(query, accId, accId);
         }
@@ -2028,7 +2036,7 @@ public class AnnotationDAO extends AbstractDAO {
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), """
             UPDATE full_annot SET term=?, annotated_object_rgd_id=?, rgd_object_key=?, data_src=?, object_symbol=?,
               ref_rgd_id=?, evidence=?, with_info=?, aspect=?, object_name=?, qualifier=?,
-              last_modified_date=SYSDATE, term_acc=?, created_by=?, last_modified_by=?, xref_source=?, annotation_extension=?,
+              last_modified_date=LOCALTIMESTAMP(0), term_acc=?, created_by=?, last_modified_by=?, xref_source=?, annotation_extension=?,
               gene_product_form_id=?, notes=?, original_created_date=?, associated_with=?, qualifier2=?,
               molecular_entity=?, alteration=?, alteration_location=?, variant_nomenclature=?
             WHERE full_annot_key=?
@@ -2066,52 +2074,49 @@ public class AnnotationDAO extends AbstractDAO {
     public int insertAnnotation(Annotation annot) throws Exception{
 
         String sql = """
-                BEGIN INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src,
+                INSERT INTO full_annot (term, annotated_object_rgd_id, rgd_object_key, data_src,
                   object_symbol, ref_rgd_id, evidence, with_info, aspect, object_name, notes, qualifier,
                   created_date, last_modified_date, term_acc, created_by, last_modified_by,
                   xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
                   molecular_entity, alteration, alteration_location, variant_nomenclature, qualifier2, full_annot_key)
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?,full_annot_seq.NEXTVAL)
-                RETURNING full_annot_key,created_date,last_modified_date INTO ?,?,?;  END;
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0),?,?,?,?,?,?,?,?,?,?,?,?,?,nextval('full_annot_seq'))
+                RETURNING full_annot_key,created_date,last_modified_date
                 """;
 
-        try( Connection conn = this.getConnection() ) {
-            CallableStatement cs = conn.prepareCall(sql);
-            cs.setString(1, annot.getTerm());
-            setInt(cs, 2, annot.getAnnotatedObjectRgdId());
-            setInt(cs, 3, annot.getRgdObjectKey());
-            cs.setString(4, annot.getDataSrc());
-            cs.setString(5, annot.getObjectSymbol());
-            setInt(cs, 6, annot.getRefRgdId());
-            cs.setString(7, annot.getEvidence());
-            cs.setString(8, annot.getWithInfo());
-            cs.setString(9, annot.getAspect());
-            cs.setString(10, annot.getObjectName());
-            cs.setString(11, annot.getNotes());
-            cs.setString(12, annot.getQualifier());
-            cs.setString(13, annot.getTermAcc());
-            setInt(cs, 14, annot.getCreatedBy());
-            setInt(cs, 15, annot.getLastModifiedBy());
-            cs.setString(16, annot.getXrefSource());
-            cs.setString(17, annot.getAnnotationExtension());
-            cs.setString(18, annot.getGeneProductFormId());
-            setTimestamp(cs, 19, annot.getOriginalCreatedDate());
-            cs.setString(20, annot.getAssociatedWith());
-            cs.setString(21, annot.getMolecularEntity());
-            cs.setString(22, annot.getAlteration());
-            cs.setString(23, annot.getAlterationLocation());
-            cs.setString(24, annot.getVariantNomenclature());
-            cs.setString(25, annot.getQualifier2());
+        try( Connection conn = this.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql) ) {
+            ps.setString(1, annot.getTerm());
+            ps.setObject(2, annot.getAnnotatedObjectRgdId(), Types.INTEGER);
+            ps.setObject(3, annot.getRgdObjectKey(), Types.INTEGER);
+            ps.setString(4, annot.getDataSrc());
+            ps.setString(5, annot.getObjectSymbol());
+            ps.setObject(6, annot.getRefRgdId(), Types.INTEGER);
+            ps.setString(7, annot.getEvidence());
+            ps.setString(8, annot.getWithInfo());
+            ps.setString(9, annot.getAspect());
+            ps.setString(10, annot.getObjectName());
+            ps.setString(11, annot.getNotes());
+            ps.setString(12, annot.getQualifier());
+            ps.setString(13, annot.getTermAcc());
+            ps.setObject(14, annot.getCreatedBy(), Types.INTEGER);
+            ps.setObject(15, annot.getLastModifiedBy(), Types.INTEGER);
+            ps.setString(16, annot.getXrefSource());
+            ps.setString(17, annot.getAnnotationExtension());
+            ps.setString(18, annot.getGeneProductFormId());
+            ps.setTimestamp(19, annot.getOriginalCreatedDate()==null ? null : new Timestamp(annot.getOriginalCreatedDate().getTime()));
+            ps.setString(20, annot.getAssociatedWith());
+            ps.setString(21, annot.getMolecularEntity());
+            ps.setString(22, annot.getAlteration());
+            ps.setString(23, annot.getAlterationLocation());
+            ps.setString(24, annot.getVariantNomenclature());
+            ps.setString(25, annot.getQualifier2());
 
-            cs.registerOutParameter(26, Types.INTEGER); // full_annot_key
-            cs.registerOutParameter(27, Types.TIMESTAMP); // created_date
-            cs.registerOutParameter(28, Types.TIMESTAMP); // last_modified_date
-
-            cs.execute();
-
-            annot.setKey(cs.getInt(26));
-            annot.setCreatedDate(cs.getTimestamp(27));
-            annot.setLastModifiedDate(cs.getTimestamp(28));
+            try( ResultSet rs = ps.executeQuery() ) {
+                rs.next();
+                annot.setKey(rs.getInt(1)); // full_annot_key
+                annot.setCreatedDate(rs.getTimestamp(2)); // created_date
+                annot.setLastModifiedDate(rs.getTimestamp(3)); // last_modified_date
+            }
         }
 
         return annot.getKey();
@@ -2124,7 +2129,7 @@ public class AnnotationDAO extends AbstractDAO {
               created_date, last_modified_date, term_acc, created_by, last_modified_by,
               xref_source, annotation_extension, gene_product_form_id, original_created_date, associated_with,
               molecular_entity, alteration, alteration_location, variant_nomenclature, qualifier2, full_annot_key)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0),?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             new int[] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR,
                 Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
@@ -2155,7 +2160,7 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public int updateAnnotationNotes(int fullAnnotKey, String notes) throws Exception{
 
-        String sql = "UPDATE full_annot SET notes=?,last_modified_date=SYSDATE WHERE full_annot_key=?";
+        String sql = "UPDATE full_annot SET notes=?,last_modified_date=LOCALTIMESTAMP(0) WHERE full_annot_key=?";
         return update(sql, notes, fullAnnotKey);
     }
 
@@ -2190,7 +2195,7 @@ public class AnnotationDAO extends AbstractDAO {
     public List<Annotation> getAnnotations(String termAcc, List<Integer> speciesTypeKeys, List<String> evidenceCodes, Integer someInt) throws Exception {
 
         String sql = "select * from full_annot fa, rgd_ids ri " +
-                "where fa.term_acc=?" +
+                "where fa.term_acc=? " +
                 "and fa.annotated_object_rgd_id=ri.rgd_id " +
                 "and ri.species_type_key in (1,2,3) " +
                 "and ri.object_key=1 and evidence in ('EXP','IAGP','IDA','IED','IEP','IGI','IMP','IPI','IPM','QTM')";
@@ -2239,18 +2244,22 @@ public class AnnotationDAO extends AbstractDAO {
         String sql= """
                 SELECT DISTINCT m.chromosome,m.start_pos,m.stop_pos,z.rgd_id,z.object_symbol,z.object_type , z.term,z.term_acc
                 FROM maps_data m,(
-                SELECT annotated_object_rgd_id rgd_id,NVL(object_symbol,object_name) object_symbol,DECODE(rgd_object_key,1,'gene',6,'qtl','strain') object_type, t.term , t.term_acc
+                SELECT annotated_object_rgd_id rgd_id,COALESCE(object_symbol,object_name) object_symbol,CASE WHEN rgd_object_key=1 THEN 'gene' WHEN rgd_object_key=6 THEN 'qtl' ELSE 'strain' END object_type, t.term , t.term_acc
                 FROM full_annot a,ont_terms t
                 WHERE rgd_object_key IN(1,5,6)
                  AND a.term_acc=t.term_acc AND t.is_obsolete=0\s
                  AND EXISTS(SELECT 1 FROM ont_term_stats2 s WHERE s.term_acc=t.term_acc AND stat_name='annotated_object_count' AND with_children>0)\s
-                 AND a.term_acc in (
-                    SELECT child_term_acc FROM ont_dag\s
-                    START WITH child_term_acc IN(
-                      SELECT term_acc FROM ont_terms t
-                      WHERE (
-                              t.ont_id in ('CC','MF','BP','RDO','PW','NBO','MP','CMO','MMO','XCO','VT','CHEBI','RS'))
-                    ) CONNECT BY PRIOR child_term_acc=parent_term_acc
+                 AND a.term_acc IN (
+                    WITH RECURSIVE d(acc) AS (
+                      SELECT child_term_acc FROM ont_dag
+                      WHERE child_term_acc IN(
+                        SELECT term_acc FROM ont_terms t
+                        WHERE (
+                                t.ont_id in ('CC','MF','BP','RDO','PW','NBO','MP','CMO','MMO','XCO','VT','CHEBI','RS'))
+                      )
+                      UNION
+                      SELECT o.child_term_acc FROM ont_dag o JOIN d ON o.parent_term_acc=d.acc
+                    ) SELECT acc FROM d
                 )
                 )z
                 WHERE z.rgd_id=m.rgd_id AND m.map_key=380
