@@ -220,16 +220,16 @@ public class PhenominerDAO extends AbstractDAO {
         String query = "select distinct en.TYPE, en.LABEL, en.VALUE, entp.DESCRIPTION from PHENOMINER_ENUMERABLES en \n" +
                 "join PHENOMINER_ENUM_TYPES entp on en.TYPE = entp.ID where 1=1";
 
-        ArrayList<String> paramList = new ArrayList<String>();
+        ArrayList<Object> paramList = new ArrayList<Object>();
         if(typeField!=0){
             query = query + " and en.TYPE = ?";
-            paramList.add(String.valueOf(typeField));
+            paramList.add(typeField);
         }
         if(!(labelField == null || labelField.length() == 0)){
             query = query + " and UPPER(en.LABEL) = UPPER(?)";
             paramList.add(labelField);
         }
-        query = query + "ORDER BY en.TYPE" ;
+        query = query + " ORDER BY en.TYPE" ;
         Object params[] = new Object[paramList.size()];
         params = paramList.toArray();
         PhenominerEnumTablesQuery pquery = new PhenominerEnumTablesQuery(this.getDataSource(), query);
@@ -268,8 +268,8 @@ public class PhenominerDAO extends AbstractDAO {
                 "SELECT geo_accession_id FROM (" +
                 "SELECT DISTINCT geo_accession_id, MIN(pubmed_id) AS pm FROM rna_seq " +
                 "WHERE sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ? " +
-                "GROUP BY geo_accession_id ORDER BY pm, geo_accession_id DESC" +
-                ") OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" +
+                "GROUP BY geo_accession_id" +
+                ") ORDER BY pm, geo_accession_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" +
                 ") ORDER BY pubmed_id, geo_accession_id DESC";
 
         GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
@@ -299,8 +299,6 @@ public class PhenominerDAO extends AbstractDAO {
     }
     /**
      * get list of studies given list of study ids
-     * <p>
-     * Note: only first 1000 studies is returned, due to Oracle limitations
      * @param studyIds list of study ids
      * @return list of Study objects
      * @throws Exception
@@ -308,9 +306,6 @@ public class PhenominerDAO extends AbstractDAO {
     public List<Study> getStudies(List studyIds) throws Exception {
         if (studyIds.size() == 0) {
             return Collections.emptyList();
-        }
-        if( studyIds.size()>1000 ) {
-            studyIds = studyIds.subList(0, 999);
         }
 
         String query = "SELECT * FROM study WHERE study_id IN ("
@@ -328,13 +323,13 @@ public class PhenominerDAO extends AbstractDAO {
     public void updateStudy(Study study) throws Exception{
 
         String query = "UPDATE study SET study_name=?, study_source=?, study_type=?, "+
-            "data_type=?, geo_series_acc=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP WHERE study_id=?";
+            "data_type=?, geo_series_acc=?, last_modified_by = ?, last_modified_date = LOCALTIMESTAMP WHERE study_id=?";
         update(query, study.getName(), study.getSource(), study.getType(),
                 study.getDataType(), study.getGeoSeriesAcc(),study.getLastModifiedBy(), study.getId());
 
         // Update curation status for each experiment record that belongs to this study
         if (study.getCurationStatus() != -1) {
-            query = "update experiment_record er set er.curation_status = ? " +
+            query = "update experiment_record er set curation_status = ? " +
                     "where exists " +
                     "(select experiment_record_id from experiment ex " +
                     "where ex.study_id = ? and ex.experiment_id = er.experiment_id)";
@@ -355,7 +350,7 @@ public class PhenominerDAO extends AbstractDAO {
         study.setId(studyId);
 
         String sql = "INSERT INTO study (study_name, study_source, study_type,  " +
-                "data_type, geo_series_acc, study_id,last_modified_by,created_by,created_date, last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "data_type, geo_series_acc, study_id,last_modified_by,created_by,created_date, last_modified_date) VALUES(?,?,?,?,?,?,?,?,LOCALTIMESTAMP,LOCALTIMESTAMP)";
 
         update(sql, study.getName(), study.getSource(), study.getType(),
                 study.getDataType(), study.getGeoSeriesAcc(), study.getId(),study.getLastModifiedBy(),study.getCreatedBy());
@@ -474,9 +469,6 @@ public class PhenominerDAO extends AbstractDAO {
 
     /**
      * Return a list of experiments from a list of experiment ID's passed in
-     * <p>
-     *     Note: only first 1000 experiments is returned, due to Oracle limitations
-     * </p>
      * @param exIds
      * @return
      * @throws Exception
@@ -484,9 +476,6 @@ public class PhenominerDAO extends AbstractDAO {
     public List<Experiment> getExperiments(List exIds) throws Exception {
         if (exIds.size() == 0) {
             return new ArrayList<Experiment>();
-        }
-        if( exIds.size()>1000 ) {
-            exIds = exIds.subList(0, 999);
         }
         String query = "SELECT * from experiment where experiment_id in (";
 
@@ -521,12 +510,12 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public void updateExperiment(Experiment ex) throws Exception{
 
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = LOCALTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
 
         /* Update curation status for each experiment record that belongs to this experiment */
 //        if (ex.getCurationStatus() != -1) {
-//            query = "update experiment_record er set er.curation_status = ? " +
+//            query = "update experiment_record er set curation_status = ? " +
 //                    "where er.experiment_id = ?";
 //            update(query, ex.getCurationStatus(), ex.getId());
 //        }
@@ -534,14 +523,14 @@ public class PhenominerDAO extends AbstractDAO {
 
     public void updateExperiment(Experiment ex, List<String> traits) throws Exception{
 
-        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = SYSTIMESTAMP where experiment_id=? ";
+        String query = "update experiment set study_id=?, experiment_name=?, experiment_notes=?,last_modified_by=?, trait_ont_id=?, trait_ont_id2=?, trait_ont_id3=?, last_modified_date = LOCALTIMESTAMP where experiment_id=? ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getLastModifiedBy(), ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getId());
 
 //        this.updateExperimentTraits(ex.getId(),traits);
 
         /* Update curation status for each experiment record that belongs to this experiment */
         if (ex.getCurationStatus() != -1) {
-            query = "update experiment_record er set er.curation_status = ? " +
+            query = "update experiment_record er set curation_status = ? " +
                     "where er.experiment_id = ?";
             update(query, ex.getCurationStatus(), ex.getId());
         }
@@ -560,7 +549,7 @@ public class PhenominerDAO extends AbstractDAO {
         ex.setId(experimentId);
 
         String query = "insert into experiment (study_id, experiment_name, experiment_notes, experiment_id,last_modified_by,trait_ont_id,trait_ont_id2,trait_ont_id3,created_by,created_date,last_modified_date) " +
-                "values (?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP) ";
+                "values (?,?,?,?,?,?,?,?,?,LOCALTIMESTAMP,LOCALTIMESTAMP) ";
         update(query, ex.getStudyId(),ex.getName(),ex.getNotes(),ex.getId(),ex.getLastModifiedBy(),ex.getTraitOntId(),ex.getTraitOntId2(),ex.getTraitOntId3(),ex.getCreatedBy());
 
         return experimentId;
@@ -748,10 +737,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         query +=
-        "SELECT ? FROM dual UNION \n"+
-        "SELECT child_term_acc FROM ont_dag\n" +
-        "START WITH parent_term_acc=?\n" +
-        "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+        "SELECT ? UNION \n"+
+        "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+        "WHERE parent_term_acc=?\n" +
+        "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return getCount(query, CURATION_STATUS, accId, accId);
     }
@@ -790,10 +779,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         query +=
-                "SELECT ? FROM dual UNION \n"+
-                        "SELECT child_term_acc FROM ont_dag\n" +
-                        "START WITH parent_term_acc=?\n" +
-                        "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+                "SELECT ? UNION \n"+
+                        "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+                        "WHERE parent_term_acc=?\n" +
+                        "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return getCount(query, CURATION_STATUS, speciesTypeKey, accId, accId);
     }
@@ -821,10 +810,10 @@ public class PhenominerDAO extends AbstractDAO {
         String sql;
         sql = "SELECT COUNT(1) FROM sample s,experiment_record r\n"+
             "WHERE r.curation_status=? AND r.species_type_key=? AND r.sample_id=s.sample_id AND sex=? AND strain_ont_id IN(\n"+
-                "SELECT ? FROM dual UNION \n"+
-                "SELECT child_term_acc FROM ont_dag\n" +
-                "START WITH parent_term_acc=?\n" +
-                "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+                "SELECT ? UNION \n"+
+                "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+                "WHERE parent_term_acc=?\n" +
+                "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return getCount(sql, CURATION_STATUS, speciesTypeKey, sex, rsId, rsId);
     }
@@ -861,20 +850,20 @@ public class PhenominerDAO extends AbstractDAO {
             " from experiment e, experiment_record r " +
                     " where e.experiment_id = r.experiment_id " +
             " and r.curation_status=? and species_type_key=? " +
-            " and (e.trait_ont_id in (SELECT ? FROM dual UNION " +
-            " SELECT child_term_acc FROM ont_dag " +
-            " START WITH parent_term_acc=? " +
-            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " and (e.trait_ont_id in (SELECT ? UNION " +
+            " SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag " +
+            " WHERE parent_term_acc=? " +
+            " UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc) " +
             " or " +
-            " e.trait_ont_id2 in (SELECT ? FROM dual UNION " +
-            " SELECT child_term_acc FROM ont_dag " +
-            " START WITH parent_term_acc=? " +
-            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " e.trait_ont_id2 in (SELECT ? UNION " +
+            " SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag " +
+            " WHERE parent_term_acc=? " +
+            " UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc) " +
             " or " +
-            " e.trait_ont_id3 in (SELECT ? FROM dual UNION " +
-            " SELECT child_term_acc FROM ont_dag " +
-            " START WITH parent_term_acc=? " +
-            " CONNECT BY PRIOR child_term_acc=parent_term_acc) " +
+            " e.trait_ont_id3 in (SELECT ? UNION " +
+            " SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag " +
+            " WHERE parent_term_acc=? " +
+            " UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc) " +
             " ) ";
 
             return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId, accId, accId, accId, accId);
@@ -886,10 +875,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         query +=
-            "SELECT ? FROM dual UNION \n"+
-            "SELECT child_term_acc FROM ont_dag\n" +
-            "START WITH parent_term_acc=?\n" +
-            "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+            "SELECT ? UNION \n"+
+            "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+            "WHERE parent_term_acc=?\n" +
+            "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return IntListQuery.execute(this, query, CURATION_STATUS, speciesTypeKey, accId, accId);
     }
@@ -917,10 +906,10 @@ public class PhenominerDAO extends AbstractDAO {
         String sql =
             "SELECT DISTINCT r.experiment_record_id FROM sample s,experiment_record r\n"+
             "WHERE r.curation_status=? AND r.species_type_key=? AND r.sample_id=s.sample_id AND sex=? AND strain_ont_id IN(\n"+
-            "SELECT ? FROM dual UNION \n"+
-            "SELECT child_term_acc FROM ont_dag\n" +
-            "START WITH parent_term_acc=?\n" +
-            "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+            "SELECT ? UNION \n"+
+            "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+            "WHERE parent_term_acc=?\n" +
+            "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return IntListQuery.execute(this, sql, CURATION_STATUS, speciesTypeKey, sex, termId, termId);
     }
@@ -1073,10 +1062,10 @@ public class PhenominerDAO extends AbstractDAO {
                 return null;
             }
 
-            query += "SELECT ? FROM dual UNION \n" +
-                     "SELECT child_term_acc FROM ont_dag\n" +
-                     "START WITH parent_term_acc =?\n" +
-                     "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+            query += "SELECT ? UNION \n" +
+                     "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+                     "WHERE parent_term_acc=?\n" +
+                     "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
             int count = getCount(query, CURATION_STATUS, accId, accId);
             recordCountMap.put(accId, count);
@@ -1195,10 +1184,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         query +=
-        "SELECT ? FROM dual UNION \n"+
-        "SELECT child_term_acc FROM ont_dag\n" +
-        "START WITH parent_term_acc=?\n" +
-        "CONNECT BY PRIOR child_term_acc=parent_term_acc)";
+        "SELECT ? UNION \n"+
+        "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+        "WHERE parent_term_acc=?\n" +
+        "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
 
         return IntListQuery.execute(this, query, CURATION_STATUS, accId, accId);
     }
@@ -1244,10 +1233,10 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         query +=
-        "SELECT ? FROM dual UNION \n"+
-        "SELECT child_term_acc FROM ont_dag\n" +
-        "START WITH parent_term_acc=?\n" +
-        "CONNECT BY PRIOR child_term_acc=parent_term_acc))";
+        "SELECT ? UNION \n"+
+        "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
+        "WHERE parent_term_acc=?\n" +
+        "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc))";
 
         return StringListQuery.execute(this, query, CURATION_STATUS, accId, accId);
     }
@@ -1351,8 +1340,6 @@ public class PhenominerDAO extends AbstractDAO {
 
     /**
      * Returns a list of records for a list of record ids;
-     * <p>
-     * Note: only first 1000 records are returned, due to Oracle limitations
      * @param ids list of record ids
      * @return list of records
      * @throws Exception
@@ -1361,10 +1348,6 @@ public class PhenominerDAO extends AbstractDAO {
 
         if (ids.size() == 0) {
             return new ArrayList<Record>();
-        }
-        // oracle internal limitation is 1000 expressions in IN list
-        if( ids.size()>1000 ) {
-            ids = ids.subList(0, 999);
         }
 
         String query = "SELECT st.study_id, er.*, s.*, cm.*, mm.* from study st, experiment e, experiment_record er, sample s, clinical_measurement cm, measurement_method mm " +
@@ -1560,7 +1543,7 @@ public class PhenominerDAO extends AbstractDAO {
 
         String query = "UPDATE sample SET age_days_from_dob_high_bound=?, age_days_from_dob_low_bound=?, number_of_animals=?, " +
                 "sample_notes=?, sex=?, strain_ont_id=?, tissue_ont_id=?, cell_type_ont_id=?, cell_line_id=?, "+
-                "geo_sample_acc=?, biosample_id=?, life_stage=?, curator_notes=?, last_modified_by = ?, last_modified_date = SYSTIMESTAMP, " +
+                "geo_sample_acc=?, biosample_id=?, life_stage=?, curator_notes=?, last_modified_by = ?, last_modified_date = LOCALTIMESTAMP, " +
                 "CULTURE_DUR_VALUE=?, CULTURE_DUR_UNIT=?, COMPUTED_SEX=? WHERE sample_id=?";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(), s.getSex(),
@@ -1795,7 +1778,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "number_of_animals, sample_notes, sex, strain_ont_id, tissue_ont_id, cell_type_ont_id, "+
                 "cell_line_id, geo_sample_acc, biosample_id, sample_id,life_stage,CURATOR_NOTES,last_modified_by,created_by, " +
                 "CULTURE_DUR_VALUE, CULTURE_DUR_UNIT, COMPUTED_SEX, created_date, last_modified_date) "+
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSTIMESTAMP,SYSTIMESTAMP)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,LOCALTIMESTAMP,LOCALTIMESTAMP)";
 
         update(query, s.getAgeDaysFromHighBound(), s.getAgeDaysFromLowBound(), s.getNumberOfAnimals(), s.getNotes(),
                 s.getSex(), s.getStrainAccId(), s.getTissueAccId(), s.getCellTypeAccId(), s.getCellLineId(),
@@ -1890,7 +1873,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "curation_status, last_modified_date, measurement_method_id, sample_id, measurement_sd, measurement_sem, " +
                 "measurement_units, measurement_value, measurement_error,experiment_record_id, class, has_individual_record, "+
                 "species_type_key,last_modified_by,created_by,created_date) VALUES( " +
-                "?,?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?,?,?,SYSTIMESTAMP)";
+                "?,?,?,LOCALTIMESTAMP,?,?,CAST(NULLIF(?,'') AS NUMERIC),CAST(NULLIF(?,'') AS NUMERIC),?,CAST(NULLIF(?,'') AS NUMERIC),CAST(NULLIF(?,'') AS NUMERIC),?, 'edu.mcw.rgd.phenodb.QuantExperimentRecord', ?,?,?,?,LOCALTIMESTAMP)";
 
         int hasIndividualRecord = r.getHasIndividualRecord() ? 1 : 0;
 
@@ -1952,8 +1935,8 @@ public class PhenominerDAO extends AbstractDAO {
         }
 
         String query = "UPDATE experiment_record SET clinical_measurement_id=?, experiment_id=?, curation_status=?, " +
-                "last_modified_date=SYSTIMESTAMP, measurement_method_id=?, sample_id=?, measurement_sd=?, measurement_sem=?, " +
-                "measurement_units=?, measurement_value=?, measurement_error=?,last_modified_by=? WHERE experiment_record_id=?";
+                "last_modified_date=LOCALTIMESTAMP, measurement_method_id=?, sample_id=?, measurement_sd=CAST(NULLIF(?,'') AS NUMERIC), measurement_sem=CAST(NULLIF(?,'') AS NUMERIC), " +
+                "measurement_units=?, measurement_value=CAST(NULLIF(?,'') AS NUMERIC), measurement_error=CAST(NULLIF(?,'') AS NUMERIC),last_modified_by=? WHERE experiment_record_id=?";
 
         update(query, r.getClinicalMeasurementId(), r.getExperimentId(), r.getCurationStatus(),
                 r.getMeasurementMethodId(), r.getSampleId(), r.getMeasurementSD(), r.getMeasurementSem(),
@@ -2113,12 +2096,12 @@ public class PhenominerDAO extends AbstractDAO {
         query.append(this.buildLike(sb.getCmUnits(), "measurement_units"));
         query.append(this.buildNumberEqual(sb.getCmSD(), "measurement_sd"));
         query.append(this.buildNumberEqual(sb.getCmSEM(), "measurement_sem"));
-        query.append(this.buildStrEqual(sb.getCmError(), "measurement_error"));
+        query.append(this.buildStrEqual(sb.getCmError(), "regexp_replace(CAST(trim_scale(measurement_error) AS VARCHAR), '^(-?)0\\.', '\\1.')"));
         query.append(this.buildLike(sb.getCmFormula(), "formula"));
         query.append(this.buildLike(sb.getCmAveType(), "clinical_meas_average_type"));
 
         query.append(this.buildStrEqual(sb.getMmAccId(), "measurement_method_ont_id"));
-        query.append(this.buildNumberEqual(sb.getMmDuration(), "measurement_duration_in_secs"));
+        query.append(this.buildNumberEqual(sb.getMmDuration(), "CAST(measurement_duration_in_secs AS NUMERIC)"));
         query.append(this.buildLike(sb.getMmSite(), "measurement_site"));
         query.append(this.buildLike(sb.getMmPIType(), "measurement_method_pi_type"));
         query.append(this.buildNumberEqual(sb.getMmPITime(), "meas_method_pi_time_value"));
@@ -2150,10 +2133,10 @@ public class PhenominerDAO extends AbstractDAO {
                 query.append(this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method"));
             }
             if (sb.getCMaxDuration() != null) {
-                query.append(this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound"));
+                query.append(this.buildStrEqual(sb.getCMaxDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_low_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')"));
             }
             if (sb.getCMinDuration() != null ) {
-                query.append(this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound"));
+                query.append(this.buildStrEqual(sb.getCMinDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_high_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')"));
             }
             if (sb.getCordinality() != null ) {
                 query.append(this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality"));
@@ -2218,12 +2201,12 @@ public class PhenominerDAO extends AbstractDAO {
         query = query + this.buildLike(sb.getCmUnits(),"measurement_units");
         query = query + this.buildNumberEqual(sb.getCmSD(),"measurement_sd");
         query = query + this.buildNumberEqual(sb.getCmSEM(),"measurement_sem");
-        query = query + this.buildStrEqual(sb.getCmError(),"measurement_error");
+        query = query + this.buildStrEqual(sb.getCmError(),"regexp_replace(CAST(trim_scale(measurement_error) AS VARCHAR), '^(-?)0\\.', '\\1.')");
         query = query + this.buildLike(sb.getCmFormula(),"formula");
         query = query + this.buildLike(sb.getCmAveType(),"clinical_meas_average_type");
 
         query = query + this.buildStrEqual(sb.getMmAccId(),"measurement_method_ont_id");
-        query = query + this.buildNumberEqual(sb.getMmDuration(),"measurement_duration_in_secs");
+        query = query + this.buildNumberEqual(sb.getMmDuration(),"CAST(measurement_duration_in_secs AS NUMERIC)");
         query = query + this.buildLike(sb.getMmSite(),"measurement_site");
         query = query + this.buildLike(sb.getMmPIType(),"measurement_method_pi_type");
         query = query + this.buildNumberEqual(sb.getMmPITime(),"meas_method_pi_time_value");
@@ -2255,10 +2238,10 @@ public class PhenominerDAO extends AbstractDAO {
                 query = query + this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method");
             }
             if (sb.getCMaxDuration() != null) {
-                query = query + this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound");
+                query = query + this.buildStrEqual(sb.getCMaxDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_low_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')");
             }
             if (sb.getCMinDuration() != null ) {
-                query = query + this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound");
+                query = query + this.buildStrEqual(sb.getCMinDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_high_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')");
             }
             if (sb.getCordinality() != null ) {
                 query = query + this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality");
@@ -2341,12 +2324,12 @@ public class PhenominerDAO extends AbstractDAO {
         query = query + this.buildLike(sb.getCmUnits(),"measurement_units");
         query = query + this.buildNumberEqual(sb.getCmSD(),"measurement_sd");
         query = query + this.buildNumberEqual(sb.getCmSEM(),"measurement_sem");
-        query = query + this.buildStrEqual(sb.getCmError(),"measurement_error");
+        query = query + this.buildStrEqual(sb.getCmError(),"regexp_replace(CAST(trim_scale(measurement_error) AS VARCHAR), '^(-?)0\\.', '\\1.')");
         query = query + this.buildLike(sb.getCmFormula(),"formula");
         query = query + this.buildLike(sb.getCmAveType(),"clinical_meas_average_type");
 
         query = query + this.buildStrEqual(sb.getMmAccId(),"measurement_method_ont_id");
-        query = query + this.buildNumberEqual(sb.getMmDuration(),"measurement_duration_in_secs");
+        query = query + this.buildNumberEqual(sb.getMmDuration(),"CAST(measurement_duration_in_secs AS NUMERIC)");
         query = query + this.buildLike(sb.getMmSite(),"measurement_site");
         query = query + this.buildLike(sb.getMmPIType(),"measurement_method_pi_type");
         query = query + this.buildNumberEqual(sb.getMmPITime(),"meas_method_pi_time_value");
@@ -2378,10 +2361,10 @@ public class PhenominerDAO extends AbstractDAO {
                 query = query + this.buildLike(sb.getCapplicationMethod(), "exp_cond_application_method");
             }
             if (sb.getCMaxDuration() != null) {
-                query = query + this.buildStrEqual(sb.getCMaxDuration(), "exp_cond_dur_sec_low_bound");
+                query = query + this.buildStrEqual(sb.getCMaxDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_low_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')");
             }
             if (sb.getCMinDuration() != null ) {
-                query = query + this.buildStrEqual(sb.getCMinDuration(), "exp_cond_dur_sec_high_bound");
+                query = query + this.buildStrEqual(sb.getCMinDuration(), "regexp_replace(CAST(trim_scale(exp_cond_dur_sec_high_bound) AS VARCHAR), '^(-?)0\\.', '\\1.')");
             }
             if (sb.getCordinality() != null ) {
                 query = query + this.buildNumberEqual(sb.getCordinality(), "exp_cond_ordinality");
@@ -2426,7 +2409,7 @@ public class PhenominerDAO extends AbstractDAO {
      */
     public int insertEnumerable(Enumerable e) throws Exception{
 
-        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO  phenominer_enumerables (type,label,value,description,onto_id,value_int) VALUES(?,?,?,?,?,CAST(NULLIF(?,'') AS NUMERIC))";
 
         return update(sql,e.getType(),e.getLabel(),e.getValue(),e.getDescription(),e.getOntId(),e.getValueInt());
     }
@@ -2528,13 +2511,13 @@ public class PhenominerDAO extends AbstractDAO {
                 "                select * from \n" +
                 "                ( \n" +
                 "                select bb.column_value as col_term, dd.column_value as row_term from \n" +
-                "                table(sys.ODCIVarchar2List("+ rowIDs +")) dd, \n" +
-                "                table(sys.ODCIVarchar2List("+ colIDs +")) bb \n" +
+                "                unnest(ARRAY["+ rowIDs +"]) AS dd(column_value), \n" +
+                "                unnest(ARRAY["+ colIDs +"]) AS bb(column_value) \n" +
                 "                )  aa \n" +
                 "                left join\n" +
                 "        (select pcrs.term1, \n" +
                 "                pcrs.term2, \n" +
-                "                decode(pcs.std, 0, 0,(pcrs.value_avg- pcs.AVG)/ pcs.STD) as heat_level \n" +
+                "                CASE WHEN pcs.std = 0 THEN 0 ELSE (pcrs.value_avg- pcs.AVG)/ pcs.STD END as heat_level \n" +
                 "                from (\n" +
                 "                         SELECT a.term1                AS term1,\n" +
                 "                          a.term2                      AS term2,\n" +
@@ -2545,7 +2528,7 @@ public class PhenominerDAO extends AbstractDAO {
                 "                          COUNT(*)                     AS COUNT,\n" +
                 "                          0\n" +
                 "                        FROM experiment_record_view er,\n" +
-                "                          (SELECT UNIQUE pai1.ONT_ID AS term1,\n" +
+                "                          (SELECT DISTINCT pai1.ONT_ID AS term1,\n" +
                 "                            pai2.ONT_ID              AS term2,\n" +
                 "                            pai1.EXPERIMENT_RECORD_ID\n" +
                 "                          FROM PHENOMINER_ANNOTATION_INDEX pai1,\n" +
@@ -2593,7 +2576,7 @@ public class PhenominerDAO extends AbstractDAO {
                                                     String ont3, String ont4,
                                                     String cmo_term, char sex) {
         String sexCondition =                     "        INTERSECT\n" +
-                    "        SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( ";
         switch (sex) {
@@ -2618,33 +2601,33 @@ public class PhenominerDAO extends AbstractDAO {
                     "FROM\n" +
                     "  (SELECT aa.term1,\n" +
                     "    aa.term2,\n" +
-                    "    DECODE(pcs.std, 0, 0,(pcrs.value_avg - pcs.AVG)/ pcs.STD) AS heat_level\n" +
+                    "    CASE WHEN pcs.std = 0 THEN 0 ELSE (pcrs.value_avg - pcs.AVG)/ pcs.STD END AS heat_level\n" +
                     "  FROM\n" +
                     "    (SELECT bb.ONT_ID AS term1,\n" +
                     "      dd.ONT_ID       AS term2\n" +
                     "    FROM\n" +
-                    "      (SELECT UNIQUE ONT_ID\n" +
+                    "      (SELECT DISTINCT ONT_ID\n" +
                     "      FROM PHENOMINER_ANNOTATION_INDEX pai\n" +
                     "      WHERE pai.EXPERIMENT_RECORD_ID IN\n" +
-                    "        (SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        (SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term1 + "' )\n" +
                     "        INTERSECT\n" +
-                    "        SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term2 + "' )\n" +
                     sexCondition +
                     "        )\n" +
                     "      AND pai.SOURCE_ONT='" + ont3 + "'\n" +
                     "      ) bb,\n" +
-                    "      (SELECT UNIQUE ONT_ID\n" +
+                    "      (SELECT DISTINCT ONT_ID\n" +
                     "      FROM PHENOMINER_ANNOTATION_INDEX pai\n" +
                     "      WHERE pai.EXPERIMENT_RECORD_ID IN\n" +
-                    "        (SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        (SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term1 + "' )\n" +
                     "        INTERSECT\n" +
-                    "        SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term2 + "' )\n" +
                     sexCondition +
@@ -2662,17 +2645,17 @@ public class PhenominerDAO extends AbstractDAO {
                     "      COUNT(*)                     AS COUNT,\n" +
                     "      0\n" +
                     "    FROM experiment_record_view er,\n" +
-                    "      (SELECT UNIQUE pai1.ONT_ID AS term1,\n" +
+                    "      (SELECT DISTINCT pai1.ONT_ID AS term1,\n" +
                     "        pai2.ONT_ID              AS term2,\n" +
                     "        pai1.EXPERIMENT_RECORD_ID\n" +
                     "      FROM PHENOMINER_ANNOTATION_INDEX pai1,\n" +
                     "        PHENOMINER_ANNOTATION_INDEX pai2\n" +
                     "      WHERE (pai1.EXPERIMENT_RECORD_ID IN\n" +
-                    "        (SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        (SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term1 + "' )\n" +
                     "        INTERSECT\n" +
-                    "        SELECT UNIQUE pai0.EXPERIMENT_RECORD_ID\n" +
+                    "        SELECT DISTINCT pai0.EXPERIMENT_RECORD_ID\n" +
                     "        FROM PHENOMINER_ANNOTATION_INDEX pai0\n" +
                     "        WHERE pai0.ONT_ID IN ( '" + ont_term2 + "' )\n" +
                     sexCondition +
@@ -2763,10 +2746,10 @@ public class PhenominerDAO extends AbstractDAO {
                 String sqlStr = "select standard_unit from PHENOMINER_STANDARD_UNITS where ont_id=?";
                 List<String> result = StringListQuery.execute(this, sqlStr, termAcc);
                 String unitTo = result.get(0);
-                sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,?,0)";
+                sqlStr = "insert into PHENOMINER_UNIT_SCALES (unit_from, unit_to, SCALE, ZERO_OFFSET) values (?,?,CAST(NULLIF(?,'') AS NUMERIC),0)";
                 update(sqlStr, unitFrom, unitTo, termScale);
 
-                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES (ont_id,unit_from,unit_to,term_specific_scale,zero_offset) values(?,?,?,?,0)";
+                sqlStr = "insert into PHENOMINER_TERM_UNIT_SCALES (ont_id,unit_from,unit_to,term_specific_scale,zero_offset) values(?,?,?,CAST(NULLIF(?,'') AS NUMERIC),0)";
 
                 update(sqlStr, termAcc,unitFrom, unitTo,termScale);
             }
