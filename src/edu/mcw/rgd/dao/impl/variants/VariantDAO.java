@@ -378,7 +378,7 @@ public class VariantDAO extends AbstractDAO {
     }
 
     public List<VariantMapData> getVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
-        String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ? offset ? rows fetch next 1000 rows only";
+        String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ? order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -390,7 +390,7 @@ public class VariantDAO extends AbstractDAO {
 
     public List<VariantMapData> getActiveVariantsWithGeneLocationLimited(int mapKey, String chrom, int start, int stop, int offset) throws Exception{
         String sql = "select v.*, vm.* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and vm.chromosome=? " +
-                "and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.start_pos between ? and ? offset ? rows fetch next 1000 rows only";
+                "and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and vm.start_pos between ? and ? order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -409,7 +409,7 @@ public class VariantDAO extends AbstractDAO {
         String sql = "select * from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id and vm.map_key=? and v.rgd_id in (\n" +
                 "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
                 "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) " +
-                "offset ? rows fetch next 1000 rows only";
+                "order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -428,7 +428,7 @@ public class VariantDAO extends AbstractDAO {
         String sql = "select v.*,vm.* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (\n" +
                 "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
                 "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) " +
-                "offset ? rows fetch next 1000 rows only";
+                "order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
@@ -514,7 +514,7 @@ public class VariantDAO extends AbstractDAO {
     public int insertSample(Sample sample) throws Exception{
         String sql = "INSERT INTO SAMPLE (SAMPLE_ID, ANALYSIS_NAME, ANALYSIS_TIME, DESCRIPTION, PATIENT_ID, SEQUENCER, GENDER, GRANT_NUMBER," +
                 " SEQUENCED_BY, WHERE_BRED, SECONDARY_ANALYSIS_SOFTWARE, MAP_KEY, DBSNP_SOURCE, STRAIN_RGD_ID, REF_RGD_ID)" +
-                " VALUES (?,?,SYSTIMESTAMP,?,?,?,?,?,?,?,?,?,?,?,?)";
+                " VALUES (?,?,LOCALTIMESTAMP,?,?,?,?,?,?,?,?,?,?,?,?)";
         return update(sql,sample.getId(),sample.getAnalysisName(),sample.getDescription(),sample.getPatientId(),sample.getSequencer(),sample.getGender(),
                 sample.getGrantNumber(), sample.getSequencedBy(),sample.getWhereBred(), sample.getSecondaryAnalysisSoftware(), sample.getMapKey(),
                 sample.getDbSnpSource(),sample.getStrainRgdId(),sample.getRefRgdId());
