@@ -161,9 +161,10 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int deleteDataModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
         String sql = """
-            DELETE FROM mirna_targets m WHERE modified_date<?
-              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)
-              AND ROWNUM<10000
+            DELETE FROM mirna_targets WHERE mirna_target_key IN(
+              SELECT m.mirna_target_key FROM mirna_targets m WHERE modified_date<?
+                AND EXISTS(SELECT 1 FROM rgd_ids r WHERE m.mirna_rgd_id=r.rgd_id AND species_type_key=?)
+              FETCH FIRST 9999 ROWS ONLY)
             """;
         int totalRowsAffected = 0, rowsAffected;
         do {
@@ -176,14 +177,14 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
     public int updateModifiedDate(int key) throws Exception {
 
-        String sql = "UPDATE mirna_targets SET modified_date=SYSDATE WHERE mirna_target_key=?";
+        String sql = "UPDATE mirna_targets SET modified_date=LOCALTIMESTAMP(0) WHERE mirna_target_key=?";
         return update(sql, key);
     }
 
     public int updateModifiedDate(List<Integer> keys) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-            "UPDATE mirna_targets SET modified_date=SYSDATE WHERE mirna_target_key=?",
+            "UPDATE mirna_targets SET modified_date=LOCALTIMESTAMP(0) WHERE mirna_target_key=?",
             new int[]{Types.INTEGER});
         su.compile();
 
@@ -201,7 +202,7 @@ public class MiRnaTargetDAO extends AbstractDAO {
              result_type,data_type,support_type,pmid,created_date,modified_date,transcript_acc,
              transcript_biotype,isoform,amplification,utr_start,utr_end,target_site,score,
              normalized_score,energy)
-            VALUES(mirna_targets_seq.NEXTVAL,?,?,?,?,?, ?,?,?,?,SYSDATE,SYSDATE,?, ?,?,?,?,?,?,?, ?,?)
+            VALUES(nextval('mirna_targets_seq'),?,?,?,?,?, ?,?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0),?, ?,?,?,?,?,?,?, ?,?)
             """;
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
@@ -233,7 +234,7 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int updateStatsModifiedDate(List<Integer> keys) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-            "UPDATE mirna_target_stats SET last_modified_date=SYSDATE WHERE mirna_stat_key=?",
+            "UPDATE mirna_target_stats SET last_modified_date=LOCALTIMESTAMP(0) WHERE mirna_stat_key=?",
             new int[]{Types.INTEGER});
         su.compile();
 
@@ -261,7 +262,7 @@ public class MiRnaTargetDAO extends AbstractDAO {
         String sql = """
             INSERT INTO mirna_target_stats
             (mirna_stat_key,rgd_id,stat_name,stat_value,created_date,last_modified_date)
-            VALUES(mirna_target_stats_seq.NEXTVAL,?,?,?,SYSDATE,SYSDATE)
+            VALUES(nextval('mirna_target_stats_seq'),?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0))
             """;
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
                 new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
@@ -277,7 +278,7 @@ public class MiRnaTargetDAO extends AbstractDAO {
 
         String sql = """
             UPDATE mirna_target_stats
-            SET stat_value=?,last_modified_date=SYSDATE
+            SET stat_value=?,last_modified_date=LOCALTIMESTAMP(0)
             WHERE mirna_stat_key=?
             """;
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(), sql,
@@ -303,9 +304,10 @@ public class MiRnaTargetDAO extends AbstractDAO {
     public int deleteStatsModifiedBefore(int speciesTypeKey, Date cutOffDate) throws Exception {
 
         String sql = """
-            DELETE FROM mirna_target_stats s WHERE last_modified_date<?
-              AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)
-              AND ROWNUM<10000
+            DELETE FROM mirna_target_stats WHERE mirna_stat_key IN(
+              SELECT s.mirna_stat_key FROM mirna_target_stats s WHERE last_modified_date<?
+                AND EXISTS(SELECT 1 FROM rgd_ids r WHERE s.rgd_id=r.rgd_id AND species_type_key=?)
+              FETCH FIRST 9999 ROWS ONLY)
             """;
         int totalRowsAffected = 0, rowsAffected;
         do {
