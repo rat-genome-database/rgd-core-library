@@ -119,8 +119,8 @@ public class XdbIdDAO extends AbstractDAO {
 
         String sql = "SELECT g.rgd_id FROM rgd_ids r, rgd_acc_xdb x, genes g " +
             "WHERE x.rgd_id=r.rgd_id AND r.rgd_id=g.rgd_id AND x.xdb_key=? AND x.acc_id=? AND r.species_type_key=? " +
-            " AND NVL(gene_type_lc,'*') NOT IN ('splice','allele') " +
-            " AND NVL(src_pipeline,'*') NOT IN ("+Utils.buildInPhraseQuoted(excludedSources)+")";
+            " AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele') " +
+            " AND COALESCE(src_pipeline,'*') NOT IN ("+Utils.buildInPhraseQuoted(excludedSources)+")";
 
         return IntListQuery.execute(this, sql, xdbKey, accId, speciesTypeKey);
     }
@@ -229,7 +229,7 @@ public class XdbIdDAO extends AbstractDAO {
     public List<XdbId> getPubmedIdsByRefRgdId(int rgdId) throws Exception {
 
         String sql = "SELECT x.*, 0 species_type_key " +
-                "FROM rgd_acc_xdb x, references f, rgd_ids r \n" +
+                "FROM rgd_acc_xdb x, \"references\" f, rgd_ids r \n" +
                 "WHERE x.RGD_ID = ? \n" +
                 "AND x.RGD_ID=f.RGD_ID\n" +
                 "AND x.RGD_ID=r.RGD_ID\n" +
@@ -249,7 +249,7 @@ public class XdbIdDAO extends AbstractDAO {
         String sql = "SELECT acc_id FROM rgd_acc_xdb x\n" +
                 "  WHERE xdb_key=2 AND creation_date>?\n" +
                 "  AND NOT EXISTS \n" +
-                "  (SELECT 1 FROM rgd_acc_xdb u,references r\n" +
+                "  (SELECT 1 FROM rgd_acc_xdb u,\"references\" r\n" +
                 "   WHERE r.rgd_id=u.rgd_id AND u.xdb_key=2 AND u.acc_id=x.acc_id)";
 
         return StringListQuery.execute(this, sql, cutoffDate);
@@ -287,7 +287,7 @@ public class XdbIdDAO extends AbstractDAO {
      */
     public List<XdbId> getXdbIdsModifiedBefore(java.util.Date modDate, String srcPipeline, int speciesTypeKey) throws Exception{
 
-        String query = "SELECT * FROM rgd_acc_xdb x WHERE NVL(modification_date,creation_date)<? AND src_pipeline=? ";
+        String query = "SELECT * FROM rgd_acc_xdb x WHERE COALESCE(modification_date,creation_date)<? AND src_pipeline=? ";
         if( speciesTypeKey!=0 )
             query += "AND EXISTS(SELECT 1 FROM rgd_ids r WHERE r.rgd_id=x.rgd_id AND r.species_type_key=?)";
 
@@ -586,7 +586,7 @@ public class XdbIdDAO extends AbstractDAO {
         // this sql query ensures we will not insert duplicate entries into RGD_ACC_XDB
         String sql = "insert into RGD_ACC_XDB "
             +"(ACC_XDB_KEY, RGD_ID, XDB_KEY, ACC_ID, CREATION_DATE, LINK_TEXT, SRC_PIPELINE, NOTES, MODIFICATION_DATE) "
-            +"(select ?,?,?,?,nvl(?,sysdate),?,?,?,? from DUAL where not exists "
+            +"(select ?,?,?,?,COALESCE(?,LOCALTIMESTAMP(0)),?,?,?,? where not exists "
             +" (select 1 from RGD_ACC_XDB where RGD_ID=? and XDB_KEY=? and ACC_ID=? and SRC_PIPELINE=?)"
             +")";
 
@@ -627,7 +627,7 @@ public class XdbIdDAO extends AbstractDAO {
                 toIndex = accXdbKeys.size();
 
             String sql = "UPDATE rgd_acc_xdb "
-                +"SET modification_date=SYSDATE "
+                +"SET modification_date=LOCALTIMESTAMP(0) "
                 +"WHERE acc_xdb_key IN("+Utils.buildInPhrase(accXdbKeys.subList(i, toIndex))+")";
             rowsAffected += update(sql);
         }
@@ -704,7 +704,7 @@ public class XdbIdDAO extends AbstractDAO {
      */
     public List<XdbId> getCuratedPubmedIds ( int rgdId ) throws Exception {
         String sql = "select x.*, 0 species_type_key " +
-                "from rgd_ref_rgd_id r, rgd_acc_xdb x, references rf " +
+                "from rgd_ref_rgd_id r, rgd_acc_xdb x, \"references\" rf " +
                 "where r.rgd_id=? and r.ref_key = rf.ref_key and rf.rgd_id = x.rgd_id and x.xdb_key = 2";
 
         return executeXdbIdQuery(sql, rgdId);
@@ -724,7 +724,7 @@ public class XdbIdDAO extends AbstractDAO {
             "FROM rgd_acc_xdb x "+
             "WHERE x.rgd_id=? AND x.xdb_key = 2 "+
             "AND NOT EXISTS( SELECT 1 "+
-            "  FROM rgd_ref_rgd_id r, rgd_acc_xdb x2, references rf "+
+            "  FROM rgd_ref_rgd_id r, rgd_acc_xdb x2, \"references\" rf "+
             "  WHERE r.rgd_id=x.rgd_id AND r.ref_key=rf.ref_key AND rf.rgd_id=x2.rgd_id "+
                 "AND x2.xdb_key=x.xdb_key AND x2.acc_id=x.acc_id)";
 
@@ -743,7 +743,7 @@ public class XdbIdDAO extends AbstractDAO {
         final HashMap<Integer, Set<String>> results = new HashMap<>();
 
         String sql = "SELECT r.rgd_id,x.acc_id " +
-                "FROM rgd_ids r,rgd_ref_rgd_id rr,references rf,rgd_acc_xdb x " +
+                "FROM rgd_ids r,rgd_ref_rgd_id rr,\"references\" rf,rgd_acc_xdb x " +
                 "WHERE r.object_key=? AND r.species_type_key=? AND object_status='ACTIVE' "+
                 "AND rr.rgd_id=r.rgd_id AND rf.ref_key=rr.ref_key " +
                 "AND rf.rgd_id=x.rgd_id AND x.xdb_key=2 ";
