@@ -21,7 +21,8 @@ public class StrainFilesQuery extends MappingSqlQuery {
         StrainFiles strainFile = new StrainFiles();
         strainFile.setStrainId(rs.getInt("STRAIN_ID"));
         strainFile.setFileType(rs.getString("FILE_TYPE"));
-        strainFile.setFileData(rs.getBlob("FILE_DATA"));
+        byte[] fileData = rs.getBytes("FILE_DATA");
+        strainFile.setFileData(fileData == null ? null : new javax.sql.rowset.serial.SerialBlob(fileData));
         strainFile.setContentType(rs.getString("CONTENT_TYPE"));
         strainFile.setFileName(rs.getString("FILE_NAME"));
         strainFile.setLastModifiedDate(rs.getDate("LAST_MODIFIED_DATE"));

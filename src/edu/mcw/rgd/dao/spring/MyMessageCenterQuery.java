@@ -5,7 +5,6 @@ import org.springframework.jdbc.object.MappingSqlQuery;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
-import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -27,11 +26,9 @@ public class MyMessageCenterQuery extends MappingSqlQuery {
         mcm.setUsername(rs.getString("username"));
         mcm.setTitle(rs.getString("title"));
 
-        Clob c = rs.getClob("message");
-
         StringBuffer str = new StringBuffer();
         String strng;
-        try (BufferedReader bufferRead = new BufferedReader(c.getCharacterStream())) {
+        try (BufferedReader bufferRead = new BufferedReader(rs.getCharacterStream("message"))) {
 
             while ((strng = bufferRead.readLine()) != null)
                 str.append(strng);
