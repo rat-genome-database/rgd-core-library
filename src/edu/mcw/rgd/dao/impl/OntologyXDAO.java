@@ -327,9 +327,11 @@ public class OntologyXDAO extends AbstractDAO {
 
         String query;
         query = "SELECT DISTINCT s.* FROM (\n"+
-            "  SELECT * FROM ont_dag \n"+
-            "  START WITH child_term_acc=? \n"+
-            "  CONNECT BY PRIOR parent_term_acc=child_term_acc \n"+
+            "  WITH RECURSIVE a AS (\n"+
+            "    SELECT * FROM ont_dag WHERE child_term_acc=? \n"+
+            "    UNION\n"+
+            "    SELECT o.* FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc \n"+
+            "  ) SELECT * FROM a \n"+
             ")d, ont_synonyms s \n"+
             " WHERE child_term_acc=term_acc AND synonym_type IN(";
          //       +Utils.buildInPhraseQuoted(synonymTypes)
@@ -432,7 +434,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql =
                 "insert into ONT_TERMS (ONT_ID,TERM_ACC,TERM,IS_OBSOLETE,TERM_DEFINITION,CREATED_BY,CREATION_DATE,TERM_COMMENT) "+
-                "select ?,?,?,?,?,?,?,? from DUAL where not exists(select 1 from ONT_TERMS where TERM_ACC=?)";
+                "select ?,?,?,?,?,?,CAST(? AS TIMESTAMP),? where not exists(select 1 from ONT_TERMS where TERM_ACC=?)";
 
         return update(sql, term.getOntologyId(), term.getAccId(), term.getTerm(), term.getObsolete(),
                 term.getDefinition(), term.getCreatedBy(), term.getCreationDate(), term.getComment(), term.getAccId());
@@ -448,7 +450,7 @@ public class OntologyXDAO extends AbstractDAO {
 
         String sql =
                 "update ONT_TERMS set TERM=?,IS_OBSOLETE=?,TERM_DEFINITION=?,CREATED_BY=?,CREATION_DATE=?" +
-                ",MODIFICATION_DATE=SYSDATE,TERM_COMMENT=? where TERM_ACC=?";
+                ",MODIFICATION_DATE=LOCALTIMESTAMP(0),TERM_COMMENT=? where TERM_ACC=?";
 
         return update(sql, term.getTerm(), term.getObsolete(), term.getDefinition(),
                 term.getCreatedBy(), term.getCreationDate(), term.getComment(), term.getAccId());
@@ -496,9 +498,11 @@ public class OntologyXDAO extends AbstractDAO {
     public List<TermDagEdge> getAllParentEdges(String termAcc) throws Exception {
 
         String sql = "select distinct d.child_term_acc,d.parent_term_acc,d.ont_rel_id,d.created_date,t.term parent_term_name from (\n" +
-                "select d.* from ont_dag d\n" +
-                "start with child_term_acc=?\n" +
-                "connect by prior parent_term_acc=child_term_acc\n" +
+                "with recursive a as (\n" +
+                "select * from ont_dag where child_term_acc=?\n" +
+                "union\n" +
+                "select o.* from ont_dag o join a on o.child_term_acc=a.parent_term_acc\n" +
+                ") select * from a\n" +
                 ")d, ont_terms t where  parent_term_acc=term_acc";
 
         TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(), sql);
@@ -516,9 +520,11 @@ public class OntologyXDAO extends AbstractDAO {
         String startCondition = constructAccCondition(termAccs, "child_term_acc");
 
         String sql = "select distinct d.child_term_acc,d.parent_term_acc,d.ont_rel_id,t.term parent_term_name from (\n" +
-                "select d.* from ont_dag d\n" +
-                "start with " + startCondition +
-                "connect by prior parent_term_acc=child_term_acc\n" +
+                "with recursive a as (\n" +
+                "select * from ont_dag where " + startCondition + "\n" +
+                "union\n" +
+                "select o.* from ont_dag o join a on o.child_term_acc=a.parent_term_acc\n" +
+                ") select * from a\n" +
                 ")d, ont_terms t where  parent_term_acc=term_acc";
 
         TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(), sql);
@@ -535,10 +541,12 @@ public class OntologyXDAO extends AbstractDAO {
      public List<TermDagEdge> getAllChildEdges(String termAcc) throws Exception {	 
  	 
          String sql = "select distinct d.child_term_acc,d.parent_term_acc,d.ont_rel_id,t.term parent_term_name from (\n" +	 
-                 "select d.* from ont_dag d\n" +	 
-                 "start with parent_term_acc=?\n" +	 
-                 "connect by prior child_term_acc=parent_term_acc\n" +	 
-                 ")d, ont_terms t where child_term_acc=term_acc";	 
+                 "with recursive a as (\n" +
+                 "select * from ont_dag where parent_term_acc=?\n" +
+                 "union\n" +
+                 "select o.* from ont_dag o join a on o.parent_term_acc=a.child_term_acc\n" +
+                 ") select * from a\n" +
+                 ")d, ont_terms t where child_term_acc=term_acc";
 				 
          TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(), sql);
          return execute(q, termAcc);
@@ -547,12 +555,15 @@ public class OntologyXDAO extends AbstractDAO {
     public List<TermDagEdge> getAllChildEdges(List<String> termAccList) throws Exception {
 
         String sql = "select distinct d.child_term_acc,d.parent_term_acc,d.ont_rel_id,t.term parent_term_name from (\n" +
-                "select d.* from ont_dag d\n" +
-                "start with parent_term_acc in (";
+                "with recursive a as (\n" +
+                "select * from ont_dag where parent_term_acc in (";
       //  +Utils.buildInPhraseQuoted(termAccList)+
                 String accVal= termAccList.stream().map(t -> "'" + t + "'").collect(Collectors.joining(", "));
                sql+=accVal;
-                sql+= ") connect by prior child_term_acc=parent_term_acc\n" +
+                sql+= ")\n" +
+                "union\n" +
+                "select o.* from ont_dag o join a on o.parent_term_acc=a.child_term_acc\n" +
+                ") select * from a\n" +
                 ")d, ont_terms t where child_term_acc=term_acc";
         TermDagEdgeQuery q = new TermDagEdgeQuery(this.getDataSource(), sql);
         return execute(q);
@@ -586,12 +597,15 @@ public class OntologyXDAO extends AbstractDAO {
     public boolean isDescendantOf(String termAcc, String ancestorTermAcc) throws Exception {
 
         String sql = """
-            SELECT COUNT(parent_term_acc) FROM ont_dag
-            WHERE parent_term_acc=?
-            START WITH child_term_acc=?
-            CONNECT BY PRIOR parent_term_acc=child_term_acc""";
+            WITH RECURSIVE a AS (
+                SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=?
+                UNION ALL
+                SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc
+            )
+            SELECT COUNT(parent_term_acc) FROM a
+            WHERE parent_term_acc=?""";
 
-        return getCount(sql, ancestorTermAcc, termAcc)!=0;
+        return getCount(sql, termAcc, ancestorTermAcc)!=0;
     }
 
     /**
@@ -622,9 +636,11 @@ public class OntologyXDAO extends AbstractDAO {
     public List<String> getAllActiveTermAncestorAccIds(String termAcc) throws Exception {
         String sql = "SELECT t.term_acc FROM ont_terms t "+
                 "WHERE term_acc IN( "+
-                "  SELECT parent_term_acc FROM ont_dag "+
-                "  START WITH child_term_acc=? "+
-                "  CONNECT BY PRIOR parent_term_acc=child_term_acc"+
+                "  WITH RECURSIVE a AS ( "+
+                "    SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=? "+
+                "    UNION "+
+                "    SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc "+
+                "  ) SELECT parent_term_acc FROM a"+
                 ") AND is_obsolete=0";
         return StringListQuery.execute(this, sql, termAcc);
     }
@@ -638,9 +654,11 @@ public class OntologyXDAO extends AbstractDAO {
     public List<Term> getAllActiveTermAncestors(String termAcc) throws Exception {
         String sql = "SELECT t.* FROM ont_terms t "+
                 "WHERE term_acc IN( "+
-                "  SELECT parent_term_acc FROM ont_dag "+
-                "  START WITH child_term_acc=? "+
-                "  CONNECT BY PRIOR parent_term_acc=child_term_acc"+
+                "  WITH RECURSIVE a AS ( "+
+                "    SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=? "+
+                "    UNION "+
+                "    SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc "+
+                "  ) SELECT parent_term_acc FROM a"+
                 ") AND is_obsolete=0";
         return executeTermQuery(sql, termAcc);
     }
@@ -654,9 +672,11 @@ public class OntologyXDAO extends AbstractDAO {
     public List<Term> getAllActiveTermDescendants(String termAcc) throws Exception {
         String sql = "SELECT t.* FROM ont_terms t "+
                 "WHERE term_acc IN( "+
-                "  SELECT child_term_acc FROM ont_dag "+
-                "  START WITH parent_term_acc=? "+
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc "+
+                "  WITH RECURSIVE a AS ( "+
+                "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=? "+
+                "    UNION "+
+                "    SELECT o.child_term_acc FROM ont_dag o JOIN a ON o.parent_term_acc=a.child_term_acc "+
+                "  ) SELECT child_term_acc FROM a "+
                 ") AND is_obsolete=0";
         return executeTermQuery(sql, termAcc);
     }
@@ -670,9 +690,11 @@ public class OntologyXDAO extends AbstractDAO {
     public List<String> getAllActiveTermDescendantAccIds(String termAcc) throws Exception {
         String sql = "SELECT t.term_acc FROM ont_terms t "+
                 "WHERE term_acc IN( "+
-                "  SELECT child_term_acc FROM ont_dag "+
-                "  START WITH parent_term_acc=? "+
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc "+
+                "  WITH RECURSIVE a AS ( "+
+                "    SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=? "+
+                "    UNION "+
+                "    SELECT o.child_term_acc FROM ont_dag o JOIN a ON o.parent_term_acc=a.child_term_acc "+
+                "  ) SELECT child_term_acc FROM a "+
                 ") AND is_obsolete=0";
         return StringListQuery.execute(this, sql, termAcc);
     }
@@ -704,9 +726,11 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public int getCountOfDescendants(String termAcc) throws Exception {
 
-        String sql = "SELECT COUNT(DISTINCT child_term_acc) FROM ont_dag "+
-                "  START WITH parent_term_acc=? "+
-                "  CONNECT BY PRIOR child_term_acc=parent_term_acc";
+        String sql = "WITH RECURSIVE a AS ( "+
+                "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=? "+
+                "  UNION "+
+                "  SELECT o.child_term_acc FROM ont_dag o JOIN a ON o.parent_term_acc=a.child_term_acc "+
+                ") SELECT COUNT(DISTINCT child_term_acc) FROM a";
         return getCount(sql, termAcc);
     }
 
@@ -718,9 +742,11 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public int getCountOfAncestors(String termAcc) throws Exception {
 
-        String sql = "SELECT COUNT(DISTINCT parent_term_acc) FROM ont_dag "+
-                "  START WITH child_term_acc=? "+
-                "  CONNECT BY PRIOR parent_term_acc=child_term_acc";
+        String sql = "WITH RECURSIVE a AS ( "+
+                "  SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=? "+
+                "  UNION "+
+                "  SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc "+
+                ") SELECT COUNT(DISTINCT parent_term_acc) FROM a";
         return getCount(sql, termAcc);
     }
 
@@ -863,6 +889,21 @@ public class OntologyXDAO extends AbstractDAO {
     public static final int PATH_OPTION_ONE_SHORTEST_AND_LONGEST = 5;
     public static final int PATH_OPTION_ALL = 6; /// up to 50 paths shown
 
+    // all paths from a term (bound to '?') up to a root term, as '/acc1/acc2/.../rootAcc';
+    // only complete paths are returned (the last term on the path has no parents);
+    // the caller appends the ORDER BY clause
+    private static final String PATHS_TO_ROOT_SQL = """
+        WITH RECURSIVE p AS (
+            SELECT parent_term_acc, 1 AS tlevel, '/' || parent_term_acc AS tpath
+            FROM ont_dag WHERE child_term_acc=?
+          UNION ALL
+            SELECT o.parent_term_acc, p.tlevel+1, p.tpath || '/' || o.parent_term_acc
+            FROM ont_dag o JOIN p ON o.child_term_acc=p.parent_term_acc
+        ) CYCLE parent_term_acc SET is_cycle USING cycle_path
+        SELECT tpath FROM p
+        WHERE NOT is_cycle AND NOT EXISTS (SELECT 1 FROM ont_dag x WHERE x.child_term_acc=p.parent_term_acc)
+        """;
+
     /**
      * return list of paths from given term to the root
      * @param termAcc accession id of term from which the paths starts
@@ -875,42 +916,24 @@ public class OntologyXDAO extends AbstractDAO {
         List<List<TermWithStats>> pathList = new ArrayList<>();
         if( option==PATH_OPTION_ONE_SHORTEST ) {
 
-            String sql = "select tpath\n" +
-                    " from (\n" +
-                    "select level tlevel,sys_connect_by_path(parent_term_acc,'/') tpath ,connect_by_isleaf isleaf\n" +
-                    "from ont_dag \n" +
-                    "    start with child_term_acc=?\n" +
-                    "    connect by prior parent_term_acc=child_term_acc\n" +
-                    ") x where isleaf>0\n" +
-                    "order by tlevel";
+            String sql = PATHS_TO_ROOT_SQL +
+                    "order by tlevel, tpath";
             List<String> columns = Utils.getSingleRow(sql, new String[]{termAcc});
             if( columns.size()>0 )
                 pathList.add(buildPath(termAcc+columns.get(0)));
         }
         else if( option==PATH_OPTION_ONE_LONGEST ) {
 
-            String sql = "select tpath\n" +
-                    " from (\n" +
-                    "select level tlevel,sys_connect_by_path(parent_term_acc,'/') tpath ,connect_by_isleaf isleaf\n" +
-                    "from ont_dag \n" +
-                    "    start with child_term_acc=?\n" +
-                    "    connect by prior parent_term_acc=child_term_acc\n" +
-                    ") x where isleaf>0\n" +
-                    "order by tlevel desc";
+            String sql = PATHS_TO_ROOT_SQL +
+                    "order by tlevel desc, tpath";
             List<String> columns = Utils.getSingleRow(sql, new String[]{termAcc});
             if( columns.size()>0 )
                 pathList.add(buildPath(termAcc+columns.get(0)));
         }
         else if( option==PATH_OPTION_ALL_SHORTEST ) {
 
-            String sql = "select tpath\n" +
-                    " from (\n" +
-                    "select level tlevel,sys_connect_by_path(parent_term_acc,'/') tpath ,connect_by_isleaf isleaf\n" +
-                    "from ont_dag \n" +
-                    "    start with child_term_acc=?\n" +
-                    "    connect by prior parent_term_acc=child_term_acc\n" +
-                    ") x where isleaf>0\n" +
-                    "order by tlevel";
+            String sql = PATHS_TO_ROOT_SQL +
+                    "order by tlevel, tpath";
             List<List<String>> rows = Utils.getRows(sql, new String[]{termAcc}, new RowComparator());
             for( List<String> row: rows ) {
                 pathList.add(buildPath(termAcc+row.get(0)));
@@ -918,14 +941,8 @@ public class OntologyXDAO extends AbstractDAO {
         }
         else if( option==PATH_OPTION_ALL_LONGEST ) {
 
-            String sql = "select tpath\n" +
-                    " from (\n" +
-                    "select level tlevel,sys_connect_by_path(parent_term_acc,'/') tpath ,connect_by_isleaf isleaf\n" +
-                    "from ont_dag \n" +
-                    "    start with child_term_acc=?\n" +
-                    "    connect by prior parent_term_acc=child_term_acc\n" +
-                    ") x where isleaf>0\n" +
-                    "order by tlevel desc";
+            String sql = PATHS_TO_ROOT_SQL +
+                    "order by tlevel desc, tpath";
             List<List<String>> rows = Utils.getRows(sql, new String[]{termAcc}, new RowComparator());
             for( List<String> row: rows ) {
                 pathList.add(buildPath(termAcc+row.get(0)));
@@ -933,14 +950,8 @@ public class OntologyXDAO extends AbstractDAO {
         }
         else if( option==PATH_OPTION_ALL ) {
 
-            String sql = "select tpath\n" +
-                    " from (\n" +
-                    "select level tlevel,sys_connect_by_path(parent_term_acc,'/') tpath ,connect_by_isleaf isleaf\n" +
-                    "from ont_dag \n" +
-                    "    start with child_term_acc=?\n" +
-                    "    connect by prior parent_term_acc=child_term_acc\n" +
-                    ") x where isleaf>0\n" +
-                    "";
+            String sql = PATHS_TO_ROOT_SQL +
+                    "order by tpath";
             List<List<String>> rows = Utils.getRows(sql, new String[]{termAcc}, null);
             for( List<String> row: rows ) {
                 pathList.add(buildPath(termAcc+row.get(0)));
@@ -1005,7 +1016,7 @@ public class OntologyXDAO extends AbstractDAO {
             throw new OntologyXDAOException("You cannot insert a dag edge where both parent and child term accession id are the same: "+childTermAcc);
         }
 
-        String sql = "UPDATE ont_dag SET last_modified_date=SYSDATE,ont_rel_id=? "+
+        String sql = "UPDATE ont_dag SET last_modified_date=LOCALTIMESTAMP(0),ont_rel_id=? "+
                 "WHERE parent_term_acc=? AND child_term_acc=?";
         int rowsAffected = update(sql, relId, parentTermAcc, childTermAcc);
         if( rowsAffected!=0 ) {
@@ -1014,7 +1025,7 @@ public class OntologyXDAO extends AbstractDAO {
         }
 
         sql = "INSERT INTO ont_dag (parent_term_acc,child_term_acc,ont_rel_id,created_date,last_modified_date) " +
-            "VALUES (?,?,?,SYSDATE,SYSDATE)";
+            "VALUES (?,?,?,LOCALTIMESTAMP(0),LOCALTIMESTAMP(0))";
 
         return update(sql, parentTermAcc, childTermAcc, relId);
     }
@@ -1048,18 +1059,18 @@ public class OntologyXDAO extends AbstractDAO {
     }
 
     public int mergeDags(String termAccFrom, String termAccTo) throws Exception {
-        String sqlp = "UPDATE ont_dag SET child_term_acc=?,last_modified_date=SYSDATE\n" +
+        String sqlp = "UPDATE ont_dag SET child_term_acc=?,last_modified_date=LOCALTIMESTAMP(0)\n" +
                 "WHERE child_term_acc=? AND parent_term_acc IN(\n" +
                 "  SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=? \n" +
-                "  MINUS\n" +
+                "  EXCEPT\n" +
                 "  SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=?\n" +
                 ")";
         int parentsMerged = update(sqlp, termAccTo, termAccFrom, termAccFrom, termAccTo);
 
-        String sqlc = "UPDATE ont_dag SET parent_term_acc=?,last_modified_date=SYSDATE\n" +
+        String sqlc = "UPDATE ont_dag SET parent_term_acc=?,last_modified_date=LOCALTIMESTAMP(0)\n" +
                 "WHERE parent_term_acc=? AND child_term_acc IN(\n" +
                 "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=? \n" +
-                "  MINUS\n" +
+                "  EXCEPT\n" +
                 "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?\n" +
                 ")";
         int childrenMerged = update(sqlc, termAccTo, termAccFrom, termAccFrom, termAccTo);
@@ -1170,26 +1181,25 @@ public class OntologyXDAO extends AbstractDAO {
      */
     public int insertTermSynonym(TermSynonym synonym) throws Exception {
 
-        String sql = "BEGIN INSERT INTO ont_synonyms (term_acc, synonym_name, synonym_type, dbxrefs, " +
-                " source, created_date, last_modified_date, syn_key)" +
-                "VALUES(?,?,?,?,?,?,?,ont_synonyms_seq.NEXTVAL) "+
-                "RETURNING syn_key INTO ?; END;";
+        String sql = "INSERT INTO ont_synonyms (term_acc, synonym_name, synonym_type, dbxrefs, " +
+                " source, created_date, last_modified_date, syn_key) " +
+                "VALUES(?,?,?,?,?,?,?,nextval('ont_synonyms_seq')) "+
+                "RETURNING syn_key";
 
-        try (Connection conn = this.getConnection() ){
-            CallableStatement cs = conn.prepareCall(sql);
-            cs.setString(1, synonym.getTermAcc());
-            cs.setString(2, synonym.getName());
-            cs.setString(3, synonym.getType());
-            cs.setString(4, synonym.getDbXrefs());
-            cs.setString(5, synonym.getSource());
-            setTimestamp(cs, 6, synonym.getCreatedDate());
-            setTimestamp(cs, 7, synonym.getLastModifiedDate());
+        try (Connection conn = this.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql) ){
+            ps.setString(1, synonym.getTermAcc());
+            ps.setString(2, synonym.getName());
+            ps.setString(3, synonym.getType());
+            ps.setString(4, synonym.getDbXrefs());
+            ps.setString(5, synonym.getSource());
+            ps.setTimestamp(6, synonym.getCreatedDate()==null ? null : new Timestamp(synonym.getCreatedDate().getTime()));
+            ps.setTimestamp(7, synonym.getLastModifiedDate()==null ? null : new Timestamp(synonym.getLastModifiedDate().getTime()));
 
-            cs.registerOutParameter(8, Types.INTEGER); // syn_key
-
-            cs.execute();
-
-            synonym.setKey(cs.getInt(8));
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                synonym.setKey(rs.getInt(1)); // syn_key
+            }
         }
 
         return synonym.getKey();
@@ -1204,7 +1214,7 @@ public class OntologyXDAO extends AbstractDAO {
     public int updateTermSynonym(TermSynonym syn) throws Exception {
 
         String sql = "UPDATE ont_synonyms SET term_acc=?,synonym_name=?,synonym_type=?,dbxrefs=?,"+
-                "source=?,last_modified_date=SYSDATE "+
+                "source=?,last_modified_date=LOCALTIMESTAMP(0) "+
                 "WHERE syn_key=?";
         return update(sql, syn.getTermAcc(), syn.getName(), syn.getType(), syn.getDbXrefs(),
                 syn.getSource(), syn.getKey());
@@ -1220,7 +1230,7 @@ public class OntologyXDAO extends AbstractDAO {
     public int updateTermSynonym(TermSynonym synOriginal, TermSynonym synUpdated) throws Exception {
 
         String sql = "UPDATE ont_synonyms SET term_acc=?,synonym_name=?,synonym_type=?,dbxrefs=? "+
-                "WHERE term_acc=? AND synonym_name=? AND synonym_type=? AND NVL(dbxrefs,'*')=NVL(?,'*')";
+                "WHERE term_acc=? AND synonym_name=? AND synonym_type=? AND COALESCE(dbxrefs,'*')=COALESCE(?,'*')";
 
         return update(sql, synUpdated.getTermAcc(), synUpdated.getName(), synUpdated.getType(), synUpdated.getDbXrefs(),
                 synOriginal.getTermAcc(), synOriginal.getName(), synOriginal.getType(), synOriginal.getDbXrefs());
@@ -1235,7 +1245,7 @@ public class OntologyXDAO extends AbstractDAO {
     public int updateTermSynonymLastModifiedDate(Collection<TermSynonym> synonyms) throws Exception {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
-                "UPDATE ont_synonyms SET last_modified_date=SYSDATE WHERE syn_key=?",
+                "UPDATE ont_synonyms SET last_modified_date=LOCALTIMESTAMP(0) WHERE syn_key=?",
                 new int[]{Types.INTEGER});
         su.compile();
 
@@ -1271,7 +1281,8 @@ public class OntologyXDAO extends AbstractDAO {
             return dropTermSynonym(synonym.getKey());
         }
 
-        String sql = "DELETE FROM ont_synonyms s WHERE s.term_acc=? AND s.synonym_name=? AND s.synonym_type=? AND ROWNUM<2";
+        String sql = "DELETE FROM ont_synonyms WHERE syn_key IN(SELECT s.syn_key FROM ont_synonyms s "+
+                "WHERE s.term_acc=? AND s.synonym_name=? AND s.synonym_type=? ORDER BY s.syn_key FETCH FIRST 1 ROWS ONLY)";
         return update(sql, synonym.getTermAcc(), synonym.getName(), synonym.getType());
     }
 
@@ -1433,11 +1444,12 @@ public class OntologyXDAO extends AbstractDAO {
             "SELECT term_acc,term FROM ont_terms "+
             "WHERE term_acc IN("+
             "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=(SELECT root_term_acc FROM ontologies WHERE ont_id=(SELECT ont_id FROM ont_terms WHERE term_acc=?))"+
-            ") AND EXISTS ("+
-            "  SELECT 1 FROM( SELECT parent_term_acc FROM ont_dag"+
-            " START WITH child_term_acc=?"+
-            " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
-            ") WHERE parent_term_acc=term_acc"+
+            ") AND term_acc IN ("+
+            "  WITH RECURSIVE a AS ("+
+            "    SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=?"+
+            "    UNION"+
+            "    SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc"+
+            "  ) SELECT parent_term_acc FROM a"+
             ")";
         return StringMapQuery.execute(this, sql, termAcc, termAcc);
     }
@@ -1467,11 +1479,12 @@ public class OntologyXDAO extends AbstractDAO {
                 "SELECT term_acc,term FROM ont_terms "+
                         "WHERE term_acc IN("+
                         "  SELECT child_term_acc FROM ont_dag WHERE parent_term_acc=?"+
-                        ") AND EXISTS ("+
-                        "  SELECT 1 FROM( SELECT parent_term_acc FROM ont_dag"+
-                        " START WITH child_term_acc=?"+
-                        " CONNECT BY PRIOR parent_term_acc=child_term_acc"+
-                        ") WHERE parent_term_acc=term_acc"+
+                        ") AND term_acc IN ("+
+                        "  WITH RECURSIVE a AS ("+
+                        "    SELECT parent_term_acc FROM ont_dag WHERE child_term_acc=?"+
+                        "    UNION"+
+                        "    SELECT o.parent_term_acc FROM ont_dag o JOIN a ON o.child_term_acc=a.parent_term_acc"+
+                        "  ) SELECT parent_term_acc FROM a"+
                         ")";
         return StringMapQuery.execute(this, sql, anchorTerm, rdoTermAcc);
     }
@@ -1503,7 +1516,7 @@ public class OntologyXDAO extends AbstractDAO {
     public int obsoleteOrphanedTerms(String ontId) throws Exception {
 
         String sql = """
-            UPDATE ont_terms SET is_obsolete=1, modification_date=SYSDATE
+            UPDATE ont_terms SET is_obsolete=1, modification_date=LOCALTIMESTAMP(0)
             WHERE is_obsolete=0 AND ont_id=?
               AND NOT EXISTS (SELECT 1 FROM ont_dag WHERE term_acc=child_term_acc OR term_acc=parent_term_acc)
             """;
