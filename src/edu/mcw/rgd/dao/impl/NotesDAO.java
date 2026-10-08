@@ -25,7 +25,7 @@ public class NotesDAO extends AbstractDAO {
 
 
     public Note getNoteByKey(int key) throws Exception {
-        String query = "select n.*, nri.ref_key, r.rgd_id as ref_rgd_id from notes n, note_ref_id nri , references r where n.note_key = nri.note_key(+) and n.note_key=" + key + " and nri.ref_key = r.ref_key(+)";
+        String query = "select n.*, nri.ref_key, r.rgd_id as ref_rgd_id from notes n LEFT JOIN note_ref_id nri ON n.note_key = nri.note_key LEFT JOIN \"references\" r ON nri.ref_key = r.ref_key where n.note_key=" + key;
 
         //String query = "select n.*, nri.ref_key from notes n, note_ref_id nri where n.note_key = nri.note_key(+) and n.note_key=" + key;
         List<Note> notes = new ArrayList<Note>();
@@ -41,8 +41,8 @@ public class NotesDAO extends AbstractDAO {
 
     public List<Note> getNotes(int rgdId) throws Exception {
         String query = "SELECT n.*, nri.ref_key, r.rgd_id as ref_rgd_id "
-            +"FROM notes n, note_ref_id nri, references r "
-            +"WHERE n.note_key = nri.note_key(+) and nri.ref_key=r.ref_key(+) and n.rgd_id=?";
+            +"FROM notes n LEFT JOIN note_ref_id nri ON n.note_key = nri.note_key LEFT JOIN \"references\" r ON nri.ref_key=r.ref_key "
+            +"WHERE n.rgd_id=?";
         NotesQuery gq = new NotesQuery(this.getDataSource(), query);
         gq.declareParameter(new SqlParameter(Types.INTEGER));
         gq.compile();
@@ -51,8 +51,8 @@ public class NotesDAO extends AbstractDAO {
 
     public List<Note> getNotes(int rgdId, String noteTypeName) throws Exception {
         String query = "SELECT n.*, nri.ref_key, r.rgd_id as ref_rgd_id "
-            +"FROM notes n, note_ref_id nri, references r "
-            +"WHERE n.note_key = nri.note_key(+) and nri.ref_key=r.ref_key(+) and n.rgd_id=? and n.notes_type_name_lc=?";
+            +"FROM notes n LEFT JOIN note_ref_id nri ON n.note_key = nri.note_key LEFT JOIN \"references\" r ON nri.ref_key=r.ref_key "
+            +"WHERE n.rgd_id=? and n.notes_type_name_lc=?";
         NotesQuery gq = new NotesQuery(this.getDataSource(), query);
         gq.declareParameter(new SqlParameter(Types.INTEGER));
         gq.declareParameter(new SqlParameter(Types.VARCHAR));
