@@ -95,8 +95,9 @@ public class TranscriptDAO extends AbstractDAO {
     public List<TranscriptFeature> getFeatures(int transcriptRgdId) throws Exception {
 
         String query = "SELECT m.*,t.transcript_rgd_id,r.object_key " +
-                "FROM maps_data m,transcript_features t,rgd_ids r " +
-                "WHERE m.rgd_id(+)=t.feature_rgd_id AND t.transcript_rgd_id=? AND t.feature_rgd_id=r.rgd_id";
+                "FROM transcript_features t JOIN rgd_ids r ON t.feature_rgd_id=r.rgd_id " +
+                "LEFT JOIN maps_data m ON m.rgd_id=t.feature_rgd_id " +
+                "WHERE t.transcript_rgd_id=?";
         TranscriptFeatureQuery q = new TranscriptFeatureQuery(this.getDataSource(), query);
         return execute(q, transcriptRgdId);
     }
@@ -529,12 +530,12 @@ public class TranscriptDAO extends AbstractDAO {
     }
 
     public void updateTranscriptVersionInfo(String acc, String version) throws Exception {
-        String sql = "UPDATE stable_transcripts SET last_version=?, last_version_date=SYSDATE WHERE accession=?";
+        String sql = "UPDATE stable_transcripts SET last_version=?, last_version_date=LOCALTIMESTAMP(0) WHERE accession=?";
         update(sql, version, acc);
     }
 
     public void insertTranscriptVersionInfo(String acc, String version, int rgdId) throws Exception {
-        String sql = "INSERT INTO stable_transcripts (accession,last_version,last_version_date,rgd_id) VALUES(?,?,SYSDATE,?)";
+        String sql = "INSERT INTO stable_transcripts (accession,last_version,last_version_date,rgd_id) VALUES(?,?,LOCALTIMESTAMP(0),?)";
         update(sql, acc, version, rgdId);
     }
 
