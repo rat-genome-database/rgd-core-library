@@ -24,7 +24,7 @@ public class SubmittedStrainDao extends AbstractDAO {
        "reference_id, display_status, notes, research_use, ilar_code,  AVAILABILTIY_CONTACT_EMAIL, AVAILABILTTY_CONTACT_URL, gene_symbol,GENE_RGD_ID, allele_symbol,ALLELE_RGD_ID,"+
                "last_name, first_name, email, pi, organization, created_date, last_updated_date, modified_by, approval_status,pi_email,image_url,strain_rgd_id)"+
         "values (?, ?,?, ?,?, ?, ?, ?, ?,?, ?,?, ?,?, ?, "+
-               " ?, ?,?,?,?, ?, ?, ?,?,?,  SYSDATE, SYSDATE, ?, ?,?,?,?)";
+               " ?, ?,?,?,?, ?, ?, ?,?,?,  LOCALTIMESTAMP(0), LOCALTIMESTAMP(0), ?, ?,?,?,?)";
         int submittedStrainKey= s.getSubmittedStrainKey();
         String strainSymbol= s.getStrainSymbol();
         String strain_symbol_lc= s.getStrainSymbolLc();
@@ -68,31 +68,31 @@ public class SubmittedStrainDao extends AbstractDAO {
     }
 
     public int updateStrainRgdId(int submissionKey, int strainRgdId) throws Exception{
-        String sql="update submitted_strains set strain_rgd_id=?,last_updated_date=SYSDATE where submitted_strain_key=?";
+        String sql="update submitted_strains set strain_rgd_id=?,last_updated_date=LOCALTIMESTAMP(0) where submitted_strain_key=?";
 
         return update(sql,strainRgdId,submissionKey);
     }
 
     public int updateGeneRgdId(int submissionKey, int geneRgdId) throws Exception{
-        String sql="update submitted_strains set gene_rgd_id=?,last_updated_date=SYSDATE where submitted_strain_key=?";
+        String sql="update submitted_strains set gene_rgd_id=?,last_updated_date=LOCALTIMESTAMP(0) where submitted_strain_key=?";
 
         return update(sql,geneRgdId,submissionKey);
     }
     public int updateAlleleRgdId(int submissionKey, int alleleRgdId) throws Exception{
-        String sql="update submitted_strains set allele_rgd_id=?,last_updated_date=SYSDATE  where submitted_strain_key=?";
+        String sql="update submitted_strains set allele_rgd_id=?,last_updated_date=LOCALTIMESTAMP(0)  where submitted_strain_key=?";
         return update(sql,alleleRgdId, submissionKey);
     }
     public int updateApprovalStatus(int submissionKey, String status)throws Exception{
-        String sql="update submitted_strains set approval_status=?, last_updated_date=SYSDATE where submitted_strain_key=?";
+        String sql="update submitted_strains set approval_status=?, last_updated_date=LOCALTIMESTAMP(0) where submitted_strain_key=?";
         return update(sql, status, submissionKey);
     }
     public int updateImageUrl(int key, String imageUrl) throws Exception{
-        String sql="update submitted_strains set image_url=?, last_updated_date=SYSDATE where submitted_strain_key=?";
+        String sql="update submitted_strains set image_url=?, last_updated_date=LOCALTIMESTAMP(0) where submitted_strain_key=?";
         return update(sql, imageUrl, key);
 
     }
     public int delete(int submissionKey) throws Exception{
-        String sql="delete submitted_strains where SUBMITTED_STRAIN_KEY=?";
+        String sql="delete from submitted_strains where SUBMITTED_STRAIN_KEY=?";
         return update(sql, submissionKey);
 
     }
@@ -128,7 +128,7 @@ public class SubmittedStrainDao extends AbstractDAO {
         else return null;
     }
     public int updateSubmittedStrain(String strainSymbolLc, String status) throws Exception{
-        String sql= "update submitted_strains set approval_status=? , last_updated_date = SYSDATE where strain_symbol_lc=?";
+        String sql= "update submitted_strains set approval_status=? , last_updated_date = LOCALTIMESTAMP(0) where strain_symbol_lc=?";
         return update(sql,status,strainSymbolLc);
     }
 
