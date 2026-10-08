@@ -415,7 +415,7 @@ public class OrthologDAO extends AbstractDAO {
 
         BatchSqlUpdate su = new BatchSqlUpdate(this.getDataSource(),
                 "UPDATE genetogene_rgd_id_rlt " +
-                        "SET last_modified_by=?, last_modified_date=SYSTIMESTAMP " +
+                        "SET last_modified_by=?, last_modified_date=LOCALTIMESTAMP(0) " +
                         "WHERE genetogene_key=?",
                 new int[]{Types.INTEGER, Types.INTEGER});
 
@@ -492,7 +492,7 @@ public class OrthologDAO extends AbstractDAO {
     }
     public Map<String, Integer> getOrthologCounts(int mapKey, int speciesTypeKey, String chr) throws Exception {
 
-        String sql = "SELECT d.species_type_key, COUNT(d.species_type_key) " +
+        String sql = "SELECT d.species_type_key, COUNT(d.species_type_key) AS cnt " +
                 "FROM genetogene_rgd_id_rlt o, rgd_ids s,rgd_ids d " +
                 "WHERE o.src_rgd_id=s.rgd_id " +
                 "AND o.dest_rgd_id=d.rgd_id " +
@@ -516,7 +516,7 @@ public class OrthologDAO extends AbstractDAO {
 
             while (rs.next()) {
                 String sKey = rs.getString("species_type_key");
-                int count = rs.getInt("count(d.species_type_key)");
+                int count = rs.getInt("cnt");
 
                 counts.put(sKey, count);
                 //    System.out.println(sKey+" || "+ count);
