@@ -25,7 +25,7 @@ public class ProjectDAO extends AbstractDAO{
 
     public List<Integer> getReferenceRgdIdsForProject(int projectRgdId) throws Exception {
         String query = "SELECT RGD_ID " +
-                "FROM references " +
+                "FROM \"references\" " +
                 "WHERE ref_key IN (" +
                 "    SELECT ref_key " +
                 "    FROM rgd_ref_rgd_id " +
