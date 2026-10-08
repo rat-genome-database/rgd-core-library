@@ -35,7 +35,7 @@ public class RGDSpringLogger extends AbstractDAO {
         } catch( IndexOutOfBoundsException e ) {
             // trick: if rpt_process_type_id, getCount() will throw IndexOutOfBoundsException
             // we intercept the exception to create a new rpt_process_type_id
-            String sql2 = "INSERT INTO report_process_types (rpt_process_type_id,subsystem_name,data_extract) VALUES(report_process_types_seq.NEXTVAL,?,?)";
+            String sql2 = "INSERT INTO report_process_types (rpt_process_type_id,subsystem_name,data_extract) VALUES(nextval('report_process_types_seq'),?,?)";
             update(sql2, subSystemName, dataExtract);
 
             // retry to get rpt_process_type_id
@@ -43,7 +43,7 @@ public class RGDSpringLogger extends AbstractDAO {
         }
 
         // Finally do the insert
-        sql = "INSERT INTO report_extracts VALUES(report_extracts_seq.nextval, ?, ?, SYSDATE)";
+        sql = "INSERT INTO report_extracts VALUES(nextval('report_extracts_seq'), ?, ?, LOCALTIMESTAMP(0))";
         update(sql, rptProcessType, dataValue);
     }
 
