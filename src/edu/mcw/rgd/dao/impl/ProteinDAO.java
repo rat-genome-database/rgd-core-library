@@ -22,7 +22,7 @@ public class ProteinDAO extends AbstractDAO {
     public void insertProtein(Protein protein) throws Exception {
 
         String sql = "INSERT INTO proteins (rgd_id,uniprot_id,protein_symbol,protein_name,created_date,src_pipeline,is_canonical) "+
-                "VALUES(?,?,?,?,SYSDATE,?,?)";
+                "VALUES(?,?,?,?,LOCALTIMESTAMP(0),?,?)";
         update(sql, protein.getRgdId(), protein.getUniprotId(), protein.getSymbol(), protein.getName(),
                 protein.getSrcPipeline(), protein.isCanonical()?1:0);
     }
