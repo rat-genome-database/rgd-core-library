@@ -334,81 +334,82 @@ public class AbstractDAO implements DAO {
     }
 
 
-    ///// DDL operations: enable/disable indexes/constraints
+// Oracle-only bulk-load helpers (ALTER INDEX ... UNUSABLE/REBUILD, DISABLE/ENABLE CONSTRAINT, user_indexes/user_constraints); no PostgreSQL equivalent and unused.
+//     ///// DDL operations: enable/disable indexes/constraints
 
-    /**
-     * get all indexes for table with given status
-     * @param tableName table name
-     * @param indexStatus index status, f.e. VALID or UNUSABLE
-     * @return names of indexes
-     * @throws Exception
-     */
-    public List<String> getIndexesForTable(String tableName, String indexStatus) throws Exception {
+//     /**
+//      * get all indexes for table with given status
+//      * @param tableName table name
+//      * @param indexStatus index status, f.e. VALID or UNUSABLE
+//      * @return names of indexes
+//      * @throws Exception
+//      */
+//     public List<String> getIndexesForTable(String tableName, String indexStatus) throws Exception {
 
-        String sql = "SELECT index_name FROM user_indexes WHERE table_name=? AND status=?";
-        //String sql = "SELECT index_name FROM user_indexes WHERE table_name=? AND status=? AND UNIQUENESS<>'UNIQUE'";
-        StringListQuery q = new StringListQuery(this.getDataSource(), sql);
-        return execute(q, tableName, indexStatus);
-    }
+//         String sql = "SELECT index_name FROM user_indexes WHERE table_name=? AND status=?";
+//         //String sql = "SELECT index_name FROM user_indexes WHERE table_name=? AND status=? AND UNIQUENESS<>'UNIQUE'";
+//         StringListQuery q = new StringListQuery(this.getDataSource(), sql);
+//         return execute(q, tableName, indexStatus);
+//     }
 
-    public int disableIndexesForTable(String tableName) throws Exception {
+//     public int disableIndexesForTable(String tableName) throws Exception {
 
-        int count = 0;
-        for( String indexName: getIndexesForTable(tableName, "VALID"))  {
-            String sql = "ALTER INDEX "+indexName+" UNUSABLE";
-            System.out.println(sql);
+//         int count = 0;
+//         for( String indexName: getIndexesForTable(tableName, "VALID"))  {
+//             String sql = "ALTER INDEX "+indexName+" UNUSABLE";
+//             System.out.println(sql);
 
-            update(sql);
-            count++;
-        }
-        return count;
-    }
+//             update(sql);
+//             count++;
+//         }
+//         return count;
+//     }
 
-    public int enableIndexesForTable(String tableName) throws Exception {
+//     public int enableIndexesForTable(String tableName) throws Exception {
 
-        int count = 0;
-        for( String indexName: getIndexesForTable(tableName, "UNUSABLE"))  {
-            String sql = "ALTER INDEX "+indexName+" REBUILD PARALLEL NOCOMPRESS NOLOGGING";
-            System.out.println(sql);
+//         int count = 0;
+//         for( String indexName: getIndexesForTable(tableName, "UNUSABLE"))  {
+//             String sql = "ALTER INDEX "+indexName+" REBUILD PARALLEL NOCOMPRESS NOLOGGING";
+//             System.out.println(sql);
 
-            update(sql);
-            count++;
-        }
-        return count;
-    }
+//             update(sql);
+//             count++;
+//         }
+//         return count;
+//     }
 
 
-    public List<String> getConstraintsForTable(String tableName, String constraintType) throws Exception {
+//     public List<String> getConstraintsForTable(String tableName, String constraintType) throws Exception {
 
-        String sql = "SELECT constraint_name FROM user_constraints WHERE table_name=? AND constraint_type=?";
-        StringListQuery q = new StringListQuery(this.getDataSource(), sql);
-        return execute(q, tableName, constraintType);
-    }
+//         String sql = "SELECT constraint_name FROM user_constraints WHERE table_name=? AND constraint_type=?";
+//         StringListQuery q = new StringListQuery(this.getDataSource(), sql);
+//         return execute(q, tableName, constraintType);
+//     }
 
-    public int disableConstraintsForTable(String tableName) throws Exception {
+//     public int disableConstraintsForTable(String tableName) throws Exception {
 
-        int count = 0;
-        for( String constraintName: getConstraintsForTable(tableName, "R"))  {
-            String sql = "ALTER TABLE "+tableName+" DISABLE CONSTRAINT "+constraintName;
-            //System.out.println(sql);
+//         int count = 0;
+//         for( String constraintName: getConstraintsForTable(tableName, "R"))  {
+//             String sql = "ALTER TABLE "+tableName+" DISABLE CONSTRAINT "+constraintName;
+//             //System.out.println(sql);
 
-            update(sql);
-            count++;
-        }
-        return count;
-    }
+//             update(sql);
+//             count++;
+//         }
+//         return count;
+//     }
 
-    public int enableConstraintsForTable(String tableName) throws Exception {
+//     public int enableConstraintsForTable(String tableName) throws Exception {
 
-        int count = 0;
-        for( String constraintName: getConstraintsForTable(tableName, "R"))  {
-            String sql = "ALTER TABLE "+tableName+" ENABLE CONSTRAINT "+constraintName;
-            //System.out.println(sql);
+//         int count = 0;
+//         for( String constraintName: getConstraintsForTable(tableName, "R"))  {
+//             String sql = "ALTER TABLE "+tableName+" ENABLE CONSTRAINT "+constraintName;
+//             //System.out.println(sql);
 
-            update(sql);
-            count++;
-        }
-        return count;
-    }
+//             update(sql);
+//             count++;
+//         }
+//         return count;
+//     }
 
 }
