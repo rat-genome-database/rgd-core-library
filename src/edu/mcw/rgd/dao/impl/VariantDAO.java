@@ -179,7 +179,6 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getVariantTypeSQL();
         sql += vsb.getIsFrameshiftSQL();
 
-        sql += "    order by v.rgd_id";
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
@@ -225,7 +224,6 @@ public class VariantDAO extends JdbcBaseDAO {
         sql += vsb.getVariantTypeSQL();
         sql += vsb.getIsFrameshiftSQL();
 
-        sql += "    order by v.rgd_id";
         sql = sqlFrom + sql;
 
         logger.debug("\n\n" + sql + "\n\n");
@@ -480,7 +478,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 " total_depth, var_freq, quality_score, rgd_id, hgvs_name,\n" +
                 " variant_type, var_nuc, zygosity_status, genic_status, zygosity_percent_read,\n" +
                 " zygosity_num_allele, zygosity_poss_error, zygosity_ref_allele, zygosity_in_pseudo, padding_base, variant_id)\n" +
-                "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, VARIANT_SEQ.NEXTVAL)";
+                "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, nextval('variant_seq'))";
 
         int countInserted = 0;
         try(Connection conn = this.getDataSource().getConnection() ) {
@@ -547,7 +545,7 @@ public class VariantDAO extends JdbcBaseDAO {
                         " ZYGOSITY_PERCENT_READ, ZYGOSITY_NUM_ALLELE, ZYGOSITY_POSS_ERROR, ZYGOSITY_REF_ALLELE, ZYGOSITY_IN_PSEUDO,\n" +
                         " PADDING_BASE)\n" +
                         "VALUES (\n" +
-                        "  VARIANT_SEQ.NEXTVAL,?,?,?,?,\n" +
+                        "  nextval('variant_seq'),?,?,?,?,\n" +
                         "  ?,?,?,?,?,\n" +
                         "  ?,?,?,?,?,\n" +
                         "  ?,?,?,?,?,\n" +
@@ -611,7 +609,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 "where v.rgd_ID in (select distinct(variant_rgd_ID) from POLYPHEN where VARIANT_RGD_ID in "+
                 " (select VARIANT_RGD_ID from VARIANT_TRANSCRIPT where TRANSCRIPT_RGD_ID IN "+
                 "(select TRANSCRIPT_RGD_ID from TRANSCRIPTS where GENE_RGD_ID =? ))"+
-                "AND PREDICTION LIKE '%damaging') and vsd.SAMPLE_ID IN (SELECT UNIQUE(SAMPLE_ID) "+
+                "AND PREDICTION LIKE '%damaging') and vsd.SAMPLE_ID IN (SELECT DISTINCT(SAMPLE_ID) "+
                 "from SAMPLE where MAP_KEY = ?) ORDER BY START_POS,END_POS,REF_NUC,VAR_NUC";
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
@@ -634,7 +632,7 @@ public class VariantDAO extends JdbcBaseDAO {
 
     public List<String> getAssemblyOfDamagingVariants(int strainRgdId) throws Exception {
 
-        String sql = "select UNIQUE(MAP_KEY) from SAMPLE where STRAIN_RGD_ID = " + strainRgdId;
+        String sql = "select DISTINCT(MAP_KEY) from SAMPLE where STRAIN_RGD_ID = " + strainRgdId;
         return getList(sql);
     }
 
@@ -667,7 +665,7 @@ public class VariantDAO extends JdbcBaseDAO {
                 "from POLYPHEN p inner join VARIANT v \n"+
                 " on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging'  " +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
-                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8"+
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8 "+
                 "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey;
 
         return getCount(sql);
@@ -675,12 +673,12 @@ public class VariantDAO extends JdbcBaseDAO {
 
     public boolean hasDamagingVariants(int sampleId, String mapKey) throws Exception {
         //String sql = "select /*+ PARALLEL*/ count(DISTINCT(p.VARIANT_RGD_ID)) as count " +
-        String sql = "select count(*) as count " +
+        String sql = "select count(*) as count from (select 1 as x " +
                 "from POLYPHEN p inner join VARIANT v \n"+
                 " on p.VARIANT_RGD_ID = v.RGD_ID and p.PREDICTION LIKE '%damaging'  " +
                 " inner join VARIANT_MAP_DATA  vmd on vmd.rgd_id=v.rgd_id " +
-                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8"+
-                "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey + " and rownum < 2";
+                " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id  and vsd.total_depth > 8 "+
+                "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID =" + sampleId +" and s.MAP_KEY ="+mapKey + " FETCH FIRST 1 ROWS ONLY) d";
 
         int count = getCount(sql);
 
