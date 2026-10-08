@@ -124,10 +124,10 @@ public class DescriptionGenerator {
      */
     public List<AnnotationDG> getAnnotationsForDescriptionGenerator(int rgdId) throws Exception {
         String query = "SELECT a.term_acc,a.term,a.qualifier,a.aspect,a.evidence,"+
-                "DECODE(evidence,'IDA',1,'IGI',1,'EXP',1,'IPI',1,'IMP',1,'IEP',1,'IED',1,'IPM',1,'IAGP',1,"+
-                        "'ISS',2,'ISO',2,'ISA',2,'ISM',2,"+
-                        "'TAS',3,'IEA',3,'IC',3,'RCA',3,'IGC',3,"+
-                        "4) equalifier "+
+                "CASE WHEN evidence IN ('IDA','IGI','EXP','IPI','IMP','IEP','IED','IPM','IAGP') THEN 1 "+
+                        "WHEN evidence IN ('ISS','ISO','ISA','ISM') THEN 2 "+
+                        "WHEN evidence IN ('TAS','IEA','IC','RCA','IGC') THEN 3 "+
+                        "ELSE 4 END equalifier "+
             "FROM full_annot a WHERE annotated_object_rgd_id=? ORDER BY term, equalifier";
 
         AnnotationDGQuery q = new AnnotationDGQuery(DataSourceFactory.getInstance().getDataSource(), query);
