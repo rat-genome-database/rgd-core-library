@@ -15,12 +15,12 @@ public class InteractionCountsDAO extends AbstractDAO{
 
     public int insert(InteractionCount count) throws Exception{
         String sql = "INSERT INTO interaction_counts (rgd_id, interactions_count, created_date, last_modified_date) "+
-                "select ?,?, SYSDATE, SYSDATE from dual  where not exists (select  rgd_id from interaction_counts where rgd_id=?)";
+                "select ?,?, LOCALTIMESTAMP(0), LOCALTIMESTAMP(0) where not exists (select  rgd_id from interaction_counts where rgd_id=?)";
         return update(sql, count.getRgdId(), count.getCount(), count.getRgdId());
     }
 
     public int update(InteractionCount count) throws Exception{
-        String sql= "UPDATE interaction_counts SET interactions_count=?, last_modified_date=SYSDATE WHERE rgd_id=? AND interactions_count<>?";
+        String sql= "UPDATE interaction_counts SET interactions_count=?, last_modified_date=LOCALTIMESTAMP(0) WHERE rgd_id=? AND interactions_count<>?";
         return update(sql, count.getCount(), count.getRgdId(), count.getCount());
     }
 
