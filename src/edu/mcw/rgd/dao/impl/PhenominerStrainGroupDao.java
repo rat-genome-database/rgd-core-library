@@ -13,7 +13,7 @@ import java.util.List;
 public class PhenominerStrainGroupDao extends OntologyXDAO{
 
     public int insertOrUpdate(PhenominerStrainGroup strainGroup) throws Exception {
-        String sql= "insert into PHENOMINER_STRAIN_GROUP(strain_group_id, strain_group_name, strain_ont_id, created_date, last_modified_date) values( "+strainGroup.getId()+",'" + strainGroup.getName()+"', '"+strainGroup.getStrain_ont_id()+"' , SYSDATE, SYSDATE)";
+        String sql= "insert into PHENOMINER_STRAIN_GROUP(strain_group_id, strain_group_name, strain_ont_id, created_date, last_modified_date) values( "+strainGroup.getId()+",'" + strainGroup.getName()+"', '"+strainGroup.getStrain_ont_id()+"' , LOCALTIMESTAMP(0), LOCALTIMESTAMP(0))";
         return this.update(sql);
     }
     public List<PhenominerStrainGroup> getAllStrainGroups() throws Exception {
