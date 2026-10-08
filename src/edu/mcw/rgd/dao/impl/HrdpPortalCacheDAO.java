@@ -53,7 +53,7 @@ public class HrdpPortalCacheDAO extends AbstractDAO {
        String sql= """
                 SELECT strain_id
                 FROM HRDP_PORTAL_CACHE
-               WHERE REGEXP_LIKE(available_strain_id, '(^|,)' || :availStrainId || '(,|$)')               
+               WHERE available_strain_id ~ ('(^|,)' || ? || '(,|$)')
                 """;
 
        List<String> strain = StringListQuery.execute(this,sql,availStrainId);
