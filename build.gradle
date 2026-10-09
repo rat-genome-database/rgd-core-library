@@ -1,0 +1,234 @@
+plugins {
+    id 'java'
+}
+
+group = 'edu.mcw.rgd'
+version = '1.1.3'
+
+ext {
+    appName = 'rgdcore'
+    mainClass = 'src.edu.mcw.rgd.dataload.DataLoadingManager'
+}
+
+def libDir = layout.projectDirectory.dir('lib')
+def distDir = layout.projectDirectory.dir('dist')
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    // lib/ was a hand-curated flat classpath, so dependencies resolve
+    // non-transitively: pulling in the full graphs would both balloon the jar
+    // set (233 artifacts instead of 72) and, through Gradle's conflict
+    // resolution, silently upgrade 15 modules that are pinned here on purpose.
+    // This has to be set on the resolvable configurations -- setting it on
+    // 'implementation' has no effect on how the classpath resolves.
+    compileClasspath {
+        transitive = false
+    }
+    runtimeClasspath {
+        transitive = false
+    }
+
+    // lib/ carried four modules at two versions each.  Gradle's conflict
+    // resolution keeps only one version of a module per resolution, even when
+    // non-transitive, so resolving the older copies separately is what keeps
+    // both on the runtime classpath, exactly as the Ant build had them.
+    legacyDuplicates {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+}
+
+dependencies {
+    implementation 'co.elastic.clients:elasticsearch-java:9.4.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.google.code.gson:gson:2.2.2'
+    implementation 'com.metaparadigm:json-rpc:1.0'
+    implementation 'commons-dbcp:commons-dbcp:1.4'
+    implementation 'commons-logging:commons-logging:1.2'
+    implementation 'commons-net:commons-net:2.2'
+    implementation 'commons-pool:commons-pool:1.6'
+    implementation 'io.netty:netty-all:4.1.31.Final'
+    implementation 'jakarta.json:jakarta.json-api:2.1.3'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'javax.servlet:servlet-api:2.4'
+    implementation 'jaxen:jaxen:1.1.1'
+    implementation 'junit:junit:3.8.1'
+    implementation 'mysql:mysql-connector-java:5.1.21'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.httpcomponents:httpasyncclient:4.1.5'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.16'
+    implementation 'org.apache.httpcomponents:httpcore-nio:4.4.16'
+    implementation 'org.apache.logging.log4j:log4j-1.2-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.apache.lucene:lucene-core:8.11.1'
+    implementation 'org.apache.solr:solr-core:8.11.4'
+    implementation 'org.apache.solr:solr-solrj:8.11.4'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.4.0'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.4'
+    implementation 'org.elasticsearch.plugin:lang-mustache-client:7.17.4'
+    implementation 'org.elasticsearch.plugin:rank-eval-client:7.17.4'
+    implementation 'org.elasticsearch:elasticsearch:7.17.4'
+    implementation 'org.elasticsearch:elasticsearch-core:7.17.4'
+    implementation 'org.elasticsearch:elasticsearch-ssl-config:7.17.4'
+    implementation 'org.elasticsearch:elasticsearch-x-content:7.17.4'
+    implementation 'org.postgresql:postgresql:42.7.5'
+    implementation 'org.springframework.ldap:spring-ldap-core:3.1.0'
+    implementation 'org.springframework.security.oauth:spring-security-oauth:2.5.2.RELEASE'
+    implementation 'org.springframework.security:spring-security-config:6.0.5'
+    implementation 'org.springframework.security:spring-security-core:6.0.5'
+    implementation 'org.springframework.security:spring-security-crypto:6.0.5'
+    implementation 'org.springframework.security:spring-security-ldap:6.0.5'
+    implementation 'org.springframework.security:spring-security-taglibs:6.0.5'
+    implementation 'org.springframework.security:spring-security-web:6.0.5'
+    implementation 'org.springframework:spring-aop:6.0.9'
+    implementation 'org.springframework:spring-aspects:6.0.9'
+    implementation 'org.springframework:spring-beans:6.0.9'
+    implementation 'org.springframework:spring-context:6.0.9'
+    implementation 'org.springframework:spring-context-support:6.0.9'
+    implementation 'org.springframework:spring-core:6.0.9'
+    implementation 'org.springframework:spring-expression:6.0.9'
+    implementation 'org.springframework:spring-instrument:6.0.9'
+    implementation 'org.springframework:spring-instrument-tomcat:4.3.30.RELEASE'
+    implementation 'org.springframework:spring-jdbc:6.0.9'
+    implementation 'org.springframework:spring-jms:6.0.9'
+    implementation 'org.springframework:spring-orm:6.0.9'
+    implementation 'org.springframework:spring-oxm:6.0.9'
+    implementation 'org.springframework:spring-struts:3.2.3.RELEASE'
+    implementation 'org.springframework:spring-test:6.0.9'
+    implementation 'org.springframework:spring-tx:6.0.9'
+    implementation 'org.springframework:spring-web:6.0.9'
+    implementation 'org.springframework:spring-webmvc:6.0.9'
+
+//    legacyDuplicates 'org.apache.logging.log4j:log4j-1.2-api:2.17.1'
+//    legacyDuplicates 'org.apache.logging.log4j:log4j-api:2.17.1'
+//    legacyDuplicates 'org.apache.logging.log4j:log4j-core:2.17.1'
+//    legacyDuplicates 'org.elasticsearch.client:elasticsearch-rest-client:7.17.4'
+
+    // Not published to Maven Central, so these stay checked into lib/:
+    //   xom 1.2.4              only 1.2.5+ were published; nu.xom is used
+    //                          by edu.mcw.rgd.xml.XomAnalyzer
+    //   jsonp 1.0.1            the org.jsonp group was never published
+    //   spring-build-src       Spring's own internal Gradle build tooling
+    implementation files(
+        "${libDir}/xom-1.2.4.jar",
+        "${libDir}/jsonp-1.0.1.jar",
+        "${libDir}/spring-build-src-3.2.3.RELEASE.jar"
+    )
+}
+
+// What ships: the resolved dependencies plus the pinned older duplicates.
+// Sorted so the manifest Class-Path and dist/lib are deterministic.
+def runtimeJars = files(
+    configurations.named('runtimeClasspath'),
+    configurations.named('legacyDuplicates')
+)
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+// Flat source layout inherited from the Ant build: everything lives under src/,
+// including the classes under edu.mcw.rgd.test, which ship inside the jar.
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = []
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.deprecation = false
+    options.debug = true
+}
+
+tasks.named('jar') {
+    archiveFileName = "${appName}_${version}.jar"
+    destinationDirectory = libDir
+
+    inputs.files(runtimeJars).withPropertyName('runtimeJars')
+
+    manifest {
+        attributes(
+            'Main-Class' : mainClass,
+            'Built-By'   : System.getProperty('user.name'),
+            'App-Version': "${appName}_${version}"
+        )
+    }
+
+    // Both are set at execution time: Class-Path needs the resolved
+    // dependencies, and a configuration-time timestamp would invalidate the
+    // task's up-to-date check on every run.
+    doFirst {
+        manifest.attributes(
+            'Class-Path': runtimeJars.files
+                .collect { it.name }.sort()
+                .collect { "lib/${it}" }.join(' '),
+            'Built-Date': java.time.LocalDateTime.now().format(
+                java.time.format.DateTimeFormatter.ofPattern('yyyy-MM-dd HH:mm:ss'))
+        )
+    }
+}
+
+// Ant's clean also removed the artifact, which lives in lib/ rather than build/.
+tasks.named('clean') {
+    delete layout.projectDirectory.file("lib/${appName}_${version}.jar")
+}
+
+tasks.register('dist', Copy) {
+    description = 'Assembles dist/ with the artifact and its runtime jars.'
+    group = 'distribution'
+
+    into distDir
+    from(tasks.named('jar'))
+    into('lib') {
+        from runtimeJars
+    }
+
+    doLast {
+        mkdir distDir.dir('logs')
+    }
+}
+
+tasks.register('cleanDist') {
+    description = 'Runs clean, then rebuilds dist/ from scratch.'
+    group = 'distribution'
+    dependsOn 'clean', 'dist'
+}
+
+// 'clean' deletes the artifact that 'dist' publishes, so it has to go first.
+tasks.named('dist') {
+    mustRunAfter 'clean'
+}
+
+tasks.named('javadoc') {
+    failOnError = false
+    destinationDir = layout.projectDirectory.dir("docs/${appName}").asFile
+    options.author = true
+    options.version = true
+    options.use = true
+    options.windowTitle = appName
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+tasks.register('distDocs') {
+    description = 'Builds dist/ plus the javadoc under docs/.'
+    group = 'distribution'
+    dependsOn 'dist', 'javadoc'
+}
+
+defaultTasks 'jar'
