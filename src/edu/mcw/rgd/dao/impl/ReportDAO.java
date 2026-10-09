@@ -91,11 +91,12 @@ public class ReportDAO extends AbstractDAO {
     static private String buildOntologyFilter(String termAcc) {
         return " AND g.rgd_id IN("+
             "SELECT annotated_object_rgd_id FROM full_annot WHERE term_acc IN("+
-            "SELECT '"+termAcc+"' FROM dual "+
+            "SELECT '"+termAcc+"' "+
             "UNION ALL "+
-            "SELECT child_term_acc FROM ont_dag d "+
-            "START WITH parent_term_acc='"+termAcc+"' "+
-            "CONNECT BY PRIOR child_term_acc=parent_term_acc "+
+            "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS ("+
+            "SELECT child_term_acc FROM ont_dag WHERE parent_term_acc='"+termAcc+"' "+
+            "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc"+
+            ") SELECT child_term_acc FROM dag) dag_desc "+
             ")) ";
     }
 
@@ -402,8 +403,8 @@ public class ReportDAO extends AbstractDAO {
             // qtl trait and subtrait: VT and CMO annotations if available
             //  if not, notes of type 'qtl_trait' and 'qtl_subtrait'
             String query = "SELECT g.*, m.* \n"+
-                    ",NVL2(a1.term_acc, a1.term||' ('||a1.term_acc||')', n1.notes) trait_name \n"+
-                    ",NVL2(a2.term_acc, a2.term||' ('||a2.term_acc||')', n2.notes) sub_trait_name \n"+
+                    ",CASE WHEN a1.term_acc IS NOT NULL THEN a1.term||' ('||a1.term_acc||')' ELSE n1.notes END trait_name \n"+
+                    ",CASE WHEN a2.term_acc IS NOT NULL THEN a2.term||' ('||a2.term_acc||')' ELSE n2.notes END sub_trait_name \n"+
                     "FROM qtls g \n"+
                     "LEFT JOIN maps_data m ON g.rgd_id = m.rgd_id "+buildMappingForMapKey(sb)+"\n"+
                     "LEFT JOIN full_annot a1 ON a1.annotated_object_rgd_id=g.rgd_id AND a1.aspect='V'\n" +
@@ -549,8 +550,8 @@ public class ReportDAO extends AbstractDAO {
             // qtl trait and subtrait: VT and CMO annotations if available
             //  if not, notes of type 'qtl_trait' and 'qtl_subtrait'
             String query = "SELECT q.*, r.*, md.* \n" +
-                ",NVL2(a1.term_acc, a1.term||' ('||a1.term_acc||')', n1.notes) trait_name \n" +
-                ",NVL2(a2.term_acc, a2.term||' ('||a2.term_acc||')', n2.notes) sub_trait_name \n" +
+                ",CASE WHEN a1.term_acc IS NOT NULL THEN a1.term||' ('||a1.term_acc||')' ELSE n1.notes END trait_name \n" +
+                ",CASE WHEN a2.term_acc IS NOT NULL THEN a2.term||' ('||a2.term_acc||')' ELSE n2.notes END sub_trait_name \n" +
                 "FROM qtls q \n" +
                 "JOIN RGD_IDS r ON r.OBJECT_STATUS='ACTIVE' AND r.RGD_ID=q.RGD_ID\n" +
                 "JOIN maps_data md ON md.rgd_id=q.rgd_id AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=?\n" +
@@ -690,8 +691,8 @@ public class ReportDAO extends AbstractDAO {
             // qtl trait and subtrait: VT and CMO annotations if available
             //  if not, notes of type 'qtl_trait' and 'qtl_subtrait'
             String query = "SELECT q.*, r.*, md.* \n" +
-                    ",NVL2(a1.term_acc, a1.term||' ('||a1.term_acc||')', n1.notes) trait_name \n" +
-                    ",NVL2(a2.term_acc, a2.term||' ('||a2.term_acc||')', n2.notes) sub_trait_name \n" +
+                    ",CASE WHEN a1.term_acc IS NOT NULL THEN a1.term||' ('||a1.term_acc||')' ELSE n1.notes END trait_name \n" +
+                    ",CASE WHEN a2.term_acc IS NOT NULL THEN a2.term||' ('||a2.term_acc||')' ELSE n2.notes END sub_trait_name \n" +
                     "FROM qtls q \n" +
                     "JOIN RGD_IDS r ON r.OBJECT_STATUS='ACTIVE' AND r.RGD_ID=q.RGD_ID\n" +
                     "JOIN maps_data md ON md.rgd_id=q.rgd_id AND md.chromosome=? AND md.start_pos<=? AND md.stop_pos>=? AND md.map_key=?\n" +
@@ -807,8 +808,8 @@ public class ReportDAO extends AbstractDAO {
 
         try {
 
-            String query = "select g.*, x.acc_id from references g, rgd_acc_xdb x " +
-                    "where g.rgd_id=x.rgd_id(+) and x.xdb_key(+)=2 and g.rgd_id in (" + Utils.buildInPhrase(rgdIds.keySet()) + ")";
+            String query = "select g.*, x.acc_id from \"references\" g LEFT JOIN rgd_acc_xdb x " +
+                    "ON g.rgd_id=x.rgd_id and x.xdb_key=2 where g.rgd_id in (" + Utils.buildInPhrase(rgdIds.keySet()) + ")";
 
             conn = this.getConnection();
 
