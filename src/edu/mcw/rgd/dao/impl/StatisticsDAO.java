@@ -69,7 +69,7 @@ public class StatisticsDAO extends AbstractDAO {
         }
 
         sql += " and rr.ref_key in ( " +
-                "select ir.ref_key from references ir, rgd_ids iri where ir.rgd_id = iri.rgd_id and iri.object_status='ACTIVE') " +
+                "select ir.ref_key from \"references\" ir, rgd_ids iri where ir.rgd_id = iri.rgd_id and iri.object_status='ACTIVE') " +
                 "group by ro.object_name order by ro.object_name ";
 
         return statQuery(speciesTypeKey, sql);
@@ -102,7 +102,7 @@ public class StatisticsDAO extends AbstractDAO {
 
 
         // compute counts for confirmed/predicted mirna targets
-        sql = "SELECT COUNT(gene_rgd_id) AS tot, 'microRNA target '||target_type AS object_name " +
+        sql = "SELECT COUNT(gene_rgd_id) AS tot, 'microRNA target '||COALESCE(target_type,'') AS object_name " +
                 "FROM rgd_ids r, " +
                 " (SELECT DISTINCT gene_rgd_id,target_type FROM mirna_targets) t " +
                 " WHERE r.rgd_id=gene_rgd_id AND r.object_status='ACTIVE' ";
@@ -125,8 +125,8 @@ public class StatisticsDAO extends AbstractDAO {
 
         sql += "    and rx.XDB_KEY=1 " +
         "    and g.gene_type_lc='protein-coding' " +
-        "    and substr(rx.acc_id, 0, 3) = 'XM_' " +
-        "    minus " +
+        "    and substr(rx.acc_id, 1, 3) = 'XM_' " +
+        "    except " +
         "    select r.rgd_id  from rgd_acc_xdb rx , rgd_ids r, genes g " +
         "    where r.rgd_id = g.rgd_id and r.RGD_ID=rx.RGD_ID and r.OBJECT_STATUS='ACTIVE' and r.OBJECT_KEY=1  ";
 
@@ -137,7 +137,7 @@ public class StatisticsDAO extends AbstractDAO {
 
         sql +="    and rx.XDB_KEY=1 " +
         "    and g.gene_type_lc='protein-coding' " +
-        "    and substr(rx.acc_id, 0, 3) = 'NM_' " +
+        "    and substr(rx.acc_id, 1, 3) = 'NM_' " +
         ")";
 
         types.putAll(statQuery(speciesTypeKey, sql));
@@ -153,7 +153,7 @@ public class StatisticsDAO extends AbstractDAO {
 
         sql +="    and rx.XDB_KEY=1 " +
         "    and g.gene_type_lc='protein-coding' " +
-        "    and substr(rx.acc_id, 0, 3) = 'NM_' " +
+        "    and substr(rx.acc_id, 1, 3) = 'NM_' " +
         ")    ";
 
         types.putAll(statQuery(speciesTypeKey, sql));
@@ -162,7 +162,7 @@ public class StatisticsDAO extends AbstractDAO {
     }
 
     public java.util.Map<String,String> getObjectWithReferenceSequenceCount(int speciesTypeKey) throws Exception {
-        String sql = "select count(*) as tot, substr(rx.acc_id, 0, 3) as object_name  from rgd_acc_xdb rx " +
+        String sql = "select count(*) as tot, substr(rx.acc_id, 1, 3) as object_name  from rgd_acc_xdb rx " +
                 "join rgd_ids r on r.RGD_ID=rx.RGD_ID " +
                 "where r.OBJECT_STATUS='ACTIVE' " +
                 "and r.OBJECT_KEY=1 ";
@@ -172,7 +172,7 @@ public class StatisticsDAO extends AbstractDAO {
 
         sql += "and rx.XDB_KEY=1 " +
                 "and rx.ACC_ID like '%~_%'  ESCAPE '~' " +
-                "group by substr(rx.acc_id, 0, 3) ";
+                "group by substr(rx.acc_id, 1, 3) ";
 
         Map first =  statQuery(speciesTypeKey, sql);
 
@@ -185,8 +185,8 @@ public class StatisticsDAO extends AbstractDAO {
                 }
 
                 sql +="        and rx.XDB_KEY=1 " +
-                "        and substr(rx.acc_id, 0, 3) = 'XM_' " +
-                "        minus " +
+                "        and substr(rx.acc_id, 1, 3) = 'XM_' " +
+                "        except " +
                 "        select r.rgd_id  from rgd_acc_xdb rx join rgd_ids r  " +
                 "        on r.RGD_ID=rx.RGD_ID where r.OBJECT_STATUS='ACTIVE' and r.OBJECT_KEY=1";
 
@@ -195,7 +195,7 @@ public class StatisticsDAO extends AbstractDAO {
                 }
 
                 sql += "        and rx.XDB_KEY=1 " +
-                "        and substr(rx.acc_id, 0, 3) = 'NM_' " +
+                "        and substr(rx.acc_id, 1, 3) = 'NM_' " +
                 "        )";
 
          first.putAll(statQuery(speciesTypeKey, sql));
@@ -590,7 +590,7 @@ public class StatisticsDAO extends AbstractDAO {
 
         String sql = "INSERT INTO object_value_history " +
             "(object_value_history_id, object_type, object_name, object_value, creation_date, species_type_key) " +
-            "VALUES(object_value_history_seq.nextval,?,?,?,TRUNC(SYSDATE),?)";
+            "VALUES(nextval('object_value_history_seq'),?,?,CAST(? AS NUMERIC),date_trunc('day',LOCALTIMESTAMP(0)),?)";
 
         for (Object o : map.keySet()) {
             String key = (String) o;
