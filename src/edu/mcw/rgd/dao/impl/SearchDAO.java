@@ -301,7 +301,7 @@ public class SearchDAO extends AbstractDAO {
         }
 
         // add ontology filter to the query
-        String ontologyFilter = ReportDAO.buildOntologyFilter(sb);
+        String ontologyFilter = ReportDAO.buildOntologyFilter(sb, true);
         if( ontologyFilter!=null )
             sql.append(ontologyFilter);
 

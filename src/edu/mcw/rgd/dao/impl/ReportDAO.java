@@ -71,26 +71,34 @@ public class ReportDAO extends AbstractDAO {
     }
 
     static String buildOntologyFilter(SearchBean sb) throws Exception {
+        return buildOntologyFilter(sb, false);
+    }
+
+    /**
+     * @param rgdIdIsVarchar true when g.rgd_id is a varchar column (rgd_index): PostgreSQL does not compare
+     *                       varchar with bigint implicitly, so the annotated ids are cast to varchar
+     */
+    static String buildOntologyFilter(SearchBean sb, boolean rgdIdIsVarchar) throws Exception {
 
         String ontFilter = null;
 
         if( !Utils.isStringEmpty(sb.getTermAccId1()) ) {
-            ontFilter = buildOntologyFilter(sb.getTermAccId1());
+            ontFilter = buildOntologyFilter(sb.getTermAccId1(), rgdIdIsVarchar);
         }
 
         if( !Utils.isStringEmpty(sb.getTermAccId2()) ) {
             if( ontFilter==null )
-                ontFilter = buildOntologyFilter(sb.getTermAccId2());
+                ontFilter = buildOntologyFilter(sb.getTermAccId2(), rgdIdIsVarchar);
             else
-                ontFilter += buildOntologyFilter(sb.getTermAccId2());
+                ontFilter += buildOntologyFilter(sb.getTermAccId2(), rgdIdIsVarchar);
         }
 
         return ontFilter;
     }
 
-    static private String buildOntologyFilter(String termAcc) {
+    static private String buildOntologyFilter(String termAcc, boolean rgdIdIsVarchar) {
         return " AND g.rgd_id IN("+
-            "SELECT annotated_object_rgd_id FROM full_annot WHERE term_acc IN("+
+            "SELECT "+(rgdIdIsVarchar ? "CAST(annotated_object_rgd_id AS VARCHAR)" : "annotated_object_rgd_id")+" FROM full_annot WHERE term_acc IN("+
             "SELECT '"+termAcc+"' "+
             "UNION ALL "+
             "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS ("+
