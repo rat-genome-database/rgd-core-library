@@ -2453,7 +2453,7 @@ public class PhenominerDAO extends AbstractDAO {
 
         try {
             StringMapQuery sq = new StringMapQuery(this.getDataSource(), sql);
-            sq.declareParameter(new SqlParameter(Types.NUMERIC));
+            sq.declareParameter(new SqlParameter(Types.INTEGER));
             sq.compile();
 
             List<StringMapQuery.MapPair> enumerables = sq.execute(new Object[]{type});

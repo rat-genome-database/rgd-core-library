@@ -260,7 +260,7 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     }
     public List<String> getDistinctPhenotypesByTrait(String strainGoupId, String traitOntId) throws Exception {
-        String sql="select distinct(clinical_measurement_ont_id) from phenominer_expected_range where strain_group_id=CAST(? AS NUMERIC) " ;
+        String sql="select distinct(clinical_measurement_ont_id) from phenominer_expected_range where strain_group_id=CAST(? AS BIGINT) " ;
         if(traitOntId!=null) {
             if(!traitOntId.equalsIgnoreCase("pga"))
                 sql+=   " and expected_range_id in (" +
