@@ -21,5 +21,3 @@ INSERT INTO test_plan_testers (github_login, name) VALUES
   ('szacher',       'Stacy Zacher'),
   ('wdemos',        'Wendy Demos')
 ON CONFLICT (github_login) DO UPDATE SET name = EXCLUDED.name;
-
--- still to add once their GitHub logins are known: Kent Brodie, Varun Reddy Gollapally, Mindy Dwinell
