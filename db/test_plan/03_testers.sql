@@ -9,19 +9,16 @@ CREATE TABLE test_plan_testers (
 INSERT INTO test_plan_testers (github_login, name) VALUES
   ('adamgibs',      'Adam Gibson'),
   ('akwitek',       'Anne Kwitek'),
-  ('AkhilAnandK',   'Akhilanand Kundurthi'),
   ('jdepons',       'Jeff De Pons'),
   ('jrsjrs',        'Jennifer Smith'),
   ('jt15',          'Jyothi Thota'),
   ('llamersmcw',    'Logan Lamers'),
-  ('mahimavedi',    'Mahima Vedi'),
   ('tutajm',        'Marek Tutaj'),
   ('mlkaldunski',   'Mary Kaldunski'),
+  ('meilbes',       'Missy Eilbes'),
   ('motutaj',       'Monika Tutaj'),
   ('shurjenw',      'Shur-Jen Wang'),
   ('szacher',       'Stacy Zacher'),
-  ('slaulederkind', 'Stan Laulederkind'),
-  ('gthayman',      'Tom Hayman'),
   ('wdemos',        'Wendy Demos')
 ON CONFLICT (github_login) DO UPDATE SET name = EXCLUDED.name;
 
