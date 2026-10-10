@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Site test plan for the Oracle -> PostgreSQL switch: the pages and tools to test, who tests each one,
  * the result, and the tester's sign-off (tables TEST_PLAN_ITEMS and TEST_PLAN_HISTORY).
- * People are identified by their GitHub login, which is also USERS.USERNAME.
+ * People are identified by their GitHub login (the curation sign-in); testers are listed in TEST_PLAN_TESTERS.
  */
 public class TestPlanDAO extends AbstractDAO {
 
@@ -52,23 +52,20 @@ public class TestPlanDAO extends AbstractDAO {
     }
 
     /**
-     * people who can be assigned items: RGD users, GitHub login -> "First Last", ordered by name
+     * people who can be assigned items (table TEST_PLAN_TESTERS): GitHub login -> name, ordered by name
      */
     public Map<String, String> getTesters() throws Exception {
-        String sql = "SELECT username, first_name, last_name FROM users ORDER BY first_name, last_name";
+        String sql = "SELECT github_login, name FROM test_plan_testers ORDER BY name";
         Map<String, String> testers = new LinkedHashMap<>();
         MappingSqlQuery<String[]> q = new MappingSqlQuery<String[]>(getDataSource(), sql) {
             @Override
             protected String[] mapRow(ResultSet rs, int rowNum) throws SQLException {
-                String first = rs.getString("first_name");
-                String last = rs.getString("last_name");
-                String name = ((first == null ? "" : first) + " " + (last == null ? "" : last)).trim();
-                return new String[]{rs.getString("username"), name};
+                return new String[]{rs.getString("github_login"), rs.getString("name")};
             }
         };
         q.compile();
         for (String[] row : q.execute()) {
-            testers.put(row[0], row[1].isEmpty() ? row[0] : row[1]);
+            testers.put(row[0], row[1]);
         }
         return testers;
     }
