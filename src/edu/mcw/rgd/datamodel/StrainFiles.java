@@ -2,7 +2,6 @@ package edu.mcw.rgd.datamodel;
 
 import edu.mcw.rgd.process.Dumper;
 import edu.mcw.rgd.process.Utils;
-import oracle.jdbc.OracleBlob;
 import java.sql.Blob;
 import java.sql.Date;
 
