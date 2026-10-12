@@ -1034,41 +1034,59 @@ public class PhenominerDAO extends AbstractDAO {
 
 
 
+    /**
+     * number of phenominer records annotated to each term or to any of its descendants;
+     * terms are counted in one query per ontology (not one query per term)
+     * @param accIds RS, CS, MMO, CMO or XCO term accession ids
+     * @return map of term acc to record count (0 for terms without records); null if any term is from another ontology
+     */
     public Map<String, Integer> getRecordCountForTermAndDescendantsByListOfAccdIds(List<String> accIds) throws Exception {
 
-
-        Map<String, Integer> recordCountMap= new HashMap<>();
-
-        // determine kind of term
+        // group the terms by the table and column holding their ontology ids
+        Map<String, List<String>> accIdsByTable = new LinkedHashMap<>();
         for(String accId: accIds) {
 
-            String query;
+            String tables;
             if (accId.startsWith("RS:") || accId.startsWith("CS:")) {
-                query = "SELECT COUNT(1) FROM sample s,experiment_record r\n" +
-                        "WHERE r.curation_status=? AND r.sample_id=s.sample_id AND strain_ont_id IN(\n";
+                tables = "sample s,experiment_record r WHERE r.sample_id=s.sample_id AND strain_ont_id";
             } else if (accId.startsWith("MMO:")) {
-                query = "SELECT COUNT(1) FROM measurement_method m,experiment_record r\n" +
-                        "WHERE r.curation_status=? AND r.measurement_method_id=m.measurement_method_id AND measurement_method_ont_id IN(\n";
+                tables = "measurement_method m,experiment_record r WHERE r.measurement_method_id=m.measurement_method_id AND measurement_method_ont_id";
             } else if (accId.startsWith("CMO:")) {
-                query = "SELECT COUNT(1) FROM clinical_measurement c,experiment_record r\n" +
-                        "WHERE r.curation_status=? AND r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id IN(\n";
+                tables = "clinical_measurement c,experiment_record r WHERE r.clinical_measurement_id=c.clinical_measurement_id AND clinical_measurement_ont_id";
             } else if (accId.startsWith("XCO:")) {
-                query = "SELECT COUNT(1) FROM experiment_condition x,experiment_record r\n" +
-                        "WHERE r.curation_status=? AND x.experiment_record_id=r.experiment_record_id\n" +
-                        "AND exp_cond_ont_id IN(\n";
+                tables = "experiment_condition x,experiment_record r WHERE x.experiment_record_id=r.experiment_record_id AND exp_cond_ont_id";
             } else {
                 System.out.println("Bad ontology came into getRecordCountForTermAndDescendantsByListOfAccdIds " + accId);
 
                 return null;
             }
+            accIdsByTable.computeIfAbsent(tables, k -> new ArrayList<>()).add(accId);
+        }
 
-            query += "SELECT ? UNION \n" +
-                     "SELECT child_term_acc FROM (WITH RECURSIVE dag(child_term_acc) AS (SELECT child_term_acc FROM ont_dag\n" +
-                     "WHERE parent_term_acc=?\n" +
-                     "UNION SELECT o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc) SELECT child_term_acc FROM dag) dag_desc)";
+        Map<String, Integer> recordCountMap= new HashMap<>();
+        for( String accId: accIds ) {
+            recordCountMap.put(accId, 0);
+        }
 
-            int count = getCount(query, CURATION_STATUS, accId, accId);
-            recordCountMap.put(accId, count);
+        // every term paired with itself and each of its descendants, then the records joined to those pairs
+        try( Connection conn = this.getConnection() ) {
+            for( Map.Entry<String, List<String>> entry: accIdsByTable.entrySet() ) {
+                String query = "WITH RECURSIVE dag(root, child_term_acc) AS (\n" +
+                        "SELECT t, t FROM unnest(?) t\n" +
+                        "UNION SELECT dag.root, o.child_term_acc FROM ont_dag o JOIN dag ON o.parent_term_acc=dag.child_term_acc)\n" +
+                        "SELECT dag.root, COUNT(1) FROM dag, " + entry.getKey() + "=dag.child_term_acc\n" +
+                        "AND r.curation_status=? GROUP BY dag.root";
+
+                try( PreparedStatement ps = conn.prepareStatement(query) ) {
+                    ps.setArray(1, conn.createArrayOf("varchar", entry.getValue().toArray()));
+                    ps.setInt(2, CURATION_STATUS);
+                    try( ResultSet rs = ps.executeQuery() ) {
+                        while( rs.next() ) {
+                            recordCountMap.put(rs.getString(1), rs.getInt(2));
+                        }
+                    }
+                }
+            }
         }
         return recordCountMap;
     }
