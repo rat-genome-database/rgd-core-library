@@ -475,7 +475,9 @@ public class SearchDAO extends AbstractDAO {
 
     public List<IndexRow> findGenomicObject(String symbol, int speciesTypeKey) throws Exception{
 
-        String sql="SELECT * FROM rgd_index WHERE keyword_lc=? AND "+
+        // 'length(keyword_lc) <= 2600' lets PostgreSQL use the keyword_lc indexes: they leave out the few values
+        // too long for a btree, and are used only when the query repeats that predicate exactly as written here
+        String sql="SELECT * FROM rgd_index WHERE keyword_lc=? AND length(keyword_lc) <= 2600 AND "+
                 "(   (data_type IN('UniProt', 'UniGene', 'GenBank Nucleotide','GenBank Protein','Ensembl Genes','Ensembl Protein','old_gene_symbol') AND object_type='GENES')" +
                 " OR (data_type='symbol' AND object_type='GENES') "+
                 " OR (data_type LIKE 'array_id%')" +
