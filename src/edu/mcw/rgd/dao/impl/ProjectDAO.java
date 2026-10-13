@@ -23,6 +23,17 @@ public class ProjectDAO extends AbstractDAO{
         return ProjectQuery.execute(this,query);
     }
 
+    /**
+     * get projects whose rgd_ids.object_status is 'ACTIVE';
+     * projects marked WITHDRAWN, RETIRED or PRIVATE in rgd_ids are excluded
+     * @return list of active projects
+     */
+    public List<Project> getActiveProjects() throws Exception {
+
+        String query = "SELECT p.* FROM projects p, rgd_ids r WHERE r.rgd_id=p.rgd_id AND r.object_status='ACTIVE' ORDER BY p.rgd_id";
+        return ProjectQuery.execute(this,query);
+    }
+
     public List<Integer> getReferenceRgdIdsForProject(int projectRgdId) throws Exception {
         String query = "SELECT RGD_ID " +
                 "FROM \"references\" " +
