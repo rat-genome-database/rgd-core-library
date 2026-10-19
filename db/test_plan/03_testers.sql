@@ -9,6 +9,7 @@ CREATE TABLE test_plan_testers (
 INSERT INTO test_plan_testers (github_login, name) VALUES
   ('adamgibs',      'Adam Gibson'),
   ('akwitek',       'Anne Kwitek'),
+  ('caripark',      'Cari Park'),
   ('jdepons',       'Jeff De Pons'),
   ('jrsjrs',        'Jennifer Smith'),
   ('jt15',          'Jyothi Thota'),
@@ -17,6 +18,7 @@ INSERT INTO test_plan_testers (github_login, name) VALUES
   ('mlkaldunski',   'Mary Kaldunski'),
   ('meilbes',       'Missy Eilbes'),
   ('motutaj',       'Monika Tutaj'),
+  ('RenukaV197',    'Renuka'),
   ('shurjenw',      'Shur-Jen Wang'),
   ('szacher',       'Stacy Zacher'),
   ('wdemos',        'Wendy Demos')
