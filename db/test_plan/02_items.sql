@@ -15,7 +15,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('search-general-search-ontology-id-redirect', 'Search', 'General search: ontology ID redirect', '/rgdweb/elasticResults.html?term=DOID:9351', 'Goes to the diabetes mellitus annotation page on this server.', NULL, 'N', 'N', 100),
   ('search-general-search-rs-id', 'Search', 'General search: rs ID', '/rgdweb/elasticResults.html?term=rs8156263', 'Goes to the variant (rsId) page or shows matching results like production.', NULL, 'N', 'N', 110),
   ('search-gene-search', 'Search', 'Gene search', '/rgdweb/search/genes.html?term=Lepr&speciesType=3', 'Results, counts and columns match production; Excel download works.', 'search/excelDownload.html', 'N', 'N', 120),
-  ('search-qtl-search', 'Search', 'QTL search', '/rgdweb/search/qtls.html?term=blood+pressure&speciesType=3', 'Results match production; positions and traits shown.', NULL, 'N', 'N', 130),
+  ('search-qtl-search', 'Search', 'QTL search', '/rgdweb/search/qtls.html', 'Results match production; positions and traits shown.', NULL, 'N', 'N', 130),
   ('search-strain-search', 'Search', 'Strain search', '/rgdweb/search/strains.html?term=SHR', 'Results match production.', NULL, 'N', 'N', 140),
   ('search-marker-sslp-search', 'Search', 'Marker (SSLP) search', '/rgdweb/search/markers.html?term=D1Rat1', 'Results match production.', NULL, 'N', 'N', 150),
   ('search-reference-search', 'Search', 'Reference search', '/rgdweb/search/references.html?term=hypertension', 'Results match production; citations display correctly.', NULL, 'N', 'N', 160),
