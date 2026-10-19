@@ -21,7 +21,6 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('search-genomic-element-search', 'Search', 'Genomic element search', '/rgdweb/search/ge.html?term=promoter', 'Results match production.', NULL, 'N', 'N', 170),
   ('search-variant-search', 'Search', 'Variant search', '/rgdweb/search/variants.html', 'Search form works; result list matches production.', NULL, 'N', 'N', 180),
   ('search-cell-line-search', 'Search', 'Cell line search', '/rgdweb/search/cellLines.html', 'Results match production.', NULL, 'N', 'N', 190),
-  ('search-classic-search-page', 'Search', 'Classic search page', '/rgdweb/search/search.html', 'Results by object type match production.', NULL, 'N', 'N', 200),
   ('search-search-by-position', 'Search', 'Search by position', '/rgdweb/search/searchByPosition.html', 'Search rat chr 1:1-5,000,000; genes, QTLs, strains and markers match production.', NULL, 'N', 'N', 210),
   ('search-variant-count', 'Search', 'Variant count', '/rgdweb/search/variantCount.html', 'Counts load and match production.', NULL, 'N', 'N', 220),
   ('object-gene-report-rat', 'Object reports', 'Gene report (rat)', '/rgdweb/report/gene/main.html?id=2004', 'Every section matches production: nomenclature, positions, annotations by ontology, orthologs, references, expression, variants, external links. Page loads in under 10 seconds.', NULL, 'N', 'N', 230),
