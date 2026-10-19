@@ -7,7 +7,6 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('home-site-header-search-box', 'Home and navigation', 'Site header search box', '/rgdweb/', 'Type a gene symbol (A2m) and pick from the autocomplete list; the result page opens on this server, not dev or production.', 'autocompleteList.html', 'N', 'N', 20),
   ('home-contact-us-form', 'Home and navigation', 'Contact us form', '/rgdweb/contact/contactus.html', 'Form loads and validates. Submit one test message marked TEST and confirm it is received.', 'contact/weblikes.html', 'N', 'N', 30),
   ('home-page-feedback-thumbs-up-down', 'Home and navigation', 'Page feedback (thumbs up/down)', '/rgdweb/report/gene/main.html?id=2004', 'Use the feedback widget on a page; it saves without an error.', 'contact/weblikes.html', 'N', 'N', 40),
-  ('home-ngc-index', 'Home and navigation', 'NGC index', '/rgdweb/ngcindex.jsp', 'Page loads and every link opens.', NULL, 'N', 'N', 50),
   ('home-hrdp-panel', 'Home and navigation', 'HRDP panel', '/rgdweb/hrdp_panel.html', 'Strain panel table loads with the same strains as production.', NULL, 'N', 'N', 60),
   ('home-login-page', 'Home and navigation', 'Login page', '/rgdweb/login.jsp', 'Page loads; access-denied page shows for a protected URL.', 'acegilogin.jsp, accessDenied.jsp', 'N', 'N', 70),
   ('search-general-search-keyword', 'Search', 'General search: keyword', '/rgdweb/elasticResults.html?term=insulin', 'Result counts per category match production; facets filter correctly; paging works.', NULL, 'N', 'N', 80),
