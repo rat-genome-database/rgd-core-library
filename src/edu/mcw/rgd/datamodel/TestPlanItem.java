@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class TestPlanItem {
 
-    public static final String[] STATUSES = {"Not started", "In progress", "Passed", "Failed", "Blocked", "Retired"};
+    public static final String[] STATUSES = {"Not started", "In progress", "Passed", "Slow", "Failed", "Blocked", "Retired"};
 
     private String itemId;
     private String area;

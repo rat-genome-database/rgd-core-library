@@ -19,7 +19,7 @@ CREATE TABLE test_plan_items (
     last_modified_by   VARCHAR(100),
     last_modified_date TIMESTAMP,
     CONSTRAINT test_plan_items_status_ck
-        CHECK (status IN ('Not started', 'In progress', 'Passed', 'Failed', 'Blocked', 'Retired'))
+        CHECK (status IN ('Not started', 'In progress', 'Passed', 'Slow', 'Failed', 'Blocked', 'Retired'))
 );
 
 -- every change to an item: who, when, what
