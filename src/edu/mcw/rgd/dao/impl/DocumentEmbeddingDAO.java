@@ -179,6 +179,20 @@ public class DocumentEmbeddingDAO extends AbstractDAO {
         return update(sql, rgdId);
     }
 
+    /**
+     * Delete an object's chunks stored under any report name other than the current one: what is
+     * left behind when a report's display name changes (a renamed gene, a strain symbol written
+     * with different markup), which would otherwise be retrieved alongside the current report.
+     * @param rgdId the object's RGD ID
+     * @param currentFileName the report name to keep
+     * @return number of rows deleted
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public int deleteChunksUnderOtherFileNames(long rgdId, String currentFileName) throws Exception {
+        String sql = "DELETE FROM document_embeddings WHERE rgd_id = ? AND file_name <> ?";
+        return update(sql, rgdId, currentFileName);
+    }
+
     // ------------------------------------------------------------------
     // report_object
     // ------------------------------------------------------------------

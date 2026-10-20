@@ -69,6 +69,24 @@ public class ReferenceDAO extends AbstractDAO {
      * @throws Exception thrown if there is no reference with such rgd id
      * @deprecated Exceptions should not be used as replacement for normal logic!
      */
+    /**
+     * RGD ids of active references cited by at least one RGD-curated annotation
+     * (FULL_ANNOT.DATA_SRC='RGD'), i.e. the literature RGD curators have actually used.
+     * @return reference RGD ids, ascending
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Integer> getRgdIdsOfReferencesWithCuratedAnnotations() throws Exception {
+        String sql = """
+            SELECT DISTINCT fa.ref_rgd_id FROM full_annot fa, rgd_ids r
+            WHERE fa.data_src='RGD'
+              AND r.rgd_id=fa.ref_rgd_id
+              AND r.object_status='ACTIVE'
+            ORDER BY fa.ref_rgd_id
+            """;
+        IntListQuery q = new IntListQuery(this.getDataSource(), sql);
+        return q.execute();
+    }
+
     public Reference getReference(int rgdId) throws Exception {
 
         Reference ref = getReferenceByRgdId(rgdId);
