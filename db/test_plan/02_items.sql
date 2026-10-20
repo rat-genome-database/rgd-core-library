@@ -38,7 +38,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('object-strain-damaging-variants', 'Object reports', 'Strain damaging variants', '/rgdweb/report/strain/damagingVariants.html?id=61498', 'List matches production.', NULL, 'N', 'N', 350),
   ('object-strain-file-download', 'Object reports', 'Strain file download', '/rgdweb/report/strain/strainFileDownload.html?id=61498', 'Download works where the strain has files.', NULL, 'N', 'N', 360),
   ('object-strain-ontology-redirect', 'Object reports', 'Strain ontology redirect', '/rgdweb/report/strainOnt/main.html?id=RS:0000029', 'Redirects to the matching strain report.', NULL, 'N', 'N', 370),
-  ('object-allele-strain-report', 'Object reports', 'Allele/strain report', '/rgdweb/alleleStrain/report.html', 'Page loads and matches production.', NULL, 'N', 'N', 380),
+  ('object-allele-strain-report', 'Object reports', 'Allele/strain report', '/rgdweb/alleleStrain/report.html?species=3&mapKey=380&genes=Lepr,Leprot,A2m,Tp53', 'Alleles and mutant strains for Lepr, Leprot, A2m and Tp53 match production. Strains added on production after the data copy may be missing.', NULL, 'N', 'N', 380),
   ('object-marker-sslp-report', 'Object reports', 'Marker (SSLP) report', '/rgdweb/report/marker/main.html?id=36199', 'D1Rat1: positions, primers and references match production.', NULL, 'N', 'N', 390),
   ('object-reference-report', 'Object reports', 'Reference report', '/rgdweb/report/reference/main.html?id=738373154', 'Citation, annotations and linked objects match production.', NULL, 'N', 'N', 400),
   ('object-genomic-element-report', 'Object reports', 'Genomic element report', '/rgdweb/report/ge/main.html?id=6849302', 'Element details and positions match production.', NULL, 'N', 'N', 410),
