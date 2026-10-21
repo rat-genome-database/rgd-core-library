@@ -361,20 +361,17 @@ public class StrainDAO extends AbstractDAO {
     }
     public Blob getStrainAttachment(int rgdId, String type) throws Exception {
         String sql = "select file_data from strain_files where strain_id = ? and file_type = ?";
-        PreparedStatement stmt;
-        ResultSet rs;
-        Connection conn = this.getDataSource().getConnection();
-        stmt = conn.prepareStatement(sql);
-        stmt.setInt(1,rgdId);
-        stmt.setString(2,type);
-        rs = stmt.executeQuery();
-        while (rs.next()) {
-            byte[] bytes = rs.getBytes("file_data");
-            return bytes==null ? null : new javax.sql.rowset.serial.SerialBlob(bytes);
+        try( Connection conn = this.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql) ) {
+            stmt.setInt(1,rgdId);
+            stmt.setString(2,type);
+            try( ResultSet rs = stmt.executeQuery() ) {
+                if (rs.next()) {
+                    byte[] bytes = rs.getBytes("file_data");
+                    return bytes==null ? null : new javax.sql.rowset.serial.SerialBlob(bytes);
+                }
+            }
         }
-        rs.close();
-        stmt.close();
-        conn.close();
         return null;
     }
     public List<Strain> getStrainsByGroupId(int strain_group_id,int speciesTypeKey) throws Exception {
