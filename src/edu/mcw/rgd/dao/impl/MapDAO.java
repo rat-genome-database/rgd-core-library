@@ -245,16 +245,16 @@ public class MapDAO extends AbstractDAO {
         int startRange = lowBound-range;
         int stopRange = highBound+range;
 
-        String query = "SELECT m.*, r.species_type_key FROM maps_data m, rgd_ids r, genes g WHERE " +
-                "m.CHROMOSOME=? " +
+        // PostgreSQL overestimates the region rows (start/stop bounds look independent to the planner) and would
+        // hash every active gene; the LATERAL with OFFSET 0 keeps the gene lookup per region row, by rgd_id
+        String query = "SELECT m.*, x.species_type_key FROM maps_data m CROSS JOIN LATERAL (" +
+                "SELECT r.species_type_key, g.gene_symbol_lc FROM rgd_ids r, genes g " +
+                "WHERE r.RGD_ID=m.RGD_ID and g.RGD_ID=r.RGD_ID and r.OBJECT_KEY=1 and r.OBJECT_STATUS='ACTIVE' OFFSET 0) x " +
+                "WHERE m.CHROMOSOME=? " +
                 "and m.MAP_KEY=? " +
                 "and m.STOP_POS>=? " +
                 "and m.START_POS<=? " +
-                "and m.RGD_ID=r.RGD_ID " +
-                "and g.RGD_ID=r.RGD_ID " +
-                "and r.OBJECT_KEY=1 " +
-                "and r.OBJECT_STATUS='ACTIVE' " +
-                "ORDER BY g.gene_symbol_lc";
+                "ORDER BY x.gene_symbol_lc";
 
         return executeMapDataQuery(query, chr, mapKey, startRange, stopRange);
     }
