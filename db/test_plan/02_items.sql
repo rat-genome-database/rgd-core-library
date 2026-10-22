@@ -29,7 +29,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('object-gene-expression-data', 'Object reports', 'Gene expression data', '/rgdweb/report/gene/main.html?id=2004#rnaSeqExpression', 'The gene report''s expression section matches production: tables, TPM values and the download.', 'report/gene/downloadExpression.html', 'N', 'N', 260),
   ('object-gene-expression-download', 'Object reports', 'Gene expression download', '/rgdweb/report/gene/downloadExpression.html?id=2004', 'File downloads and opens; rows match production.', NULL, 'N', 'N', 270),
   ('object-gene-damaging-variants', 'Object reports', 'Gene damaging variants', '/rgdweb/report/gene/damagingVariants.html?id=2004', 'Variant list matches production.', NULL, 'N', 'N', 280),
-  ('object-gene-transcripts', 'Object reports', 'Gene transcripts', '/rgdweb/genes/transcripts.html?id=2004', 'Transcript list and coordinates match production.', NULL, 'N', 'N', 290),
+  ('object-gene-transcripts', 'Object reports', 'Gene transcripts', '/rgdweb/genes/transcripts.html?rgdid=2004', 'Transcript list and coordinates match production.', NULL, 'N', 'N', 290),
   ('object-gene-ensembl-comparison', 'Object reports', 'Gene Ensembl comparison', '/rgdweb/genes/ensembl.html?id=2004', 'Page loads and matches production.', NULL, 'N', 'N', 300),
   ('object-mirna-targets', 'Object reports', 'miRNA targets', '/rgdweb/genes/mirnaTargets.html?id=2004', 'Target list matches production.', NULL, 'N', 'N', 310),
   ('object-qtl-report', 'Object reports', 'QTL report', '/rgdweb/report/qtl/main.html?id=61387', 'Bp1: positions, traits, candidate genes, strains and references match production.', NULL, 'N', 'N', 320),
