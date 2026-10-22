@@ -116,7 +116,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('curation-edit-ontology-term', 'Curation tools', 'Edit ontology term', '/rgdweb/curation/edit/editTerm.html?termAcc=DOID:9351', 'Edit and save a test term.', 'ontology/uploadOboFile.html', 'Y', 'Y', 1130),
   ('curation-edit-news', 'Curation tools', 'Edit news', '/rgdweb/curation/edit/editNews.html', 'Add and remove a test news item.', 'updateNewsConf', 'Y', 'Y', 1140),
   ('curation-gene-and-term-merge', 'Curation tools', 'Gene and term merge', '/rgdweb/curation/edit/geneMerge.html', 'Run a merge on test records only.', 'termMerge, dropManualOrthologs, updateGeneAssociations, updateSequence', 'Y', 'Y', 1150),
-  ('curation-image-display', 'Curation tools', 'Image display', '/rgdweb/curation/edit/imageDisplay.html', 'Images load.', NULL, 'Y', 'Y', 1160),
+  ('curation-image-display', 'Curation tools', 'Image display', '/rgdweb/curation/edit/editStrain.html?rgdId=11564350', 'Click the image link on the strain edit page: the strain image opens.', NULL, 'Y', 'Y', 1160),
   ('curation-submitted-strains', 'Curation tools', 'Submitted strains', '/rgdweb/curation/edit/submittedStrains/editStrains.html', 'Review list loads; create, edit and complete a TEST submission.', 'createStrain, editStrains, editStrainButton, editSubmittedGeneObject, completedStrains, curatorInstructions', 'Y', 'Y', 1170),
   ('curation-strain-file-upload', 'Curation tools', 'Strain file upload', '/rgdweb/curation/strainFileUpload.html', 'Upload a test file.', NULL, 'Y', 'Y', 1180),
   ('curation-nomenclature', 'Curation tools', 'Nomenclature', '/rgdweb/curation/nomen/nomenSearch.html', 'Search and edit nomenclature events.', 'curation/nomen/nomenEdit.html', 'Y', 'Y', 1190),
