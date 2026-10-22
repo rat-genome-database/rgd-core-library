@@ -72,7 +72,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('analysis-variant-visualizer', 'Analysis tools', 'Variant Visualizer', '/rgdweb/front/config.html', 'Pick strains and a region; variant table, details and download match production.', 'front/select, options, region, searchType, geneList, variants, detail, dist, annotation, download; variantVisualizer.html', 'N', 'N', 690),
   ('analysis-phenotype-annotator-compare', 'Analysis tools', 'Phenotype annotator compare', '/rgdweb/pa/termCompare.html?term1=RS%3A0000457&term2=CMO%3A0000000&countType=rec&species=3', 'Comparison runs and matches production.', 'pa/window.html', 'N', 'N', 700),
   ('analysis-gviewer-genome-viewer', 'Analysis tools', 'GViewer genome viewer', '/rgdweb/gTool/Gviewer.jsp', 'Add genes or terms; ideogram and gene list draw.', 'gviewer/*, gTool/*', 'N', 'N', 710),
-  ('analysis-genome-viewer', 'Analysis tools', 'Genome viewer', '/rgdweb/genomeViewer.html?oKey=1&mapKey=372&rgdIds=2004&species=3', 'Viewer loads.', NULL, 'N', 'N', 720),
+  ('analysis-genome-viewer', 'Analysis tools', 'Genome viewer', '/rgdweb/gTool/Gviewer.jsp', 'Viewer loads.', NULL, 'N', 'N', 720),
   ('analysis-cytoscape-interaction-viewer', 'Analysis tools', 'Cytoscape interaction viewer', '/rgdweb/cytoscape/query.html', 'Query a gene list; network and report draw; download works.', 'cytoscape/cy, report, download', 'N', 'N', 730),
   ('analysis-sequence-retrieval', 'Analysis tools', 'Sequence retrieval', '/rgdweb/seqretrieve/retrieve.html', 'Retrieve a sequence for a region; output matches production.', NULL, 'N', 'N', 740),
   ('analysis-overgo-probe-finder', 'Analysis tools', 'Overgo probe finder', '/rgdweb/overgo/find.html', 'Tool runs.', NULL, 'N', 'N', 750),
