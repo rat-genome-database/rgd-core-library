@@ -322,6 +322,31 @@ public class PhenominerExpectedRangeDao extends AbstractDAO{
 
     }
 
+    /**
+     * Clinical measurement (CMO) term accessions that have at least one expected range.
+     * @return distinct CMO accessions, ascending
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<String> getDistinctClinicalMeasurementOntIds() throws Exception {
+        String sql = "SELECT DISTINCT clinical_measurement_ont_id FROM phenominer_expected_range ORDER BY 1";
+        StringListQuery q = new StringListQuery(this.getDataSource(), sql);
+        return q.execute();
+    }
+
+    /**
+     * All expected ranges for one clinical measurement, across every strain group, sex and age:
+     * the normal ranges and the strain-specific ones alike.
+     * @param clinicalId clinical measurement (CMO) term accession
+     * @return expected ranges ordered by strain group, sex and age
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<PhenominerExpectedRange> getExpectedRangesByCMId(String clinicalId) throws Exception {
+        String sql = "SELECT * FROM phenominer_expected_range WHERE clinical_measurement_ont_id=? "
+                + "ORDER BY strain_group_id, sex, age_days_from_dob_low_bound";
+        PhenominerExpectedRangeQuery query = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);
+        return execute(query, new Object[]{clinicalId});
+    }
+
     public List<PhenominerExpectedRange> getNormalRangesByCMId(String clinicalId) throws Exception {
         String sql= "select * from phenominer_expected_range where clinical_measurement_ont_id = ? and expected_range_name like 'Normal%'";
         PhenominerExpectedRangeQuery query = new PhenominerExpectedRangeQuery(this.getDataSource(), sql);

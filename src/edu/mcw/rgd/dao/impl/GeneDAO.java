@@ -558,6 +558,26 @@ public class GeneDAO extends AbstractDAO {
     }
 
     /**
+     * Returns all active allele genes for given species: the variant and engineered forms RGD
+     * records as gene objects of type 'allele', which {@link #getActiveGenes(int)} leaves out.
+     * @param speciesKey species type key
+     * @return list of active allele genes for given species
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Gene> getActiveAlleles(int speciesKey) throws Exception {
+        String query = """
+            SELECT g.*, r.species_type_key FROM genes g, rgd_ids r
+            WHERE r.object_status='ACTIVE'
+              AND r.species_type_key=?
+              AND g.gene_type_lc='allele'
+              AND r.rgd_id=g.rgd_id
+            ORDER BY g.gene_symbol_lc
+            """;
+
+        return GeneQuery.execute(this, query, speciesKey);
+    }
+
+    /**
      * Returns (gene RGD id, gene symbol) pairs for all active genes of given species.
      * Results do not contain splices or alleles.
      * @param speciesTypeKey species type key
