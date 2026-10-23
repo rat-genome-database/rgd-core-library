@@ -29,7 +29,8 @@ public class GeneExpressionRecordQuery extends MappingSqlQuery {
         rec.setCurationStatus(rs.getInt("curation_status"));
         rec.setSpeciesTypeKey(rs.getInt("species_type_key"));
         rec.setClinicalMeasurementId(rs.getInt("CLINICAL_MEASUREMENT_ID"));
-        rec.setStudyControl(rs.getString("study_control").equals("Y")?true:false);
+        // study_control is not in the schema yet -- restore when the feature is implemented
+        //rec.setStudyControl("Y".equals(rs.getString("study_control")));
         return rec;
     }
 }
