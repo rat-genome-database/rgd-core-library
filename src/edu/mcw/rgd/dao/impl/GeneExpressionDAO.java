@@ -32,20 +32,30 @@ public class GeneExpressionDAO extends PhenominerDAO {
         int id = getNextKeyFromSequence("gene_expression_exp_record_seq");
         r.setId(id);
 
+        // study_control is not in the schema yet -- restore these lines when the feature is implemented
+        //String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
+        //        +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, study_control, last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
+        //char studyCtrl = r.getStudyControl()?'Y':'N';
+        //update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
+        //        r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(),studyCtrl);
         String sql = "INSERT INTO gene_expression_exp_record (gene_expression_exp_record_id, experiment_id, sample_id"
-                +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, study_control, last_modified_date) VALUES(?,?,?,?,?,?,?,?,SYSTIMESTAMP)";
-        char studyCtrl = r.getStudyControl()?'Y':'N';
+                +",last_modified_by, curation_status, species_type_key, CLINICAL_MEASUREMENT_ID, last_modified_date) VALUES(?,?,?,?,?,?,?,SYSTIMESTAMP)";
         update(sql, id, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
-                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(),studyCtrl);
+                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId());
         return id;
     }
 
     public void updateGeneExpressionRecord(GeneExpressionRecord r) throws Exception {
+        // study_control is not in the schema yet -- restore these lines when the feature is implemented
+        //String sql = "update gene_expression_exp_record set experiment_id=?, sample_id=?, last_modified_by=?, curation_status=?," +
+        //        "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, STUDY_CONTROL=?, last_modified_date = SYSTIMESTAMP where gene_expression_exp_record_id=?";
+        //char studyCtrl = r.getStudyControl()?'Y':'N';
+        //update(sql, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
+        //        r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(), studyCtrl, r.getId());
         String sql = "update gene_expression_exp_record set experiment_id=?, sample_id=?, last_modified_by=?, curation_status=?," +
-                "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, STUDY_CONTROL=?, last_modified_date = SYSTIMESTAMP where gene_expression_exp_record_id=?";
-        char studyCtrl = r.getStudyControl()?'Y':'N';
+                "species_type_key=?, CLINICAL_MEASUREMENT_ID=?, last_modified_date = SYSTIMESTAMP where gene_expression_exp_record_id=?";
         update(sql, r.getExperimentId(), r.getSampleId(), r.getLastModifiedBy(),
-                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(), studyCtrl, r.getId());
+                r.getCurationStatus(), r.getSpeciesTypeKey(), r.getClinicalMeasurementId(), r.getId());
     }
 
     /**
