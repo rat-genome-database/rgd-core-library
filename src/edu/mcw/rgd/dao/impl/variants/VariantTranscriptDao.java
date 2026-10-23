@@ -33,11 +33,12 @@ public class VariantTranscriptDao extends AbstractDAO {
         List<Long> ids = new ArrayList<>(new LinkedHashSet<>(rgdIds));
         for( int i=0; i<ids.size(); i+=1000 ) {
             List<Long> chunk = ids.subList(i, Math.min(i+1000, ids.size()));
-            String sql=" select t.*, p.prediction from variant_transcript t left outer join " +
-                    "                polyphen p on (t.variant_rgd_id=p.variant_rgd_id and t.transcript_rgd_id=p.transcript_rgd_id)\n" +
-                    " inner join transcripts tr on tr.transcript_rgd_id=t.transcript_rgd_id" +
-                    "                where t.variant_rgd_id in (" + Utils.concatenate(chunk, ",") + ")" +
-                    "                and t.map_key=?";
+            // same rows as getVariantTranscripts(rgdId, mapKey); the lookups are kept per transcript row (OFFSET 0),
+            // because Postgres expects far more rows than there are and otherwise scans all of transcripts and polyphen
+            String sql="select t.*, p.prediction from (select * from variant_transcript where variant_rgd_id in (" + Utils.concatenate(chunk, ",") + ")" +
+                    " and map_key=? offset 0) t" +
+                    " cross join lateral (select 1 from transcripts tr where tr.transcript_rgd_id=t.transcript_rgd_id offset 0) tr" +
+                    " left join lateral (select p.prediction from polyphen p where p.variant_rgd_id=t.variant_rgd_id and p.transcript_rgd_id=t.transcript_rgd_id offset 0) p on true";
             VariantTranscriptQuery q=new VariantTranscriptQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
             q.declareParameter(new SqlParameter(Types.INTEGER));
             for( VariantTranscript t: q.execute(mapKey) ) {
