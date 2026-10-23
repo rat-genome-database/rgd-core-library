@@ -419,61 +419,44 @@ public class VariantDAO extends AbstractDAO {
         return q.execute(mapKey,chrom,start,stop, offset);
     }
 
+    // variants on the map within the region that have a transcript location of the given name (Exon or Intron);
+    // the EXISTS is kept as a per-variant index lookup (OFFSET 0): as a join, Postgres scans all of variant_transcript
+    private static final String TRANSCRIPT_LOCATION_FROM =
+            " from variant_map_data vm, variant v, rgd_ids r" +
+            " where vm.map_key=? and vm.chromosome=? and vm.start_pos between ? and ?" +
+            " and v.rgd_id=vm.rgd_id and r.rgd_id=v.rgd_id and r.object_status='ACTIVE'" +
+            " and exists (select 1 from variant_transcript vt where vt.variant_rgd_id=vm.rgd_id and vt.location_name like ? offset 0)";
+
+    private String getTranscriptLocationPattern(String locName) {
+        return locName.equals("Exon") ? "%EXON%" : "%INTRON%";
+    }
+
     public List<VariantMapData> getActiveVariantsWithTranscriptLocationNameLimited(int mapKey, String chrom, int start, int stop, String locName, int offset) throws Exception{
-        String loc = "";
-        if (locName.equals("Exon"))
-            loc = "EXON";
-        else
-            loc="INTRON";
-        String sql = "select v.*,vm.* from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (\n" +
-                "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%"+loc+"%' and variant_rgd_id in " +
-                "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) ) " +
-                "order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
+        String sql = "select v.*,vm.*" + TRANSCRIPT_LOCATION_FROM +
+                " order by vm.start_pos, vm.rgd_id offset ? rows fetch next 1000 rows only";
         VariantMapQuery q= new VariantMapQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(),sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
+        q.declareParameter(new SqlParameter(Types.VARCHAR));
         q.declareParameter(new SqlParameter(Types.INTEGER));
-        return q.execute(mapKey,chrom,start,stop, offset);
+        return q.execute(mapKey,chrom,start,stop, getTranscriptLocationPattern(locName), offset);
     }
 
     public Integer getVariantsWithTranscriptLocationNameCount(int mapKey, String chrom, int start, int stop, String locName) throws Exception{
-        String sql = "";
-        int cnt = 0;
-        if (locName.equals("Exon"))
-            sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (" +
-                    "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%EXON%' and variant_rgd_id in " +
-                    "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
-        else
-            sql = "select count(*) as CNT from variant v, variant_map_data vm, RGD_IDS r where v.rgd_id=vm.rgd_id and vm.map_key=? and r.rgd_id=v.rgd_id and r.OBJECT_STATUS='ACTIVE' and v.rgd_id in (" +
-                    "select distinct variant_rgd_id as rgd_id from variant_transcript where location_name like '%INTRON%' and variant_rgd_id in " +
-                    "(select v.rgd_id as rgd_id from variant v, variant_map_data vm where v.rgd_id=vm.rgd_id  and vm.chromosome=? and vm.start_pos between ? and ?) )";
-        Connection con = null;
-        try {
-            con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
+        String sql = "select count(*)" + TRANSCRIPT_LOCATION_FROM;
+        try( Connection con = DataSourceFactory.getInstance().getCarpeNovoDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql) ) {
             ps.setInt(1, mapKey);
             ps.setString(2, chrom);
             ps.setInt(3, start);
             ps.setInt(4, stop);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                cnt = rs.getInt(1);
+            ps.setString(5, getTranscriptLocationPattern(locName));
+            try( ResultSet rs = ps.executeQuery() ) {
+                return rs.next() ? rs.getInt(1) : 0;
             }
-            ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                con.close();
-            }
-            catch (Exception ignored){  }
         }
-//        CountQuery q = new CountQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
-//        List<Integer> results = execute(q, mapKey,chrom,start,stop);
-        return cnt;
     }
 
     public Integer getVariantsCountWithGeneLocation(int mapKey, String chrom, int start, int stop) throws Exception{
