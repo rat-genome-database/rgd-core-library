@@ -7,7 +7,9 @@ import edu.mcw.rgd.datamodel.Reference;
 import edu.mcw.rgd.datamodel.XdbId;
 import edu.mcw.rgd.process.Utils;
 
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author jdepons
@@ -214,6 +216,35 @@ public class ReferenceDAO extends AbstractDAO {
                 "WHERE r.rgd_id=ref.rgd_id AND rid.ref_key=ref.ref_key AND rid.RGD_ID=?";
 
         return executeRefQuery(query, rgdId);
+    }
+
+    /**
+     * get references for many rgd objects at once
+     * @param rgdIds object rgd ids
+     * @return map of object rgd id to its Reference objects; objects without references are not in the map
+     * @throws Exception if something unexpected happens in the framework
+     */
+    public Map<Integer, List<Reference>> getReferencesForObjects(Collection<Integer> rgdIds) throws Exception {
+
+        Map<Integer, List<Reference>> results = new HashMap<>();
+        List<Integer> ids = new ArrayList<>(new LinkedHashSet<>(rgdIds));
+        for( int i=0; i<ids.size(); i+=1000 ) {
+            List<Integer> chunk = ids.subList(i, Math.min(i+1000, ids.size()));
+            String query = "SELECT ref.*, r.species_type_key, rid.rgd_id AS object_rgd_id "+
+                    "FROM \"references\" ref, rgd_ids r, rgd_ref_rgd_id rid "+
+                    "WHERE r.rgd_id=ref.rgd_id AND rid.ref_key=ref.ref_key AND rid.rgd_id IN("+Utils.concatenate(chunk, ",")+")";
+
+            ReferenceQuery q = new ReferenceQuery(this.getDataSource(), query) {
+                protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    return new Object[]{rs.getInt("object_rgd_id"), super.mapRow(rs, rowNum)};
+                }
+            };
+            for( Object o: q.execute() ) {
+                Object[] row = (Object[]) o;
+                results.computeIfAbsent((Integer) row[0], k -> new ArrayList<>()).add((Reference) row[1]);
+            }
+        }
+        return results;
     }
 
     /**
