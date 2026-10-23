@@ -32,6 +32,9 @@ public class VariantTranscriptQuery extends MappingSqlQuery<VariantTranscript> {
         t.setFrameShift(rs.getString("frameshift"));
         t.setPolyphenStatus(rs.getString("PREDICTION"));
         try{
+            t.setVariantId(rs.getLong("variant_rgd_id"));
+        }catch (Exception ignored){}
+        try{
             t.setTranscriptSymbol(rs.getString("acc_id"));
         }catch (Exception ignored){}
         try{
