@@ -33,10 +33,10 @@ public class VariantTranscriptDao extends AbstractDAO {
         List<Long> ids = new ArrayList<>(new LinkedHashSet<>(rgdIds));
         for( int i=0; i<ids.size(); i+=1000 ) {
             List<Long> chunk = ids.subList(i, Math.min(i+1000, ids.size()));
-            // same rows as getVariantTranscripts(rgdId, mapKey); the lookups are kept per transcript row (OFFSET 0),
-            // because Postgres expects far more rows than there are and otherwise scans all of transcripts and polyphen
-            String sql="select t.*, p.prediction from (select * from variant_transcript where variant_rgd_id in (" + Utils.concatenate(chunk, ",") + ")" +
-                    " and map_key=? offset 0) t" +
+            // same rows as getVariantTranscripts(rgdId, mapKey); every lookup is kept per variant / per transcript row (OFFSET 0):
+            // given the whole id list at once, Postgres picks the wrong variant_transcript index or scans all of transcripts and polyphen
+            String sql="select t.*, p.prediction from unnest(array[" + Utils.concatenate(chunk, ",") + "]::bigint[]) ids(id)" +
+                    " cross join lateral (select * from variant_transcript vt where vt.variant_rgd_id=ids.id and vt.map_key=? offset 0) t" +
                     " cross join lateral (select 1 from transcripts tr where tr.transcript_rgd_id=t.transcript_rgd_id offset 0) tr" +
                     " left join lateral (select p.prediction from polyphen p where p.variant_rgd_id=t.variant_rgd_id and p.transcript_rgd_id=t.transcript_rgd_id offset 0) p on true";
             VariantTranscriptQuery q=new VariantTranscriptQuery(DataSourceFactory.getInstance().getCarpeNovoDataSource(), sql);
