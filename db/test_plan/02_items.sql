@@ -56,7 +56,7 @@ INSERT INTO test_plan_items (item_id, area, name, path, check_text, covers, cura
   ('object-report-export-formats', 'Object reports', 'Report export formats', '/rgdweb/report/format.html', 'Export a report in each offered format.', NULL, 'N', 'N', 530),
   ('object-gbrowse-jbrowse-track-associations', 'Object reports', 'GBrowse/JBrowse track associations', '/rgdweb/report/associationsForGBrowseTracks.html?rgd_id=2004&aspect=D', 'Association list returns data.', NULL, 'N', 'N', 540),
   ('object-genome-information', 'Object reports', 'Genome information', '/rgdweb/report/genomeInformation/genomeInformation.html', 'Species and assembly statistics match production.', NULL, 'N', 'N', 550),
-  ('object-genome-information-chromosome', 'Object reports', 'Genome information: chromosome', '/rgdweb/report/genomeInformation/chromosome.html?species=3&chr=1', 'Chromosome page matches production.', NULL, 'N', 'N', 560),
+  ('object-genome-information-chromosome', 'Object reports', 'Genome information: chromosome', '/rgdweb/report/genomeInformation/chromosome.html?chr=1&mapKey=380&locus=NC_086019.1', 'Chromosome page matches production.', NULL, 'N', 'N', 560),
   ('object-genome-information-disease-genes', 'Object reports', 'Genome information: disease genes', '/rgdweb/report/genomeInformation/diseaseGenes.html', 'Lists match production.', NULL, 'N', 'N', 570),
   ('ontology-ontology-search', 'Ontology browser', 'Ontology search', '/rgdweb/ontology/search.html', 'Results per ontology match production.', 'ontology/autocomplete.html', 'N', 'N', 580),
   ('ontology-ontology-term-browser', 'Ontology browser', 'Ontology term browser', '/rgdweb/ontology/view.html?acc_id=DOID:9351', 'Parent and child terms match production.', 'ontology/tree.html', 'N', 'N', 590),
