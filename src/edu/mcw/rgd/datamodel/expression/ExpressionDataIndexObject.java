@@ -31,6 +31,7 @@ public class ExpressionDataIndexObject {
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
+    private int referenceRgdId;
     private String geoSeriesAcc;
     private String traitOntId;
     private String traitTerm;
@@ -237,7 +238,13 @@ public class ExpressionDataIndexObject {
         this.tissueTerm = tissueTerm;
     }
 
+    public int getReferenceRgdId() {
+        return referenceRgdId;
+    }
 
+    public void setReferenceRgdId(int referenceRgdId) {
+        this.referenceRgdId = referenceRgdId;
+    }
 //    public double getValueMean() {
 //        return valueMean;
 //    }
