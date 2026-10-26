@@ -706,11 +706,17 @@ public class VariantDAO extends JdbcBaseDAO {
                 " inner join VARIANT_SAMPLE_DETAIL vsd on vsd.rgd_id=v.rgd_id and vsd.total_depth > 8 "+
                 "inner join SAMPLE s on vsd.SAMPLE_ID = s.SAMPLE_ID and s.SAMPLE_ID=? and s.MAP_KEY =? \n" +
                 "inner join POLYPHEN p on v.RGD_ID = p.VARIANT_RGD_ID and p.PREDICTION LIKE '%damaging'  \n" +
+                // find the sample's damaging variants first (a range scan of the sample's index entries and the small
+                // POLYPHEN table), so the large tables are read only for those variants; otherwise every damaging
+                // prediction (~170,000) is probed into VARIANT_SAMPLE_DETAIL, which is very slow when not cached
+                "where v.RGD_ID = any(array(select d.RGD_ID from VARIANT_SAMPLE_DETAIL d where d.SAMPLE_ID=? \n" +
+                "  intersect select p2.VARIANT_RGD_ID from POLYPHEN p2 where p2.PREDICTION LIKE '%damaging')) \n" +
                 "ORDER BY vmd.CHROMOSOME,vmd.START_POS,vmd.END_POS,v.REF_NUC,v.VAR_NUC";
         VariantMapper q = new VariantMapper(getDataSource(), sql);
         q.declareParameter(new SqlParameter(Types.INTEGER));
         q.declareParameter(new SqlParameter(Types.INTEGER));
-        return q.execute(sampleId,mapKey);
+        q.declareParameter(new SqlParameter(Types.INTEGER));
+        return q.execute(sampleId,mapKey,sampleId);
     }
 
 
