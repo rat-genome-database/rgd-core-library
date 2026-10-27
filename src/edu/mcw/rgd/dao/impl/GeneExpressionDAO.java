@@ -556,6 +556,51 @@ public class GeneExpressionDAO extends PhenominerDAO {
         return execute(q,unit, geneId, tissueOntId,strainOntId);
     }
 
+    /**
+     * Studies whose GEO series has a PubMed id in RNA_SEQ but that have no row in STUDY_REFERENCES.
+     * RNA_SEQ.PUBMED_ID is free text, so each value is split into its numeric PubMed ids.
+     * @return studies ordered by study id, each with the distinct PubMed ids found in RNA_SEQ for its GEO series
+     * @throws Exception if something unexpected happens in the framework
+     */
+    public LinkedHashMap<Study, List<String>> getStudiesWithRnaSeqPubmedIdsButNoReferences() throws Exception {
+        String query = """
+                SELECT st.*, rs.pubmed_id
+                FROM study st
+                JOIN (SELECT DISTINCT geo_accession_id, pubmed_id FROM rna_seq WHERE pubmed_id IS NOT NULL) rs
+                  ON rs.geo_accession_id = st.geo_series_acc
+                WHERE NOT EXISTS (SELECT 1 FROM study_references sr WHERE sr.study_id = st.study_id)
+                ORDER BY st.study_id, rs.pubmed_id
+                """;
+        StudyQuery q = new StudyQuery(this.getDataSource(), query) {
+            @Override
+            protected Object mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+                return new Object[]{super.mapRow(rs, rowNum), rs.getString("pubmed_id")};
+            }
+        };
+        List<Object[]> rows = execute(q);
+
+        Map<Integer, Study> studiesById = new HashMap<>();
+        Map<Study, Set<String>> pmidsByStudy = new LinkedHashMap<>();
+        for( Object[] row: rows ) {
+            Study rowStudy = (Study) row[0];
+            Study study = studiesById.computeIfAbsent(rowStudy.getId(), id -> rowStudy);
+            Set<String> pmids = pmidsByStudy.computeIfAbsent(study, s -> new LinkedHashSet<>());
+            for( String pmid: ((String) row[1]).split("[^0-9]+") ) {
+                if( !pmid.isEmpty() ) {
+                    pmids.add(pmid);
+                }
+            }
+        }
+
+        LinkedHashMap<Study, List<String>> result = new LinkedHashMap<>();
+        for( Map.Entry<Study, Set<String>> entry: pmidsByStudy.entrySet() ) {
+            if( !entry.getValue().isEmpty() ) {
+                result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+        }
+        return result;
+    }
+
     public List<Study> getGeneExpressionStudies() throws Exception {
         String query="select *  from study where study_type=?";
         StudyQuery studyQuery=new StudyQuery(this.getDataSource(), query);
