@@ -257,31 +257,69 @@ public class PhenominerDAO extends AbstractDAO {
         return null;
     }
 
+    static final String GEO_STUDY_FILTER = "sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ?";
+
+    // search matches the GEO series accession, PubMed id or study title, ignoring case
+    static final String GEO_STUDY_SEARCH = " AND (LOWER(geo_accession_id) LIKE ? OR LOWER(pubmed_id) LIKE ? OR LOWER(study_title) LIKE ?)";
+
     public int getGeoStudyCount(String species, String status) throws Exception {
-        String query = "SELECT COUNT(DISTINCT geo_accession_id) FROM rna_seq " +
-                "WHERE sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ?";
-        return getCount(query, species + "%", status);
+        return getGeoStudyCount(species, status, null);
+    }
+
+    /**
+     * number of GEO series with samples of the given species and curation status
+     * @param search optional text to look for in the series accession, PubMed id or study title; null or blank for all series
+     */
+    public int getGeoStudyCount(String species, String status, String search) throws Exception {
+        List<Object> params = new ArrayList<>();
+        String query = "SELECT COUNT(DISTINCT geo_accession_id) FROM rna_seq WHERE " + GEO_STUDY_FILTER
+                + geoStudySearch(search, species, status, params);
+        return getCount(query, params.toArray());
     }
 
     public LinkedHashMap<String,GeoRecord> getGeoStudiesPaged(String species, String status, int offset, int pageSize) throws Exception {
-        String query = "SELECT * FROM rna_seq WHERE geo_accession_id IN (" +
+        return getGeoStudiesPaged(species, status, null, offset, pageSize);
+    }
+
+    /**
+     * one page of GEO series, in the order of getGeoStudies (lowest PubMed id, then series accession descending);
+     * each series maps to the same record getGeoStudies returns for it
+     * @param search optional text to look for in the series accession, PubMed id or study title; null or blank for all series
+     */
+    public LinkedHashMap<String,GeoRecord> getGeoStudiesPaged(String species, String status, String search, int offset, int pageSize) throws Exception {
+        List<Object> params = new ArrayList<>();
+        String query = "SELECT * FROM rna_seq WHERE " + GEO_STUDY_FILTER + " AND geo_accession_id IN (" +
                 "SELECT geo_accession_id FROM (" +
-                "SELECT DISTINCT geo_accession_id, MIN(pubmed_id) AS pm FROM rna_seq " +
-                "WHERE sample_organism LIKE ? AND platform_technology='high-throughput sequencing' AND curation_status = ? " +
-                "GROUP BY geo_accession_id" +
-                ") ORDER BY pm, geo_accession_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" +
-                ") ORDER BY pubmed_id, geo_accession_id DESC";
+                "SELECT geo_accession_id, MIN(pubmed_id) AS pm FROM rna_seq WHERE " + GEO_STUDY_FILTER +
+                geoStudySearch(search, species, status, params) +
+                " GROUP BY geo_accession_id ORDER BY pm, geo_accession_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" +
+                ") pg) ORDER BY pubmed_id, geo_accession_id DESC";
+        params.add(0, status);
+        params.add(0, species + "%");
+        params.add(offset);
+        params.add(pageSize);
 
         GeoRecordQuery q = new GeoRecordQuery(this.getDataSource(), query);
-        List<GeoRecord> result = execute(q, species + "%", status, offset, pageSize);
+        List<GeoRecord> result = execute(q, params.toArray());
         LinkedHashMap<String,GeoRecord> r = new LinkedHashMap<>();
-        if(result != null) {
-            for(GeoRecord s : result) {
-                r.put(s.getGeoAccessionId(), s);
-            }
-            return r;
+        for(GeoRecord s : result) {
+            r.put(s.getGeoAccessionId(), s);
         }
-        return null;
+        return r;
+    }
+
+    /// adds the species and status parameters, and the search condition with its parameters when search is given
+    String geoStudySearch(String search, String species, String status, List<Object> params) {
+        params.add(species + "%");
+        params.add(status);
+        if( search==null || search.trim().isEmpty() ) {
+            return "";
+        }
+        String pattern = "%" + search.trim().toLowerCase() + "%";
+        params.add(pattern);
+        params.add(pattern);
+        params.add(pattern);
+        return GEO_STUDY_SEARCH;
     }
 
     public void updateGeoStudyStatus(String gse,String status,String species) throws Exception{
