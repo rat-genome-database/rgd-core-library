@@ -300,13 +300,14 @@ public class AnnotationDAO extends AbstractDAO {
 
         String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? AND evidence=? AND term_acc=? AND created_by=? ";
 
-        if (xrefSource == null) {
-            query += " AND xref_source is null";
-        } else {
-           query += " AND xref_source='" + xrefSource + "'";
+        // NULL and '' are the same in Oracle, but distinct in Postgres: treat both as 'no xref_source'
+        if( Utils.isStringEmpty(xrefSource) ) {
+            query += "AND (xref_source IS NULL OR xref_source='')";
+            return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc, createdBy);
         }
 
-        return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc, createdBy);
+        query += "AND xref_source=?";
+        return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc, createdBy, xrefSource);
     }
 
     /**
@@ -320,15 +321,16 @@ public class AnnotationDAO extends AbstractDAO {
      */
     public List<Annotation> getAnnotations(int annotatedObjectRGDId, String evidence, String termAcc, String xrefSource) throws Exception {
 
-        String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? and evidence=? and term_acc=? ";
+        String query = "SELECT * FROM full_annot WHERE annotated_object_rgd_id=? AND evidence=? AND term_acc=? ";
 
-        if (xrefSource == null) {
-            query += " and xref_source is null";
-        } else {
-           query += " and xref_source='" + xrefSource + "'";
+        // NULL and '' are the same in Oracle, but distinct in Postgres: treat both as 'no xref_source'
+        if( Utils.isStringEmpty(xrefSource) ) {
+            query += "AND (xref_source IS NULL OR xref_source='')";
+            return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc);
         }
 
-        return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc);
+        query += "AND xref_source=?";
+        return executeAnnotationQuery(query, annotatedObjectRGDId, evidence, termAcc, xrefSource);
     }
 
     public List<Annotation> getAnnotationsWithDiseaseCategory(int annotatedObjectRGDId) throws Exception {
@@ -350,13 +352,14 @@ public class AnnotationDAO extends AbstractDAO {
         String sql = "UPDATE full_annot SET last_modified_date=LOCALTIMESTAMP(0) " +
                 "WHERE annotated_object_rgd_id=? AND evidence=? AND term_acc=? AND created_by=? ";
 
-        if (xrefSource == null) {
-            sql += " AND xref_source IS NULL";
-        } else {
-           sql += " AND xref_source='" + xrefSource + "'";
+        // NULL and '' are the same in Oracle, but distinct in Postgres: treat both as 'no xref_source'
+        if( Utils.isStringEmpty(xrefSource) ) {
+            sql += "AND (xref_source IS NULL OR xref_source='')";
+            return update(sql, annotatedObjectRGDID, evidence, termAcc, createdBy);
         }
 
-        return update(sql, annotatedObjectRGDID, evidence, termAcc, createdBy);
+        sql += "AND xref_source=?";
+        return update(sql, annotatedObjectRGDID, evidence, termAcc, createdBy, xrefSource);
     }
 
     /**

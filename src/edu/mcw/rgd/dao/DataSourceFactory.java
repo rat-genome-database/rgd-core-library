@@ -5,6 +5,9 @@ import edu.mcw.rgd.dao.spring.XmlBeanFactoryManager;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * @author jdepons
@@ -67,6 +70,23 @@ public class DataSourceFactory {
      * @throws Exception
      */
     public DataSource getDataSource(String domain) throws Exception{
+        DataSource ds = lookupDataSource(domain);
+        // Ensembl is MySQL, not migrated from Oracle: keep its own empty string semantics
+        return domain.equalsIgnoreCase("Ensembl") ? ds : emptyStringToNull(ds);
+    }
+
+    // one wrapper per DataSource, so the same DataSource object is returned every time
+    // (Spring transaction managers and JdbcTemplates match connections by DataSource)
+    private final Map<DataSource, DataSource> wrappedDataSources = Collections.synchronizedMap(new IdentityHashMap<>());
+
+    private DataSource emptyStringToNull(DataSource ds) {
+        if( ds == null || ds instanceof EmptyStringToNullDataSource ) {
+            return ds;
+        }
+        return wrappedDataSources.computeIfAbsent(ds, EmptyStringToNullDataSource::new);
+    }
+
+    private DataSource lookupDataSource(String domain) throws Exception{
         try {
             if (System.getProperty("spring.config") != null && !System.getProperty("spring.config").equals("")) {
                 return (DataSource) (XmlBeanFactoryManager.getInstance().getBean(domain+"DataSource"));

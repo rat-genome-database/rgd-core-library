@@ -178,6 +178,31 @@ public class ReferenceDAO extends AbstractDAO {
     }
 
     /**
+     * Returns the Rgd Ids of active references for the given PubMed ids, in one query per 1000 ids.
+     * @param pmids PubMed ids (digits only)
+     * @return map of PubMed id to reference Rgd Id; PubMed ids without an active reference are not in the map
+     * @throws Exception if something unexpected happens in the framework
+     */
+    public Map<String, Integer> getReferenceRgdIdsByPubmedIds(Collection<String> pmids) throws Exception {
+
+        Map<String, Integer> result = new HashMap<>();
+        List<String> pmidList = new ArrayList<>(pmids);
+        for( int i=0; i<pmidList.size(); i+=1000 ) {
+            List<String> chunk = pmidList.subList(i, Math.min(i+1000, pmidList.size()));
+            String sql = "SELECT MAX(ref.rgd_id), x.acc_id \n" +
+                "FROM \"references\" ref, rgd_acc_xdb x, rgd_ids r \n" +
+                "WHERE x.xdb_key=" + XdbId.XDB_KEY_PUBMED +
+                " AND x.rgd_id=ref.rgd_id AND x.acc_id IN("+Utils.buildInPhraseQuoted(chunk)+")\n" +
+                " AND ref.rgd_id=r.rgd_id AND r.object_status='ACTIVE'\n" +
+                "GROUP BY x.acc_id";
+            for( IntStringMapQuery.MapPair pair: IntStringMapQuery.execute(this, sql) ) {
+                result.put(pair.stringValue, pair.keyValue);
+            }
+        }
+        return result;
+    }
+
+    /**
      * get PubMed IDs for all active references
      * @return list of external ids
      */

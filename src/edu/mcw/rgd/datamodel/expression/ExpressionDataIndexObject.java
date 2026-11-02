@@ -31,10 +31,14 @@ public class ExpressionDataIndexObject {
 //    private List<MapInfo> mapDataList;
 //    private Map<String, String> metaData;
     private String studyId;
+    private Set<Integer> referenceRgdId;
     private String geoSeriesAcc;
     private String traitOntId;
     private String traitTerm;
     private String lifeStage;
+    private int ageDaysFromDobLowBound;
+    private int ageDaysFromDobHighBound;
+
     private String computedSex;
     private String sex;
     private String bioSampleId;
@@ -51,6 +55,21 @@ public class ExpressionDataIndexObject {
         this.parentTermAccIds = parentTermAccIds;
     }
 
+    public int getAgeDaysFromDobLowBound() {
+        return ageDaysFromDobLowBound;
+    }
+
+    public void setAgeDaysFromDobLowBound(int ageDaysFromDobLowBound) {
+        this.ageDaysFromDobLowBound = ageDaysFromDobLowBound;
+    }
+
+    public int getAgeDaysFromDobHighBound() {
+        return ageDaysFromDobHighBound;
+    }
+
+    public void setAgeDaysFromDobHighBound(int ageDaysFromDobHighBound) {
+        this.ageDaysFromDobHighBound = ageDaysFromDobHighBound;
+    }
 
 //    public Set<String> getCondition() {
 //        return condition;
@@ -237,7 +256,13 @@ public class ExpressionDataIndexObject {
         this.tissueTerm = tissueTerm;
     }
 
+    public Set<Integer> getReferenceRgdId() {
+        return referenceRgdId;
+    }
 
+    public void setReferenceRgdId(Set<Integer> referenceRgdId) {
+        this.referenceRgdId = referenceRgdId;
+    }
 //    public double getValueMean() {
 //        return valueMean;
 //    }
