@@ -6,6 +6,7 @@ import edu.mcw.rgd.dao.spring.GWASCatalogQuery;
 import edu.mcw.rgd.dao.spring.GWASVersionQuery;
 import edu.mcw.rgd.datamodel.GWASCatalog;
 import edu.mcw.rgd.datamodel.GWASVersion;
+import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
@@ -48,11 +49,18 @@ public class GWASCatalogDAO extends AbstractDAO {
             int gwasId = this.getNextKeyFromSequence("GWAS_CAT_SEQ");
             gc.setGwasId(gwasId);
 
-            su.update(gc.getGwasId(),gc.getPmid(),gc.getDiseaseTrait(),gc.getInitialSample(), gc.getReplicateSample(),gc.getRegion(),gc.getChr(),gc.getPos(),
-            gc.getReportedGenes(),gc.getMappedGene(),gc.getStrongSnpRiskallele(),gc.getSnps(),gc.getCurSnpId(),gc.getContext(),gc.getRiskAlleleFreq(),gc.getpValStr(),gc.getpValMlog(),
-            gc.getSnpPassQc(),gc.getMapTrait(),gc.getEfoId(),gc.getStudyAcc(),gc.getOrBeta(), gc.getVariantRgdId(), gc.getMapKey());
+            su.update(gc.getGwasId(),nvl(gc.getPmid()),nvl(gc.getDiseaseTrait()),nvl(gc.getInitialSample()), nvl(gc.getReplicateSample()),nvl(gc.getRegion()),nvl(gc.getChr()),nvl(gc.getPos()),
+            nvl(gc.getReportedGenes()),nvl(gc.getMappedGene()),nvl(gc.getStrongSnpRiskallele()),nvl(gc.getSnps()),nvl(gc.getCurSnpId()),nvl(gc.getContext()),nvl(gc.getRiskAlleleFreq()),nvl(gc.getpValStr()),gc.getpValMlog(),
+            nvl(gc.getSnpPassQc()),nvl(gc.getMapTrait()),nvl(gc.getEfoId()),nvl(gc.getStudyAcc()),nvl(gc.getOrBeta()), gc.getVariantRgdId(), gc.getMapKey());
         }
         return executeBatch(su);
+    }
+
+    // Oracle stored '' as NULL; postgres does not, and every nullable varchar column in
+    // GWAS_CATALOG carries a *_nonempty_ck check constraint, so empty strings coming from
+    // the catalog file must be written as NULL.
+    private static String nvl(String s) {
+        return Utils.isStringEmpty(s) ? null : s;
     }
 
     public int insertGWASVersionBatch(Collection<GWASVersion> insert) throws Exception {
