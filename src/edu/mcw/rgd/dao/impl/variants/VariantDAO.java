@@ -6,7 +6,6 @@ import edu.mcw.rgd.dao.spring.*;
 import edu.mcw.rgd.dao.spring.variants.*;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.variants.*;
-import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.BatchSqlUpdate;
 
