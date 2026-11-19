@@ -2077,6 +2077,8 @@ public class PhenominerDAO extends AbstractDAO {
             "SELECT er.experiment_id, er.measurement_error,  er.measurement_sd, er.measurement_sem, \n" +
             "er.measurement_units, er.measurement_value, er.curation_status, er.has_individual_record, \n" +
             "mm.measurement_method_id, mm.measurement_method_ont_id, mm.measurement_duration_in_secs, mm.measurement_site, " +
+            // post-insult columns are needed by the mmPIType/mmPITime/mmPIUnit filters below
+            "mm.measurement_method_pi_type, mm.meas_method_pi_time_value, mm.meas_method_pi_time_unit, " +
             "s1.*, cm.*, ec.*\n" +
             "FROM " + (isForReport ? "experiment_record_view" : "experiment_record") + " er, sample s1, clinical_measurement cm, measurement_method mm, " +
             " experiment_condition ec\n" +
@@ -2307,7 +2309,12 @@ public class PhenominerDAO extends AbstractDAO {
                 "SELECT er.experiment_id, er.measurement_error,\n" +
                 "er.measurement_sd, er.measurement_sem, er.measurement_units, er.measurement_value,\n" +
                 "er.curation_status, er.has_individual_record,\n" +
-                "s1.*, cm.*, mm.*, ec.*\n" +
+                // mm columns listed explicitly: measurement_method also has experiment_record_id (and
+                // gene_expression_exp_record_id), so mm.* + ec.* made er1.experiment_record_id ambiguous (RGDD-3147)
+                "mm.measurement_method_id, mm.measurement_duration_in_secs, mm.measurement_method_notes, mm.measurement_method_ont_id,\n" +
+                "mm.measurement_site, mm.measurement_method_pi_type, mm.meas_method_pi_time_value, mm.meas_method_pi_time_unit,\n" +
+                "mm.measurement_site_ont_ids, mm.measurement_method_type,\n" +
+                "s1.*, cm.*, ec.*\n" +
                 "from experiment_record er, sample s1, clinical_measurement cm, measurement_method mm, \n" +
                 "experiment_condition ec\n" +
                 "WHERE er.sample_id = s1.sample_id\n" +
