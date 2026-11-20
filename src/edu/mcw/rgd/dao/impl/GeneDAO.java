@@ -597,6 +597,27 @@ public class GeneDAO extends AbstractDAO {
     }
 
     /**
+     * Returns RGD ids of all active genes for given species.
+     * Results do not contain splices or alleles (same gene set as {@link #getActiveGenes(int)}).
+     * Cheaper than {@link #getActiveGenes(int)} when only the RGD ids are needed.
+     * @param speciesTypeKey species type key
+     * @return list of RGD ids of active genes, sorted by RGD id (empty list possible)
+     * @throws Exception when unexpected error in spring framework occurs
+     */
+    public List<Integer> getActiveGeneRgdIds(int speciesTypeKey) throws Exception {
+        String query = """
+            SELECT g.rgd_id FROM genes g, rgd_ids r
+            WHERE r.object_status='ACTIVE'
+              AND r.species_type_key=?
+              AND COALESCE(gene_type_lc,'*') NOT IN ('splice','allele')
+              AND r.rgd_id=g.rgd_id
+            ORDER BY g.rgd_id
+            """;
+
+        return IntListQuery.execute(this, query, speciesTypeKey);
+    }
+
+    /**
      * Returns all active genes for given species and gene symbol. Results do not contain splices or alleles
      * @param speciesKey species type key
      * @param symbol gene symbol
@@ -819,9 +840,12 @@ public class GeneDAO extends AbstractDAO {
         if( geneSymbol == null)
             return null;
 
-        String query = "SELECT g.rgd_id FROM genes g, rgd_ids r "+
-                "WHERE g.gene_symbol_lc=? AND g.rgd_id=r.rgd_id AND r.species_type_key=? "+
-                "ORDER BY r.object_status"; // active genes are returned first
+        // active genes are returned first
+        String query = """
+            SELECT g.rgd_id FROM genes g, rgd_ids r
+            WHERE g.gene_symbol_lc=? AND g.rgd_id=r.rgd_id AND r.species_type_key=?
+            ORDER BY r.object_status
+            """;
 
         return IntListQuery.execute(this, query, geneSymbol.trim().toLowerCase(), speciesKey);
     }
