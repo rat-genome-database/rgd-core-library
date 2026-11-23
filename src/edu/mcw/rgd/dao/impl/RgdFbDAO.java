@@ -2,8 +2,10 @@ package edu.mcw.rgd.dao.impl;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.spring.FBAnswerQuery;
 import edu.mcw.rgd.dao.spring.FBPersonQuery;
 import edu.mcw.rgd.dao.spring.FBQuestionQuery;
+import edu.mcw.rgd.datamodel.FBAnswer;
 import edu.mcw.rgd.datamodel.FBPerson;
 import edu.mcw.rgd.datamodel.FBQuestion;
 
@@ -104,6 +106,19 @@ public class RgdFbDAO extends AbstractDAO {
         String query = QUESTION_SELECT + "where q.MESSAGE_ID=?";
         List<FBQuestion> questions = FBQuestionQuery.execute(this, getDataSource(), query, messageId);
         return questions.isEmpty() ? null : questions.get(0);
+    }
+
+    /**
+     * Get the answers given to a message, oldest first, each with the person who gave it.
+     */
+    public List<FBAnswer> getAnswers(int messageId) throws Exception {
+        String query = "select a.ANSWER_ID, a.ANSWER_DATE, a.ANSWER, a.ANSWER_ORIG, a.MESSAGE_ID, a.PERSON_ID, " +
+                "p.FIRSTNAME, p.LASTNAME, p.EMAIL_ADDRESS " +
+                "from FB_ANSWER a " +
+                "left join FB_PERSON p on p.PERSON_ID=a.PERSON_ID " +
+                "where a.MESSAGE_ID=? " +
+                "order by a.ANSWER_DATE, a.ANSWER_ID";
+        return FBAnswerQuery.execute(this, getDataSource(), query, messageId);
     }
 
     /**
