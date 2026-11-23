@@ -20,6 +20,14 @@ public class RgdFbDAO extends AbstractDAO {
         return FBPersonQuery.execute(this,getDataSource(),query, email);
     }
 
+    /**
+     * Get the people with this exact email address, ignoring case (no wildcards, unlike getPersonByEmail).
+     */
+    public List<FBPerson> getPeopleByEmailIgnoreCase(String email) throws Exception {
+        String query = "select * from FB_PERSON where lower(EMAIL_ADDRESS)=lower(?) order by PERSON_ID";
+        return FBPersonQuery.execute(this,getDataSource(),query, email);
+    }
+
     public FBPerson getPersonById(int id) throws Exception {
         String query = "select * from FB_PERSON where PERSON_ID=?";
         List<FBPerson> person = FBPersonQuery.execute(this,getDataSource(),query, id);
@@ -32,6 +40,7 @@ public class RgdFbDAO extends AbstractDAO {
         int personId = this.getNextKeyFromSequence("FB_PERSON_SEQ");
         update(query,personId, person.getFirstName(),person.getLastName(),person.getEmail(),person.getPhoneNumber(),
                 person.getInstitute(),person.getAddress(),person.getCity(),person.getState(),person.getZipCode(),person.getCountry(),person.getIsCurator());
+        person.setPersonId(personId); // the caller gets the id of the new row
     }
 
     public List<FBPerson> getAllPeople() throws Exception {
