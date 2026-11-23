@@ -27,11 +27,11 @@ public class RgdFbDAO extends AbstractDAO {
     }
 
     public void insertPerson(FBPerson person) throws Exception {
-        String query = "insert into FB_PERSON (PERSON_ID,FIRSTNAME,LASTNAME,EMAIL_ADDRESS,PHONE_NUMBER,INSTITUTE, ADDRESS,CITY,STATE,ZIP_CODE,COUNTRY) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "insert into FB_PERSON (PERSON_ID,FIRSTNAME,LASTNAME,EMAIL_ADDRESS,PHONE_NUMBER,INSTITUTE, ADDRESS,CITY,STATE,ZIP_CODE,COUNTRY,IS_CURATOR) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         int personId = this.getNextKeyFromSequence("FB_PERSON_SEQ");
         update(query,personId, person.getFirstName(),person.getLastName(),person.getEmail(),person.getPhoneNumber(),
-                person.getInstitute(),person.getAddress(),person.getCity(),person.getState(),person.getZipCode(),person.getCountry());
+                person.getInstitute(),person.getAddress(),person.getCity(),person.getState(),person.getZipCode(),person.getCountry(),person.getIsCurator());
     }
 
     public List<FBPerson> getAllPeople() throws Exception {
@@ -99,9 +99,9 @@ public class RgdFbDAO extends AbstractDAO {
 
     public void updatePerson(FBPerson person) throws Exception {
         String query = "update FB_PERSON set FIRSTNAME=?,LASTNAME=?,EMAIL_ADDRESS=?,PHONE_NUMBER=?,INSTITUTE=?, ADDRESS=?," +
-                "CITY=?,STATE=?,ZIP_CODE=?,COUNTRY=? where PERSON_ID=?";
+                "CITY=?,STATE=?,ZIP_CODE=?,COUNTRY=?,IS_CURATOR=? where PERSON_ID=?";
         update(query,person.getFirstName(),person.getLastName(),person.getEmail(),person.getPhoneNumber(),person.getInstitute(),
-                person.getAddress(),person.getCity(),person.getState(),person.getZipCode(),person.getCountry(),person.getPersonId());
+                person.getAddress(),person.getCity(),person.getState(),person.getZipCode(),person.getCountry(),person.getIsCurator(),person.getPersonId());
     }
 
 }

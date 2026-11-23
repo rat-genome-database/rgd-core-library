@@ -26,6 +26,7 @@ public class FBPersonQuery extends MappingSqlQuery {
         fp.setState(rs.getString("STATE"));
         fp.setZipCode(rs.getInt("ZIP_CODE"));
         fp.setCountry(rs.getString("COUNTRY"));
+        fp.setIsCurator(rs.getString("IS_CURATOR"));
         return fp;
     }
     public static List<FBPerson> execute(AbstractDAO dao, DataSource src, String sql, Object... params) throws Exception {

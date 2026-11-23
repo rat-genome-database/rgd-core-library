@@ -15,8 +15,23 @@ public class FBPerson {
     private String state;
     private int zipCode;
     private String country;
+    private String isCurator; // column IS_CURATOR: 'Y' = RGD curator; 'N' or null = not a curator
 
     public FBPerson() {}
+
+    /** @return value of column IS_CURATOR: 'Y', 'N' or null */
+    public String getIsCurator() {
+        return isCurator;
+    }
+
+    public void setIsCurator(String isCurator) {
+        this.isCurator = isCurator;
+    }
+
+    /** @return true if this person is an RGD curator (IS_CURATOR is 'Y'); 'N' and null both mean not a curator */
+    public boolean isCurator() {
+        return "Y".equals(isCurator);
+    }
 
     public int getPersonId() {
         return personId;
