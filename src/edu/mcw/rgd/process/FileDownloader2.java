@@ -80,6 +80,9 @@ public class FileDownloader2 {
     /** timeout for waiting for data, in milliseconds */
     private int soTimeout = 20000;
 
+    /** set to true after an HTTP/2 download failed: from then on, HTTP/1.1 is used */
+    private boolean useHttp11 = false;
+
     private static final Logger log = LogManager.getLogger(FileDownloader2.class);
 
     /**
@@ -166,11 +169,35 @@ public class FileDownloader2 {
         throw new PermanentDownloadErrorException(msg);
     }
 
+    /**
+     * Downloads via HTTP/2 (the JDK client default, with automatic downgrade when the server
+     * does not offer HTTP/2); if that fails at the transport level, the download is immediately
+     * retried with HTTP/1.1, and HTTP/1.1 is used for all later attempts of this downloader.
+     * Some servers (f.e. www.ebi.ac.uk) drop HTTP/2 connections from the JDK client
+     * ('GOAWAY received', 'EOF reached while reading'), while serving HTTP/1.1 fine.
+     */
     void downloadHttp(String outFileName) throws Exception {
 
-        log.info("Downloading file " + externalFile);
+        if( !useHttp11 ) {
+            try {
+                downloadHttp(outFileName, HttpClient.Version.HTTP_2);
+                return;
+            } catch( HttpStatusException e ) {
+                throw e; // the server did respond: a protocol change will not help
+            } catch( IOException e ) {
+                log.warn("HTTP/2 download failed: " + e + " -- falling back to HTTP/1.1");
+                useHttp11 = true;
+            }
+        }
+        downloadHttp(outFileName, HttpClient.Version.HTTP_1_1);
+    }
+
+    void downloadHttp(String outFileName, HttpClient.Version httpVersion) throws Exception {
+
+        log.info("Downloading file " + externalFile + (httpVersion == HttpClient.Version.HTTP_1_1 ? " (HTTP/1.1)" : ""));
 
         HttpClient client = HttpClient.newBuilder()
+                .version(httpVersion)
                 .connectTimeout(Duration.ofMillis(connectionTimeout))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
@@ -229,7 +256,14 @@ public class FileDownloader2 {
 
     private void checkStatus(int statusCode) throws IOException {
         if( statusCode < 200 || statusCode >= 300 ) {
-            throw new IOException("HTTP " + statusCode + " from " + externalFile);
+            throw new HttpStatusException("HTTP " + statusCode + " from " + externalFile);
+        }
+    }
+
+    /** non-2xx HTTP status received from the server */
+    private static class HttpStatusException extends IOException {
+        HttpStatusException(String msg) {
+            super(msg);
         }
     }
 
