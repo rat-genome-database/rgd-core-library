@@ -128,8 +128,7 @@ public class RgdFbDAO extends AbstractDAO {
      * @return id of the new answer
      */
     public int insertAnswer(int messageId, int personId, String answer) throws Exception {
-        // FB_ANSWER has no sequence; if two answers are saved at the same moment, the primary key rejects the second one
-        int answerId = getCount("select coalesce(max(ANSWER_ID),0)+1 from FB_ANSWER");
+        int answerId = this.getNextKeyFromSequence("FB_ANSWER_SEQ");
         String query = "insert into FB_ANSWER (ANSWER_ID, ANSWER_DATE, ANSWER, PERSON_ID, MESSAGE_ID) " +
                 "values(?, LOCALTIMESTAMP(0), ?, ?, ?)";
         update(query, answerId, answer, personId, messageId);
