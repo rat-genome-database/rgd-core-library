@@ -58,21 +58,35 @@ public class RgdFbDAO extends AbstractDAO {
         return messageId;
     }
 
+    // a message with its type name, sender and number of answers: the columns FBQuestionQuery reads
+    private static final String QUESTION_SELECT =
+            "select q.MESSAGE_ID, q.SUBJECT, q.MESSAGE, q.MESSAGE_DATE, q.TYPE_ID, t.TYPE_NAME, q.PERSON_ID, " +
+            "p.FIRSTNAME, p.LASTNAME, p.EMAIL_ADDRESS, p.INSTITUTE, " +
+            "(select count(*) from FB_ANSWER a where a.MESSAGE_ID=q.MESSAGE_ID) ANSWER_COUNT " +
+            "from FB_QUESTION q " +
+            "left join FB_TYPE t on t.TYPE_ID=q.TYPE_ID " +
+            "left join FB_PERSON p on p.PERSON_ID=q.PERSON_ID ";
+
     /**
      * Get messages submitted in a date range, newest first, each with its type name, sender and number of answers.
      * @param fromDate messages submitted at or after this moment
      * @param toDate messages submitted before this moment
      */
     public List<FBQuestion> getQuestions(Date fromDate, Date toDate) throws Exception {
-        String query = "select q.MESSAGE_ID, q.SUBJECT, q.MESSAGE, q.MESSAGE_DATE, q.TYPE_ID, t.TYPE_NAME, q.PERSON_ID, " +
-                "p.FIRSTNAME, p.LASTNAME, p.EMAIL_ADDRESS, p.INSTITUTE, " +
-                "(select count(*) from FB_ANSWER a where a.MESSAGE_ID=q.MESSAGE_ID) ANSWER_COUNT " +
-                "from FB_QUESTION q " +
-                "left join FB_TYPE t on t.TYPE_ID=q.TYPE_ID " +
-                "left join FB_PERSON p on p.PERSON_ID=q.PERSON_ID " +
+        String query = QUESTION_SELECT +
                 "where q.MESSAGE_DATE>=? and q.MESSAGE_DATE<? " +
                 "order by q.MESSAGE_DATE desc, q.MESSAGE_ID desc";
         return FBQuestionQuery.execute(this, getDataSource(), query, fromDate, toDate);
+    }
+
+    /**
+     * Get one message with its type name, sender and number of answers.
+     * @return the message, or null if there is no message with this id
+     */
+    public FBQuestion getQuestion(int messageId) throws Exception {
+        String query = QUESTION_SELECT + "where q.MESSAGE_ID=?";
+        List<FBQuestion> questions = FBQuestionQuery.execute(this, getDataSource(), query, messageId);
+        return questions.isEmpty() ? null : questions.get(0);
     }
 
     /**
