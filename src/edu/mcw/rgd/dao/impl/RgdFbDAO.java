@@ -3,9 +3,12 @@ package edu.mcw.rgd.dao.impl;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.spring.FBPersonQuery;
+import edu.mcw.rgd.dao.spring.FBQuestionQuery;
 import edu.mcw.rgd.datamodel.FBPerson;
+import edu.mcw.rgd.datamodel.FBQuestion;
 
 import javax.sql.DataSource;
+import java.util.Date;
 import java.util.List;
 
 public class RgdFbDAO extends AbstractDAO {
@@ -53,6 +56,31 @@ public class RgdFbDAO extends AbstractDAO {
         int messageId = this.getNextKeyFromSequence("FB_QUESTION_SEQ");
         update(query, messageId, subject, message, type);
         return messageId;
+    }
+
+    /**
+     * Get messages submitted in a date range, newest first, each with its type name, sender and number of answers.
+     * @param fromDate messages submitted at or after this moment
+     * @param toDate messages submitted before this moment
+     */
+    public List<FBQuestion> getQuestions(Date fromDate, Date toDate) throws Exception {
+        String query = "select q.MESSAGE_ID, q.SUBJECT, q.MESSAGE, q.MESSAGE_DATE, q.TYPE_ID, t.TYPE_NAME, q.PERSON_ID, " +
+                "p.FIRSTNAME, p.LASTNAME, p.EMAIL_ADDRESS, p.INSTITUTE, " +
+                "(select count(*) from FB_ANSWER a where a.MESSAGE_ID=q.MESSAGE_ID) ANSWER_COUNT " +
+                "from FB_QUESTION q " +
+                "left join FB_TYPE t on t.TYPE_ID=q.TYPE_ID " +
+                "left join FB_PERSON p on p.PERSON_ID=q.PERSON_ID " +
+                "where q.MESSAGE_DATE>=? and q.MESSAGE_DATE<? " +
+                "order by q.MESSAGE_DATE desc, q.MESSAGE_ID desc";
+        return FBQuestionQuery.execute(this, getDataSource(), query, fromDate, toDate);
+    }
+
+    /**
+     * Get the day the oldest message was submitted.
+     * @return date as yyyy-MM-dd, or null if there are no messages
+     */
+    public String getOldestQuestionDate() throws Exception {
+        return getStringResult("select to_char(min(MESSAGE_DATE),'YYYY-MM-DD') from FB_QUESTION");
     }
 
     public void updatePerson(FBPerson person) throws Exception {
