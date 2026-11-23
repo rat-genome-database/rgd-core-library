@@ -107,6 +107,25 @@ public class RgdFbDAO extends AbstractDAO {
     }
 
     /**
+     * Save an answer to a message, dated now.
+     * @param messageId the message (FB_QUESTION) that is answered
+     * @param personId the person (FB_PERSON) who gives the answer
+     * @return id of the new answer
+     */
+    public int insertAnswer(int messageId, int personId, String answer) throws Exception {
+        // FB_ANSWER has no sequence; if two answers are saved at the same moment, the primary key rejects the second one
+        int answerId = getCount("select coalesce(max(ANSWER_ID),0)+1 from FB_ANSWER");
+        String query = "insert into FB_ANSWER (ANSWER_ID, ANSWER_DATE, ANSWER, PERSON_ID, MESSAGE_ID) " +
+                "values(?, LOCALTIMESTAMP(0), ?, ?, ?)";
+        update(query, answerId, answer, personId, messageId);
+        return answerId;
+    }
+
+    public void deleteAnswer(int answerId) throws Exception {
+        update("delete from FB_ANSWER where ANSWER_ID=?", answerId);
+    }
+
+    /**
      * Get the day the oldest message was submitted.
      * @return date as yyyy-MM-dd, or null if there are no messages
      */
