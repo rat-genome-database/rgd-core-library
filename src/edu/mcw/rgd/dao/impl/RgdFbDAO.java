@@ -39,6 +39,14 @@ public class RgdFbDAO extends AbstractDAO {
         return FBPersonQuery.execute(this,getDataSource(),query);
     }
 
+    /**
+     * Get the people who are RGD curators (IS_CURATOR is 'Y'), sorted by last name and first name.
+     */
+    public List<FBPerson> getCurators() throws Exception {
+        String query = "select * from FB_PERSON where IS_CURATOR='Y' order by LASTNAME, FIRSTNAME, PERSON_ID";
+        return FBPersonQuery.execute(this,getDataSource(),query);
+    }
+
     public int insertMessage(String subject, String message, int type, int personId) throws Exception {
         String query = "insert into FB_QUESTION (MESSAGE_ID, SUBJECT, MESSAGE, MESSAGE_DATE, TYPE_ID, PERSON_ID) " +
                 "values(?, ?, ?, LOCALTIMESTAMP(0), ?, ?)";
